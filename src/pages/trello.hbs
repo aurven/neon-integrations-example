@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+  </head>
+  <body>
+<!--  https://developer.atlassian.com/cloud/trello/guides/power-ups/building-a-power-up-part-one/#:~:text=The%20most%20important%20field%20is,into%20the%20iframe%20connector%20field    -->
+    <script src="https://p.trellocdn.com/power-up.min.js"></script>
+    <script>
+    TrelloPowerUp.initialize({
+      'card-buttons': function(t, options){
+        return [{
+          icon: 'https://cdn.glitch.global/0abe559b-8f5a-4b00-96f6-ff09b8d8b7f1/Neon_TrelloIcon.png?v=1738741548765',
+          text: 'Send to Neon',
+          callback: function(t) {
+            return t.popup({
+              title: "Send to Neon",
+              url: "trello/send-to-neon.html"
+            });
+          }
+        }];
+      },
+    });
+    </script>
+  </body>
+</html>
