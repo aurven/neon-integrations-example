@@ -5,7 +5,7 @@ const { CookieJar } = require('tough-cookie');
 const jar = new CookieJar();
 const client = wrapper(axios.create({ jar }));
 
-const NEON_BASEURL = process.env.NEON_BASEURL;
+const NEON_BASEURL = process.env.NEON_BO_URL;
 const NEON_USERNAME = process.env.NEON_USERNAME;
 const NEON_PASSWORD = process.env.NEON_PASSWORD;
 

@@ -1,9 +1,6 @@
-/**
- * This is the main Node.js server script for your project
- * Check out the two endpoints this back-end API provides in fastify.get and fastify.post below
- */
-
 const path = require("path");
+const neonToMethode = require('./src/helpers/neon-to-methode.js');
+const gdocsToNeon = require('./src/helpers/gdocs-to-neon.js');
 
 // Require the fastify framework and instantiate it
 const fastify = require("fastify")({
@@ -112,7 +109,8 @@ fastify.get('/test', async function handler (request, reply) {
   return { hello: 'world' }
 });
 
-const { processNeonStory } = require('./src/helpers/neon-to-methode.js');
+// From Neon to the World
+// Neon to Méthode
 fastify.post('/out/methode', async function handler (request, reply) {
   const { model } = request.body;
   
@@ -120,14 +118,16 @@ fastify.post('/out/methode', async function handler (request, reply) {
       return reply.status(400).json({ error: 'Missing model in request body' });
   }
   
-  const processResult = await processNeonStory(model);
+  const processResult = await neonToMethode.processNeonStory(model);
   
-  return { 
+  return reply.status(200).json({ 
     message: 'Webhook processed',
     data: processResult
-  }
+  });
 });
 
+// From the World to Neon
+// Trello to Neon
 fastify.get("/in/trello", function (request, reply) {
   // Build the params object to pass to the template
   let params = { seo: seo };
@@ -144,6 +144,23 @@ fastify.get("/in/trello/send-to-neon.html", function (request, reply) {
   return reply.view("/src/pages/trello/send-to-neon.html", params);
 });
 
+// Google Docs to Neon WIP
+fastify.get("/in/googledocs", function (request, reply) {
+  const { processedDocument } = request.body;
+  
+  if (!processedDocument) {
+      return reply.status(400).json({ error: 'Missing processedDocument in request body' });
+  }
+  
+  gdocsToNeon.sendToNeon(processedDocument);
+  
+  return reply.status(200).json({ 
+    message: 'Webhook processed',
+    data: {
+      familyRef: "neonId"
+    }
+  });
+});
 
 
 // Run the server and report out to the logs

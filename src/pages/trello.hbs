@@ -8,7 +8,7 @@
     <script src="https://p.trellocdn.com/power-up.min.js"></script>
     <script>
     TrelloPowerUp.initialize({
-      'card-buttons': function(t, options){
+      'card-buttons': function(t, options) {
         return [{
           icon: 'https://cdn.glitch.global/0abe559b-8f5a-4b00-96f6-ff09b8d8b7f1/Neon_TrelloIcon.png?v=1738741548765',
           text: 'Send to Neon',
@@ -20,6 +20,32 @@
           }
         }];
       },
+      'card-badges': function(t, options) {
+          return t.get('card', 'shared', 'estimate')
+            .then(function(estimate) {
+              return [{
+                icon: 'https://cdn.glitch.global/0abe559b-8f5a-4b00-96f6-ff09b8d8b7f1/Neon_TrelloIcon.png?v=1738741548765',
+                text: estimate || 'No Estimate!',
+                color: estimate ? 'blue' : null,
+              }];
+            });
+      },
+      'card-detail-badges': function(t, options) {
+        return t.get('card', 'shared', 'estimate')
+          .then(function(estimate) {
+            return [{
+              title: 'Estimate',
+              text: estimate || 'No Estimate!',
+              color: estimate ? 'blue' : null,
+              callback: function(t) {
+                return t.popup({
+                  title: "Send to Neon",
+                  url: "trello/send-to-neon.html"
+                });
+              }
+            }]
+          });
+      }
     });
     </script>
   </body>
