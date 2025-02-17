@@ -17,7 +17,8 @@
     "tough-cookie": "^4.0.0",
     "unorm": "^1.6.0",
     "remove-accents": "^0.5.0",
-    "dayjs": "^1.11.13"
+    "dayjs": "^1.11.13",
+    "node-html-parser": "^6.1.13"
   },
   "engines": {
     "node": "14.x"

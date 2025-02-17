@@ -1,0 +1,68 @@
+<html>
+  <link rel="stylesheet" href="https://p.trellocdn.com/power-up.min.css" />
+  <style>
+    body {
+      background: #c3ca5a;
+    }
+    #content {
+      padding: 30px;
+      text-align: center;
+      text-color: #f4aa97;
+    }
+    input[type="text"] {
+      margin: 0 auto;
+      padding: 10px;
+    }
+  </style>
+  <script src="https://p.trellocdn.com/power-up.min.js"></script>
+  <body>
+    <div id="content">
+      <h1>Authorize 🥑</h1>
+      <p>There could be a paragraph here about what is happening.</p>
+      <input
+        type="text"
+        id="username"
+        name="username"
+        value="testerino@trello.com"
+      />
+      <br />
+      <input
+        type="text"
+        id="password"
+        name="password"
+        value="TheBestPassword"
+      />
+      <br />
+      <button id="authorize">Authorize</button>
+    </div>
+  </body>
+  <script src="./js/authorize.js"></script>
+  <script>
+    var username = document.getElementById("username");
+    var password = document.getElementById("password");
+    var authBtn = document.getElementById("authorize");
+    authBtn.addEventListener("click", function () {
+      fetch("/auth", {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+        body: JSON.stringify({
+          username: username.value,
+          password: password.value,
+        }),
+      }).then(function (response) {
+        const token = response.token;
+        if (window.opener && typeof window.opener.authorize === "function") {
+          window.opener.authorize(token);
+        } else {
+          localStorage.setItem("token", token);
+        }
+        setTimeout(function () {
+          window.close();
+        }, 1 * 1000);
+      });
+    });
+  </script>
+</html>

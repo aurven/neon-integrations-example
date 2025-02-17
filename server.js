@@ -1,15 +1,14 @@
 const path = require("path");
-const neonToMethode = require('./src/helpers/neon-to-methode.js');
-const gdocsToNeon = require('./src/helpers/gdocs-to-neon.js');
+const neonToMethode = require("./src/neon-to-methode.js");
+const gdocsToNeon = require("./src/gdocs-to-neon.js");
+const storiesPopulator = require("./src/stories-populator.js");
+const guardianConnector = require("./src/connectors/guardian-connector.js");
 
 // Require the fastify framework and instantiate it
 const fastify = require("fastify")({
   // Set this to true for detailed logging:
   logger: false,
 });
-
-// ADD FAVORITES ARRAY VARIABLE FROM TODO HERE
-const favourites = [];
 
 // Setup our static files
 fastify.register(require("@fastify/static"), {
@@ -33,137 +32,176 @@ if (seo.url === "glitch-default") {
   seo.url = `https://${process.env.PROJECT_DOMAIN}.glitch.me`;
 }
 
-/**
- * Our home page route
- *
- * Returns src/pages/index.hbs with data built into it
- */
 fastify.get("/", function (request, reply) {
   // params is an object we'll pass to our handlebars template
   let params = { seo: seo };
-
-  // If someone clicked the option for a random color it'll be passed in the querystring
-  if (request.query.randomize) {
-    // We need to load our color data file, pick one at random, and add it to the params
-    const colors = require("./src/colors.json");
-    const allColors = Object.keys(colors);
-    let currentColor = allColors[(allColors.length * Math.random()) << 0];
-
-    // Add the color properties to the params object
-    params = {
-      color: colors[currentColor],
-      colorError: null,
-      seo: seo,
-    };
-  }
 
   // The Handlebars code will be able to access the parameter values and build them into the page
   return reply.view("/src/pages/index.hbs", params);
 });
 
-/**
- * Our POST route to handle and react to form submissions
- *
- * Accepts body data indicating the user choice
- */
-fastify.post("/", function (request, reply) {
-  // Build the params object to pass to the template
-  let params = { seo: seo };
-
-  // If the user submitted a color through the form it'll be passed here in the request body
-  let color = request.body.color;
-
-  // If it's not empty, let's try to find the color
-  if (color) {
-    // ADD CODE FROM TODO HERE TO SAVE SUBMITTED FAVORITES
-
-    // Load our color data file
-    const colors = require("./src/colors.json");
-
-    // Take our form submission, remove whitespace, and convert to lowercase
-    color = color.toLowerCase().replace(/\s/g, "");
-
-    // Now we see if that color is a key in our colors object
-    if (colors[color]) {
-      // Found one!
-      params = {
-        color: colors[color],
-        colorError: null,
-        seo: seo,
-      };
-    } else {
-      // No luck! Return the user value as the error property
-      params = {
-        colorError: request.body.color,
-        seo: seo,
-      };
-    }
-  }
-
-  // The Handlebars template will use the parameter values to update the page with the chosen color
-  return reply.view("/src/pages/index.hbs", params);
-});
-
 // Example
-fastify.get('/test', async function handler (request, reply) {
-  return { hello: 'world' }
+fastify.get("/test", async function handler(request, reply) {
+  return { hello: "world" };
 });
 
 // From Neon to the World
 // Neon to Méthode
-fastify.post('/out/methode', async function handler (request, reply) {
+fastify.post("/out/methode", async function handler(request, reply) {
+  const { apikey } = request.headers?.apikey
+    ? request.headers
+    : { apikey: null };
   const { model } = request.body;
-  
-  if (!model) {
-      return reply.status(400).json({ error: 'Missing model in request body' });
+
+  if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
+    return reply.status(401).send({ error: "Unauthorized" });
   }
-  
+
+  if (!model) {
+    return reply.status(400).send({ error: "Missing model in request body" });
+  }
+
   const processResult = await neonToMethode.processNeonStory(model);
-  
-  return reply.status(200).json({ 
-    message: 'Webhook processed',
-    data: processResult
+
+  return reply.status(200).send({
+    message: "Webhook processed",
+    data: processResult,
   });
 });
 
 // From the World to Neon
-// Trello to Neon
+// External Source to Neon
+fastify.post("/in/neon", async function handler(request, reply) {
+  const { apikey } = request.headers?.apikey
+    ? request.headers
+    : { apikey: null };
+  const { site, workspace, items } = request.body;
+
+  if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
+    return reply.status(401).send({ error: "Unauthorized" });
+  }
+
+  if (!items || items.length === 0) {
+    return reply.status(400).send({ error: "No items provided" });
+  }
+
+  const processResult = await storiesPopulator.populateNeonInstance(items, {
+    site,
+    workspace,
+  });
+
+  return reply.status(200).send({
+    message: "Items processed successfully",
+    data: processResult,
+  });
+});
+
+// External Source to Neon
+fastify.post("/in/neon/from/guardian", async function handler(request, reply) {
+  const { apikey } = request.headers?.apikey
+    ? request.headers
+    : { apikey: null };
+  const options = request.body;
+
+  const pageSize = options.pageSize || null;
+  const fromDate = options.fromDate || null;
+  const toDate = options.toDate || null;
+  const section = options.section;
+  const targetSite = options.targetSite;
+  const targetWorkspace = options.targetWorkspace;
+
+  if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
+    return reply.status(401).send({ error: "Unauthorized" });
+  }
+
+  if (!section || section.length === 0) {
+    return reply.status(400).send({ error: "No target section provided" });
+  }
+
+  const items = await guardianConnector.getItems({
+      pageSize,
+      section,
+      fromDate,
+      toDate,
+    },
+    false
+  );
+  
+  if (!items || items.length === 0) {
+    return reply.status(400).send({ error: "No items provided" });
+  }
+
+  const processResult = await storiesPopulator.populateNeonInstance(items, {
+    site: targetSite,
+    workspace: targetWorkspace,
+  });
+
+  return reply.status(200).send({
+    message: "Items processed successfully",
+    data: processResult,
+  });
+});
+
+/**
+ *
+ * Trello to Neon
+ *
+ */
+
 fastify.get("/in/trello", function (request, reply) {
-  // Build the params object to pass to the template
   let params = { seo: seo };
 
-  // The Handlebars template will use the parameter values to update the page with the chosen color
-  return reply.view("/src/pages/trello.hbs", params);
+  return reply.view("/src/trello/trello.hbs", params);
 });
 
 fastify.get("/in/trello/send-to-neon.html", function (request, reply) {
-  // Build the params object to pass to the template
   let params = { seo: seo };
 
-  // The Handlebars template will use the parameter values to update the page with the chosen color
-  return reply.view("/src/pages/trello/send-to-neon.html", params);
+  return reply.view("/src/trello/send-to-neon.hbs", params);
 });
 
-// Google Docs to Neon WIP
+fastify.get("/in/trello/authorization.html", function (request, reply) {
+  let params = { seo: seo };
+
+  return reply.view("/src/trello/authorization.hbs", params);
+});
+
+fastify.get("/in/trello/neon/login.html", function (request, reply) {
+  let params = { seo: seo };
+
+  return reply.view("/src/trello/neon-login.hbs", params);
+});
+
+/**
+ *
+ * Google Docs to Neon WIP
+ *
+ */
 fastify.get("/in/googledocs", function (request, reply) {
   const { processedDocument } = request.body;
-  
+
   if (!processedDocument) {
-      return reply.status(400).json({ error: 'Missing processedDocument in request body' });
+    return reply
+      .status(400)
+      .send({ error: "Missing processedDocument in request body" });
   }
-  
+
   gdocsToNeon.sendToNeon(processedDocument);
-  
-  return reply.status(200).json({ 
-    message: 'Webhook processed',
+
+  return reply.status(200).send({
+    message: "Webhook processed",
     data: {
-      familyRef: "neonId"
-    }
+      familyRef: "neonId",
+    },
   });
 });
 
 
-// Run the server and report out to the logs
+/**
+ *
+ * Run the server and report out to the logs
+ *
+ */
 fastify.listen(
   { port: process.env.PORT, host: "0.0.0.0" },
   function (err, address) {

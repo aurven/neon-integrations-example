@@ -24,9 +24,9 @@
           return t.get('card', 'shared', 'estimate')
             .then(function(estimate) {
               return [{
-                icon: 'https://cdn.glitch.global/0abe559b-8f5a-4b00-96f6-ff09b8d8b7f1/Neon_TrelloIcon.png?v=1738741548765',
-                text: estimate || 'No Estimate!',
-                color: estimate ? 'blue' : null,
+                icon: estimate ? 'https://cdn.glitch.global/0abe559b-8f5a-4b00-96f6-ff09b8d8b7f1/Neon_TrelloIcon.png?v=1738741548765' : null,
+                text: estimate || null,
+                color: estimate ? 'blue' : 'grey',
               }];
             });
       },
@@ -35,7 +35,7 @@
           .then(function(estimate) {
             return [{
               title: 'Estimate',
-              text: estimate || 'No Estimate!',
+              text: estimate || null,
               color: estimate ? 'blue' : null,
               callback: function(t) {
                 return t.popup({
@@ -45,7 +45,21 @@
               }
             }]
           });
+      },
+      'authorization-status': function(t, options){
+        return t.get('member', 'private', 'authToken')
+        .then(function(authToken) {
+          return { authorized: authToken != null }
+        });
+      },
+      'show-authorization': function(t, options){
+        return t.popup({
+          title: 'Authorize 🥑 Account',
+          url: 'trello/authorization.html',
+          height: 140,
+        });
       }
+      
     });
     </script>
   </body>

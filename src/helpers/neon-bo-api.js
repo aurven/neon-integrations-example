@@ -8,6 +8,7 @@ const client = wrapper(axios.create({ jar }));
 const NEON_BASEURL = process.env.NEON_BO_URL;
 const NEON_USERNAME = process.env.NEON_USERNAME;
 const NEON_PASSWORD = process.env.NEON_PASSWORD;
+const NEON_BO_APIKEY = process.env.NEON_BO_APIKEY;
 
 async function login() {
     const data = JSON.stringify({
@@ -20,7 +21,8 @@ async function login() {
         maxBodyLength: Infinity,
         url: `${NEON_BASEURL}/directory/sessions/login?rememberMe=true`,
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'neon-bo-access-key': NEON_BO_APIKEY
         },
         data: data
     };
@@ -43,7 +45,8 @@ async function logout(all = false) {
         maxBodyLength: Infinity,
         url: `${NEON_BASEURL}/directory/sessions/logout?all=${all ? 'true' : 'false'}`,
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'neon-bo-access-key': NEON_BO_APIKEY
         },
         data: data
     };
@@ -64,7 +67,8 @@ async function deleteNode(familyRef, force = false) {
         maxBodyLength: Infinity,
         url: `${NEON_BASEURL}/contents/nodes?familyRefs=${familyRef}&unpublish=${force}`,
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'neon-bo-access-key': NEON_BO_APIKEY
         }
     };
 
@@ -88,7 +92,8 @@ async function lockNode(familyRef) {
         maxBodyLength: Infinity,
         url: `${NEON_BASEURL}/contents/nodes/lock`,
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'neon-bo-access-key': NEON_BO_APIKEY
         },
         data: data
     };
@@ -113,7 +118,8 @@ async function unlockNode(familyRef, unlockMode = 'MAJOR') {
         maxBodyLength: Infinity,
         url: `${NEON_BASEURL}/contents/nodes/unlock?unlockMode=${unlockMode}`,
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'neon-bo-access-key': NEON_BO_APIKEY
         },
         data: data
     };
@@ -137,7 +143,8 @@ async function updateNodeContent(familyRef, xmlBodyString) {
         url: `${NEON_BASEURL}/contents/story/${familyRef}?saveMode=UPDATE_ONLY&keepCheckedout=false`,
         headers: {
             'Content-Type': 'application/xml',
-            'Accept': 'text/xml'
+            'Accept': 'text/xml',
+            'neon-bo-access-key': NEON_BO_APIKEY
         },
         data: data
     };
@@ -162,7 +169,8 @@ async function createNewStory(options) {
         maxBodyLength: Infinity,
         url: `${NEON_BASEURL}/contents/story`,
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'neon-bo-access-key': NEON_BO_APIKEY
         },
         data: data
     };
@@ -184,7 +192,8 @@ async function getSites() {
         maxBodyLength: Infinity,
         url: `${NEON_BASEURL}/core/sites`,
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'neon-bo-access-key': NEON_BO_APIKEY
         }
     };
 
@@ -207,7 +216,8 @@ async function createNewSiteNode(options, realm = 'default') {
         maxBodyLength: Infinity,
         url: `${NEON_BASEURL}/core/sites/nodes/create?realm=${realm}`,
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'neon-bo-access-key': NEON_BO_APIKEY
         },
         data: data
     };
@@ -231,7 +241,8 @@ async function publishSiteNode(options, realm = 'default', viewStatus = 'LIVE') 
         maxBodyLength: Infinity,
         url: `${NEON_BASEURL}/core/sites/nodes/publish?realm=${realm}&viewStatus=${viewStatus}`,
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'neon-bo-access-key': NEON_BO_APIKEY
         },
         data: data
     };
@@ -254,7 +265,8 @@ async function createUser(options) {
         maxBodyLength: Infinity,
         url: `${NEON_BASEURL}/directory/users/create`,
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'neon-bo-access-key': NEON_BO_APIKEY
         },
         data: data
     };
@@ -275,7 +287,8 @@ async function getUsers() {
         maxBodyLength: Infinity,
         url: `${NEON_BASEURL}/directory/users?limit=100`,
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'neon-bo-access-key': NEON_BO_APIKEY
         }
     };
 
@@ -301,7 +314,8 @@ async function addUserToGroup(userId, groupName) {
         maxBodyLength: Infinity,
         url: `${NEON_BASEURL}/directory/users/groups/add?realm=default`,
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'neon-bo-access-key': NEON_BO_APIKEY
         },
         data: data
     };
@@ -324,7 +338,8 @@ async function createGroup(options) {
         maxBodyLength: Infinity,
         url: `${NEON_BASEURL}/directory/groups/create`,
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'neon-bo-access-key': NEON_BO_APIKEY
         },
         data: data
     };
@@ -348,7 +363,8 @@ async function updateGroup(options) {
         maxBodyLength: Infinity,
         url: `${NEON_BASEURL}/directory/groups/update`,
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'neon-bo-access-key': NEON_BO_APIKEY
         },
         data: data
     };
@@ -371,7 +387,8 @@ async function updateWorkspace({parentWorkspaceName, targetWorkspaceId, options}
         maxBodyLength: Infinity,
         url: `${NEON_BASEURL}/contents/folders/config/${parentWorkspaceName}/${targetWorkspaceId}`,
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'neon-bo-access-key': NEON_BO_APIKEY
         },
         data: data
     };
@@ -394,7 +411,8 @@ async function updateWorkspaceTemplates({targetWorkspaceId, options}) {
         maxBodyLength: Infinity,
         url: `${NEON_BASEURL}/contents/folders/templates/${targetWorkspaceId}`,
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'neon-bo-access-key': NEON_BO_APIKEY
         },
         data: data
     };
@@ -421,7 +439,8 @@ async function createBasefolder(options) {
         maxBodyLength: Infinity,
         url: `${NEON_BASEURL}/contents/folders`,
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'neon-bo-access-key': NEON_BO_APIKEY
         },
         data: data
     };
@@ -435,6 +454,57 @@ async function createBasefolder(options) {
             console.error(JSON.stringify(error.response.data));
         });
 }
+
+// Workflow
+async function getNextSteps(familyRef = null) {
+    if (familyRef === null) return null;
+
+    const config = {
+        method: 'get',
+        maxBodyLength: Infinity,
+        url: `${NEON_BASEURL}/contents/nodes/${familyRef}/workflow/nextsteps`,
+        headers: {
+            'Content-Type': 'application/json',
+            'neon-bo-access-key': NEON_BO_APIKEY
+        }
+    };
+
+    return await client.request(config)
+        .then((response) => {
+            console.log(JSON.stringify(response.data));
+            return response;
+        })
+        .catch((error) => {
+            console.error(`❌ ERROR: ${error.code}`);
+            console.error(JSON.stringify(error.response.data));
+        });
+}
+
+async function nextStepAssignment(familyRef = null, options) {
+    if (familyRef === null) return null;
+
+    const config = {
+        method: 'get',
+        maxBodyLength: Infinity,
+        url: `${NEON_BASEURL}/contents/nodes/${familyRef}/workflow/nextsteps`,
+        headers: {
+            'Content-Type': 'application/json',
+            'neon-bo-access-key': NEON_BO_APIKEY
+        }
+    };
+
+    return await client.request(config)
+        .then((response) => {
+            console.log(JSON.stringify(response.data));
+            return response;
+        })
+        .catch((error) => {
+            console.error(`❌ ERROR: ${error.code}`);
+            console.error(JSON.stringify(error.response.data));
+        });
+}
+
+
 
 module.exports = {
   login,

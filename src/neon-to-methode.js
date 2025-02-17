@@ -1,14 +1,14 @@
-const unorm = require("unorm");
-const { remove } = require("remove-accents");
-const { jsonToXml } = require("./json-to-xml.js");
-const edapi = require("./edapi-utils.js");
-const dayjs = require("dayjs");
+const unorm = require('unorm');
+const { remove } = require('remove-accents');
+const { jsonToXml } = require('./helpers/json-to-xml.js');
+const edapi = require('./helpers/edapi-utils.js');
+const dayjs = require('dayjs');
 
 const USERNAME = process.env.EDAPI_USERNAME;
 const PASSWORD = process.env.EDAPI_PASSWORD;
-const TEMPLATE = "/SysConfig/Product/Shared/Templates/Default/story.xml";
-const CHANNEL = "Tabloid";
-const WORKFOLDER = "/Product/World";
+const TEMPLATE = '/SysConfig/Product/Shared/Templates/Default/story.xml';
+const CHANNEL = 'Tabloid';
+const WORKFOLDER = '/Product/World';
 
 // Process webhook data
 const processWebhookData = async (model) => {
@@ -31,13 +31,13 @@ const processWebhookData = async (model) => {
       normalized = remove(normalized);
 
       // Remove non-Latin characters (anything not a-z, A-Z, and spaces)
-      normalized = normalized.replace(/[^a-zA-Z\s]/g, "");
+      normalized = normalized.replace(/[^a-zA-Z\s]/g, '');
 
       // Replace multiple spaces with a single space
-      normalized = normalized.replace(/\s+/g, " ");
+      normalized = normalized.replace(/\s+/g, ' ');
 
       // Replace spaces with dashes
-      normalized = normalized.replace(/\s/g, "-");
+      normalized = normalized.replace(/\s/g, '-');
 
       console.log(normalized);
       return normalized;
@@ -89,7 +89,7 @@ const processNeonStory = async (model) => {
   try {
     const { info, name, content } = await processWebhookData(model);
 
-    const issueDate = dayjs().add(1, "day").format("YYYYMMDD");
+    const issueDate = dayjs().add(1, 'day').format('YYYYMMDD');
 
     await edapi.login({
       username: USERNAME,
@@ -105,7 +105,7 @@ const processNeonStory = async (model) => {
     });
     loid && (await edapi.putContentToStory(loid, content));
     await edapi.logout();
-    console.log("Neon item imported successfully!");
+    console.log('Neon item imported successfully!');
 
     return {
       source: info,
