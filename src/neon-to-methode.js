@@ -14,11 +14,11 @@ const WORKFOLDER = '/Product/World';
 const processWebhookData = async (model) => {
   const generateInfoFromModel = (model) => {
     return {
-      id: model.data.id,
-      title: model.data.title,
-      type: model.data.sys.type,
-      pubInfo: model.data.pubInfo,
-      attributes: model.data.attributes,
+      id: model.id,
+      title: model.title,
+      type: model.sys.type,
+      pubInfo: model.pubInfo,
+      attributes: model.attributes,
     };
   };
 
@@ -43,7 +43,7 @@ const processWebhookData = async (model) => {
       return normalized;
     }
 
-    const title = model.data.title;
+    const title = model.title;
     const normalizedTitle = normalizeToPlainText(title);
     const newName = `${normalizedTitle}.xml`;
 
@@ -52,7 +52,7 @@ const processWebhookData = async (model) => {
 
   const generateContentFromModel = async (model) => {
     const neonXmlContent = await jsonToXml({
-      json: model.data.files,
+      json: model.files,
       excludeAttributes: [
         "id",
         "enabledcropslist",

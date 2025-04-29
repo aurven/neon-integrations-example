@@ -37,6 +37,10 @@ to this section's matching END comment to see page-specific styles.
   display: none !important;
 }
 
+html {
+  height: 100%;
+}
+
 body {
   font-family: var(--sans-font);
   background: linear-gradient(135deg, var(--neon-blue), var(--neon-blue) 40%, var(--neon-pink));

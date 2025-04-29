@@ -18,51 +18,43 @@
   <body>
     <div id="content">
       <h1>Authorize 🥑</h1>
-      <p>There could be a paragraph here about what is happening.</p>
+      <p>Insert the APIKEY to connect to your Neon Integration</p>
       <input
         type="text"
-        id="username"
-        name="username"
-        value="testerino@trello.com"
+        id="token"
+        name="token"
+        value=""
+        placeholder="Add here APIKEY Token"
       />
       <br />
       <input
         type="text"
-        id="password"
-        name="password"
-        value="TheBestPassword"
+        id="neonusername"
+        name="neonusername"
+        value=""
+        placeholder="Add here your Neon Username"
       />
       <br />
       <button id="authorize">Authorize</button>
     </div>
   </body>
-  <script src="./js/authorize.js"></script>
+<!--   <script src="./js/authorize.js"></script> -->
   <script>
-    var username = document.getElementById("username");
-    var password = document.getElementById("password");
     var authBtn = document.getElementById("authorize");
+    var tokenInput = document.getElementById("token");
+    var neonUsernameInput = document.getElementById("neonusername");
     authBtn.addEventListener("click", function () {
-      fetch("/auth", {
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        method: "POST",
-        body: JSON.stringify({
-          username: username.value,
-          password: password.value,
-        }),
-      }).then(function (response) {
-        const token = response.token;
-        if (window.opener && typeof window.opener.authorize === "function") {
-          window.opener.authorize(token);
-        } else {
-          localStorage.setItem("token", token);
-        }
-        setTimeout(function () {
-          window.close();
-        }, 1 * 1000);
-      });
+      const token = tokenInput.value;
+      const neonusername = neonUsernameInput.value;
+      if (window.opener && typeof window.opener.authorize === "function") {
+        window.opener.authorize({ token, neonusername });
+      } else {
+        localStorage.setItem("token", token);
+        localStorage.setItem("neonusername", neonusername);
+      }
+      setTimeout(function () {
+        window.close();
+      }, 1 * 1000);
     });
   </script>
 </html>

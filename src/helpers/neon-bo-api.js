@@ -482,15 +482,18 @@ async function getNextSteps(familyRef = null) {
 
 async function nextStepAssignment(familyRef = null, options) {
     if (familyRef === null) return null;
+  
+    const data = JSON.stringify(options);
 
     const config = {
-        method: 'get',
+        method: 'post',
         maxBodyLength: Infinity,
-        url: `${NEON_BASEURL}/contents/nodes/${familyRef}/workflow/nextsteps`,
+        url: `${NEON_BASEURL}/workflow/instance/task/nextStepAssignment?objRef=${familyRef}`,
         headers: {
             'Content-Type': 'application/json',
             'neon-bo-access-key': NEON_BO_APIKEY
-        }
+        },
+        data: options
     };
 
     return await client.request(config)
@@ -504,6 +507,62 @@ async function nextStepAssignment(familyRef = null, options) {
         });
 }
 
+// Images Upload
+async function putNode({ boundary, requestBody }) {
+    const config = {
+        method: 'put',
+        maxBodyLength: Infinity,
+        url: `${NEON_BASEURL}/contents/nodes`,
+        headers: {
+            'Content-Type': `multipart/form-data; boundary=${boundary}`,
+            'neon-bo-access-key': NEON_BO_APIKEY
+        },
+        data: requestBody
+    };
+
+    return await client.request(config)
+        .then((response) => {
+            console.log(JSON.stringify(response.data));
+            return response.data;
+        })
+        .catch((error) => {
+            console.error(`❌ ERROR: ${error.code}`);
+            console.error(JSON.stringify(error.response.data));
+        });
+}
+
+// Promote
+async function promoteNode(familyRef = null, { targetSite, targetSection, mode }) {
+    if (familyRef === null) return null;
+  
+    const data = JSON.stringify({
+      "siteDetails": [{
+        "siteName": targetSite,
+        "sitePath": targetSection
+      }]
+    });
+
+    const config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        url: `${NEON_BASEURL}/contents/nodes/${familyRef}/promote/${mode || 'PREVIEW'}`,
+        headers: {
+            'Content-Type': 'application/json',
+            'neon-bo-access-key': NEON_BO_APIKEY
+        },
+        data
+    };
+
+    return await client.request(config)
+        .then((response) => {
+            console.log(JSON.stringify(response.data));
+            return response;
+        })
+        .catch((error) => {
+            console.error(`❌ ERROR: ${error.code}`);
+            console.error(JSON.stringify(error.response.data));
+        });
+}
 
 
 module.exports = {
@@ -526,4 +585,8 @@ module.exports = {
   updateWorkspace,
   updateWorkspaceTemplates,
   createBasefolder,
+  getNextSteps,
+  nextStepAssignment,
+  putNode,
+  promoteNode
 };

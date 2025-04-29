@@ -7,60 +7,88 @@
 <!--  https://developer.atlassian.com/cloud/trello/guides/power-ups/building-a-power-up-part-one/#:~:text=The%20most%20important%20field%20is,into%20the%20iframe%20connector%20field    -->
     <script src="https://p.trellocdn.com/power-up.min.js"></script>
     <script>
-    TrelloPowerUp.initialize({
-      'card-buttons': function(t, options) {
-        return [{
-          icon: 'https://cdn.glitch.global/0abe559b-8f5a-4b00-96f6-ff09b8d8b7f1/Neon_TrelloIcon.png?v=1738741548765',
-          text: 'Send to Neon',
-          callback: function(t) {
-            return t.popup({
-              title: "Send to Neon",
-              url: "trello/send-to-neon.html"
-            });
-          }
-        }];
-      },
-      'card-badges': function(t, options) {
-          return t.get('card', 'shared', 'estimate')
-            .then(function(estimate) {
-              return [{
-                icon: estimate ? 'https://cdn.glitch.global/0abe559b-8f5a-4b00-96f6-ff09b8d8b7f1/Neon_TrelloIcon.png?v=1738741548765' : null,
-                text: estimate || null,
-                color: estimate ? 'blue' : 'grey',
-              }];
-            });
-      },
-      'card-detail-badges': function(t, options) {
-        return t.get('card', 'shared', 'estimate')
-          .then(function(estimate) {
-            return [{
-              title: 'Estimate',
-              text: estimate || null,
-              color: estimate ? 'blue' : null,
-              callback: function(t) {
-                return t.popup({
-                  title: "Send to Neon",
-                  url: "trello/send-to-neon.html"
-                });
-              }
-            }]
-          });
-      },
-      'authorization-status': function(t, options){
-        return t.get('member', 'private', 'authToken')
-        .then(function(authToken) {
-          return { authorized: authToken != null }
-        });
-      },
-      'show-authorization': function(t, options){
-        return t.popup({
-          title: 'Authorize 🥑 Account',
-          url: 'trello/authorization.html',
-          height: 140,
-        });
-      }
+      const neonIcon = 'https://cdn.glitch.global/0abe559b-8f5a-4b00-96f6-ff09b8d8b7f1/Neon_TrelloIcon.png?v=1738741548765';
       
-    });
+      const priorityTranslation = (priority) => {
+        let output = '';
+        console.log(priority);
+        switch(priority) {
+          case '9':
+            output = '🟥 Critical!';
+            break;
+          case '8':
+            output = '🟧 High';
+            break;
+          case '5':
+            output = '🟨 Medium';
+            break;
+          case '1':
+            output = '🟩 Low';
+            break;
+          default:
+            output = null
+        }
+        
+        return output;
+      };
+      
+      TrelloPowerUp.initialize({
+        'card-buttons': function(t, options) {
+          return [{
+            icon: neonIcon,
+            text: 'Send to Neon',
+            callback: function(t) {
+              return t.popup({
+                title: "Send to Neon",
+                url: "trello/send-to-neon.html"
+              });
+            }
+          }];
+        },
+        'card-badges': function(t, options) {
+            return t.get('card', 'shared')
+              .then(function(cardInfo) {
+                const {priority, neonId} = cardInfo;
+                return [{
+                  icon: priority ? neonIcon : null,
+                  text: priorityTranslation(priority) || null,
+                  color: neonId ? 'blue' : 'grey',
+                }];
+              });
+        },
+        'card-detail-badges': function(t, options) {
+          return t.get('card', 'shared')
+            .then(function(cardInfo) {
+              const {priority, neonId} = cardInfo;
+              return [{
+                title: 'Neon',
+                icon: priority ? neonIcon : null,
+                text: priorityTranslation(priority) || null,
+                color: neonId ? 'blue' : null,
+                callback: function(t) {
+                  return t.popup({
+                    title: "Send to Neon",
+                    url: "trello/send-to-neon.html"
+                  });
+                }
+              }]
+            });
+        },
+        'authorization-status': function(t, options){
+          return t.get('member', 'private', 'authToken')
+          .then(function(authToken) {
+            return { authorized: authToken != null }
+          });
+        },
+        'show-authorization': function(t, options){
+          return t.popup({
+            title: 'Authorize 🥑 Account',
+            url: 'trello/authorization.html',
+            height: 140,
+          });
+        }
+
+      });
     </script>
   </body>
 </html>

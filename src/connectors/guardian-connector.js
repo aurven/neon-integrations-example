@@ -90,7 +90,7 @@ async function getItemsFromSite(options, saveLocally = false) {
                             headline: article.fields.headline,
                             summary: article.fields.trailText,
                             byline: article.fields.byline,
-                            figureURL: figureUrl,
+                            figureUrl,
                             localFigurePath: localFigurePath,
                             figureCaption: figureCaption,
                             figureCredit: figureCredit,

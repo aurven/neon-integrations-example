@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>News Widget</title>
+  
+  <!-- Tabulator Simple Theme CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/tabulator/5.5.2/css/tabulator_simple.min.css" rel="stylesheet">
+  
+  <!-- Tabulator JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tabulator/5.5.2/js/tabulator.min.js"></script>
+  
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  
+  <!-- shadcn/ui inspired styling -->
+  <link href="/resources/wires-list/wires-list.css" rel="stylesheet" />
+</head>
+<body>
+  <div class="container">
+    <div class="widget-header">
+      <h2>Latest News</h2>
+      <button id="refresh-btn" class="btn btn-secondary">Refresh</button>
+    </div>
+    
+    <div id="news-table"></div>
+    
+    <div id="news-modal" class="modal-backdrop">
+      <div class="modal">
+        <div class="modal-header">
+          <h3 class="modal-title">Content Details</h3>
+          <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <!-- Content will be dynamically inserted here -->
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary modal-close-btn">Close</button>
+          <button class="btn btn-primary create-story-btn">Create Story from this Wire</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const APIKEY = "{{apiKey}}";
+  </script>
+  <script src="/resources/wires-list/wires-list.js"></script>
+</body>
+</html>

@@ -25,23 +25,24 @@
     <meta name="twitter:card" content="summary">
 
     <!-- Import the webpage's stylesheet -->
-    <link rel="stylesheet" href="/style.css" />   
+    <link rel="stylesheet" href="/style.css" /> 
+    <link href="https://unpkg.com/filepond@^4/dist/filepond.css" rel="stylesheet" />
   </head>
   <body>
     <div class="wrapper">
       <div class="content" role="main">
         
         <!-- This is the start of content for our page -->
-        <h1 class="title">Hello Neon!</h1>
+        <h2 class="">Import a file, create an experience</h2>
         
         
         
-        <div class="illo-container">
+        <div class="illo-container" hidden>
           <img src="https://cdn.glitch.com/c62efef6-1e75-45cf-b248-afeccdda9477%2Fillustration.svg?v=1618196069568" class="illustration" alt="Node logo" />
         </div>
         
         <!-- Instructions on using this project -->
-        <div class="instructions">
+        <div class="instructions" hidden>
           <h2>
             Using this integration example with Glitch + Node.js
           </h2>
@@ -52,6 +53,10 @@
           </p>
         </div>
         
+        <form id="dropADoc" method="post">
+          <input type="file" />
+        </form>
+        
       </div>
     </div>
     <!-- The footer holds our remix button — you can use it for structure or cut it out ✂ -->
@@ -59,6 +64,32 @@
       <div class="links">Eidosmedia S.p.a. - 2025</div>
       
     </footer>
-    <script></script> 
+    <script src="https://unpkg.com/filepond@^4/dist/filepond.js"></script>
+    <script>
+      // Get a reference to the file input element
+      const inputElement = document.querySelector('input[type="file"]');
+
+      // Create a FilePond instance
+      const pond = FilePond.create(inputElement, {
+        allowMultiple: true,
+        acceptedFileTypes: [
+          // "application/msword", //.doc
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document", //.docx
+          // "application/zip", //.zip
+          // "application/x-7z-compressed", //.7z
+          // "application/vnd.rar", //.rar
+          // "application/gzip", //.gz
+          // "application/x-gzip", //.gz (from Mac and Windows)
+          // "application/x-tar", //.tar
+          "audio/mpeg", //.mp3
+          "audio/ogg", //.ogg / .oga
+        ],
+        server: {
+          process: "./drop/upload",
+          revert: null
+        },
+        labelIdle: 'Drag & Drop your file or <span class="filepond--label-action"> Browse </span>'
+      });
+    </script> 
   </body>
 </html>
