@@ -16,7 +16,7 @@ function getCreationOptions(itemData) {
     const cleanedUpTitle = utils.removeNonAlphanumeric(itemData.id || itemData.title);
     const fileName = cleanedUpTitle + '_' + (translation || language) + '.xml';
 
-    return {
+    const options = {
         "type": "article",
         "name": fileName,
         "template": "story.xml",
@@ -24,9 +24,14 @@ function getCreationOptions(itemData) {
         "workFolder": itemData.tgtWorkspace,
         "creationMode": "AUTO_RENAME",
         "timeSuffix": false,
-        "storageFolder": "SELECTED_WORKFOLDER",
-        "outputChannel": itemData.tgtSite
+        "storageFolder": "SELECTED_WORKFOLDER"
     }
+    
+    if (itemData.siteAsChannel) {
+      options['outputChannel'] = itemData.tgtSite;
+    }
+  
+    return options;
 }
 
 function getOptionsFromData(itemData) {
@@ -122,7 +127,7 @@ async function translateStory(story) {
   return story;
 }
 
-async function populateNeonInstance(data, options = {site: null, workspace: null, language: 'en', translate: null}) {
+async function populateNeonInstance(data, options = {site: null, workspace: null, language: 'en', translate: null, siteAsChannel: false}) {
     if (!options.site || !options.workspace) {
       const noOptsError = 'No options provided! {site, workspace}';
       console.log(noOptsError);
@@ -141,6 +146,7 @@ async function populateNeonInstance(data, options = {site: null, workspace: null
         story.tgtSection = options.section;
         story.language = options.language;
         story.translate = options.translate;
+        story.siteAsChannel = options.siteAsChannel;
         const directPublish = options.directPublish;
 
         return promiseAcc.then(async () => {

@@ -135,7 +135,7 @@ async function getObject(loid) {
     return objectsInfo?.items?.[0] || null;
 }
 
-async function createStory({ name, issueDate, channel, template, workFolder, attributes}) {
+async function createStory({ name, issueDate, channel, template, workFolder, attributes }) {
     const createEndpoint = `/v3/object/create/from/template/path?path=${template}`;
     const createUrl = `${EDAPIURL}${createEndpoint}`;
 
@@ -179,6 +179,42 @@ async function createStory({ name, issueDate, channel, template, workFolder, att
                 const storyLoid = response.data.result.id;
                 console.log(`Created. Loid is: ${storyLoid}`);
                 return storyLoid;
+            })
+            .catch((error) => {
+                console.error(`❌ ERROR: ${error.code}`);
+                console.error(JSON.stringify(error.response.data));
+                return null;
+            });
+    } catch (error) {
+        console.error('Creation failed...', error.response?.data || error.message);
+    }
+
+    return null;
+}
+
+async function createObject(form) {
+    const createEndpoint = `/v3/object/create`;
+    const createUrl = `${EDAPIURL}${createEndpoint}`;
+
+
+    const config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        maxContentLength: Infinity,
+        url: createUrl,
+        headers: {
+            ...form.getHeaders()
+        },
+        data: form
+    };
+
+    try {
+        return await client.request(config)
+            .then((response) => {
+                // console.log(JSON.stringify(response.data));
+                const objectLoid = response.data.result.id;
+                console.log(`Created. Loid is: ${objectLoid}`);
+                return response.data.result;
             })
             .catch((error) => {
                 console.error(`❌ ERROR: ${error.code}`);
@@ -249,6 +285,7 @@ module.exports = {
     getObjects,
     getObject,
     createStory,
+    createObject,
     readContent,
     putContentToStory
 };

@@ -22,6 +22,7 @@ async function completions({
     const config = {
         method: 'post',
         maxBodyLength: Infinity,
+        maxContentLength: Infinity,
         url: `https://api.openai.com/v1/chat/completions`,
         headers: {
             'Content-Type': 'application/json',
@@ -52,7 +53,7 @@ async function transcribeAudio(audioBuffer, filename, apiKey = OPENAI_APIKEY) {
   const form = new FormData();
   form.append('file', audioBuffer, filename);
   form.append('model', 'gpt-4o-transcribe'); // The options are gpt-4o-transcribe, gpt-4o-mini-transcribe, and whisper-1
-  form.append('prompt', 'This is an interview between two people. One asks questions, the other answers. Format the transcription with "Q:" and "A:" prefixes to distinguish each part. Do not hallucinate.');
+  //form.append('prompt', 'This is an interview between two people. One asks questions, the other answers. Do not hallucinate.');
   
   try {
     const response = await axios.post('https://api.openai.com/v1/audio/transcriptions', form, {

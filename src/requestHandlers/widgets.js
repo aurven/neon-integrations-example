@@ -1,4 +1,3 @@
-
 const mammoth = require("mammoth");
 const seo = require("../seo.json");
 const openai = require("../ai/openai.js");

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Visite Homepage</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .dashboard {
+            max-width: 800px;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        canvas {
+            margin-top: 20px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .footer img {
+            width: 120px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <h2>Dashboard Visite Homepage</h2>
+        <canvas id="viewsChart"></canvas>
+    </div>
+    
+    <script>
+        const ctx = document.getElementById('viewsChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Set 2024', 'Ott 2024', 'Nov 2024', 'Dic 2024', 'Gen 2025', 'Feb 2025'],
+                datasets: [
+                    {
+                        label: 'Sports Arena',
+                        data: [158500000, 159200000, 158800000, 159300000, 159700000, 151000000],
+                        borderColor: '#ff6f00',
+                        backgroundColor: 'rgba(255, 111, 0, 0.2)',
+                        fill: true,
+                    },
+                    {
+                        label: 'The Globe',
+                        data: [180000000, 190000000, 175000000, 185000000, 195000000, 158400000],
+                        borderColor: '#0073e6',
+                        backgroundColor: 'rgba(0, 115, 230, 0.2)',
+                        fill: true,
+                    },
+                    {
+                        label: 'Next Frontier',
+                        data: [100000000, 105000000, 102000000, 107000000, 108000000, 99000000],
+                        borderColor: '#00a650',
+                        backgroundColor: 'rgba(0, 166, 80, 0.2)',
+                        fill: true,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                scales: {
+                    y: {
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString('it-IT');
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

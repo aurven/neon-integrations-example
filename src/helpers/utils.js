@@ -28,6 +28,16 @@ function removeATags(htmlString) {
   return htmlString.replace?.(/<a\b[^>]*>|<\/a>/gi, "");
 }
 
+/**
+ * Removes all <![CDATA[...]]> blocks from a string, preserving the inner content.
+ * Works safely across multiple and multiline CDATA sections.
+ * @param {string} xml - The XML string.
+ * @returns {string} - XML string without CDATA wrappers.
+ */
+function stripAllCData(xml) {
+  return xml.replace(/<!\[CDATA\[(.*?)\]\]>/gs, '$1');
+}
+
 function getImageNameFromUrl(url) {
   try {
     const urlObj = new URL(url);
@@ -47,6 +57,20 @@ function textToHtmlParagraphs(text) {
     .map(paragraph => `<p>${paragraph.trim()}</p>`) // Wrap in <p> tags
     .join(""); // Join into a single string
 }
+
+function generateAutoId() {
+  const prefix = 'U';
+  const length = 13; // Total length after the prefix is 13 characters
+  const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  
+  let randomPart = '';
+  for (let i = 0; i < length; i++) {
+    randomPart += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  
+  return prefix + randomPart;
+}
+
 
 function bodyGenerator({
     mainImageReference = '',
@@ -162,8 +186,10 @@ module.exports = {
   polyfills,
   removeNonAlphanumeric,
   removeATags,
+  stripAllCData,
   getImageNameFromUrl,
   textToHtmlParagraphs,
+  generateAutoId,
   bodyGenerator,
   nextStepAssignmentBodyGenerator
 };
