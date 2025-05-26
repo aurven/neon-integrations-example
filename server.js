@@ -58,6 +58,7 @@ fastify.get("/test", async function handler(request, reply) {
 const utilitiesHandlers = require("./src/requestHandlers/utilities.js");
 fastify.post("/utilities/cleanup", utilitiesHandlers.cleanupHandler);
 fastify.post("/ai/openai", utilitiesHandlers.openAiHandler);
+fastify.get("/utilities/services", utilitiesHandlers.neonDiscoveryHandler);
 
 /**
  *
@@ -96,7 +97,7 @@ fastify.post("/out/sendgrid", neonExportHandlers.postSendgridHandler);
 const neonImportHandlers = require("./src/requestHandlers/neon-import.js");
 fastify.post("/in/neon", neonImportHandlers.importHandler);
 fastify.post("/in/neon/from/guardian", neonImportHandlers.importFromGuardianHandler);
-fastify.post("/in/neon/from/ansa", neonImportHandlers.importFromAnsaHandler);
+fastify.post("/in/neon/from/rss", neonImportHandlers.importFromRssHandler);
 fastify.post("/in/neon/from/guardian/test", neonImportHandlers.importTest);
 fastify.get("/in/googledocs", neonImportHandlers.importFromGoogleDocsHandler);
 fastify.post("/in/binary", neonImportHandlers.importBinaryHandler);

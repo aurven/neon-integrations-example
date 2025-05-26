@@ -51,7 +51,7 @@ async function imageToBase64(url) {
         const base64 = Buffer.from(response.data, 'binary').toString('base64');
         const mimeType = response.headers['content-type']; // Get the image MIME type
 
-        console.log(`{data:${mimeType};base64,${base64}}`);
+        //console.log(`{data:${mimeType};base64,${base64}}`);
       
         return { mimeType, base64 }
     } catch (error) {
@@ -72,13 +72,16 @@ async function uploadImage(options = {
   
   const { mimeType, base64 } = await imageToBase64(imageUrl);
   
+  const imageType = mimeType.split('/')[1];
+  const imageName = utils.hasFileExtension(options.imageName) ? options.imageName : options.imageName + '.' + imageType;
+  
   //return { mimeType, base64 };
   
   const boundary = 'WebKitFormBoundary4B2922fkRo7Alk4m';
   
   // Prepare the image part
   const imagePart = `--${boundary}\r\n` +
-                    `Content-Disposition: form-data; name="content"; filename="${options.imageName}"\r\n` +
+                    `Content-Disposition: form-data; name="content"; filename="${imageName}"\r\n` +
                     `Content-Type: ${mimeType}\r\n` +
                     `Content-Transfer-Encoding: base64\r\n\r\n` +
                     `${base64}\r\n`;
@@ -88,7 +91,7 @@ async function uploadImage(options = {
     "workFolder": options.workspace,
     "creationMode": "AUTO_RENAME",
     "timeSuffix": true,
-    "name": options.imageName
+    "name": imageName
   };
   
   const objectModelPart = `--${boundary}\r\n` +

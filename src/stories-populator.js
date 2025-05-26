@@ -29,6 +29,8 @@ function getCreationOptions(itemData) {
     
     if (itemData.siteAsChannel) {
       options['outputChannel'] = itemData.tgtSite;
+    } else {
+      options['edition'] = 'English-US';
     }
   
     return options;
@@ -72,7 +74,7 @@ async function newNodeFromStory(story, publishStory = true) {
         const creationOptions = getCreationOptions(story);
         const familyRef = await neon.createNewStory(creationOptions);
         const imageUpload = await images.uploadImageFromStory(story);
-        const mainImageReference = images.mainImageReferenceGenerator(imageUpload.node);
+        const mainImageReference = imageUpload.node ? images.mainImageReferenceGenerator(imageUpload.node) : null;
         story.mainImageReference = mainImageReference ? mainImageReference : null;
         const bodyOptions = story.translate ? await translateStory(story) : getOptionsFromData(story);
       

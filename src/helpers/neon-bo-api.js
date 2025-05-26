@@ -29,7 +29,9 @@ async function login() {
 
     await client.request(config)
         .then((response) => {
-            console.log(JSON.stringify(response.data));
+            //console.log(JSON.stringify(response.data));
+            const { user } = response.data;
+            console.log(`Neon Session initiated. Logged in as ${user.name} [${user.id}]`);
         })
         .catch((error) => {
             console.error(`❌ ERROR: ${error.code}`);
@@ -53,6 +55,7 @@ async function logout(all = false) {
 
     await client.request(config)
         .then((response) => {
+            console.log('Neon Session terminated successfully.')
             console.log(JSON.stringify(response.data));
         })
         .catch((error) => {
@@ -74,6 +77,7 @@ async function deleteNode(familyRef, force = false) {
 
     await client.request(config)
         .then((response) => {
+      
             console.log(JSON.stringify(response.data));
         })
         .catch((error) => {
@@ -556,7 +560,29 @@ async function promoteNode(familyRef = null, { targetSite, targetSection, mode }
     return await client.request(config)
         .then((response) => {
             console.log(JSON.stringify(response.data));
-            return response;
+            return response.data;
+        })
+        .catch((error) => {
+            console.error(`❌ ERROR: ${error.code}`);
+            console.error(JSON.stringify(error.response.data));
+        });
+}
+
+async function discoveryServices() {
+    const config = {
+        method: 'get',
+        maxBodyLength: Infinity,
+        url: `${NEON_BASEURL}/discovery/services`,
+        headers: {
+            'Content-Type': 'application/json',
+            'neon-bo-access-key': NEON_BO_APIKEY
+        }
+    };
+
+    return await client.request(config)
+        .then((response) => {
+            console.log('Called /discovery/services successfully');
+            return response.data;
         })
         .catch((error) => {
             console.error(`❌ ERROR: ${error.code}`);
@@ -588,5 +614,6 @@ module.exports = {
   getNextSteps,
   nextStepAssignment,
   putNode,
-  promoteNode
+  promoteNode,
+  discoveryServices
 };

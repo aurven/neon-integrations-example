@@ -1,7 +1,7 @@
 const storiesPopulator = require("../stories-populator.js");
 const imagesImporter = require("../images-importer.js");
 const guardianConnector = require("../connectors/guardian-connector.js");
-const ansaConnector = require("../connectors/ansa-connector.js");
+const rssConnector = require("../connectors/rss-connector.js");
 const gdocsToNeon = require("../gdocs-to-neon.js");
 
 // External Source to Neon
@@ -95,7 +95,7 @@ async function importFromGuardianHandler(request, reply) {
   });
 };
 
-async function importFromAnsaHandler(request, reply) {
+async function importFromRssHandler(request, reply) {
   const { apikey } = request.headers?.apikey
     ? request.headers
     : { apikey: null };
@@ -107,6 +107,7 @@ async function importFromAnsaHandler(request, reply) {
   const targetWorkspace = options.targetWorkspace;
   const targetSection = options.targetSection;
   const targetTranslation = options.targetTranslation;
+  const siteAsChannel = options.siteAsChannel;
 
   if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
     return reply.status(401).send({ error: "Unauthorized" });
@@ -116,7 +117,7 @@ async function importFromAnsaHandler(request, reply) {
     return reply.status(400).send({ error: "No rssUrl provided" });
   }
 
-  const items = await ansaConnector.getItems({
+  const items = await rssConnector.getItems({
       rssUrl,
       maxItems
     }
@@ -125,19 +126,23 @@ async function importFromAnsaHandler(request, reply) {
   if (!items || items.length === 0) {
     return reply.status(400).send({ error: "No items provided" });
   }
+  
+  const validItems = items.filter(item => item.headline && item.mainContent);
 
-  const processResult = storiesPopulator.populateNeonInstance(items, {
+  const processResult = storiesPopulator.populateNeonInstance(validItems, {
     site: targetSite,
     workspace: targetWorkspace,
     section: targetSection,
     language: 'it',
-    translate: targetTranslation
+    translate: targetTranslation,
+    siteAsChannel
   });
   
   console.log(processResult);
 
   return reply.status(200).send({
     message: "Import Process Started Successfully",
+    items
   });
 };
 
@@ -245,7 +250,7 @@ async function importTest(request, reply) {
 module.exports = {
   importHandler,
   importFromGuardianHandler,
-  importFromAnsaHandler,
+  importFromRssHandler,
   importFromGoogleDocsHandler,
   importBinaryHandler,
   importTest

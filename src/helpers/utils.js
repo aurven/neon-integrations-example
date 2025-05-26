@@ -38,6 +38,15 @@ function stripAllCData(xml) {
   return xml.replace(/<!\[CDATA\[(.*?)\]\]>/gs, '$1');
 }
 
+/**
+ * Checks if a filename string has a file extension.
+ * @param {string} filename - The filename (not a full path)
+ * @returns {boolean} - True if an extension exists, false otherwise
+ */
+function hasFileExtension(filename) {
+  return /^[^\\.]+(\.[^\\.]+)+$/.test(filename);
+}
+
 function getImageNameFromUrl(url) {
   try {
     const urlObj = new URL(url);
@@ -182,14 +191,74 @@ function nextStepAssignmentBodyGenerator(getNextStepsResult, targetStateName) {
     return nextStepAssignmentBody;
 }
 
+/**
+ * Parses a srcset string and returns an array of { url, width } entries.
+ * Supports width descriptors (e.g., 640w) and pixel density descriptors (e.g., 2x).
+ */
+function parseSrcset(srcset) {
+  return srcset
+    .split(',')
+    .map(item => item.trim())
+    .map(entry => {
+      const [url, descriptor] = entry.split(/\s+/);
+      if (!descriptor) return { url, width: 0 }; // fallback
+      if (descriptor.endsWith('w')) {
+        return { url, width: parseInt(descriptor, 10) };
+      } else if (descriptor.endsWith('x')) {
+        return { url, width: parseFloat(descriptor) * 1000 }; // scale x to approx width
+      }
+      return { url, width: 0 };
+    });
+}
+
+/**
+ * Given a <picture> element, returns the URL of the largest image in any srcset.
+ * @param {HTMLPictureElement} picture - The <picture> DOM element
+ * @returns {string|null} - URL of the largest image or null if none found
+ */
+function getLargestSrcFromPicture(picture) {
+  let candidates = [];
+  
+  const sourcesElements = picture.querySelectorAll('source');
+  
+  if (typeof sourcesElements === typeof undefined) return null;
+
+  // Check <source> elements
+  sourcesElements.forEach(source => {
+    const srcset = source.getAttribute('srcset');
+    if (srcset) {
+      candidates = candidates.concat(parseSrcset(srcset));
+    }
+  });
+
+  // Optionally include <img srcset> fallback
+  const img = picture.querySelector('img');
+  if (img) {
+    const srcset = img.getAttribute('srcset');
+    if (srcset) {
+      candidates = candidates.concat(parseSrcset(srcset));
+    } else if (img.src) {
+      candidates.push({ url: img.src, width: 1 }); // lowest priority fallback
+    }
+  }
+
+  if (candidates.length === 0) return null;
+
+  // Return the URL with the highest width
+  return candidates.sort((a, b) => b.width - a.width)[0].url;
+}
+
+
 module.exports = {
   polyfills,
   removeNonAlphanumeric,
   removeATags,
   stripAllCData,
+  hasFileExtension,
   getImageNameFromUrl,
   textToHtmlParagraphs,
   generateAutoId,
   bodyGenerator,
-  nextStepAssignmentBodyGenerator
+  nextStepAssignmentBodyGenerator,
+  getLargestSrcFromPicture
 };

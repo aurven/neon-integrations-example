@@ -81,7 +81,8 @@ async function asyncDropUploadWidgetHandler(request, reply) {
     const neonPopulatorOptions = {
         "site": "TheGlobe",
         "workspace": "/Convergent/Culture",
-        "directPublish": false
+        "directPublish": false,
+        "siteAsChannel": false,
     };
     
     const processResult = await storiesPopulator.populateNeonInstance([
