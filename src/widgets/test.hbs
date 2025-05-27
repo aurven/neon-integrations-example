@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Newsroom Analytics Dashboard</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: "Source Sans 3", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f7fa;
+      color: #333;
+    }
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-gap: 20px;
+      /* max-width: 1200px; */
+      max-width: 100%;
+      margin: 0 auto;
+    }
+    .card {
+      background-color: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .card h2 {
+      margin-top: 0;
+      color: #2c3e50;
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .header h1 {
+      color: #2c3e50;
+      margin-bottom: 10px;
+    }
+    .header p {
+      color: #7f8c8d;
+      margin: 0;
+    }
+    .tabs {
+      display: flex;
+      margin-bottom: 20px;
+      justify-content: center;
+    }
+    .tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      background-color: #f0f0f0;
+      border: none;
+      outline: none;
+      margin-right: 5px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+    .tab.active {
+      background-color: #2846e2;
+      color: white;
+    }
+    .tooltip {
+      position: absolute;
+      padding: 8px;
+      background-color: rgba(0, 0, 0, 0.7);
+      color: white;
+      border-radius: 4px;
+      pointer-events: none;
+      font-size: 12px;
+    }
+    .axis text {
+      font-size: 12px;
+    }
+    .axis line, .axis path {
+      stroke: #ccc;
+    }
+    .site-legend {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      margin: 0 10px;
+    }
+    .legend-color {
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+      margin-right: 5px;
+    }
+    [hidden] {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="header" hidden>
+    <h1>Newsroom Analytics Dashboard</h1>
+    <p>Data for April 23-29, 2025</p>
+  </div>
+
+  <div class="site-legend" hidden>
+    <div class="legend-item">
+      <div class="legend-color" style="background-color: #EE609C;"></div>
+      <span>The Globe</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background-color: #F9844E;"></div>
+      <span>Sports Arena</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background-color: #78B7FF;"></div>
+      <span>Next Frontier</span>
+    </div>
+  </div>
+  
+  <!-- <div class="tabs">
+    <button class="tab active" data-site="all">All Sites</button>
+    <button class="tab" data-site="dailynews">The Globe</button>
+    <button class="tab" data-site="sports">Sports Arena</button>
+    <button class="tab" data-site="science">Next Frontier</button>
+  </div> -->
+
+  <div class="tabs">
+    <button class="tab active" data-site="all">All Sites</button>
+    <button class="tab" data-site="dailynews">
+      <div class="legend-item">
+        <div class="legend-color" style="background-color: #EE609C;"></div>
+        <span>The Globe</span>
+      </div>
+    </button>
+    <button class="tab" data-site="sports">
+      <div class="legend-item">
+        <div class="legend-color" style="background-color: #F9844E;"></div>
+        <span>Sports Arena</span>
+      </div>
+    </button>
+    <button class="tab" data-site="science">
+      <div class="legend-item">
+        <div class="legend-color" style="background-color: #78B7FF;"></div>
+        <span>Next Frontier</span>
+      </div>
+    </button>
+  </div>
+
+  <div class="dashboard">
+    <div class="card">
+      <h2>Daily Visits</h2>
+      <div id="visits-chart"></div>
+    </div>
+    <div class="card">
+      <h2>Engagement Metrics</h2>
+      <div id="engagement-chart"></div>
+    </div>
+    <div class="card">
+      <h2>Top Articles</h2>
+      <div id="top-articles-chart"></div>
+    </div>
+    <div class="card">
+      <h2>Popular Keywords</h2>
+      <div id="keywords-chart"></div>
+    </div>
+  </div>
+  
+  <a href="https://demo-neon-app.eks-dev.dev.eidosmedia.io/neon/app/neon.html#editor/0296-1d247168969c-778722851d41-1000" target="_blank">Test</a>
+
+  <script>
+    // Generate fake data
+    const sites = ['The Globe', 'Sports Arena', 'Next Frontier'];
+    const siteColors = {
+      'The Globe': '#EE609C',
+      'Sports Arena': '#F9844E',
+      'Next Frontier': '#78B7FF'
+    };
+    
+    const dates = ['04-23', '04-24', '04-25', '04-26', '04-27', '04-28', '04-29'];
+    
+    // Visit data per site per day
+    const visitsData = sites.flatMap(site => 
+      dates.map((date, i) => {
+        const baseVisits = site === 'The Globe' ? 45000 : 
+                          site === 'Sports Arena' ? 32000 : 20000;
+        const weekdayFactor = (i < 5) ? 1.2 : 0.8; // More visits on weekdays
+        const randomFactor = 0.9 + Math.random() * 0.2;
+        return {
+          site,
+          date,
+          visits: Math.round(baseVisits * weekdayFactor * randomFactor)
+        };
+      })
+    );
+    
+    // Engagement data (avg. time on page, pages per session, bounce rate)
+    const engagementData = sites.map(site => {
+      const timeBase = site === 'Next Frontier' ? 4.2 : 
+                      site === 'The Globe' ? 2.8 : 3.5;
+      const pagesBase = site === 'Next Frontier' ? 2.4 : 
+                       site === 'The Globe' ? 3.2 : 2.8;
+      const bounceBase = site === 'Next Frontier' ? 35 : 
+                        site === 'Sports Arena' ? 42 : 48;
+                        
+      return {
+        site,
+        metrics: [
+          { name: 'Avg. Time (min)', value: timeBase + Math.random() * 0.8 },
+          { name: 'Pages/Session', value: pagesBase + Math.random() * 0.6 },
+          { name: 'Bounce Rate (%)', value: bounceBase + Math.random() * 5 }
+        ]
+      };
+    });
+    
+    // Top articles data
+    const topArticlesData = [
+      { site: 'The Globe', title: 'New Economic Policy Announced', views: 26543 },
+      { site: 'Sports Arena', title: 'Championship Finals Set for Weekend', views: 23189 },
+      { site: 'Next Frontier', title: 'Breakthrough in Quantum Computing', views: 18276 },
+      { site: 'The Globe', title: 'Mayor Unveils City Development Plan', views: 17894 },
+      { site: 'Sports Arena', title: 'Star Player Signs Record Contract', views: 15632 },
+      { site: 'Next Frontier', title: 'Climate Study Reveals Surprising Trends', views: 14521 },
+      { site: 'The Globe', title: 'Global Summit to Begin Tomorrow', views: 12786 },
+      { site: 'Sports Arena', title: 'Team Announces New Head Coach', views: 11458 },
+      { site: 'Next Frontier', title: 'Space Mission Discovers Water on Distant Planet', views: 10923 },
+    ];
+    
+    // Keywords data
+    const keywordsData = [
+      { site: 'The Globe', keyword: 'policy', count: 143 },
+      { site: 'The Globe', keyword: 'economy', count: 128 },
+      { site: 'The Globe', keyword: 'election', count: 115 },
+      { site: 'The Globe', keyword: 'development', count: 98 },
+      { site: 'The Globe', keyword: 'government', count: 92 },
+      { site: 'Sports Arena', keyword: 'championship', count: 167 },
+      { site: 'Sports Arena', keyword: 'finals', count: 152 },
+      { site: 'Sports Arena', keyword: 'contract', count: 131 },
+      { site: 'Sports Arena', keyword: 'tournament', count: 119 },
+      { site: 'Sports Arena', keyword: 'injury', count: 104 },
+      { site: 'Next Frontier', keyword: 'research', count: 138 },
+      { site: 'Next Frontier', keyword: 'discovery', count: 129 },
+      { site: 'Next Frontier', keyword: 'climate', count: 117 },
+      { site: 'Next Frontier', keyword: 'quantum', count: 106 },
+      { site: 'Next Frontier', keyword: 'space', count: 98 }
+    ];
+    
+    // Active site filter
+    let activeSite = 'all';
+
+    // Initialize dashboard
+    function initDashboard() {
+      drawVisitsChart();
+      drawEngagementChart();
+      drawTopArticlesChart();
+      drawKeywordsChart();
+      
+      // Set up tab clicks
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+          document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+          this.classList.add('active');
+          activeSite = this.dataset.site;
+          
+          // Redraw all charts
+          drawVisitsChart();
+          drawEngagementChart();
+          drawTopArticlesChart();
+          drawKeywordsChart();
+        });
+      });
+    }
+    
+    // Filter data based on active site
+    function filterBySite(data) {
+      if (activeSite === 'all') return data;
+      
+      const siteMap = {
+        'dailynews': 'The Globe',
+        'sports': 'Sports Arena',
+        'science': 'Next Frontier'
+      };
+      
+      return data.filter(d => d.site === siteMap[activeSite]);
+    }
+    
+    // Draw visits chart
+    function drawVisitsChart() {
+      const filteredData = activeSite === 'all' ? 
+        visitsData : 
+        visitsData.filter(d => {
+          const siteMap = {
+            'dailynews': 'The Globe',
+            'sports': 'Sports Arena',
+            'science': 'Next Frontier'
+          };
+          return d.site === siteMap[activeSite];
+        });
+      
+      const container = d3.select('#visits-chart');
+      container.html(''); // Clear previous chart
+      
+      const margin = {top: 20, right: 30, bottom: 40, left: 60};
+      const width = container.node().getBoundingClientRect().width - margin.left - margin.right;
+      const height = 300 - margin.top - margin.bottom;
+      
+      const svg = container.append('svg')
+        .attr('width', width + margin.left + margin.right)
+        .attr('height', height + margin.top + margin.bottom)
+        .append('g')
+        .attr('transform', `translate(${margin.left},${margin.top})`);
+        
+      // Create scales
+      const x = d3.scaleBand()
+        .domain(dates)
+        .range([0, width])
+        .padding(0.1);
+        
+      const y = d3.scaleLinear()
+        .domain([0, d3.max(filteredData, d => d.visits) * 1.1])
+        .range([height, 0]);
+        
+      // Add axes
+      svg.append('g')
+        .attr('class', 'axis')
+        .attr('transform', `translate(0,${height})`)
+        .call(d3.axisBottom(x));
+        
+      svg.append('g')
+        .attr('class', 'axis')
+        .call(d3.axisLeft(y).ticks(5).tickFormat(d => d3.format(',.0f')(d)));
+        
+      // Add axis labels
+      svg.append('text')
+        .attr('text-anchor', 'middle')
+        .attr('transform', `translate(${width/2},${height + margin.bottom - 5})`)
+        .style('font-size', '12px')
+        .text('Date (April 2025)');
+        
+      svg.append('text')
+        .attr('text-anchor', 'middle')
+        .attr('transform', `translate(${-margin.left + 15},${height/2})rotate(-90)`)
+        .style('font-size', '12px')
+        .text('Daily Visits');
+      
+      if (activeSite === 'all') {
+        // Group data by date
+        const groupedByDate = d3.group(filteredData, d => d.date);
+        
+        // Create stacked data
+        const stackedData = Array.from(groupedByDate, ([date, values]) => {
+          const obj = {date};
+          values.forEach(v => obj[v.site] = v.visits);
+          return obj;
+        });
+        
+        const stackKeys = sites;
+        const stack = d3.stack().keys(stackKeys);
+        const series = stack(stackedData);
+        
+        // Draw stacked bars
+        svg.append('g')
+          .selectAll('g')
+          .data(series)
+          .join('g')
+            .attr('fill', d => siteColors[d.key])
+            .selectAll('rect')
+            .data(d => d)
+            .join('rect')
+              .attr('x', d => x(d.data.date))
+              .attr('y', d => y(d[1]))
+              .attr('height', d => y(d[0]) - y(d[1]))
+              .attr('width', x.bandwidth())
+              .append('title')
+              .text(d => {
+                const site = series.findIndex(s => s.includes(d)) >= 0 ? sites[series.findIndex(s => s.includes(d))] : '';
+                return `${site}: ${d3.format(',')(d[1]-d[0])}\nDate: ${d.data.date}`;
+              });
+      } else {
+        // Simple bar chart for single site
+        svg.selectAll('rect')
+          .data(filteredData)
+          .join('rect')
+            .attr('x', d => x(d.date))
+            .attr('y', d => y(d.visits))
+            .attr('width', x.bandwidth())
+            .attr('height', d => height - y(d.visits))
+            .attr('fill', d => siteColors[d.site])
+            .append('title')
+            .text(d => `${d.site}: ${d3.format(',')(d.visits)}\nDate: ${d.date}`);
+      }
+    }
+    
+    // Draw engagement chart
+    function drawEngagementChart() {
+      const filteredData = filterBySite(engagementData);
+      
+      const container = d3.select('#engagement-chart');
+      container.html(''); // Clear previous chart
+      
+      const margin = {top: 20, right: 80, bottom: 40, left: 60};
+      const width = container.node().getBoundingClientRect().width - margin.left - margin.right;
+      const height = 300 - margin.top - margin.bottom;
+      
+      const svg = container.append('svg')
+        .attr('width', width + margin.left + margin.right)
+        .attr('height', height + margin.top + margin.bottom)
+        .append('g')
+        .attr('transform', `translate(${margin.left},${margin.top})`);
+        
+      // Prepare radar chart data
+      const metrics = ['Avg. Time (min)', 'Pages/Session', 'Bounce Rate (%)'];
+      
+      // Get max values for each metric
+      const maxValues = {
+        'Avg. Time (min)': d3.max(engagementData.flatMap(d => d.metrics.filter(m => m.name === 'Avg. Time (min)').map(m => m.value))),
+        'Pages/Session': d3.max(engagementData.flatMap(d => d.metrics.filter(m => m.name === 'Pages/Session').map(m => m.value))),
+        'Bounce Rate (%)': d3.max(engagementData.flatMap(d => d.metrics.filter(m => m.name === 'Bounce Rate (%)').map(m => m.value)))
+      };
+      
+      // For radar chart, we'll use a grouped bar chart instead
+      const x0 = d3.scaleBand()
+        .domain(metrics)
+        .range([0, width])
+        .padding(0.1);
+        
+      const x1 = d3.scaleBand()
+        .domain(filteredData.map(d => d.site))
+        .range([0, x0.bandwidth()])
+        .padding(0.05);
+        
+      const y = d3.scaleLinear()
+        .domain([0, d3.max(Object.values(maxValues)) * 1.1])
+        .range([height, 0]);
+        
+      // Add axes
+      svg.append('g')
+        .attr('class', 'axis')
+        .attr('transform', `translate(0,${height})`)
+        .call(d3.axisBottom(x0));
+        
+      svg.append('g')
+        .attr('class', 'axis')
+        .call(d3.axisLeft(y).ticks(5));
+        
+      // Add grouped bars
+      const groups = svg.selectAll('.metric-group')
+        .data(metrics)
+        .join('g')
+          .attr('class', 'metric-group')
+          .attr('transform', d => `translate(${x0(d)},0)`);
+          
+      groups.selectAll('rect')
+        .data(d => filteredData.map(site => ({
+          site: site.site,
+          value: site.metrics.find(m => m.name === d).value,
+          metric: d
+        })))
+        .join('rect')
+          .attr('x', d => x1(d.site))
+          .attr('y', d => y(d.value))
+          .attr('width', x1.bandwidth())
+          .attr('height', d => height - y(d.value))
+          .attr('fill', d => siteColors[d.site])
+          .append('title')
+          .text(d => `${d.site}\n${d.metric}: ${d3.format('.2f')(d.value)}`);
+          
+      // Add a legend
+      const legend = svg.append('g')
+        .attr('class', 'legend')
+        .attr('transform', `translate(${width + 20}, 0)`);
+        
+      if (filteredData.length > 1) {
+        filteredData.forEach((site, i) => {
+          const legendItem = legend.append('g')
+            .attr('transform', `translate(0, ${i * 20})`);
+            
+          legendItem.append('rect')
+            .attr('width', 12)
+            .attr('height', 12)
+            .attr('fill', siteColors[site.site]);
+            
+          legendItem.append('text')
+            .attr('x', 20)
+            .attr('y', 10)
+            .style('font-size', '12px')
+            .text(site.site);
+        });
+      }
+    }
+    
+    // Draw top articles chart
+    function drawTopArticlesChart() {
+      const filteredData = filterBySite(topArticlesData)
+        .sort((a, b) => b.views - a.views)
+        .slice(0, 5);
+      
+      const container = d3.select('#top-articles-chart');
+      container.html(''); // Clear previous chart
+      
+      const margin = {top: 20, right: 30, bottom: 40, left: 60};
+      const width = container.node().getBoundingClientRect().width - margin.left - margin.right;
+      const height = 300 - margin.top - margin.bottom;
+      
+      const svg = container.append('svg')
+        .attr('width', width + margin.left + margin.right)
+        .attr('height', height + margin.top + margin.bottom)
+        .append('g')
+        .attr('transform', `translate(${margin.left},${margin.top})`);
+        
+      // Create scales
+      const y = d3.scaleBand()
+        .domain(filteredData.map((d, i) => i))
+        .range([0, height])
+        .padding(0.2);
+        
+      const x = d3.scaleLinear()
+        .domain([0, d3.max(filteredData, d => d.views) * 1.1])
+        .range([0, width]);
+        
+      // Add axes
+      svg.append('g')
+        .attr('class', 'axis')
+        .attr('transform', `translate(0,${height})`)
+        .call(d3.axisBottom(x).ticks(5).tickFormat(d => d3.format(',.0f')(d)));
+        
+      // Add bars
+      svg.selectAll('rect')
+        .data(filteredData)
+        .join('rect')
+          .attr('x', 0)
+          .attr('y', (d, i) => y(i))
+          .attr('width', d => x(d.views))
+          .attr('height', y.bandwidth())
+          .attr('fill', d => siteColors[d.site])
+          .append('a')
+          .text(d => `${d.title}\n${d.site}\nViews: ${d3.format(',')(d.views)}`);
+          
+      // Add article titles
+      svg.selectAll('.article-title')
+        .data(filteredData)
+        .join('text')
+          .attr('class', 'article-title')
+          .attr('x', 5)
+          .attr('y', (d, i) => y(i) + y.bandwidth() / 2 + 5)
+          .attr('fill', 'white')
+          .style('font-size', '12px')
+          .style('font-weight', '500')
+          .text(d => {
+            const maxLength = 25;
+            return d.title.length > maxLength ? d.title.substring(0, maxLength) + '...' : d.title;
+          });
+          
+      // Add view counts
+      svg.selectAll('.view-count')
+        .data(filteredData)
+        .join('text')
+          .attr('class', 'view-count')
+          .attr('x', d => x(d.views) - 10)
+          .attr('y', (d, i) => y(i) + y.bandwidth() / 2 + 5)
+          .attr('text-anchor', 'end')
+          .attr('fill', 'white')
+          .style('font-size', '12px')
+          .style('font-weight', '600')
+          .text(d => d3.format(',')(d.views));
+          
+      // Add x-axis label
+      svg.append('text')
+        .attr('text-anchor', 'middle')
+        .attr('transform', `translate(${width/2},${height + margin.bottom - 5})`)
+        .style('font-size', '12px')
+        .text('Views');
+    }
+    
+    // Draw keywords chart
+    function drawKeywordsChart() {
+      const filteredData = filterBySite(keywordsData)
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 10);
+      
+      const container = d3.select('#keywords-chart');
+      container.html(''); // Clear previous chart
+      
+      // If we have multiple sites selected, we'll create a bubble chart
+      // Otherwise, we'll create a word cloud-like visualization
+      if (activeSite === 'all') {
+        drawBubbleChart(filteredData, container);
+      } else {
+        drawWordCloudChart(filteredData, container);
+      }
+    }
+    
+    function drawBubbleChart(data, container) {
+      const margin = {top: 20, right: 20, bottom: 20, left: 20};
+      const width = container.node().getBoundingClientRect().width - margin.left - margin.right;
+      const height = 300 - margin.top - margin.bottom;
+      
+      const svg = container.append('svg')
+        .attr('width', width + margin.left + margin.right)
+        .attr('height', height + margin.top + margin.bottom)
+        .append('g')
+        .attr('transform', `translate(${margin.left},${margin.top})`);
+      
+      // Create a radius scale
+      const radiusScale = d3.scaleSqrt()
+        .domain([d3.min(data, d => d.count), d3.max(data, d => d.count)])
+        .range([15, 40]);
+        
+      // Create a force simulation
+      const simulation = d3.forceSimulation(data)
+        .force('x', d3.forceX(width / 2).strength(0.05))
+        .force('y', d3.forceY(height / 2).strength(0.05))
+        .force('collide', d3.forceCollide(d => radiusScale(d.count) + 2).iterations(2));
+        
+      // Create tooltip
+      const tooltip = d3.select('body').append('div')
+        .attr('class', 'tooltip')
+        .style('opacity', 0);
+        
+      // Create circles for each keyword
+      const circles = svg.selectAll('circle')
+        .data(data)
+        .join('circle')
+          .attr('r', d => radiusScale(d.count))
+          .attr('fill', d => siteColors[d.site])
+          .attr('opacity', 0.7)
+          .on('mouseover', function(event, d) {
+            d3.select(this).attr('opacity', 1);
+            tooltip.transition()
+              .duration(200)
+              .style('opacity', 0.9);
+            tooltip.html(`${d.keyword}<br/>${d.site}<br/>${d.count} occurrences`)
+              .style('left', (event.pageX + 10) + 'px')
+              .style('top', (event.pageY - 28) + 'px');
+          })
+          .on('mouseout', function() {
+            d3.select(this).attr('opacity', 0.7);
+            tooltip.transition()
+              .duration(500)
+              .style('opacity', 0);
+          });
+          
+      // Add text labels
+      const labels = svg.selectAll('text')
+        .data(data)
+        .join('text')
+          .text(d => d.keyword)
+          .style('font-size', '10px')
+          .style('text-anchor', 'middle')
+          .style('fill', 'white')
+          .style('pointer-events', 'none');
+          
+      // Update positions on tick
+      simulation.on('tick', () => {
+        circles
+          .attr('cx', d => Math.max(radiusScale(d.count), Math.min(width - radiusScale(d.count), d.x)))
+          .attr('cy', d => Math.max(radiusScale(d.count), Math.min(height - radiusScale(d.count), d.y)));
+          
+        labels
+          .attr('x', d => Math.max(radiusScale(d.count), Math.min(width - radiusScale(d.count), d.x)))
+          .attr('y', d => Math.max(radiusScale(d.count), Math.min(height - radiusScale(d.count), d.y)) + 4);
+      });
+    }
+    
+    function drawWordCloudChart(data, container) {
+      const margin = {top: 20, right: 20, bottom: 20, left: 20};
+      const width = container.node().getBoundingClientRect().width - margin.left - margin.right;
+      const height = 300 - margin.top - margin.bottom;
+      
+      const svg = container.append('svg')
+        .attr('width', width + margin.left + margin.right)
+        .attr('height', height + margin.top + margin.bottom)
+        .append('g')
+        .attr('transform', `translate(${width/2 + margin.left},${height/2 + margin.top})`);
+        
+      // Create font size scale
+      const fontScale = d3.scaleLinear()
+        .domain([d3.min(data, d => d.count), d3.max(data, d => d.count)])
+        .range([12, 32]);
+        
+      // Create positions
+      const positions = [
+        {x: 0, y: 0},
+        {x: -100, y: -50},
+        {x: 100, y: -50},
+        {x: -120, y: 50},
+        {x: 120, y: 50},
+        {x: -70, y: -100},
+        {x: 70, y: -100},
+        {x: -70, y: 100},
+        {x: 70, y: 100},
+        {x: 0, y: -80}
+      ];
+      
+      // Add keywords
+      svg.selectAll('text')
+        .data(data)
+        .join('text')
+          .attr('x', (d, i) => positions[i % positions.length].x)
+          .attr('y', (d, i) => positions[i % positions.length].y)
+          .style('font-size', d => fontScale(d.count) + 'px')
+          .style('font-weight', '600')
+          .style('text-anchor', 'middle')
+          .style('fill', d => siteColors[d.site])
+          .text(d => d.keyword)
+          .append('title')
+          .text(d => `${d.keyword}: ${d.count} occurrences`);
+    }
+    
+    // Initialize the dashboard
+    window.addEventListener('DOMContentLoaded', initDashboard);
+    window.addEventListener('resize', () => {
+      drawVisitsChart();
+      drawEngagementChart();
+      drawTopArticlesChart();
+      drawKeywordsChart();
+    });
+  </script>
+</body>
+</html>

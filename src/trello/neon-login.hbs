@@ -1,0 +1,60 @@
+<html>
+  <link rel="stylesheet" href="https://p.trellocdn.com/power-up.min.css" />
+  <style>
+    body {
+      background: #c3ca5a;
+    }
+    #content {
+      padding: 30px;
+      text-align: center;
+      text-color: #f4aa97;
+    }
+    input[type="text"] {
+      margin: 0 auto;
+      padding: 10px;
+    }
+  </style>
+  <script src="https://p.trellocdn.com/power-up.min.js"></script>
+  <body>
+    <div id="content">
+      <h1>Authorize 🥑</h1>
+      <p>Insert the APIKEY to connect to your Neon Integration</p>
+      <input
+        type="text"
+        id="token"
+        name="token"
+        value=""
+        placeholder="Add here APIKEY Token"
+      />
+      <br />
+      <input
+        type="text"
+        id="neonusername"
+        name="neonusername"
+        value=""
+        placeholder="Add here your Neon Username"
+      />
+      <br />
+      <button id="authorize">Authorize</button>
+    </div>
+  </body>
+<!--   <script src="./js/authorize.js"></script> -->
+  <script>
+    var authBtn = document.getElementById("authorize");
+    var tokenInput = document.getElementById("token");
+    var neonUsernameInput = document.getElementById("neonusername");
+    authBtn.addEventListener("click", function () {
+      const token = tokenInput.value;
+      const neonusername = neonUsernameInput.value;
+      if (window.opener && typeof window.opener.authorize === "function") {
+        window.opener.authorize({ token, neonusername });
+      } else {
+        localStorage.setItem("token", token);
+        localStorage.setItem("neonusername", neonusername);
+      }
+      setTimeout(function () {
+        window.close();
+      }, 1 * 1000);
+    });
+  </script>
+</html>

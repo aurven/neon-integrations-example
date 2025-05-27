@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kubernetes Services Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.7/handlebars.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #326ce5; /* Kubernetes blue */
+            --secondary-color: #f2f4f8;
+            --accent-color: #ff9800;
+            --text-color: #333;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: #f9f9fb;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e1e4e8;
+        }
+        
+        .logo {
+            width: 40px;
+            height: 40px;
+            margin-right: 15px;
+            color: var(--primary-color);
+        }
+        
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0;
+            color: var(--primary-color);
+        }
+        
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            flex: 1;
+            box-shadow: var(--card-shadow);
+            border-top: 3px solid var(--primary-color);
+        }
+        
+        .stat-card h3 {
+            margin-top: 0;
+            font-size: 14px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .stat-card p {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0;
+            color: var(--primary-color);
+        }
+        
+        .services-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .service-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .service-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .service-icon {
+            width: 40px;
+            height: 40px;
+            background-color: var(--secondary-color);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: var(--primary-color);
+        }
+        
+        .service-title {
+            flex: 1;
+        }
+        
+        .service-title h2 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .service-title p {
+            margin: 0;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .service-details {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 6px 15px;
+            font-size: 14px;
+        }
+        
+        .detail-label {
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .detail-value {
+            color: var(--text-color);
+            word-break: break-word;
+        }
+        
+        .region-tag {
+            display: inline-block;
+            background-color: var(--accent-color);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-top: 5px;
+        }
+        
+        .no-services {
+            text-align: center;
+            padding: 40px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .no-services i {
+            font-size: 48px;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .no-services h2 {
+            margin: 0;
+            color: #666;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e1e4e8;
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-dharmachakra fa-2x"></i>
+            </div>
+            <h1>Kubernetes Services Dashboard</h1>
+        </header>
+
+        <div id="content">
+            <div class="stats">
+                <div class="stat-card">
+                    <h3>Total Services</h3>
+                    <p>{{data.count}}</p>
+                </div>
+                <div class="stat-card" hidden>
+                    <h3>Unique Namespaces</h3>
+                    <p></p>
+                </div>
+                <div class="stat-card" hidden>
+                    <h3>Unique Regions</h3>
+                    <p></p>
+                </div>
+            </div>
+
+            {{#if data.result.length}}
+                <div class="services-container">
+                    {{#each data.result}}
+                        <div class="service-card">
+                            <div class="service-header">
+                                <div class="service-icon">
+                                    <i class="fas fa-server"></i>
+                                </div>
+                                <div class="service-title">
+                                    <h2>{{id}}</h2>
+                                    <p>{{type}}</p>
+                                </div>
+                            </div>
+                            <div class="service-details">
+                                <div class="detail-label">Namespace:</div>
+                                <div class="detail-value">{{meta.kubernetes.namespace}}</div>
+
+                                <div class="detail-label">Kind:</div>
+                                <div class="detail-value">{{meta.kubernetes.kind}}</div>
+
+                                <div class="detail-label">Context Path:</div>
+                                <div class="detail-value">{{meta.contextPath}}</div>
+
+                                <div class="detail-label">Hostname:</div>
+                                <div class="detail-value">{{meta.hostname}}</div>
+
+                                <div class="detail-label">IP:</div>
+                                <div class="detail-value">{{meta.ip}}</div>
+
+                                <div class="detail-label">Node:</div>
+                                <div class="detail-value">{{meta.kubernetes.nodeName}}</div>
+
+                                <div class="detail-label">Public URI:</div>
+                                <div class="detail-value">{{publicUri}}</div>
+                            </div>
+                            <div class="region-tag">
+                                <i class="fas fa-globe-americas"></i> {{regionName}}
+                            </div>
+                        </div>
+                    {{/each}}
+                </div>
+            {{else}}
+                <div class="no-services">
+                    <i class="fas fa-search"></i>
+                    <h2>No services found</h2>
+                    <p>There are currently no Kubernetes services to display.</p>
+                </div>
+            {{/if}}
+        </div>
+
+        <footer>
+            <p>Kubernetes Services Dashboard &copy; 2025</p>
+        </footer>
+    </div>
+</body>
+</html>

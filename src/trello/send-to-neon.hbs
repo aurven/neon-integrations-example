@@ -1,0 +1,103 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="https://p.trellocdn.com/power-up.min.css" />
+    <style>
+      select {
+        height: 30px;
+      }
+    </style>
+    <script src="https://p.trellocdn.com/power-up.min.js"></script>
+  </head>
+  <body>
+    <form id="neon">
+      <label for="prioritySize">Priority:</label>
+      <select name="prioritySize" id="prioritySize">
+        <option value="9">🟥 Critical!</option>
+        <option value="8">🟧 High</option>
+        <option value="5">🟨 Medium</option>
+        <option value="0">🟩 Low</option>
+      </select>
+      <label for="neonId">Neon Id:</label>
+      <input type="text" name="neonId" id="neonId" placeholder="None" disabled/>
+      <button type="submit" class="mod-primary">Create in Neon</button>
+      <button id="openInNeon" type="button" class="mod-primary">Open in Neon</button>
+    </form>
+    <script>
+      var t = TrelloPowerUp.iframe();
+      
+      window.openInNeon.addEventListener("click", function(event) {
+        event.preventDefault();
+        const familyRef = window.neonId.value;
+        familyRef && window.open(`{{neonAppUrl}}/neon/app/neon.html#open/${familyRef}`);
+      });
+      
+      window.neon.addEventListener("submit", function (event) {
+        // Stop the browser trying to submit the form itself.
+        event.preventDefault();
+        return t
+          .set("card", "shared", "priority", window.prioritySize.value)
+          .then(function () {
+            t.card('all')
+              .then(function (data) {
+                console.log(JSON.stringify(data, null, 2));
+                return data
+              })
+              .then(function (data) {
+                t.get('member', 'private')
+                  .then(memberInfo => {
+                  
+                  console.log(memberInfo);
+                  
+                  const token = memberInfo.authToken;
+                  const neonUsername = memberInfo.neonUsername;
+                  
+                  data.neonUsername = neonUsername;
+
+                  const requestHeaders = new Headers();
+                  requestHeaders.append("ApiKey", token);
+
+                  const requestOptions = {
+                    method: "POST",
+                    headers: requestHeaders,
+                    redirect: "follow",
+                    body: JSON.stringify(data)
+                  };
+                  
+                  console.log(requestOptions);
+
+                  fetch("/in/trello/neon", requestOptions)
+                    .then((response) => response.json())
+                    .then((result) => {
+                      console.log("result");
+                      console.log(result);
+                      t.set("card", "shared", "neonId", result.data?.neon?.familyRef)
+                        .then((result) => {
+                          console.log("result after set");
+                          console.log(result);
+                          t.closePopup();
+                        });
+                    })
+                    .catch((error) => console.error(error))
+                });
+              });
+          });
+      });
+      
+      t.render(function () {
+          return t
+            .get("card", "shared")
+            .then(function (cardInfo) {
+              const {priority, neonId} = cardInfo;
+              window.prioritySize.value = priority;
+              window.neonId.value = neonId || '';
+              if (!neonId) {
+                window.neonId.style.display = 'none';
+              }
+            })
+            .then(function () {
+              t.sizeTo("#neon").done();
+            });
+      });
+    </script>
+  </body>
+</html>

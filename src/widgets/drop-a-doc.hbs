@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    
+    <!-- 
+      This is the main Handlebars template for the site 
+      - When the user visits the homepage or submits a color the app calls the endpoints in server.js
+      - The server script passes data in here and the Handlebars code builds it into the HTML page
+    -->
+    
+    <meta charset="utf-8" />
+    <link rel="icon" href="https://glitch.com/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>{{seo.title}}</title>
+    
+    <!-- Meta tags for SEO and social sharing -->
+    <link rel="canonical" href="{{seo.url}}">
+    <meta name="description" content="{{seo.description}}">
+    <meta property="og:title" content="{{seo.title}}">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="{{seo.url}}">
+    <meta property="og:description" content="{{seo.description}}">
+    <meta property="og:image" content="{{seo.image}}">
+    <meta name="twitter:card" content="summary">
+
+    <!-- Import the webpage's stylesheet -->
+    <link rel="stylesheet" href="/style.css" /> 
+    <link href="https://unpkg.com/filepond@^4/dist/filepond.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="wrapper">
+      <div class="content" role="main">
+        
+        <!-- This is the start of content for our page -->
+        <h2 class="">Import a file, create an experience</h2>
+        
+        
+        
+        <div class="illo-container" hidden>
+          <img src="https://cdn.glitch.com/c62efef6-1e75-45cf-b248-afeccdda9477%2Fillustration.svg?v=1618196069568" class="illustration" alt="Node logo" />
+        </div>
+        
+        <!-- Instructions on using this project -->
+        <div class="instructions" hidden>
+          <h2>
+            Using this integration example with Glitch + Node.js
+          </h2>
+          <p>
+            This is the Glitch <strong>neon-integrations-example</strong> project.<br>
+            From here you can create a new application to create simple Node.js
+            integrations between Neon and the rest of the world.
+          </p>
+        </div>
+        
+        <form id="dropADoc" method="post">
+          <input type="file" />
+        </form>
+        
+      </div>
+    </div>
+    <!-- The footer holds our remix button — you can use it for structure or cut it out ✂ -->
+    <footer class="footer" hidden>
+      <div class="links">Eidosmedia S.p.a. - 2025</div>
+      
+    </footer>
+    <script src="https://unpkg.com/filepond@^4/dist/filepond.js"></script>
+    <script>
+      // Get a reference to the file input element
+      const inputElement = document.querySelector('input[type="file"]');
+
+      // Create a FilePond instance
+      const pond = FilePond.create(inputElement, {
+        allowMultiple: true,
+        acceptedFileTypes: [
+          // "application/msword", //.doc
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document", //.docx
+          // "application/zip", //.zip
+          // "application/x-7z-compressed", //.7z
+          // "application/vnd.rar", //.rar
+          // "application/gzip", //.gz
+          // "application/x-gzip", //.gz (from Mac and Windows)
+          // "application/x-tar", //.tar
+          "audio/mpeg", //.mp3
+          "audio/ogg", //.ogg / .oga
+        ],
+        server: {
+          // process: "./drop/upload",
+          revert: null,
+          // onload: (response) => { console.log(response.data) },
+          process: (fieldName, file, metadata, load, error, progress, abort, transfer, options) => {
+              // fieldName is the name of the input field
+              // file is the actual file object to send
+              const formData = new FormData();
+              formData.append(fieldName, file, file.name);
+
+              const request = new XMLHttpRequest();
+              request.open('POST', './drop/upload');
+
+              // Should call the progress method to update the progress to 100% before calling load
+              // Setting computable to false switches the loading indicator to infinite mode
+              request.upload.onprogress = (e) => {
+                  progress(e.lengthComputable, e.loaded, e.total);
+              };
+
+              // Should call the load method when done and pass the returned server file id
+              // this server file id is then used later on when reverting or restoring a file
+              // so your server knows which file to return without exposing that info to the client
+              request.onload = function () {
+                  if (request.status >= 200 && request.status < 300) {
+                      // the load method accepts either a string (id) or an object
+                      load(request.responseText);
+                  } else {
+                      // Can call the error method if something is wrong, should exit after
+                      error('oh no');
+                  }
+              };
+
+              request.send(formData);
+
+              // Should expose an abort method so the request can be cancelled
+              return {
+                  abort: () => {
+                      // This function is entered if the user has tapped the cancel button
+                      request.abort();
+
+                      // Let FilePond know the request has been cancelled
+                      abort();
+                  },
+              };
+          },
+        },
+        labelIdle: 'Drag & Drop your file or <span class="filepond--label-action"> Browse </span>'
+      });
+    </script> 
+  </body>
+</html>

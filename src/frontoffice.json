@@ -1,0 +1,10 @@
+{
+  "TheGlobe": {
+    "id": "TheGlobe",
+    "urls": {
+      "live": "https://theglobe-demo-site.neon.eks-dev.dev.eidosmedia.io",
+      "preview": "https://theglobe-preview-demo-site.neon.eks-dev.dev.eidosmedia.io",
+      "stage": "https://theglobe-stage-demo-site.neon.eks-dev.dev.eidosmedia.io"
+    }
+  }
+}

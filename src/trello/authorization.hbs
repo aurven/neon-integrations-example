@@ -1,0 +1,46 @@
+<html>
+  <head>
+    <script src="https://p.trellocdn.com/power-up.min.js"></script>
+    <link rel="stylesheet" href="https://p.trellocdn.com/power-up.min.css" />
+    <style>
+      select {
+        height: 30px;
+      }
+      * {
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="content">
+      <p>We need you to authorize first!</p>
+      <button id="authorize" type="submit" class="mod-primary">
+        Authorize
+      </button>
+    </div>
+  </body>
+<!--   <script src="./js/auth.js"></script> -->
+  <script>
+    var t = window.TrelloPowerUp.iframe();
+
+    t.render(function () {
+      return t.sizeTo("#content");
+    });
+
+    var oauthUrl = window.origin + "/in/trello/neon/login.html";
+
+    var authBtn = document.getElementById("authorize");
+    authBtn.addEventListener("click", function () {
+      t.authorize(oauthUrl)
+        .then(function ({ token, neonusername }) {
+          return t.set("member", "private", {
+            "authToken": token,
+            "neonUsername": neonusername
+          });
+        })
+        .then(function () {
+          return t.closePopup();
+        });
+    });
+  </script>
+</html>
