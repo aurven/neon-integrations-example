@@ -118,8 +118,6 @@ async function asyncDropUploadWidgetHandler(request, reply) {
       audioTypes: supportedAudios
     }
   });
-  
-  
 }
 
 function wiresWidgetHandler (request, reply) {

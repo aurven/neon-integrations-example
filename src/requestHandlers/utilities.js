@@ -1,4 +1,5 @@
 const openaiPrompts = require("../ai/openai.js");
+const pexels = require('../connectors/pexels-connector.js');
 const cleaner = require('../content-cleaner.js');
 const neon = require('../helpers/neon-bo-api.js');
 
@@ -46,6 +47,31 @@ async function openAiHandler(request, reply) {
     });  
 }
 
+async function pexelsPhotosHandler(request, reply) {
+  const { apikey } = request.headers?.apikey
+    ? request.headers
+    : { apikey: null };
+
+  if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
+    console.log("Received call, but no API key was passed.");
+    return reply.status(401).send({ error: "Unauthorized" });
+  }
+  
+  console.log("Request received:");
+  
+  console.log(request.query.query);
+  const { query } = request.query;
+
+  return await pexels.getPhotos(query)
+    .then(result => {
+        return reply.status(200).send(result);
+        /* return reply.status(200).send({
+            message: "Processed",
+            data: result,
+        }); */
+    });  
+}
+
 async function neonDiscoveryHandler (request, reply) {
   return await neon.discoveryServices()
     .then(data => {
@@ -58,5 +84,6 @@ async function neonDiscoveryHandler (request, reply) {
 module.exports = {
   cleanupHandler,
   openAiHandler,
+  pexelsPhotosHandler,
   neonDiscoveryHandler
 };

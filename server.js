@@ -58,6 +58,7 @@ fastify.get("/test", async function handler(request, reply) {
 const utilitiesHandlers = require("./src/requestHandlers/utilities.js");
 fastify.post("/utilities/cleanup", utilitiesHandlers.cleanupHandler);
 fastify.post("/ai/openai", utilitiesHandlers.openAiHandler);
+fastify.get("/sources/pexels", utilitiesHandlers.pexelsPhotosHandler);
 fastify.get("/utilities/services", utilitiesHandlers.neonDiscoveryHandler);
 
 /**
