@@ -165,6 +165,34 @@ async function updateNodeContent(familyRef, xmlBodyString) {
         });
 }
 
+async function updateNodeMetadata(familyRef, xmlBodyString) {
+    const data = xmlBodyString;
+
+    const config = {
+        method: 'put',
+        maxBodyLength: Infinity,
+        url: `${NEON_BASEURL}/contents/nodes/${familyRef}/metadata`,
+        headers: {
+            'Content-Type': 'application/xml',
+            'Accept': 'text/xml',
+            'neon-bo-access-key': NEON_BO_APIKEY
+        },
+        data: data
+    };
+    
+    return await client.request(config)
+        .then((response) => {
+            console.log(JSON.stringify(response.data));
+            return true;
+        })
+        .catch((error) => {
+            console.error(`❌ ERROR: ${error.code}`);
+            console.error(JSON.stringify(error.response.data));
+            return false;
+        });
+}
+
+
 async function createNewStory(options) {
     const data = JSON.stringify(options);
 
@@ -598,6 +626,7 @@ module.exports = {
   lockNode,
   unlockNode,
   updateNodeContent,
+  updateNodeMetadata,
   createNewStory,
   getSites,
   createNewSiteNode,

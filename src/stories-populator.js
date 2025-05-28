@@ -81,6 +81,7 @@ async function newNodeFromStory(story, publishStory = true) {
         if (familyRef) {
             console.log(`Created new node with ID ${familyRef}`);
             const updateStatus = await neon.updateNodeContent(familyRef, utils.bodyGenerator(bodyOptions));
+            const metaUpdateStatus = await neon.updateNodeMetadata(familyRef, utils.metadataGenerator(story.metadata));
           
             if (updateStatus) {
                 await neon.unlockNode(familyRef);
