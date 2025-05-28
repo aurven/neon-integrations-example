@@ -30,7 +30,8 @@
     "mammoth": "^1.9.0",
     "form-data": "^4.0.2",
     "fast-xml-parser": "^5.2.2",
-    "cheerio": "1.0.0-rc.12"
+    "cheerio": "1.0.0-rc.12",
+    "fastify-sse": "^1.0.0"
   },
   "engines": {
     "node": "14.x"

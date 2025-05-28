@@ -49,11 +49,12 @@ async function completions({
  * @param {string} apiKey - Your OpenAI API key.
  * @returns {Promise<string>} - The transcribed text.
  */
-async function transcribeAudio(audioBuffer, filename, apiKey = OPENAI_APIKEY) {
+async function transcribeAudio(audio, filename, apiKey = OPENAI_APIKEY) {
   const form = new FormData();
-  form.append('file', audioBuffer, filename);
-  form.append('model', 'gpt-4o-transcribe'); // The options are gpt-4o-transcribe, gpt-4o-mini-transcribe, and whisper-1
+  form.append('file', audio, filename);
+  form.append('model', 'whisper-1'); // The options are gpt-4o-transcribe, gpt-4o-mini-transcribe, and whisper-1
   //form.append('prompt', 'This is an interview between two people. One asks questions, the other answers. Do not hallucinate.');
+  //form.append('response_format', 'verbose_json');
   
   try {
     const response = await axios.post('https://api.openai.com/v1/audio/transcriptions', form, {
@@ -82,7 +83,7 @@ async function transcribeAudio(audioBuffer, filename, apiKey = OPENAI_APIKEY) {
       }
     }
 
-    return { qna, rawText: text };
+    return { qna, rawText: text, openAiResponseData: response.data };
   } catch (error) {
     console.error('Transcription failed:', error.response?.data || error.message);
     throw new Error('Transcription error');
@@ -98,21 +99,29 @@ async function transcribeAudio(audioBuffer, filename, apiKey = OPENAI_APIKEY) {
 async function generateInterviewStructure(transcription, apiKey = OPENAI_APIKEY) {
   const qa = transcription.qna;
   
-  const prompt = qa.length > 0 ? `
-You are given a transcription of an interview in Q&A format. 
-Create:
-1. A concise, engaging headline.
-2. A short summary paragraph (3-4 sentences).
-3. A full article body in HTML, using <h3> for questions and <p> for answers.
-
-Q&A:
-${qa.map((item, i) => `Q: ${item.question}\nA: ${item.answer}`).join('\n\n')}
-` : `
+  const prompt = `
 You are given a transcription of an interview in raw text. 
-Desume the interview structure, without allucinating. Create:
-1. A concise, engaging headline.
-2. A short summary paragraph (3-4 sentences).
-3. A full article body in HTML, using <h3> for questions and <p> for answers.
+Desume the interview structure, without allucinating. Create a JSON response with the following structure:
+{
+  "structure": {
+    "headline": "",
+    "summary": "",
+    "html": ""
+  },
+  "metadata": {
+    "seoTitle": "",
+    "seoMeta": "",
+    "keywords": ""
+  }
+}
+
+Where:
+headline: A concise, engaging headline.
+summary: A short summary paragraph (3-4 sentences).
+html: A full article body in HTML, using <h4> for questions and <p> for answers.
+seoTitle: A creative, engaging, and relevant SEO title based on the article provided. The title should capture the essence of the article and be suitable for a news audience. The generated title must not exceed 50 characters in length. Don't put a full stop at the end of the title.
+seoMeta: A creative, engaging, and relevant SEO Meta Description based on the article provided. The Meta Description should capture the essence of the article and be suitable for a news audience. The generated Meta Description must not exceed 150 characters in length. Don't put a full stop at the end of the Meta Description.
+keywords: I would like you to act as a keywords extraction server. I give you a text and you respond with the keywords extracted from the text. Give a maximum of five keyswords per prompt. You only answer with the list of keywords and nothing else. The words must exist. Precise presentation of the top information. Focus on the core statements of the article. Favour clear and concrete information. Do not write any explanations. 
 
 Text: ${transcription.rawText}
 `;
@@ -133,8 +142,11 @@ Text: ${transcription.rawText}
     });
 
     const content = response.data.choices[0].message.content;
+    
+    return JSON.parse(content);
 
     // Naive parsing — assuming sections are clearly separated
+    /*
     const headlineMatch = content.match(/headline[:\-]?\s*(.+)/i);
     const summaryMatch = content.match(/summary[:\-]?\s*((.|\n)+?)\n\n/i);
     const htmlMatch = content.match(/<h3>.*<\/p>/is);
@@ -143,7 +155,9 @@ Text: ${transcription.rawText}
       headline: headlineMatch?.[1]?.trim() || '',
       summary: summaryMatch?.[1]?.trim() || '',
       html: htmlMatch?.[0]?.trim() || ''
-    };
+    };*/
+    
+    
 
   } catch (error) {
     console.error('Completion failed:', error.response?.data || error.message);

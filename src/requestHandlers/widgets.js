@@ -31,7 +31,13 @@ async function asyncDropUploadWidgetHandler(request, reply) {
   // params is an object we'll pass to our handlebars template
   let params = { seo: seo };
   
-  const data = await request.file();
+  const data = await request.file({
+      limits: {
+        fileSize: 10 * 1024 * 1024,  // 10mb limit
+      }
+    });
+  
+  //await data.toBuffer();
   
   const isDocument = data && data.mimetype && supportedDocs.includes(data.mimetype);
   const isAudio = data && data.mimetype && supportedAudios.includes(data.mimetype);
@@ -76,7 +82,7 @@ async function asyncDropUploadWidgetHandler(request, reply) {
   if (isAudio) {
     const transcription = await openai.transcribeAudio(dataBuffer, fileName);
     
-    const structure = await openai.generateInterviewStructure(transcription);
+    const { structure, metadata } = await openai.generateInterviewStructure(transcription);
     
     const neonPopulatorOptions = {
         "site": "TheGlobe",
@@ -97,7 +103,8 @@ async function asyncDropUploadWidgetHandler(request, reply) {
             "localFigurePath": null,
             "figureCaption": null,
             "figureCredit": null,
-            "mainContentHtml": structure.html
+            "mainContentHtml": structure.html,
+            "metadata": metadata
         }
     ], neonPopulatorOptions);
     

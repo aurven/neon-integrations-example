@@ -144,10 +144,6 @@ function bodyGenerator({
                     <web-image id="lAD685ktThyR2wK" class="square" softCrop="Square"/>
                     <web-image id="F6iNQSPx3LcbnCI" class="portrait" softCrop="Portrait"/>
                     <web-image id="9M2n7Yh9VPBa95P" class="ultrawide" softCrop="Ultrawide" />
-                    <web-image-caption>
-                        <caption id="ztnacsNP1XOPV8s"><p><?EM-dummyText Caption ?></p></caption>
-                        <credit id="hgKq6b6uvmfkWZn"><p><?EM-dummyText Credit ?></p></credit>
-                    </web-image-caption>
                 </web-image-group>
                 <grouphead>
                     <headline id="vxP5csG6DrRPZMP">
@@ -159,6 +155,130 @@ function bodyGenerator({
                 </summary>
             </teaser>
         </doc>
+    `;
+
+    return body.replaceAll('\n', '').replaceAll('    ', '').trim();
+}
+
+function metadataGenerator(meta) {
+    const { seoTitle, seoMeta, keywords } = meta;
+    const body = `
+        <?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE ObjectMetadata SYSTEM "/common/rules/classify.dtd">
+        <ObjectMetadata>
+            <General>
+                <MainCategory>
+                    <SuggestedSubjects>
+                        <group/>
+                        <SuggestedSubject/>
+                    </SuggestedSubjects>
+                    <SuggestedPeoples>
+                        <group/>
+                        <SuggestedPeople/>
+                    </SuggestedPeoples>
+                </MainCategory>
+                <NewsCode/>
+                <IndustrySegment/>
+                <GeographicalPlaces>
+                    <Address/>
+                    <City/>
+                    <State/>
+                    <Zip/>
+                    <Country/>
+                    <Latitude/>
+                    <Longitude/>
+                </GeographicalPlaces>
+                <ContentType>article</ContentType>
+                <Language/>
+                <Author/>
+                <Fee/>
+                <People/>
+                <Companies>
+                    <Company/>
+                    <Country/>
+                </Companies>
+                <coverage_type/>
+                <Keywords/>
+                <Comment/>
+                <Headline/>
+                <WordCount/>
+                <Priority/>
+            </General>
+            <DistributionChannels>
+                <OnLine>
+                    <WebPage/>
+                    <WebType/>
+                    <WebPortalPath/>
+                    <WebPortalCategory/>
+                    <WebSections/>
+                    <WebPriority/>
+                    <WebObjectType/>
+                    <WebDateTimePubStart/>
+                    <WebDateTimePubEnd>20160908114300</WebDateTimePubEnd>
+                    <AllowUserComments/>
+                    <SpecialType/>
+                    <StartDate/>
+                    <EndDate/>
+                </OnLine>
+                <Radio>
+                    <RadioBroadcastDateTime/>
+                    <RadioProgram/>
+                    <RadioObjectType/>
+                </Radio>
+                <TV>
+                    <TVBroadcastDateTime/>
+                    <TVProgram/>
+                    <TVObjectType/>
+                </TV>
+                <Sms/>
+                <Mms/>
+                <Syndication/>
+                <Gallery/>
+                <Blog>
+                    <BlogSection/>
+                    <BlogDate/>
+                </Blog>
+                <Output>
+                    <Queue/>
+                    <PriorityQueue/>
+                    <Embargo/>
+                </Output>
+            </DistributionChannels>
+            <Diffusion>
+                <Diff_Print/>
+                <Diff_Web/>
+                <Diff_Syndication/>
+            </Diffusion>
+            <SEO>
+                <SEOTitle>${seoTitle}</SEOTitle>
+                <MetaDescription>${seoMeta}</MetaDescription>
+                <Keywords>${keywords}</Keywords>
+                <SchemaMarkup>Article</SchemaMarkup>
+                <NoIndex>No</NoIndex>
+                <OpenGraph>
+                    <OGTitle/>
+                    <OGDescription/>
+                </OpenGraph>
+                <SEM>
+                    <GoogleAds>
+                        <GoogleAdTitle/>
+                        <GoogleAdDescription/>
+                    </GoogleAds>
+                    <UTMParameters>
+                        <UTMSource/>
+                    </UTMParameters>
+                </SEM>
+            </SEO>
+            <Paywall>
+                <AccessType>Free</AccessType>
+                <UserSegment>All</UserSegment>
+                <SubscriptionLevel>Basic</SubscriptionLevel>
+                <GeoRestriction>None</GeoRestriction>
+                <DeviceRestriction>None</DeviceRestriction>
+                <BehaviorTracking>None</BehaviorTracking>
+                <RenewalPolicy>Auto</RenewalPolicy>
+            </Paywall>
+        </ObjectMetadata>
     `;
 
     return body.replaceAll('\n', '').replaceAll('    ', '').trim();
@@ -259,6 +379,7 @@ module.exports = {
   textToHtmlParagraphs,
   generateAutoId,
   bodyGenerator,
+  metadataGenerator,
   nextStepAssignmentBodyGenerator,
   getLargestSrcFromPicture
 };
