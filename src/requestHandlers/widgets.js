@@ -13,7 +13,7 @@ function testWidgetHandler(request, reply) {
 
 function dropWidgetHandler (request, reply) {
   // params is an object we'll pass to our handlebars template
-  let params = { seo: seo };
+  let params = { seo: seo, neonAppUrl: process.env.NEON_APP_URL };
 
   // The Handlebars code will be able to access the parameter values and build them into the page
   return reply.view("/src/widgets/drop-a-doc.hbs", params);
@@ -129,7 +129,7 @@ async function asyncDropUploadWidgetHandler(request, reply) {
 
 function wiresWidgetHandler (request, reply) {
   // params is an object we'll pass to our handlebars template
-  let params = { seo: seo, apiKey: process.env.NEON_EXT_APIKEY };
+  let params = { seo: seo, apiKey: process.env.NEON_EXT_APIKEY, neonAppUrl: process.env.NEON_APP_URL };
 
   // The Handlebars code will be able to access the parameter values and build them into the page
   return reply.view("/src/widgets/wires-list.hbs", params);

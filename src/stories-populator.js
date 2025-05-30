@@ -80,6 +80,7 @@ async function newNodeFromStory(story, publishStory = true) {
       
         if (familyRef) {
             console.log(`Created new node with ID ${familyRef}`);
+            createdIds.push(familyRef);
             const updateStatus = await neon.updateNodeContent(familyRef, utils.bodyGenerator(bodyOptions));
             const metaUpdateStatus = await neon.updateNodeMetadata(familyRef, utils.metadataGenerator(story.metadata));
           
@@ -89,7 +90,6 @@ async function newNodeFromStory(story, publishStory = true) {
               
                 if (publishStory) {
                   await workflowTransitionTo(familyRef, 'Ready');
-                  createdIds.push(familyRef);
                   console.log(`${familyRef} updated successfully!`);
                   await neon.promoteNode(familyRef, { targetSite: story.tgtSite, targetSection: story.tgtSection, mode: 'LIVE' });
                 } else {
@@ -141,7 +141,7 @@ async function populateNeonInstance(data, options = {site: null, workspace: null
   
     await neon.login();
 
-    return await data.reduce((promiseAcc, story) => {
+    return await data.reduce(async (promiseAcc, story) => {
         console.log(story.id || story.title);
 
         story.tgtSite = options.site;
@@ -152,11 +152,11 @@ async function populateNeonInstance(data, options = {site: null, workspace: null
         story.siteAsChannel = options.siteAsChannel;
         const directPublish = options.directPublish;
 
-        return promiseAcc.then(async () => {
+        return await promiseAcc.then(async () => {
             return await newNodeFromStory(story, directPublish);
         });
     }, Promise.resolve())
-        .finally(() => {
+        .then(() => {
             neon.logout();
             return createdIds;
         });  

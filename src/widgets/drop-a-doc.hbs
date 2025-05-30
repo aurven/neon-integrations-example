@@ -31,32 +31,18 @@
   <body>
     <div class="wrapper">
       <div class="content" role="main">
-        
-        <!-- This is the start of content for our page -->
         <h2 class="">Import a file, create an experience</h2>
         
-        
-        
-        <div class="illo-container" hidden>
-          <img src="https://cdn.glitch.com/c62efef6-1e75-45cf-b248-afeccdda9477%2Fillustration.svg?v=1618196069568" class="illustration" alt="Node logo" />
-        </div>
-        
-        <!-- Instructions on using this project -->
-        <div class="instructions" hidden>
-          <h2>
-            Using this integration example with Glitch + Node.js
-          </h2>
-          <p>
-            This is the Glitch <strong>neon-integrations-example</strong> project.<br>
-            From here you can create a new application to create simple Node.js
-            integrations between Neon and the rest of the world.
-          </p>
-        </div>
-        
+        <!-- Dropper -->
         <form id="dropADoc" method="post">
           <input type="file" />
         </form>
-        
+          
+        <!-- Progress Message Container -->
+        <div id="progressContainer" class="progress-container">
+          <div id="progressMessage" class="progress-message"></div>
+          <div id="progressButtons" class="progress-buttons"></div>
+        </div>
       </div>
     </div>
     <!-- The footer holds our remix button — you can use it for structure or cut it out ✂ -->
@@ -66,6 +52,130 @@
     </footer>
     <script src="https://unpkg.com/filepond@^4/dist/filepond.js"></script>
     <script>
+      let interval;
+      
+      // Progress Message API
+      class ProgressMessageAPI {
+        constructor(containerId, messageId, buttonsId) {
+          this.container = document.getElementById(containerId);
+          this.messageEl = document.getElementById(messageId);
+          this.buttonsEl = document.getElementById(buttonsId);
+          this.isVisible = false;
+        }
+
+        show() {
+          if (!this.isVisible) {
+            this.container.classList.add('show');
+            this.isVisible = true;
+
+            setTimeout(() => {
+              this.messageEl.classList.add('show');
+              this.buttonsEl.classList.add('show');
+            }, 100);
+          }
+          return this;
+        }
+
+        hide() {
+          this.messageEl.classList.remove('show');
+          this.buttonsEl.classList.remove('show');
+
+          setTimeout(() => {
+            this.container.classList.remove('show');
+            this.isVisible = false;
+          }, 300);
+
+          return this;
+        }
+
+        updateMessage(message) {
+          if (this.messageEl.classList.contains('show')) {
+            this.messageEl.classList.remove('show');
+
+            setTimeout(() => {
+              this.messageEl.innerHTML = message;
+              this.messageEl.classList.add('show');
+            }, 200);
+          } else {
+            this.messageEl.innerHTML = message;
+          }
+          return this;
+        }
+
+        setStyle(style) {
+          this.container.className = 'progress-container show';
+          if (style && style !== 'default') {
+            this.container.classList.add(style);
+          }
+          return this;
+        }
+
+        clearButtons() {
+          if (this.buttonsEl.classList.contains('show')) {
+            this.buttonsEl.classList.remove('show');
+            setTimeout(() => {
+              this.buttonsEl.innerHTML = '';
+            }, 150);
+          } else {
+            this.buttonsEl.innerHTML = '';
+          }
+          return this;
+        }
+
+        addButton(text, onclick, style = 'primary') {
+          const button = document.createElement('button');
+          button.textContent = text;
+          button.className = `progress-btn ${style}`;
+          button.onclick = onclick;
+          this.buttonsEl.appendChild(button);
+          return this;
+        }
+
+        update(options = {}) {
+          const hasMessage = options.message !== undefined;
+          const hasButtons = options.buttons !== undefined;
+          const hasStyle = options.style !== undefined;
+
+          if (hasStyle) {
+            this.setStyle(options.style);
+          }
+
+          if (hasMessage) {
+            this.updateMessage(options.message);
+          }
+
+          if (hasButtons) {
+            if (this.buttonsEl.classList.contains('show')) {
+              this.buttonsEl.classList.remove('show');
+              setTimeout(() => {
+                this.buttonsEl.innerHTML = '';
+                options.buttons.forEach(btn => {
+                  this.addButton(btn.text, btn.onclick, btn.style || 'primary');
+                });
+                this.buttonsEl.classList.add('show');
+              }, 150);
+            } else {
+              this.buttonsEl.innerHTML = '';
+              options.buttons.forEach(btn => {
+                this.addButton(btn.text, btn.onclick, btn.style || 'primary');
+              });
+              setTimeout(() => {
+                this.buttonsEl.classList.add('show');
+              }, hasMessage ? 300 : 100);
+            }
+          }
+
+          if (options.show !== false && !this.isVisible) {
+            this.show();
+          }
+
+          return this;
+        }
+      }
+      
+      // Initialize the Progress Message API
+      const progressAPI = new ProgressMessageAPI('progressContainer', 'progressMessage', 'progressButtons');
+      
       // Get a reference to the file input element
       const inputElement = document.querySelector('input[type="file"]');
 
@@ -100,19 +210,88 @@
               // Should call the progress method to update the progress to 100% before calling load
               // Setting computable to false switches the loading indicator to infinite mode
               request.upload.onprogress = (e) => {
-                  progress(e.lengthComputable, e.loaded, e.total);
+                  console.log('Progress: ', e.loaded, e.total);
+                  progress(false, e.loaded, e.total);
+                  
+                  // Update progress message
+                  const percentage = Math.round((e.loaded / e.total) * 100);
+                  progressAPI.updateMessage(
+                    `<i class="fas fa-cloud-upload-alt"></i> Uploading ${file.name}... ${percentage}% complete 📊`
+                  );
+                
+                  if (percentage === 100) {
+                    // Add messages while waiting
+                    demoProgressStates()
+                  }
               };
 
               // Should call the load method when done and pass the returned server file id
               // this server file id is then used later on when reverting or restoring a file
               // so your server knows which file to return without exposing that info to the client
               request.onload = function () {
+                  clearInterval(interval);
+                
                   if (request.status >= 200 && request.status < 300) {
+                      // Upload successful
+                      const responseJson = JSON.parse(request.response);
+                      const familyRef = responseJson.neon[0];
+                    
+                      progressAPI.update({
+                        message: `🎉 ${file.name} processed successfully!`,
+                        style: 'success',
+                        buttons: [
+                          {
+                            text: 'Open your new Story',
+                            style: 'success',
+                            onclick: () => {
+                              window.open(`{{neonAppUrl}}/neon/app/neon.html#open/${familyRef}`);
+                            }
+                          },
+                          {
+                            text: 'Upload Another',
+                            style: 'secondary',
+                            onclick: () => {
+                              pond.removeFiles();
+                              progressAPI.hide();
+                            }
+                          }
+                        ]
+                      });
+                      
                       // the load method accepts either a string (id) or an object
                       load(request.responseText);
                   } else {
+                      // Upload failed
+                      progressAPI.update({
+                        message: `❌ Failed to upload ${file.name}. Please try again.`,
+                        style: 'error',
+                        buttons: [
+                          {
+                            text: 'Retry',
+                            style: 'danger',
+                            onclick: () => {
+                              // Reset and retry
+                              progressAPI.update({
+                                message: '⏳ Retrying upload...',
+                                style: 'default',
+                                buttons: []
+                              });
+                              pond.processFile(file);
+                            }
+                          },
+                          {
+                            text: 'Cancel',
+                            style: 'secondary',
+                            onclick: () => {
+                              pond.removeFiles();
+                              progressAPI.hide();
+                            }
+                          }
+                        ]
+                      });
+                      
                       // Can call the error method if something is wrong, should exit after
-                      error('oh no');
+                      error('Upload failed');
                   }
               };
 
@@ -123,6 +302,21 @@
                   abort: () => {
                       // This function is entered if the user has tapped the cancel button
                       request.abort();
+                      
+                      // Update progress message
+                      progressAPI.update({
+                        message: '🚫 Upload cancelled by user. ',
+                        style: 'warning',
+                        buttons: [
+                          {
+                            text: 'Try Again',
+                            style: 'primary',
+                            onclick: () => {
+                              progressAPI.hide();
+                            }
+                          }
+                        ]
+                      });
 
                       // Let FilePond know the request has been cancelled
                       abort();
@@ -130,8 +324,79 @@
               };
           },
         },
-        labelIdle: 'Drag & Drop your file or <span class="filepond--label-action"> Browse </span>'
+        labelIdle: 'Drag & Drop your file or <span class="filepond--label-action"> Browse </span>',
+        labelFileProcessing: 'Processing...',
+        labelFileProcessingComplete: 'Done!'
       });
+      
+      // FilePond event listeners for progress updates
+      pond.on('addfile', (error, file) => {
+        if (!error) {
+          progressAPI.update({
+            message: `📁 File "${file.file.name}" added. Ready to upload... `,
+            style: 'default',
+            buttons: []
+          });
+        }
+      });
+      
+      pond.on('processfilestart', (file) => {
+        progressAPI.update({
+          message: `⏳ Starting upload of ${file.file.name}...`,
+          style: 'default',
+          buttons: []
+        });
+      });
+      
+      pond.on('removefile', (error, file) => {
+        if (!error) {
+          progressAPI.hide();
+        }
+      });
+      
+      // Demo function to test different message states (remove in production)
+      function demoProgressStates() {
+        let step = 0;
+        const steps = [
+          {
+            message: '<i class="fas fa-check-circle"></i> File uploaded successfully! 🎉 Processing...',
+            style: 'default'
+          },
+          {
+            message: '⏳ OpenAI Whisper Transcription in progress...',
+            style: 'default'
+          },
+          {
+            message: '⏳ Arranging text content...',
+            style: 'default'
+          },
+          {
+            message: '⏳ Generating Headline, Summary and relevant Metadata...',
+            style: 'default'
+          },
+          {
+            message: '⏳ Generating Story object...',
+            style: 'default'
+          },
+          {
+            message: '⏳ Almost there!',
+            style: 'default'
+          },
+          {
+            message: '⏳ All good things come with time!',
+            style: 'default'
+          }
+        ];
+        
+        interval = setInterval(() => {
+          if (step < steps.length) {
+            progressAPI.update(steps[step]);
+            step++;
+          } else {
+            clearInterval(interval);
+          }
+        }, 3500);
+      }
     </script> 
   </body>
 </html>
