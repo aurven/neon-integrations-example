@@ -34,7 +34,7 @@ async function login() {
             console.log(`Neon Session initiated. Logged in as ${user.name} [${user.id}]`);
         })
         .catch((error) => {
-            console.error(`❌ ERROR: ${error.code}`);
+            console.error(`❌ ERROR during login: ${error.code}`);
             console.error(JSON.stringify(error.response.data));
         });
 }
@@ -56,10 +56,10 @@ async function logout(all = false) {
     await client.request(config)
         .then((response) => {
             console.log('Neon Session terminated successfully.')
-            console.log(JSON.stringify(response.data));
+            // console.log(JSON.stringify(response.data));
         })
         .catch((error) => {
-            console.error(`❌ ERROR: ${error.code}`);
+            console.error(`❌ ERROR during logout: ${error.code}`);
             console.error(JSON.stringify(error.response.data));
         });
 }
@@ -77,11 +77,11 @@ async function deleteNode(familyRef, force = false) {
 
     await client.request(config)
         .then((response) => {
-      
-            console.log(JSON.stringify(response.data));
+            console.log(`Node ${familyRef} deleted successfully`);
+            // console.log(JSON.stringify(response.data));
         })
         .catch((error) => {
-            console.error(`❌ ERROR: ${error.code}`);
+            console.error(`❌ ERROR during deleteNode: ${error.code}`);
             console.error(JSON.stringify(error.response.data));
         });
 }
@@ -104,10 +104,11 @@ async function lockNode(familyRef) {
 
     await client.request(config)
         .then((response) => {
+            console.log(`Node ${familyRef} locked successfully`);
             console.log(JSON.stringify(response.data));
         })
         .catch((error) => {
-            console.error(`❌ ERROR: ${error.code}`);
+            console.error(`❌ ERROR during lockNode: ${error.code}`);
             console.error(JSON.stringify(error.response.data));
         });
 }
@@ -130,10 +131,11 @@ async function unlockNode(familyRef, unlockMode = 'MAJOR') {
 
     await client.request(config)
         .then((response) => {
-            console.log(JSON.stringify(response.data));
+            console.log(`Node ${familyRef} unlocked successfully`);
+            // console.log(JSON.stringify(response.data));
         })
         .catch((error) => {
-            console.error(`❌ ERROR: ${error.code}`);
+            console.error(`❌ ERROR during unlockNode: ${error.code}`);
             console.error(JSON.stringify(error.response.data));
         });
 }
@@ -152,14 +154,18 @@ async function updateNodeContent(familyRef, xmlBodyString) {
         },
         data: data
     };
+  
+    console.log(`Updating Node Content for ${familyRef}`);
+    console.log('xmlBodyString', xmlBodyString);
     
     return await client.request(config)
         .then((response) => {
-            console.log(JSON.stringify(response.data));
+            console.log(`Node Content for ${familyRef} updated successfully`);
+            // console.log(JSON.stringify(response.data));
             return true;
         })
         .catch((error) => {
-            console.error(`❌ ERROR: ${error.code}`);
+            console.error(`❌ ERROR during updateNodeContent: ${error.code}`);
             console.error(JSON.stringify(error.response.data));
             return false;
         });
@@ -179,14 +185,18 @@ async function updateNodeMetadata(familyRef, xmlBodyString) {
         },
         data: data
     };
+  
+    console.log(`Updating Node Metadata for ${familyRef}`);
+    console.log('xmlBodyString', xmlBodyString);
     
     return await client.request(config)
         .then((response) => {
-            console.log(JSON.stringify(response.data));
+            // console.log(JSON.stringify(response.data));
+            console.log(`Node Content for ${familyRef} updated successfully`);
             return true;
         })
         .catch((error) => {
-            console.error(`❌ ERROR: ${error.code}`);
+            console.error(`❌ ERROR during updateNodeMetadata: ${error.code}`);
             console.error(JSON.stringify(error.response.data));
             return false;
         });
@@ -209,11 +219,13 @@ async function createNewStory(options) {
 
     return await client.request(config)
         .then((response) => {
-            console.log(JSON.stringify(response.data));
-            return response.data.node.familyRef;
+            const familyRef = response.data.node.familyRef;
+            // console.log(JSON.stringify(response.data));
+            console.log(`Created new Story: ${familyRef}`);
+            return familyRef;
         })
         .catch((error) => {
-            console.error(`❌ ERROR: ${error.code}`);
+            console.error(`❌ ERROR during createNewStory: ${error.code}`);
             console.error(JSON.stringify(error.response.data));
         });
 }
@@ -231,11 +243,12 @@ async function getSites() {
 
     return await client.request(config)
         .then((response) => {
+            console.log(`Success retrieving sites`);
             console.log(JSON.stringify(response.data));
             return response.data.result;
         })
         .catch((error) => {
-            console.error(`❌ ERROR: ${error.code}`);
+            console.error(`❌ ERROR during getSites: ${error.code}`);
             console.error(JSON.stringify(error.response.data));
         });
 }
@@ -256,11 +269,13 @@ async function createNewSiteNode(options, realm = 'default') {
 
     return await client.request(config)
         .then((response) => {
-            console.log(JSON.stringify(response.data));
-            return response.data.id;
+            const siteId = response.data.id;
+            // console.log(JSON.stringify(response.data));
+            console.log(`Created new Site! Id: ${siteId}`);
+            return siteId;
         })
         .catch((error) => {
-            console.error(`❌ ERROR: ${error.code}`);
+            console.error(`❌ ERROR during createNewSiteNode: ${error.code}`);
             console.error(JSON.stringify(error.response.data));
         });
 }
@@ -281,10 +296,12 @@ async function publishSiteNode(options, realm = 'default', viewStatus = 'LIVE') 
 
     return await client.request(config)
         .then((response) => {
-            console.log(JSON.stringify(response.data));
+            console.log('Site Node published successfully');
+            //console.log(JSON.stringify(response.data));
+            return response.data;
         })
         .catch((error) => {
-            console.error(`❌ ERROR: ${error.code}`);
+            console.error(`❌ ERROR publishSiteNode: ${error.code}`);
             console.error(JSON.stringify(error.response.data));
         });
 }
@@ -305,10 +322,12 @@ async function createUser(options) {
 
     return await client.request(config)
         .then((response) => {
-            console.log(JSON.stringify(response.data));
+            console.log('New user created.');
+            // console.log(JSON.stringify(response.data));
+            return response.data;
         })
         .catch((error) => {
-            console.error(`❌ ERROR: ${error.code}`);
+            console.error(`❌ ERROR during createUser: ${error.code}`);
             console.error(JSON.stringify(error.response.data));
         });
 }
@@ -326,11 +345,12 @@ async function getUsers() {
 
     return await client.request(config)
         .then((response) => {
+            console.log('Got Users:');
             console.log(JSON.stringify(response.data));
             return response.data;
         })
         .catch((error) => {
-            console.error(`❌ ERROR: ${error.code}`);
+            console.error(`❌ ERROR during getUsers: ${error.code}`);
             console.error(JSON.stringify(error.response.data));
         });
 }
@@ -354,10 +374,11 @@ async function addUserToGroup(userId, groupName) {
 
     return await client.request(config)
         .then((response) => {
+            console.log(`User ${userId} added to ${groupName}`);
             console.log(JSON.stringify(response.data));
         })
         .catch((error) => {
-            console.error(`❌ ERROR: ${error.code}`);
+            console.error(`❌ ERROR during addUserToGroup: ${error.code}`);
             console.error(JSON.stringify(error.response.data));
         });
 }
@@ -378,11 +399,12 @@ async function createGroup(options) {
 
     return await client.request(config)
         .then((response) => {
+            console.log('New group created:');
             console.log(JSON.stringify(response.data));
             return response.data;
         })
         .catch((error) => {
-            console.error(`❌ ERROR: ${error.code}`);
+            console.error(`❌ ERROR during createGroup: ${error.code}`);
             console.error(JSON.stringify(error.response.data));
         });
 }
@@ -403,10 +425,12 @@ async function updateGroup(options) {
 
     return await client.request(config)
         .then((response) => {
+            console.log('Group updated:');
             console.log(JSON.stringify(response.data));
+            return response.data;
         })
         .catch((error) => {
-            console.error(`❌ ERROR: ${error.code}`);
+            console.error(`❌ ERROR during updateGroup: ${error.code}`);
             console.error(JSON.stringify(error.response.data));
         });
 }
@@ -427,10 +451,12 @@ async function updateWorkspace({parentWorkspaceName, targetWorkspaceId, options}
 
     return await client.request(config)
         .then((response) => {
+            console.log('Workspace updated:');
             console.log(JSON.stringify(response.data));
+            return response.data;
         })
         .catch((error) => {
-            console.error(`❌ ERROR: ${error.code}`);
+            console.error(`❌ ERROR during updateWorkspace: ${error.code}`);
             console.error(JSON.stringify(error.response.data));
         });
 }
@@ -452,9 +478,10 @@ async function updateWorkspaceTemplates({targetWorkspaceId, options}) {
     return await client.request(config)
         .then((response) => {
             console.log(JSON.stringify(response.data));
+            return response.data;
         })
         .catch((error) => {
-            console.error(`❌ ERROR: ${error.code}`);
+            console.error(`❌ ERROR during updateWorkspaceTemplates: ${error.code}`);
             console.error(JSON.stringify(error.response.data));
         });
 }
@@ -480,9 +507,10 @@ async function createBasefolder(options) {
     return await client.request(config)
         .then((response) => {
             console.log(JSON.stringify(response.data));
+            return response.data;
         })
         .catch((error) => {
-            console.error(`❌ ERROR: ${error.code}`);
+            console.error(`❌ ERROR during createBasefolder: ${error.code}`);
             console.error(JSON.stringify(error.response.data));
         });
 }
@@ -503,11 +531,12 @@ async function getNextSteps(familyRef = null) {
 
     return await client.request(config)
         .then((response) => {
-            console.log(JSON.stringify(response.data));
+            console.log(`Got next workflow steps for ${familyRef}`);
+            //console.log(JSON.stringify(response.data));
             return response;
         })
         .catch((error) => {
-            console.error(`❌ ERROR: ${error.code}`);
+            console.error(`❌ ERROR during getNextSteps: ${error.code}`);
             console.error(JSON.stringify(error.response.data));
         });
 }
@@ -530,11 +559,13 @@ async function nextStepAssignment(familyRef = null, options) {
 
     return await client.request(config)
         .then((response) => {
-            console.log(JSON.stringify(response.data));
+            console.log(`Assigned new workflow step to ${familyRef}:`);
+            console.log(data);
+            //console.log(JSON.stringify(response.data));
             return response;
         })
         .catch((error) => {
-            console.error(`❌ ERROR: ${error.code}`);
+            console.error(`❌ ERROR during nextStepAssignment: ${error.code}`);
             console.error(JSON.stringify(error.response.data));
         });
 }
@@ -554,11 +585,11 @@ async function putNode({ boundary, requestBody }) {
 
     return await client.request(config)
         .then((response) => {
-            console.log(JSON.stringify(response.data));
+            //console.log(JSON.stringify(response.data));
             return response.data;
         })
         .catch((error) => {
-            console.error(`❌ ERROR: ${error.code}`);
+            console.error(`❌ ERROR during putNode: ${error.code}`);
             console.error(JSON.stringify(error.response.data));
         });
 }
@@ -587,11 +618,12 @@ async function promoteNode(familyRef = null, { targetSite, targetSection, mode }
 
     return await client.request(config)
         .then((response) => {
-            console.log(JSON.stringify(response.data));
+            console.log(`Node ${familyRef} promoted to:`, data);
+            //console.log(JSON.stringify(response.data));
             return response.data;
         })
         .catch((error) => {
-            console.error(`❌ ERROR: ${error.code}`);
+            console.error(`❌ ERROR during promoteNode: ${error.code}`);
             console.error(JSON.stringify(error.response.data));
         });
 }
@@ -613,7 +645,7 @@ async function discoveryServices() {
             return response.data;
         })
         .catch((error) => {
-            console.error(`❌ ERROR: ${error.code}`);
+            console.error(`❌ ERROR during discoveryServices: ${error.code}`);
             console.error(JSON.stringify(error.response.data));
         });
 }

@@ -110,47 +110,47 @@ function bodyGenerator({
         <?xml-stylesheet type="text/css" href="/common/styles/css/main.css"?>
         <doc xml:lang="en-us">
             <story>
-                <web-image-group id="9Ge0PKxKzLsOBjo" group="media" class="default" picturedesklite="true">
-                    <web-image ${processedMainImageReference} id="cJsGBk6C1zX6Mu0" class="wide" softCrop="Wide" />
-                    <web-image ${processedMainImageReference} id="Tv6ovLrTVZCufxJ" class="square" softCrop="Square"/>
-                    <web-image ${processedMainImageReference} id="lI5qvoKT6rQmZP6" class="portrait" softCrop="Portrait"/>
-                    <web-image ${processedMainImageReference} id="DjHOEomkrt5j56m" class="ultrawide" softCrop="Ultrawide" />
+                <web-image-group id="${ generateAutoId() }" group="media" class="default" picturedesklite="true">
+                    <web-image ${processedMainImageReference} id="${ generateAutoId() }" class="wide" softCrop="Wide" />
+                    <web-image ${processedMainImageReference} id="${ generateAutoId() }" class="square" softCrop="Square"/>
+                    <web-image ${processedMainImageReference} id="${ generateAutoId() }" class="portrait" softCrop="Portrait"/>
+                    <web-image ${processedMainImageReference} id="${ generateAutoId() }" class="ultrawide" softCrop="Ultrawide" />
                     <web-image-caption>
-                        <caption id="x4uSrQnRtPHhzog"><p>${processedCaption}</p></caption>
-                        <credit id="daQWoJATGjkRjxN"><p>${processedCredit}</p></credit>
+                        <caption id="${ generateAutoId() }"><p>${processedCaption}</p></caption>
+                        <credit id="${ generateAutoId() }"><p>${processedCredit}</p></credit>
                     </web-image-caption>
                 </web-image-group>
-                <grouphead id="HyGfGTqtgkS1r10">
-                    <overhead id="8wBfRNVk0Cy18dB">
+                <grouphead id="${ generateAutoId() }">
+                    <overhead id="${ generateAutoId() }">
                         <p>${processedOverhead}</p>
                     </overhead>
-                    <headline id="l7LHJMA3z6wm4m6">
+                    <headline id="${ generateAutoId() }">
                         <p>${processedHeadline}</p>
                     </headline>
                 </grouphead>
-                <summary id="3CRkB9hDWlDD4Rq">
+                <summary id="${ generateAutoId() }">
                     <p>${processedSummary}</p>
                 </summary>
-                <byline id="v9EMmjofXwNnrqs">
+                <byline id="${ generateAutoId() }">
                     <p>${processedByline}</p>
                 </byline>
-                <text id="yjm90uF7IlvVTPX">
+                <text id="${ generateAutoId() }">
                     ${processedTextHtml}
                 </text>
             </story>
             <teaser>
-                <web-image-group id="eyXgctKGr6NgKVH" group="media" class="default" picturedesklite="true">
-                    <web-image id="OnfoLzcIawL8Lvl" class="wide" softCrop="Wide" />
-                    <web-image id="lAD685ktThyR2wK" class="square" softCrop="Square"/>
-                    <web-image id="F6iNQSPx3LcbnCI" class="portrait" softCrop="Portrait"/>
-                    <web-image id="9M2n7Yh9VPBa95P" class="ultrawide" softCrop="Ultrawide" />
+                <web-image-group id="${ generateAutoId() }" group="media" class="default" picturedesklite="true">
+                    <web-image id="${ generateAutoId() }" class="wide" softCrop="Wide" />
+                    <web-image id="${ generateAutoId() }" class="square" softCrop="Square"/>
+                    <web-image id="${ generateAutoId() }" class="portrait" softCrop="Portrait"/>
+                    <web-image id="${ generateAutoId() }" class="ultrawide" softCrop="Ultrawide" />
                 </web-image-group>
                 <grouphead>
-                    <headline id="vxP5csG6DrRPZMP">
+                    <headline id="${ generateAutoId() }">
                         <p><?EM-dummyText Teaser Headline ?></p>
                     </headline>
                 </grouphead>
-                <summary id="FL6rotUA32PhnA8">
+                <summary id="${ generateAutoId() }">
                     <p><?EM-dummyText Teaser Summary ?></p>
                 </summary>
             </teaser>

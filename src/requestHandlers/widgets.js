@@ -38,6 +38,7 @@ async function asyncDropUploadWidgetHandler(request, reply) {
     });
   
   //await data.toBuffer();
+  console.log('asyncDropUploadWidgetHandler - File received!');
   
   const isDocument = data && data.mimetype && supportedDocs.includes(data.mimetype);
   const isAudio = data && data.mimetype && supportedAudios.includes(data.mimetype);
@@ -86,7 +87,7 @@ async function asyncDropUploadWidgetHandler(request, reply) {
     
     const neonPopulatorOptions = {
         "site": "TheGlobe",
-        "workspace": "/Convergent/Culture",
+        "workspace": "/Convergent/Sport",
         "directPublish": false,
         "siteAsChannel": false,
     };
@@ -98,7 +99,7 @@ async function asyncDropUploadWidgetHandler(request, reply) {
             "overhead": "Interview",
             "headline": structure.headline,
             "summary": structure.summary,
-            "byline": "by Eidosmedia AI Suite",
+            "byline": "Eidosmedia AI Suite",
             "figureURL": null,
             "localFigurePath": null,
             "figureCaption": null,
@@ -109,13 +110,17 @@ async function asyncDropUploadWidgetHandler(request, reply) {
     ], neonPopulatorOptions);
     
     const resultMessage = fileName + ' successfully imported!';
-
-    return reply.status(200).send({
+    
+    const responseBody = {
       message: resultMessage,
       transcription: transcription,
       structure: structure,
       neon: processResult
-    });
+    };
+    
+    console.log('asyncDropUploadWidgetHandler - Done!', responseBody);
+
+    return reply.status(200).send(responseBody);
   }
   
   return reply.status(400).send({

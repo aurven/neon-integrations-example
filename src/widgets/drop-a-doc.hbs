@@ -176,6 +176,188 @@
       // Initialize the Progress Message API
       const progressAPI = new ProgressMessageAPI('progressContainer', 'progressMessage', 'progressButtons');
       
+      
+      // Progress Demo Sequence
+      class ProgressDemoSequence {
+        constructor() {
+          this.step = 0;
+          this.timeoutId = null;
+          this.isRunning = false;
+          this.onComplete = null;
+          this.onInterrupt = null;
+
+          this.steps = [
+            {
+              message: '🎉 File uploaded <strong>successfully</strong>! Processing...',
+              style: 'default',
+              delay: 5000
+            },
+            {
+              message: '⏳ Contacting <strong>Transcription</strong> service...',
+              style: 'default',
+              delay: 3000
+            },
+            {
+              message: '⏳ <strong>Transcription</strong> in progress...',
+              style: 'default',
+              delay: 15000
+            },
+            {
+              message: '⏳ Arranging <strong>text</strong> content...',
+              style: 'default',
+              delay: 20000
+            },
+            {
+              message: '⏳ Generating <strong>Headline</strong>, <strong>Summary</strong> and relevant <strong>Metadata</strong>...',
+              style: 'default',
+              delay: 10000
+            },
+            {
+              message: '⏳ Generating <strong>Story object</strong>...',
+              style: 'default',
+              delay: 6000
+            },
+            {
+              message: '⏳ Almost there!',
+              style: 'default',
+              delay: 3000
+            },
+            {
+              message: '⏳ Any second now!',
+              style: 'default',
+              delay: 2000
+            },
+            {
+              message: '⏳ Did you know that all good things come with time?',
+              style: 'default',
+              delay: 4000
+            },
+          ];
+        }
+
+        start(onComplete = null, onInterrupt = null) {
+          if (this.isRunning) {
+            console.warn('Sequence is already running');
+            return false;
+          }
+
+          this.step = 0;
+          this.isRunning = true;
+          this.onComplete = onComplete;
+          this.onInterrupt = onInterrupt;
+
+          this.showNextStep();
+          return true;
+        }
+
+        stop(reason = 'manual') {
+          if (!this.isRunning) {
+            return false;
+          }
+
+          this.isRunning = false;
+
+          if (this.timeoutId) {
+            clearTimeout(this.timeoutId);
+            this.timeoutId = null;
+          }
+
+          console.log(`Demo sequence stopped: ${reason}`);
+
+          // Call interrupt callback if provided
+          if (this.onInterrupt) {
+            this.onInterrupt(reason, this.step);
+          }
+
+          return true;
+        }
+
+        showNextStep() {
+          if (!this.isRunning || this.step >= this.steps.length) {
+            if (this.isRunning) {
+              // Sequence completed naturally
+              this.isRunning = false;
+              if (this.onComplete) {
+                this.onComplete();
+              }
+            }
+            return;
+          }
+
+          progressAPI.update(this.steps[this.step]);
+
+          // Schedule next step
+          if (this.step + 1 < this.steps.length) {
+            this.timeoutId = setTimeout(() => {
+              this.step++;
+              this.showNextStep();
+            }, this.steps[this.step].delay);
+          } else {
+            this.step++;
+          }
+        }
+
+        getCurrentStep() {
+          return this.step;
+        }
+
+        getTotalSteps() {
+          return this.steps.length;
+        }
+
+        getProgress() {
+          return {
+            current: this.step,
+            total: this.steps.length,
+            percentage: Math.round((this.step / this.steps.length) * 100)
+          };
+        }
+      }
+      
+      // Global instance
+      let progressDemo = null;
+
+      // Start the demo sequence
+      function demoProgressStates() {
+        // Stop any existing sequence
+        if (progressDemo) {
+          progressDemo.stop('new_sequence');
+        }
+
+        progressDemo = new ProgressDemoSequence();
+
+        progressDemo.start(
+          // onComplete callback
+          () => {
+            console.log('Demo sequence completed successfully');
+          },
+          // onInterrupt callback
+          (reason, step) => {
+            console.log(`Demo sequence interrupted at step ${step}. Reason: ${reason}`);
+          }
+        );
+
+        return progressDemo;
+      }
+
+      // External method to stop the demo
+      function stopDemoProgress(reason = 'external_event') {
+        if (progressDemo && progressDemo.isRunning) {
+          return progressDemo.stop(reason);
+        }
+        return false;
+      }
+
+      // Additional utility functions
+      function getDemoProgress() {
+        return progressDemo ? progressDemo.getProgress() : null;
+      }
+
+      function isDemoRunning() {
+        return progressDemo ? progressDemo.isRunning : false;
+      }
+      
+      
       // Get a reference to the file input element
       const inputElement = document.querySelector('input[type="file"]');
 
@@ -216,7 +398,7 @@
                   // Update progress message
                   const percentage = Math.round((e.loaded / e.total) * 100);
                   progressAPI.updateMessage(
-                    `<i class="fas fa-cloud-upload-alt"></i> Uploading ${file.name}... ${percentage}% complete 📊`
+                    `📊 Uploading <em>${file.name}</em>... <strong>${percentage}</strong>% complete.`
                   );
                 
                   if (percentage === 100) {
@@ -229,7 +411,7 @@
               // this server file id is then used later on when reverting or restoring a file
               // so your server knows which file to return without exposing that info to the client
               request.onload = function () {
-                  clearInterval(interval);
+                  stopDemoProgress();
                 
                   if (request.status >= 200 && request.status < 300) {
                       // Upload successful
@@ -237,7 +419,7 @@
                       const familyRef = responseJson.neon[0];
                     
                       progressAPI.update({
-                        message: `🎉 ${file.name} processed successfully!`,
+                        message: `🎉 <em>${file.name}</em> processed </strong>successfully</strong>!`,
                         style: 'success',
                         buttons: [
                           {
@@ -263,7 +445,7 @@
                   } else {
                       // Upload failed
                       progressAPI.update({
-                        message: `❌ Failed to upload ${file.name}. Please try again.`,
+                        message: `❌ Failed to upload <em>${file.name}</em>. Please try again.`,
                         style: 'error',
                         buttons: [
                           {
@@ -333,7 +515,7 @@
       pond.on('addfile', (error, file) => {
         if (!error) {
           progressAPI.update({
-            message: `📁 File "${file.file.name}" added. Ready to upload... `,
+            message: `📁 File <em>"${file.file.name}"</em> added. Ready to upload... `,
             style: 'default',
             buttons: []
           });
@@ -342,7 +524,7 @@
       
       pond.on('processfilestart', (file) => {
         progressAPI.update({
-          message: `⏳ Starting upload of ${file.file.name}...`,
+          message: `⏳ Starting upload of <em>${file.file.name}</em>...`,
           style: 'default',
           buttons: []
         });
@@ -353,50 +535,6 @@
           progressAPI.hide();
         }
       });
-      
-      // Demo function to test different message states (remove in production)
-      function demoProgressStates() {
-        let step = 0;
-        const steps = [
-          {
-            message: '<i class="fas fa-check-circle"></i> File uploaded successfully! 🎉 Processing...',
-            style: 'default'
-          },
-          {
-            message: '⏳ OpenAI Whisper Transcription in progress...',
-            style: 'default'
-          },
-          {
-            message: '⏳ Arranging text content...',
-            style: 'default'
-          },
-          {
-            message: '⏳ Generating Headline, Summary and relevant Metadata...',
-            style: 'default'
-          },
-          {
-            message: '⏳ Generating Story object...',
-            style: 'default'
-          },
-          {
-            message: '⏳ Almost there!',
-            style: 'default'
-          },
-          {
-            message: '⏳ All good things come with time!',
-            style: 'default'
-          }
-        ];
-        
-        interval = setInterval(() => {
-          if (step < steps.length) {
-            progressAPI.update(steps[step]);
-            step++;
-          } else {
-            clearInterval(interval);
-          }
-        }, 3500);
-      }
     </script> 
   </body>
 </html>
