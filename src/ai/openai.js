@@ -67,6 +67,7 @@ async function transcribeAudio(audio, filename, apiKey = OPENAI_APIKEY) {
     });
 
     const text = response.data.text;
+    console.log('OpenAI Response for Transcription: ', response.data);
 
     // Simple Q&A extraction
     const qna = [];
@@ -116,13 +117,14 @@ Desume the interview structure, without allucinating. Create a JSON response wit
 }
 
 Where:
-headline: A concise, engaging headline.
-summary: A short summary paragraph (3-4 sentences).
-html: A full article body in HTML, using <h4> for questions and <p> for answers.
+headline: A concise, engaging headline. The title should capture the essence of the article and be suitable for a news audience. The generated title must not exceed 50 characters in length. Don't put a full stop at the end of the title.
+summary: A short summary paragraph (3-4 sentences).should capture the essence of the article and be suitable for a news audience. The generated summary must not exceed 150 characters in length. Don't put a full stop at the end of the summary.
+html: The full transcription body in HTML. Usually all parts of text should use paragraphs <p> but use <h3> for questions and <p> for answers. Use the whole Transcription for it. All html tags need an id attribute with 13 characters, starting with "U", the rest will be lowercase letters, uppercase letters, and numbers only.
 seoTitle: A creative, engaging, and relevant SEO title based on the article provided. The title should capture the essence of the article and be suitable for a news audience. The generated title must not exceed 50 characters in length. Don't put a full stop at the end of the title.
 seoMeta: A creative, engaging, and relevant SEO Meta Description based on the article provided. The Meta Description should capture the essence of the article and be suitable for a news audience. The generated Meta Description must not exceed 150 characters in length. Don't put a full stop at the end of the Meta Description.
 keywords: I would like you to act as a keywords extraction server. I give you a text and you respond with the keywords extracted from the text. Give a maximum of five keyswords per prompt. You only answer with the list of keywords and nothing else. The words must exist. Precise presentation of the top information. Focus on the core statements of the article. Favour clear and concrete information. Do not write any explanations. 
 
+Use the whole text to generate the HTML part. Do not skip any text while creating the HTML structure. Do not hallucinate on the content.
 Text: ${transcription.rawText}
 `;
 
@@ -130,7 +132,7 @@ Text: ${transcription.rawText}
     const response = await axios.post('https://api.openai.com/v1/chat/completions', {
       model: 'gpt-4',
       messages: [
-        { role: 'system', content: 'You are a journalist formatting an interview for publication.' },
+        { role: 'system', content: 'You are a journalist formatting an interview for publication. Use always the whole text as reference.' },
         { role: 'user', content: prompt }
       ],
       temperature: 0.7
@@ -142,8 +144,10 @@ Text: ${transcription.rawText}
     });
 
     const content = response.data.choices[0].message.content;
+    const jsonContent = JSON.parse(content);
+    console.log('OpenAi Completions: ', jsonContent);
     
-    return JSON.parse(content);
+    return jsonContent;
 
     // Naive parsing — assuming sections are clearly separated
     /*
