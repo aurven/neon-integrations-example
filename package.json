@@ -1,10 +1,11 @@
 {
-  "name": "glitch-mvp-node",
-  "version": "0.1.0",
-  "description": "A simple Node app built on fastify, instantly up and running.",
+  "name": "neon-integrations-example",
+  "version": "1.1.0",
+  "description": "A bunch of Neon integrations on a simple Node app built on fastify, instantly up and running.",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev": "node --env-file=.env server.js"
   },
   "dependencies": {
     "fastify": "^4.21.0",
@@ -34,14 +35,10 @@
     "fastify-sse": "^1.0.0"
   },
   "engines": {
-    "node": "14.x"
-  },
-  "repository": {
-    "url": "https://glitch.com/edit/#!/glitch-mvp-node"
+    "node": "20.x"
   },
   "license": "MIT",
   "keywords": [
-    "node",
-    "glitch"
+    "node"
   ]
 }

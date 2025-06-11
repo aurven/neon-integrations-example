@@ -2,3 +2,8 @@
 .node-gyp
 node_modules
 tmp
+.env
+.DS_Store
+# Logs
+logs
+npm-debug.log*

@@ -2,11 +2,11 @@ const axios = require('axios');
 const { CookieJar } = require('tough-cookie');
 const { wrapper } = require('axios-cookiejar-support');
 
-const SERVER_EDAPI = process.env.SERVER_EDAPI;
+const EDAPI_SERVER = process.env.EDAPI_SERVER;
 const EDAPI_REST_ENDPOINT = process.env.EDAPI_REST_ENDPOINT;
-const EDAPIURL = SERVER_EDAPI + EDAPI_REST_ENDPOINT;
-const CONNECTIONID = process.env.CONNECTIONID;
-const DATABASEID = process.env.DATABASEID;
+const EDAPIURL = EDAPI_SERVER + EDAPI_REST_ENDPOINT;
+const EDAPI_CONNECTIONID = process.env.EDAPI_CONNECTIONID;
+const EDAPI_DATABASEID = process.env.EDAPI_DATABASEID;
 
 const jar = new CookieJar();
 const client = wrapper(axios.create({ jar }));
@@ -17,7 +17,7 @@ async function login({ username, password }) {
 
     const authPayload = {
         applicationId: 'neonToMethodeApp',
-        connectionId: CONNECTIONID,
+        connectionId: EDAPI_CONNECTIONID,
         username,
         password,
         options: {
@@ -146,7 +146,7 @@ async function createStory({ name, issueDate, channel, template, workFolder, att
         attributes,
         type: 'EOM::CompoundStory',
         application: 'neonToMethodeApp',
-        databaseId: DATABASEID,
+        databaseId: EDAPI_DATABASEID,
         edition: '',
         product: channel,
         options: {
