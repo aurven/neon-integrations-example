@@ -52,7 +52,9 @@ fastify.get("/test", async function handler(request, reply) {
   }
 
   return reply.status(200).send({
-    message: "Neon Integrations Up and Running"
+    message: "Neon Integrations Up and Running",
+    version: '1.1.0',
+    location: process.env.NEON_EXT_LOCATION || "Unknown",
   });
 });
 

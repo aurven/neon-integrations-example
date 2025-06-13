@@ -8,6 +8,7 @@ This key protects the service from incoming calls, which is checked with a dedic
 
 ```
 NEON_EXT_APIKEY=xxx
+NEON_EXT_LOCATION=local
 ```
 
 ## Neon keys
@@ -27,12 +28,12 @@ NEON_PASSWORD=xxx
 Service credentials and desired Méthode endpoints.
 
 ```
-SERVER_EDAPI=xxx
+EDAPI_SERVER=xxx
 EDAPI_REST_ENDPOINT=xxx
 EDAPI_USERNAME=xxx
 EDAPI_PASSWORD=xxx
-CONNECTIONID=xxx
-DATABASEID=xxx
+EDAPI_CONNECTIONID=xxx
+EDAPI_DATABASEID=xxx
 ```
 
 ## Third-party Services Keys
