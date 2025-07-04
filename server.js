@@ -94,6 +94,10 @@ const neonExportHandlers = require("./src/requestHandlers/neon-export.js");
 fastify.get("/out/sendgrid", neonExportHandlers.getSendgridHandler);
 fastify.post("/out/sendgrid", neonExportHandlers.postSendgridHandler);
 
+// Mailjet
+fastify.get("/out/mailjet", neonExportHandlers.getMailjetHandler);
+fastify.post("/out/mailjet", neonExportHandlers.postMailjetHandler);
+
 /**
  *
  * From the World to Neon
