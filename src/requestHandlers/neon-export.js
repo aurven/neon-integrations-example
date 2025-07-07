@@ -65,7 +65,7 @@ async function postMailjetHandler(request, reply) {
     let result;
     
     // Check if this is a Neon model (newsletter) or direct Mailjet Messages format
-    if (request.body.model || request.body.nodes) {
+    if (request.body.model || request.body.nodes || request.body.contentData) {
       // This is a Neon model - convert to newsletter
       result = await mailjetService.sendNewsletter(request.body);
     } else if (request.body.Messages) {
