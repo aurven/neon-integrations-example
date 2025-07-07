@@ -19,7 +19,7 @@ async function postSendgridHandler(request, reply) {
   const { model, rootData } = request.body;
   
   console.log("Hook received:");
-  console.log(request.body);
+  console.log(JSON.stringify(request.body));
 
   if (!model && !rootData) {
     console.error("Missing model in request body");
@@ -54,7 +54,7 @@ async function postMailjetHandler(request, reply) {
   // }
   
   console.log("Mailjet request received:");
-  console.log(request.body);
+  console.log(JSON.stringify(request.body));
 
   if (!request.body) {
     console.error("Missing request body");
