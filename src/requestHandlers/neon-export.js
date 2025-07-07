@@ -48,10 +48,10 @@ async function postMailjetHandler(request, reply) {
     ? request.headers
     : { apikey: null };
 
-  if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
-    console.log("Received call, but no API key was passed.");
-    return reply.status(401).send({ error: "Unauthorized" });
-  }
+  // if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
+  //   console.log("Received call, but no API key was passed.");
+  //   return reply.status(401).send({ error: "Unauthorized" });
+  // }
   
   console.log("Mailjet request received:");
   console.log(request.body);
