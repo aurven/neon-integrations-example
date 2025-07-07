@@ -52,18 +52,19 @@ async function sendTest() {
 }
 
 async function sendNewsletter(neonModel) {
+  const contentData = neonModel.contentData || {};
   const model = neonModel.model || neonModel;
-  const newsletterTitle = model.data?.title || "Latest News Updates";
+  const newsletterTitle = contentData.data.title || model.data?.title || "Latest News Updates";
   const baseUrl = neonModel.siteNode?.hostname || "https://theglobe-demo.neon.eks-dev.dev.eidosmedia.io";
   
   // Extract linked articles from the model
-  const articleIds = model.data?.links?.pagelink?.main || [];
+  const articleIds = contentData.data?.links?.pagelink?.main || model.data?.links?.pagelink?.main || [];
   const articles = [];
   
   // Process each article
   for (const link of articleIds) {
     const articleId = link.targetId;
-    const articleNode = neonModel.model.nodes?.[articleId];
+    const articleNode = contentData.nodes?.[articleId] || neonModel.model.nodes?.[articleId];
     
     if (articleNode && articleNode.title) {
       // Get main image URL
