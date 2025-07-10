@@ -2,12 +2,6 @@
 <html lang="en">
   <head>
     
-    <!-- 
-      This is the main Handlebars template for the site 
-      - When the user visits the homepage or submits a color the app calls the endpoints in server.js
-      - The server script passes data in here and the Handlebars code builds it into the HTML page
-    -->
-    
     <meta charset="utf-8" />
     <link rel="icon" href="/assets/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -30,13 +24,7 @@
   <body>
     <div class="wrapper">
       <div class="content" role="main">
-        
-        <!-- This is the start of content for our page -->
         <h1 class="title">Hello Neon!</h1>
-        
-        
-        
-        <!-- Instructions on using this project -->
         <div class="instructions">
           <h2>
             Using this integration example with Node.js and Fastify
@@ -48,12 +36,22 @@
           </p>
         </div>
         
+        <!-- Navigation to Services Dashboard -->
+        <div class="services-nav">
+          <a href="/services" class="services-link">
+            <div class="services-box">
+              <h3>Services Dashboard</h3>
+              <p>View all available integrations and services</p>
+              <span class="arrow">→</span>
+            </div>
+          </a>
+        </div>
+        
       </div>
     </div>
-    <!-- The footer holds our remix button — you can use it for structure or cut it out ✂ -->
+    
     <footer class="footer" hidden>
       <div class="links">Eidosmedia S.p.a. - 2025</div>
-      
     </footer>
     <script></script> 
   </body>

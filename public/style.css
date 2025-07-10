@@ -264,3 +264,60 @@ h2 {
   border-left-color: #ffc107;
   background: #fff3cd;
 }
+
+/* Services Navigation Box */
+.services-nav {
+  margin-top: 3rem;
+}
+
+.services-link {
+  text-decoration: none;
+  display: block;
+}
+
+.services-box {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--basic-radius);
+  padding: 2rem;
+  transition: all 0.3s ease;
+  position: relative;
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+}
+
+.services-box:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.services-box h3 {
+  color: var(--color-text-header);
+  font-family: var(--font-family-header);
+  font-size: 1.5rem;
+  margin: 0 0 0.5rem 0;
+  font-weight: bold;
+}
+
+.services-box p {
+  color: var(--color-text-main);
+  font-size: 1rem;
+  margin: 0;
+  opacity: 0.9;
+}
+
+.services-box .arrow {
+  position: absolute;
+  top: 50%;
+  right: 2rem;
+  transform: translateY(-50%);
+  font-size: 1.5rem;
+  color: var(--color-text-header);
+  transition: transform 0.3s ease;
+}
+
+.services-box:hover .arrow {
+  transform: translateY(-50%) translateX(5px);
+}

@@ -41,6 +41,47 @@ fastify.get("/", function (request, reply) {
   return reply.view("/src/pages/index.hbs", params);
 });
 
+// Services dashboard
+fastify.get("/services", function (request, reply) {
+  const integrations = {
+    inbound: [
+      { name: "Generic Import", endpoint: "POST /in/neon", description: "Import items from external sources to Neon CMS" },
+      { name: "Guardian API", endpoint: "POST /in/neon/from/guardian", description: "Import articles from The Guardian API" },
+      { name: "RSS Feeds", endpoint: "POST /in/neon/from/rss", description: "Import articles from RSS feeds (ANSA, TGcom24)" },
+      { name: "Google Docs", endpoint: "GET /in/googledocs", description: "Import content from Google Docs" },
+      { name: "Binary Upload", endpoint: "POST /in/binary", description: "Upload binary files to Neon" },
+      { name: "Trello Integration", endpoint: "GET /in/trello", description: "Import Trello cards to Neon with web interface" }
+    ],
+    outbound: [
+      { name: "Méthode CMS", endpoint: "POST /out/methode", description: "Export Neon content to Méthode CMS" },
+      { name: "Méthode Images", endpoint: "POST /out/imagesToMethode", description: "Export images to Méthode CMS" },
+      { name: "Sendgrid", endpoint: "POST /out/sendgrid", description: "Export content to Sendgrid email marketing" },
+      { name: "Mailjet", endpoint: "POST /out/mailjet", description: "Export content to Mailjet email service" }
+    ],
+    utilities: [
+      { name: "Content Cleanup", endpoint: "POST /utilities/cleanup", description: "Clean up content references" },
+      { name: "OpenAI Processing", endpoint: "POST /ai/openai", description: "Process content with OpenAI" },
+      { name: "Pexels Photos", endpoint: "GET /sources/pexels", description: "Source photos from Pexels API" },
+      { name: "Neon Discovery", endpoint: "GET /utilities/services", description: "Discover Neon services" }
+    ],
+    widgets: [
+      { name: "Test Widget", endpoint: "GET /widgets/test", description: "Test widget interface" },
+      { name: "Document Drop", endpoint: "GET /widgets/drop", description: "Drop and upload documents" },
+      { name: "Document Upload", endpoint: "POST /widgets/drop/upload", description: "Process uploaded documents" },
+      { name: "Wires Widget", endpoint: "GET /widgets/wires", description: "Wire management interface" }
+    ]
+  };
+
+  let params = { 
+    seo: seo, 
+    integrations: integrations,
+    location: process.env.NEON_EXT_LOCATION || "Unknown",
+    version: "1.1.0"
+  };
+
+  return reply.view("/src/pages/services-dashboard.hbs", params);
+});
+
 // Example
 fastify.get("/test", async function handler(request, reply) {
   const { apikey } = request.headers?.apikey

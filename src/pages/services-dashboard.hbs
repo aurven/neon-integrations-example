@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="/assets/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{seo.title}} - Services Dashboard</title>
+    
+    <!-- Meta tags for SEO and social sharing -->
+    <link rel="canonical" href="{{seo.url}}/services">
+    <meta name="description" content="{{seo.description}} - Services Dashboard">
+    <meta property="og:title" content="{{seo.title}} - Services Dashboard">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="{{seo.url}}/services">
+    <meta property="og:description" content="{{seo.description}} - Services Dashboard">
+    <meta property="og:image" content="{{seo.image}}">
+    <meta name="twitter:card" content="summary">
+
+    <!-- Import the webpage's stylesheet -->
+    <link rel="stylesheet" href="/style.css" />
+    
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background: #f8f9fa;
+        min-height: 100vh;
+        font-family: Arial, sans-serif;
+      }
+      
+      .dashboard-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        font-family: Arial, sans-serif;
+      }
+      
+      .header {
+        text-align: center;
+        margin-bottom: 40px;
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 10px;
+      }
+      
+      .header h1 {
+        margin: 0;
+        font-size: 2.5em;
+      }
+      
+      .header p {
+        margin: 10px 0 0 0;
+        font-size: 1.2em;
+        opacity: 0.9;
+      }
+      
+      .status-info {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+        border-left: 4px solid #28a745;
+        color: #333;
+      }
+
+      .status-info p {
+        color: #333;
+      }
+      
+      .status-info h3 {
+        margin-top: 0;
+        color: #28a745;
+      }
+      
+      .status-chip {
+        display: inline-flex;
+        align-items: center;
+        background: #28a745;
+        color: white;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.9em;
+        font-weight: 500;
+        margin-left: 10px;
+        box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
+      }
+      
+      .status-chip::before {
+        content: '●';
+        margin-right: 6px;
+        font-size: 1.2em;
+        animation: pulse 2s infinite;
+      }
+      
+      @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.5; }
+        100% { opacity: 1; }
+      }
+      
+      .integration-section {
+        margin-bottom: 40px;
+      }
+      
+      .section-title {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+        font-size: 1.5em;
+        font-weight: bold;
+        color: #333;
+      }
+      
+      .section-icon {
+        width: 24px;
+        height: 24px;
+        margin-right: 10px;
+        border-radius: 50%;
+      }
+      
+      .inbound .section-icon { background: #28a745; }
+      .outbound .section-icon { background: #dc3545; }
+      .utilities .section-icon { background: #ffc107; }
+      .widgets .section-icon { background: #6f42c1; }
+      
+      .integration-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 20px;
+      }
+      
+      .integration-card {
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+        color: #333;
+      }
+      
+      .integration-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+      }
+      
+      .integration-name {
+        font-size: 1.2em;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 8px;
+      }
+      
+      .integration-endpoint {
+        background: #f8f9fa;
+        padding: 8px 12px;
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 0.9em;
+        color: #495057;
+        margin-bottom: 10px;
+        border-left: 3px solid #007bff;
+      }
+      
+      .integration-description {
+        color: #666;
+        line-height: 1.4;
+      }
+      
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+      }
+      
+      .stat-card {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        color: #333;
+      }
+      
+      .stat-number {
+        font-size: 2em;
+        font-weight: bold;
+        color: #007bff;
+        margin-bottom: 5px;
+      }
+      
+      .stat-label {
+        color: #666;
+        font-size: 0.9em;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      
+      .footer {
+        text-align: center;
+        margin-top: 40px;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="dashboard-container">
+      <div class="header">
+        <h1>Neon Integrations Dashboard</h1>
+        <p>Comprehensive overview of all available integrations and services</p>
+      </div>
+      
+      <div class="status-info">
+        <h3>System Status</h3>
+        <p><strong>Version:</strong> {{version}}</p>
+        <p><strong>Location:</strong> {{location}}</p>
+        <p><strong>Status:</strong> <span class="status-chip">Active</span></p>
+      </div>
+      
+      <div class="stats">
+        <div class="stat-card">
+          <div class="stat-number">{{integrations.inbound.length}}</div>
+          <div class="stat-label">Inbound</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">{{integrations.outbound.length}}</div>
+          <div class="stat-label">Outbound</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">{{integrations.utilities.length}}</div>
+          <div class="stat-label">Utilities</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">{{integrations.widgets.length}}</div>
+          <div class="stat-label">Widgets</div>
+        </div>
+      </div>
+      
+      <div class="integration-section inbound">
+        <div class="section-title">
+          <div class="section-icon"></div>
+          Inbound Integrations
+        </div>
+        <div class="integration-grid">
+          {{#each integrations.inbound}}
+          <div class="integration-card">
+            <div class="integration-name">{{name}}</div>
+            <div class="integration-endpoint">{{endpoint}}</div>
+            <div class="integration-description">{{description}}</div>
+          </div>
+          {{/each}}
+        </div>
+      </div>
+      
+      <div class="integration-section outbound">
+        <div class="section-title">
+          <div class="section-icon"></div>
+          Outbound Integrations
+        </div>
+        <div class="integration-grid">
+          {{#each integrations.outbound}}
+          <div class="integration-card">
+            <div class="integration-name">{{name}}</div>
+            <div class="integration-endpoint">{{endpoint}}</div>
+            <div class="integration-description">{{description}}</div>
+          </div>
+          {{/each}}
+        </div>
+      </div>
+      
+      <div class="integration-section utilities">
+        <div class="section-title">
+          <div class="section-icon"></div>
+          Utility Services
+        </div>
+        <div class="integration-grid">
+          {{#each integrations.utilities}}
+          <div class="integration-card">
+            <div class="integration-name">{{name}}</div>
+            <div class="integration-endpoint">{{endpoint}}</div>
+            <div class="integration-description">{{description}}</div>
+          </div>
+          {{/each}}
+        </div>
+      </div>
+      
+      <div class="integration-section widgets">
+        <div class="section-title">
+          <div class="section-icon"></div>
+          Widget Interfaces
+        </div>
+        <div class="integration-grid">
+          {{#each integrations.widgets}}
+          <div class="integration-card">
+            <div class="integration-name">{{name}}</div>
+            <div class="integration-endpoint">{{endpoint}}</div>
+            <div class="integration-description">{{description}}</div>
+          </div>
+          {{/each}}
+        </div>
+      </div>
+      
+      <div class="footer">
+        <p>Neon Integrations Hub - Connecting your content management ecosystem</p>
+        <p><em>All endpoints require API key authentication via 'apikey' header</em></p>
+      </div>
+    </div>
+  </body>
+</html>
