@@ -4,11 +4,11 @@ which it's being shared. In other words, this is us using an MIT license to
 say "we wrote this and you can do whatever you want with it."
 
 ******************************************************************************
-~glitch-hello-node
+~neon-integrations-example
 ******************************************************************************
 MIT License
 
-Copyright (c) 2021, Glitch, Inc.
+Copyright (c) 2025, Eidosmedia S.p.A. <https://www.eidosmedia.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -40,7 +40,6 @@ THIRD-PARTY SOFTWARE
 2. fastify/static: Plugin for serving static files as fast as possible.
 3. handlebars.js: Minimal templating on steroids
 4. fastify/view: Templates rendering plugin support for Fastify.
-5. HK Grotesk: The font we're using. 
 
 
 ******************************************************************************
@@ -163,17 +162,4 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ******************************************************************************
 END, fastify/view
-******************************************************************************
-
-
-******************************************************************************
-5. HK Grotesk
-URL: https://hanken.co/products/hk-grotesk
-******************************************************************************
-HK Grotesk was designed by Hanken Design Co. It is shared using a SIL OFL
-license. Full license text can be found at:
-
-https://hanken.co/pages/web-fonts-eula
-******************************************************************************
-END, HK Grotesk
 ******************************************************************************
