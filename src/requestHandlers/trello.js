@@ -30,8 +30,12 @@ async function trelloToNeonHandler(request, reply) {
     ? request.headers
     : { apikey: null };
 
+  console.log("trelloToNeonHandler << IN:");
+  console.log("Request Headers:", request.headers);
+  console.log("Request Body:", request.body);
+
   if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
-    console.log("Received call, but no API key was passed.");
+    console.log("trelloToNeonHandler << ERROR: Unauthorized");
     return reply.status(401).send({ error: "Unauthorized" });
   }
   
@@ -46,7 +50,8 @@ async function trelloToNeonHandler(request, reply) {
             message: "Processed",
             data: result,
         }
-        console.log(message);
+        console.log("trelloToNeonHandler << OUT:");
+        console.log("Response Data:", message);
         return reply.status(200).send(message);
     });
 };

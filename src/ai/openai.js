@@ -1,73 +1,72 @@
-// const { OpenAIApi } = require('openai'); Not compatible with Node 14
-
-const axios = require('axios');
-const FormData = require('form-data');
+const { OpenAI } = require('openai');
+const fs = require('fs');
+const path = require('path');
+const { Readable } = require('stream');
 
 const OPENAI_APIKEY = process.env.OPENAI_APIKEY;
+
+// Initialize OpenAI client with proper error handling
+const openai = OPENAI_APIKEY ? new OpenAI({
+  apiKey: OPENAI_APIKEY,
+}) : null;
 
 async function completions({
   model = "gpt-4o-mini",
   messages,
   temperature = 0.7
 }) {
+    if (!openai) {
+        throw new Error('OpenAI client not initialized. Please set OPENAI_APIKEY environment variable.');
+    }
+    
     console.log(model);
     console.log(temperature);
     console.log(messages);
-    console.log(OPENAI_APIKEY);
     
-    const data = JSON.stringify({
-      model, messages, temperature
-    });
-
-    const config = {
-        method: 'post',
-        maxBodyLength: Infinity,
-        maxContentLength: Infinity,
-        url: `https://api.openai.com/v1/chat/completions`,
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${OPENAI_APIKEY}`
-        },
-        data: data
-    };
-
-    return await axios.request(config)
-        .then((response) => {
-            console.log(JSON.stringify(response.data));
-            return response.data;
-        })
-        .catch((error) => {
-            console.error(`❌ ERROR: ${error.code}`);
-            console.error(JSON.stringify(error.response.data));
+    try {
+        const completion = await openai.chat.completions.create({
+            model,
+            messages,
+            temperature
         });
+        
+        console.log(JSON.stringify(completion));
+        return completion;
+    } catch (error) {
+        console.error(`❌ ERROR: ${error.code || error.type}`);
+        console.error(error.message);
+        throw error;
+    }
 }
 
 /**
  * Transcribes an audio buffer using OpenAI Whisper API.
  * @param {Buffer} audioBuffer - The audio data buffer.
  * @param {string} filename - The name of the audio file (with extension, e.g., 'audio.mp3').
- * @param {string} apiKey - Your OpenAI API key.
- * @returns {Promise<string>} - The transcribed text.
+ * @param {string} apiKey - Your OpenAI API key (optional, uses environment variable by default).
+ * @returns {Promise<Object>} - Object containing QNA array, raw text, and OpenAI response data.
  */
 async function transcribeAudio(audio, filename, apiKey = OPENAI_APIKEY) {
-  const form = new FormData();
-  form.append('file', audio, filename);
-  form.append('model', 'whisper-1'); // The options are gpt-4o-transcribe, gpt-4o-mini-transcribe, and whisper-1
-  //form.append('prompt', 'This is an interview between two people. One asks questions, the other answers. Do not hallucinate.');
-  //form.append('response_format', 'verbose_json');
+  if (!openai) {
+    throw new Error('OpenAI client not initialized. Please set OPENAI_APIKEY environment variable.');
+  }
   
   try {
-    const response = await axios.post('https://api.openai.com/v1/audio/transcriptions', form, {
-      headers: {
-        ...form.getHeaders(),
-        Authorization: `Bearer ${apiKey}`
-      },
-      maxContentLength: Infinity,
-      maxBodyLength: Infinity
+    // Convert buffer to readable stream for OpenAI SDK
+    const audioStream = Readable.from(audio);
+    // Add filename property for proper handling
+    audioStream.path = filename;
+
+    const transcription = await openai.audio.transcriptions.create({
+      file: audioStream,
+      model: 'whisper-1',
+      // Optional parameters can be uncommented as needed:
+      // prompt: 'This is an interview between two people. One asks questions, the other answers. Do not hallucinate.',
+      // response_format: 'verbose_json',
     });
 
-    const text = response.data.text;
-    console.log('OpenAI Response for Transcription: ', response.data);
+    const text = transcription.text;
+    console.log('OpenAI Response for Transcription: ', transcription);
 
     // Simple Q&A extraction
     const qna = [];
@@ -84,23 +83,44 @@ async function transcribeAudio(audio, filename, apiKey = OPENAI_APIKEY) {
       }
     }
 
-    return { qna, rawText: text, openAiResponseData: response.data };
+    return { qna, rawText: text, openAiResponseData: transcription };
   } catch (error) {
-    console.error('Transcription failed:', error.response?.data || error.message);
+    console.error('Transcription failed:', error.message);
     throw new Error('Transcription error');
   }
 }
 
 /**
+ * Helper function to determine MIME type based on file extension.
+ * @param {string} filename - The filename with extension.
+ * @returns {string} - The MIME type.
+ */
+function getAudioMimeType(filename) {
+  const ext = filename.toLowerCase().split('.').pop();
+  const mimeTypes = {
+    'mp3': 'audio/mpeg',
+    'wav': 'audio/wav',
+    'ogg': 'audio/ogg',
+    'flac': 'audio/flac',
+    'm4a': 'audio/m4a',
+    'webm': 'audio/webm'
+  };
+  return mimeTypes[ext] || 'audio/mpeg';
+}
+
+/**
  * Converts Q&A into a structured article structure using OpenAI completions.
- * @param {Object[]} qa - Array of Q&A objects from transcription.
- * @param {string} apiKey
- * @returns {Promise<{ headline: string, summary: string, html: string }>}
+ * @param {Object} transcription - Transcription object from transcribeAudio.
+ * @param {string} apiKey - OpenAI API key (optional, uses environment variable by default).
+ * @returns {Promise<Object>} - Object containing structured article data.
  */
 async function generateInterviewStructure(transcription, apiKey = OPENAI_APIKEY) {
-  const qa = transcription.qna;
+  if (!openai) {
+    throw new Error('OpenAI client not initialized. Please set OPENAI_APIKEY environment variable.');
+  }
   
-  const prompt = `
+  const systemPrompt = `
+You are a journalist formatting an interview for publication. Use always the whole text as reference.
 You are given a transcription of an interview in raw text. 
 Desume the interview structure, without allucinating. Create a JSON response with the following structure:
 {
@@ -125,53 +145,41 @@ seoMeta: A creative, engaging, and relevant SEO Meta Description based on the ar
 keywords: I would like you to act as a keywords extraction server. I give you a text and you respond with the keywords extracted from the text. Give a maximum of five keyswords per prompt. You only answer with the list of keywords and nothing else. The words must exist. Precise presentation of the top information. Focus on the core statements of the article. Favour clear and concrete information. Do not write any explanations. 
 
 Use the whole text to generate the HTML part. Do not skip any text while creating the HTML structure. Do not hallucinate on the content.
-Text: ${transcription.rawText}
 `;
 
   try {
-    const response = await axios.post('https://api.openai.com/v1/chat/completions', {
+    const completion = await openai.chat.completions.create({
       model: 'gpt-4',
       messages: [
-        { role: 'system', content: 'You are a journalist formatting an interview for publication. Use always the whole text as reference.' },
-        { role: 'user', content: prompt }
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: `Text: ${transcription.rawText}` }
       ],
       temperature: 0.7
-    }, {
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        'Content-Type': 'application/json'
-      }
     });
 
-    const content = response.data.choices[0].message.content;
+    const content = completion.choices[0].message.content;
     const jsonContent = JSON.parse(content);
     console.log('OpenAi Completions: ', jsonContent);
     
     return jsonContent;
 
-    // Naive parsing — assuming sections are clearly separated
-    /*
-    const headlineMatch = content.match(/headline[:\-]?\s*(.+)/i);
-    const summaryMatch = content.match(/summary[:\-]?\s*((.|\n)+?)\n\n/i);
-    const htmlMatch = content.match(/<h3>.*<\/p>/is);
-
-    return {
-      headline: headlineMatch?.[1]?.trim() || '',
-      summary: summaryMatch?.[1]?.trim() || '',
-      html: htmlMatch?.[0]?.trim() || ''
-    };*/
-    
-    
-
   } catch (error) {
-    console.error('Completion failed:', error.response?.data || error.message);
+    console.error('Completion failed:', error.message);
     throw new Error('Summary generation error');
   }
 }
 
 
 async function test() {
-  return await completions({ "messages": [{"role": "user", "content": "Say this is a test!"}] });
+  try {
+    const response = await completions({ 
+      "messages": [{"role": "user", "content": "Say this is a test!"}] 
+    });
+    return response;
+  } catch (error) {
+    console.error('Test function failed:', error.message);
+    throw error;
+  }
 }
 
 module.exports = {

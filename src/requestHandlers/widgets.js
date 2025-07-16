@@ -28,6 +28,9 @@ async function asyncDropUploadWidgetHandler(request, reply) {
     'audio/ogg'
   ];
   
+  console.log("asyncDropUploadWidgetHandler << IN:");
+  console.log("Request Headers:", request.headers);
+  
   // params is an object we'll pass to our handlebars template
   let params = { seo: seo };
   
@@ -74,10 +77,15 @@ async function asyncDropUploadWidgetHandler(request, reply) {
     console.log(resultMessage);
     console.log(parsedDoc);
 
-    return reply.status(200).send({
+    const docResponse = {
       message: resultMessage,
       document: parsedDoc
-    });
+    };
+
+    console.log("asyncDropUploadWidgetHandler << OUT:");
+    console.log("Response Data:", docResponse);
+
+    return reply.status(200).send(docResponse);
   }
   
   if (isAudio) {
@@ -120,16 +128,24 @@ async function asyncDropUploadWidgetHandler(request, reply) {
     
     console.log('asyncDropUploadWidgetHandler - Done!', responseBody);
 
+    console.log("asyncDropUploadWidgetHandler << OUT:");
+    console.log("Response Data:", responseBody);
+
     return reply.status(200).send(responseBody);
   }
   
-  return reply.status(400).send({
+  const errorResponse = {
     message: 'Unsupported MIME type',
     supportedTypes: {
       documentTypes: supportedDocs,
       audioTypes: supportedAudios
     }
-  });
+  };
+
+  console.log("asyncDropUploadWidgetHandler << ERROR:");
+  console.log("Error Response:", errorResponse);
+
+  return reply.status(400).send(errorResponse);
 }
 
 function wiresWidgetHandler (request, reply) {

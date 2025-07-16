@@ -10,6 +10,10 @@ async function postSendgridHandler(request, reply) {
     ? request.headers
     : { apikey: null };
 
+  console.log("postSendgridHandler << IN:");
+  console.log("Request Headers:", request.headers);
+  console.log("Request Body:", request.body);
+
   // TODO - Restore when we can add ApiKeys to Webhooks headers
   // if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
   //   console.log("Received call, but no API key was passed.");
@@ -22,7 +26,7 @@ async function postSendgridHandler(request, reply) {
   console.log(JSON.stringify(request.body));
 
   if (!model && !rootData) {
-    console.error("Missing model in request body");
+    console.error("postSendgridHandler << ERROR: Missing model in request body");
     return reply.status(400).send({ error: "Missing model in request body" });
   }
   
@@ -32,10 +36,13 @@ async function postSendgridHandler(request, reply) {
 
   return await neonToSendgrid.sendWeeklyGlobe()
     .finally(result => {
-        return reply.status(200).send({
+        const response = {
             message: "Processed",
             data: result,
-        });
+        };
+        console.log("postSendgridHandler << OUT:");
+        console.log("Response Data:", response);
+        return reply.status(200).send(response);
     });
 }
 
@@ -48,6 +55,10 @@ async function postMailjetHandler(request, reply) {
     ? request.headers
     : { apikey: null };
 
+  console.log("postMailjetHandler << IN:");
+  console.log("Request Headers:", request.headers);
+  console.log("Request Body:", request.body);
+
   // if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
   //   console.log("Received call, but no API key was passed.");
   //   return reply.status(401).send({ error: "Unauthorized" });
@@ -57,7 +68,7 @@ async function postMailjetHandler(request, reply) {
   console.log(JSON.stringify(request.body));
 
   if (!request.body) {
-    console.error("Missing request body");
+    console.error("postMailjetHandler << ERROR: Missing request body");
     return reply.status(400).send({ error: "Missing request body" });
   }
 
@@ -72,22 +83,30 @@ async function postMailjetHandler(request, reply) {
       // This is direct Mailjet format
       result = await mailjetService.sendSingleEmail(request.body);
     } else {
-      console.error("Invalid request format - expected either 'model' (Neon) or 'Messages' (Mailjet)");
+      console.error("postMailjetHandler << ERROR: Invalid request format - expected either 'model' (Neon) or 'Messages' (Mailjet)");
       return reply.status(400).send({ 
         error: "Invalid request format - expected either 'model' for newsletter or 'Messages' for direct email" 
       });
     }
     
-    return reply.status(200).send({
+    const response = {
       message: "Email sent successfully",
       data: result,
-    });
+    };
+    
+    console.log("postMailjetHandler << OUT:");
+    console.log("Response Data:", response);
+    
+    return reply.status(200).send(response);
   } catch (error) {
-    console.error("Error sending email:", error);
-    return reply.status(500).send({
+    console.error("postMailjetHandler << ERROR: Error sending email:", error);
+    const errorResponse = {
       error: "Failed to send email",
       details: error.message,
-    });
+    };
+    console.log("postMailjetHandler << ERROR:");
+    console.log("Error Response:", errorResponse);
+    return reply.status(500).send(errorResponse);
   }
 }
 

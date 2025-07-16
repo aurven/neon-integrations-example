@@ -9,19 +9,27 @@ async function cleanupHandler(request, reply) {
     : { apikey: null };
   const { familyRefs } = request.body;
 
+  console.log("cleanupHandler << IN:");
+  console.log("Request Headers:", request.headers);
+  console.log("Request Body:", request.body);
+
   if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
+    console.log("cleanupHandler << ERROR: Unauthorized");
     return reply.status(401).send({ error: "Unauthorized" });
   }
 
   if (!familyRefs || familyRefs.length === 0) {
+    console.error("cleanupHandler << ERROR: No items provided");
     return reply.status(400).send({ error: "No items provided" });
   }
   
   await cleaner.cleanupRefs(familyRefs);
 
-  return reply.status(200).send({
-    message: "Items processed successfully"
-  });
+  const result = { message: "Items processed successfully" };
+  console.log("cleanupHandler << OUT:");
+  console.log("Response Data:", result);
+
+  return reply.status(200).send(result);
 }
 
 async function openAiHandler(request, reply) {
@@ -29,8 +37,12 @@ async function openAiHandler(request, reply) {
     ? request.headers
     : { apikey: null };
 
+  console.log("openAiHandler << IN:");
+  console.log("Request Headers:", request.headers);
+  console.log("Request Body:", request.body);
+
   if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
-    console.log("Received call, but no API key was passed.");
+    console.log("openAiHandler << ERROR: Unauthorized");
     return reply.status(401).send({ error: "Unauthorized" });
   }
   
@@ -40,10 +52,13 @@ async function openAiHandler(request, reply) {
 
   return await openaiPrompts.test()
     .finally(result => {
-        return reply.status(200).send({
+        const response = {
             message: "Processed",
             data: result,
-        });
+        };
+        console.log("openAiHandler << OUT:");
+        console.log("Response Data:", response);
+        return reply.status(200).send(response);
     });  
 }
 
@@ -52,8 +67,12 @@ async function pexelsPhotosHandler(request, reply) {
     ? request.headers
     : { apikey: null };
 
+  console.log("pexelsPhotosHandler << IN:");
+  console.log("Request Headers:", request.headers);
+  console.log("Request Query:", request.query);
+
   if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
-    console.log("Received call, but no API key was passed.");
+    console.log("pexelsPhotosHandler << ERROR: Unauthorized");
     return reply.status(401).send({ error: "Unauthorized" });
   }
   
@@ -64,6 +83,8 @@ async function pexelsPhotosHandler(request, reply) {
 
   return await pexels.getPhotos(query)
     .then(result => {
+        console.log("pexelsPhotosHandler << OUT:");
+        console.log("Response Data:", result);
         return reply.status(200).send(result);
         /* return reply.status(200).send({
             message: "Processed",
@@ -73,8 +94,13 @@ async function pexelsPhotosHandler(request, reply) {
 }
 
 async function neonDiscoveryHandler (request, reply) {
+  console.log("neonDiscoveryHandler << IN:");
+  console.log("Request Headers:", request.headers);
+  console.log("Request Query:", request.query);
+
   return await neon.discoveryServices()
     .then(data => {
+        console.log("neonDiscoveryHandler << OUT:");
         console.log('Passing data: ', data);
         return reply.view("/src/pages/discovery.hbs", { data });
     });

@@ -11,11 +11,17 @@ async function importHandler(request, reply) {
     : { apikey: null };
   const { site, workspace, items } = request.body;
 
+  console.log("importHandler << IN:");
+  console.log("Request Headers:", request.headers);
+  console.log("Request Body:", request.body);
+
   if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
+    console.log("importHandler << ERROR: Unauthorized");
     return reply.status(401).send({ error: "Unauthorized" });
   }
 
   if (!items || items.length === 0) {
+    console.error("importHandler << ERROR: No items provided");
     return reply.status(400).send({ error: "No items provided" });
   }
 
@@ -24,10 +30,15 @@ async function importHandler(request, reply) {
     workspace,
   });
 
-  return reply.status(200).send({
+  const response = {
     message: "Items processed successfully",
     data: processResult,
-  });
+  };
+
+  console.log("importHandler << OUT:");
+  console.log("Response Data:", response);
+
+  return reply.status(200).send(response);
 };
 
 // External Source to Neon
@@ -38,6 +49,10 @@ async function importFromGuardianHandler(request, reply) {
     ? request.headers
     : { apikey: null };
   const options = request.body;
+  
+  console.log("importFromGuardianHandler << IN:");
+  console.log("Request Headers:", request.headers);
+  console.log("Request Body:", request.body);
   
   console.log('Options:');
   console.log(options);
@@ -54,10 +69,12 @@ async function importFromGuardianHandler(request, reply) {
   const siteAsChannel = options.siteAsChannel === 'true' || options.siteAsChannel === true;
 
   if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
+    console.log("importFromGuardianHandler << ERROR: Unauthorized");
     return reply.status(401).send({ error: "Unauthorized" });
   }
 
   if (!section || section.length === 0) {
+    console.error("importFromGuardianHandler << ERROR: No target section provided");
     return reply.status(400).send({ error: "No target section provided" });
   }
 
@@ -71,6 +88,7 @@ async function importFromGuardianHandler(request, reply) {
   );
   
   if (!items || items.length === 0) {
+    console.error("importFromGuardianHandler << ERROR: No items provided");
     return reply.status(400).send({ error: "No items provided" });
   }
   
@@ -89,10 +107,15 @@ async function importFromGuardianHandler(request, reply) {
 
   const processResult = await storiesPopulator.populateNeonInstance(items, populatorOptions);
 
-  return reply.status(200).send({
+  const response = {
     message: "Items processed successfully",
     data: processResult,
-  });
+  };
+
+  console.log("importFromGuardianHandler << OUT:");
+  console.log("Response Data:", response);
+
+  return reply.status(200).send(response);
 };
 
 async function importFromRssHandler(request, reply) {
@@ -100,6 +123,10 @@ async function importFromRssHandler(request, reply) {
     ? request.headers
     : { apikey: null };
   const options = request.body;
+
+  console.log("importFromRssHandler << IN:");
+  console.log("Request Headers:", request.headers);
+  console.log("Request Body:", request.body);
 
   const rssUrl = options.rssUrl || null;
   const maxItems = options.maxItems || null;
@@ -110,10 +137,12 @@ async function importFromRssHandler(request, reply) {
   const siteAsChannel = options.siteAsChannel;
 
   if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
+    console.log("importFromRssHandler << ERROR: Unauthorized");
     return reply.status(401).send({ error: "Unauthorized" });
   }
 
   if (!rssUrl || rssUrl.length === 0) {
+    console.error("importFromRssHandler << ERROR: No rssUrl provided");
     return reply.status(400).send({ error: "No rssUrl provided" });
   }
 
@@ -124,6 +153,7 @@ async function importFromRssHandler(request, reply) {
   );
   
   if (!items || items.length === 0) {
+    console.error("importFromRssHandler << ERROR: No items provided");
     return reply.status(400).send({ error: "No items provided" });
   }
   
@@ -140,16 +170,26 @@ async function importFromRssHandler(request, reply) {
   
   console.log(processResult);
 
-  return reply.status(200).send({
+  const response = {
     message: "Import Process Started Successfully",
     items
-  });
+  };
+
+  console.log("importFromRssHandler << OUT:");
+  console.log("Response Data:", response);
+
+  return reply.status(200).send(response);
 };
 
 function importFromGoogleDocsHandler(request, reply) {
   const { processedDocument } = request.body;
 
+  console.log("importFromGoogleDocsHandler << IN:");
+  console.log("Request Headers:", request.headers);
+  console.log("Request Body:", request.body);
+
   if (!processedDocument) {
+    console.error("importFromGoogleDocsHandler << ERROR: Missing processedDocument in request body");
     return reply
       .status(400)
       .send({ error: "Missing processedDocument in request body" });
@@ -157,12 +197,17 @@ function importFromGoogleDocsHandler(request, reply) {
 
   gdocsToNeon.sendToNeon(processedDocument);
 
-  return reply.status(200).send({
+  const response = {
     message: "Webhook processed",
     data: {
       familyRef: "neonId",
     },
-  });
+  };
+
+  console.log("importFromGoogleDocsHandler << OUT:");
+  console.log("Response Data:", response);
+
+  return reply.status(200).send(response);
 }
 
 async function importBinaryHandler(request, reply) {
@@ -171,8 +216,12 @@ async function importBinaryHandler(request, reply) {
     : { apikey: null };
   const { model, rootData } = request.body;
 
+  console.log("importBinaryHandler << IN:");
+  console.log("Request Headers:", request.headers);
+  console.log("Request Body:", request.body);
+
   if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
-    console.log("Received call, but no API key was passed.");
+    console.log("importBinaryHandler << ERROR: Unauthorized");
     return reply.status(401).send({ error: "Unauthorized" });
   }
   
@@ -182,7 +231,7 @@ async function importBinaryHandler(request, reply) {
   const { urls } = request.body;
 
   if (!urls || urls.length == 0) {
-    console.error("Missing model in request body");
+    console.error("importBinaryHandler << ERROR: Missing model in request body");
     return reply.status(400).send({ error: "Missing model in request body" });
   }
 
@@ -192,10 +241,15 @@ async function importBinaryHandler(request, reply) {
     workspace: ''
   });
 
-  return reply.status(200).send({
+  const response = {
     message: "Processed",
     data: processResult,
-  });
+  };
+
+  console.log("importBinaryHandler << OUT:");
+  console.log("Response Data:", response);
+
+  return reply.status(200).send(response);
 }
 
 async function importTest(request, reply) {
@@ -203,6 +257,10 @@ async function importTest(request, reply) {
     ? request.headers
     : { apikey: null };
   const options = request.body;
+
+  console.log("importTest << IN:");
+  console.log("Request Headers:", request.headers);
+  console.log("Request Body:", request.body);
 
   const pageSize = options.pageSize || null;
   const fromDate = options.fromDate || null;
@@ -214,10 +272,12 @@ async function importTest(request, reply) {
   const targetTranslation = options.targetTranslation;
 
   if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
+    console.log("importTest << ERROR: Unauthorized");
     return reply.status(401).send({ error: "Unauthorized" });
   }
 
   if (!section || section.length === 0) {
+    console.error("importTest << ERROR: No target section provided");
     return reply.status(400).send({ error: "No target section provided" });
   }
 
@@ -231,6 +291,7 @@ async function importTest(request, reply) {
   );
   
   if (!items || items.length === 0) {
+    console.error("importTest << ERROR: No items provided");
     return reply.status(400).send({ error: "No items provided" });
   }
 
@@ -241,10 +302,15 @@ async function importTest(request, reply) {
     translate: targetTranslation
   });
 
-  return reply.status(200).send({
+  const response = {
     message: "Items processed successfully",
     data: processResult,
-  });
+  };
+
+  console.log("importTest << OUT:");
+  console.log("Response Data:", response);
+
+  return reply.status(200).send(response);
 };
 
 module.exports = {

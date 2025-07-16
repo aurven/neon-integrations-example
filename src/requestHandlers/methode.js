@@ -10,6 +10,10 @@ async function postMethodeHandler(request, reply) {
     : { apikey: null };
   const { model, rootData } = request.body;
 
+  console.log("postMethodeHandler << IN:");
+  console.log("Request Headers:", request.headers);
+  console.log("Request Body:", request.body);
+
   // TODO - Restore when we can add ApiKeys to Webhooks headers
   // if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
   //   console.log("Received call, but no API key was passed.");
@@ -27,6 +31,9 @@ async function postMethodeHandler(request, reply) {
   const neonModel = (model && model.data) || rootData || model;
 
   const processResult = await neonToMethode.processNeonStoryV2(neonModel);
+
+  console.log("postMethodeHandler << OUT:");
+  console.log("Response Data:", processResult);
 
   return reply.status(200).send({
     message: "Webhook processed",
@@ -40,6 +47,10 @@ async function postMethodeImageHandler(request, reply) {
     : { apikey: null };
   const { model, rootData } = request.body;
 
+  console.log("postMethodeImageHandler << IN:");
+  console.log("Request Headers:", request.headers);
+  console.log("Request Body:", request.body);
+
   // TODO - Restore when we can add ApiKeys to Webhooks headers
   // if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
   //   console.log("Received call, but no API key was passed.");
@@ -50,13 +61,16 @@ async function postMethodeImageHandler(request, reply) {
   console.log(request.body);
 
   if (!model && !rootData) {
-    console.error("Missing model in request body");
+    console.error("postMethodeImageHandler << ERROR: Missing model in request body");
     return reply.status(400).send({ error: "Missing model in request body" });
   }
   
   const neonModel = (model && model.data) || rootData || model;
 
   const processResult = await neonToMethode.processNeonImages(neonModel);
+
+  console.log("postMethodeImageHandler << OUT:");
+  console.log("Response Data:", processResult);
 
   return reply.status(200).send({
     message: "Webhook processed",
@@ -70,6 +84,10 @@ async function postMethodeTest(request, reply) {
     : { apikey: null };
   const { model, rootData } = request.body;
 
+  console.log("postMethodeTest << IN:");
+  console.log("Request Headers:", request.headers);
+  console.log("Request Body:", request.body);
+
   // TODO - Restore when we can add ApiKeys to Webhooks headers
   // if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
   //   console.log("Received call, but no API key was passed.");
@@ -80,13 +98,16 @@ async function postMethodeTest(request, reply) {
   console.log(request.body);
 
   if (!model && !rootData) {
-    console.error("Missing model in request body");
+    console.error("postMethodeTest << ERROR: Missing model in request body");
     return reply.status(400).send({ error: "Missing model in request body" });
   }
   
   const neonModel = (model && model.data) || rootData || model;
 
   const processResult = await neonToMethode.processNeonStoryV2(neonModel);
+
+  console.log("postMethodeTest << OUT:");
+  console.log("Response Data:", processResult);
 
   return reply.status(200).send({
     message: "Webhook processed",
