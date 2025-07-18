@@ -161,7 +161,9 @@ function bodyGenerator({
 }
 
 function metadataGenerator(meta) {
-    const { seoTitle, seoMeta, keywords } = meta;
+    const seoTitle = meta?.seoTitle || '';
+    const seoMeta = meta?.seoMeta || '';
+    const keywords = meta?.keywords || '';
     const body = `
         <?xml version="1.0" encoding="UTF-8"?>
         <!DOCTYPE ObjectMetadata SYSTEM "/common/rules/classify.dtd">
