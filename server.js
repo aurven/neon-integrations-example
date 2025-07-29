@@ -42,6 +42,10 @@ fastify.register(require("@fastify/view"), {
 
 
 
+// Load application version from package.json
+const packageJson = require("./package.json");
+const appVersion = packageJson.version;
+
 // Load and parse SEO data
 const seo = require("./src/seo.json");
 if (seo.url === "default") {
@@ -104,7 +108,7 @@ fastify.get("/services", function (request, reply) {
     seo: seo, 
     integrations: integrations,
     location: process.env.NEON_EXT_LOCATION || "Unknown",
-    version: process.env.NEON_EXT_VERSION || "Unknown"
+    version: appVersion
   };
 
   return reply.view("/src/pages/services-dashboard.hbs", params);
@@ -122,7 +126,7 @@ fastify.get("/test", async function handler(request, reply) {
 
   return reply.status(200).send({
     message: "Neon Integrations Up and Running",
-    version: process.env.NEON_EXT_VERSION || "Unknown",
+    version: appVersion,
     location: process.env.NEON_EXT_LOCATION || "Unknown",
   });
 });

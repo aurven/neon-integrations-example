@@ -1,6 +1,6 @@
 {
   "name": "neon-integrations-example",
-  "version": "1.1.0",
+  "version": "1.2.2",
   "description": "A bunch of Neon integrations on a simple Node app built on fastify, instantly up and running.",
   "main": "server.js",
   "scripts": {
