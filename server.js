@@ -91,13 +91,13 @@ fastify.get("/services", function (request, reply) {
       { name: "Neon Webhook Test", endpoint: "POST /in/neon/webhook/test", description: "Test webhook handler with sample data" },
       { name: "Telegram Integration", endpoint: "N/A", description: "Automatic posting to Telegram channels for TheGlobe articles" }
     ],
-    // poc: [
-    //   { name: "Mobile Client Dashboard", endpoint: "GET /mobileclient", description: "Mobile-optimized article management interface with cards view" },
-    //   { name: "Mobile Rich Text Editor", endpoint: "GET /mobileclient/editor", description: "Quill.js-based editor for creating/editing articles with XML generation" },
-    //   { name: "Save Article", endpoint: "POST /mobileclient/save", description: "Save article content and generate XML for Neon CMS integration" },
-    //   { name: "Articles API - List", endpoint: "GET /mobileclient/api/articles", description: "RESTful API to retrieve list of articles with metadata" },
-    //   { name: "Articles API - Single", endpoint: "GET /mobileclient/api/articles/:id", description: "RESTful API to retrieve specific article by UUID for editing" }
-    // ]
+    poc: [
+      { name: "Mobile Client Dashboard", endpoint: "GET /mobileclient", description: "Mobile-optimized article management interface with cards view" },
+      { name: "Mobile Rich Text Editor", endpoint: "GET /mobileclient/editor", description: "Quill.js-based editor for creating/editing articles with XML generation" },
+      { name: "Save Article", endpoint: "POST /mobileclient/save", description: "Save article content and generate XML for Neon CMS integration" },
+      { name: "Articles API - List", endpoint: "GET /mobileclient/api/articles", description: "RESTful API to retrieve list of articles with metadata" },
+      { name: "Articles API - Single", endpoint: "GET /mobileclient/api/articles/:id", description: "RESTful API to retrieve specific article by UUID for editing" }
+    ]
   };
 
   let params = { 
