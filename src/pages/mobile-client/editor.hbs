@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{seo.title}}</title>
+    <link rel="stylesheet" href="/mobile-client.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Quill.js CSS -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+</head>
+<body>
+    <div class="mobile-container">
+        <!-- Header -->
+        <header class="header editor-header">
+            <div class="header-left">
+                <button class="btn btn-secondary back-btn" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i> Back
+                </button>
+                <h1>
+                    {{#if isEditing}}
+                        <i class="fas fa-edit"></i> Edit Article
+                    {{else}}
+                        <i class="fas fa-plus"></i> New Article
+                    {{/if}}
+                </h1>
+            </div>
+            <div class="header-right">
+                <button class="btn btn-success save-btn" onclick="saveArticle()">
+                    <i class="fas fa-save"></i> Save
+                </button>
+            </div>
+        </header>
+
+        <!-- Editor Form -->
+        <main class="editor-content">
+            <form id="articleForm" class="article-form">
+                <!-- Hidden field for article ID -->
+                <input type="hidden" id="articleId" value="{{article.uuid}}">
+
+                <!-- Headline Field -->
+                <div class="form-group">
+                    <label for="headline">
+                        <i class="fas fa-heading"></i> Headline
+                    </label>
+                    <div id="headlineEditor" class="editor-field">{{{article.title}}}</div>
+                </div>
+
+                <!-- Summary Field -->
+                <div class="form-group">
+                    <label for="summary">
+                        <i class="fas fa-align-left"></i> Summary
+                    </label>
+                    <div id="summaryEditor" class="editor-field">{{{article.summary}}}</div>
+                </div>
+
+                <!-- Content Field -->
+                <div class="form-group">
+                    <label for="content">
+                        <i class="fas fa-file-text"></i> Content
+                    </label>
+                    <div id="contentEditor" class="editor-field">{{{article.content}}}</div>
+                </div>
+
+                <!-- Byline Field -->
+                <div class="form-group">
+                    <label for="byline">
+                        <i class="fas fa-user"></i> Byline
+                    </label>
+                    <div id="bylineEditor" class="editor-field">{{{article.byline}}}</div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="previewArticle()">
+                        <i class="fas fa-eye"></i> Preview
+                    </button>
+                    <button type="button" class="btn btn-info" onclick="generateXML()">
+                        <i class="fas fa-code"></i> Generate XML
+                    </button>
+                    <button type="button" class="btn btn-success" onclick="saveArticle()">
+                        <i class="fas fa-save"></i> Save Article
+                    </button>
+                </div>
+            </form>
+        </main>
+
+        <!-- Save Status -->
+        <div class="save-status" id="saveStatus" style="display: none;">
+            <div class="status-content">
+                <i class="fas fa-spinner fa-spin" id="statusIcon"></i>
+                <span id="statusMessage">Saving...</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Preview Modal -->
+    <div class="modal large-modal" id="previewModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-eye"></i> Article Preview</h3>
+                <button class="close-btn" onclick="closePreview()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="previewContent" class="preview-content"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closePreview()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- XML Modal -->
+    <div class="modal large-modal" id="xmlModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-code"></i> Generated XML</h3>
+                <button class="close-btn" onclick="closeXMLModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <pre id="xmlContent" class="xml-content"></pre>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="copyXML()">
+                    <i class="fas fa-copy"></i> Copy XML
+                </button>
+                <button class="btn btn-secondary" onclick="closeXMLModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quill.js JavaScript -->
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+    <script src="/mobile-client-editor.js"></script>
+</body>
+</html>
