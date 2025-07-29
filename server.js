@@ -223,6 +223,7 @@ fastify.get("/mobileclient/api/articles/:id", mobileClientHandlers.getMobileClie
 // Configure server host and port
 const port = process.env.PORT || 3000;
 const host = process.env.HOST || "0.0.0.0";
+const projectDomain = process.env.PROJECT_DOMAIN || "http://localhost:" + port;
 
 fastify.listen(
   { port: port, host: host },
@@ -233,13 +234,13 @@ fastify.listen(
     }
     
     console.log(`🚀 Server is running on ${address}`);
-    
+
     // Show additional access information
     if (host === "0.0.0.0") {
       console.log(`📱 Local access: http://localhost:${port}`);
-      console.log(`🌐 Network access: http://[your-ip]:${port}`);
-      console.log(`📋 Services dashboard: http://localhost:${port}/services`);
-      console.log(`📲 Mobile client: http://localhost:${port}/mobileclient`);
+      console.log(`🌐 Network access: ${projectDomain}`);
+      console.log(`📋 Services dashboard: ${projectDomain}/services`);
+      console.log(`📲 Mobile client: ${projectDomain}/mobileclient`);
     } else {
       console.log(`🏠 Available at: http://${host}:${port}`);
     }
