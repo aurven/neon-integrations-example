@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{seo.title}}</title>
+    <link rel="stylesheet" href="/mobile-client.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="mobile-container">
+        <!-- Header -->
+        <header class="header">
+            <h1><i class="fas fa-newspaper"></i> Article Manager</h1>
+            <button class="btn btn-primary create-btn" onclick="createNewArticle()">
+                <i class="fas fa-plus"></i> Create Article
+            </button>
+        </header>
+
+        <!-- Article List -->
+        <main class="main-content">
+            <div class="articles-container" id="articlesContainer">
+                {{#each articles}}
+                <div class="article-card" data-uuid="{{uuid}}">
+                    <div class="article-header">
+                        <h3 class="article-title">{{title}}</h3>
+                        <span class="article-status status-{{status}}">{{status}}</span>
+                    </div>
+                    
+                    <p class="article-summary">{{summary}}</p>
+                    
+                    <div class="article-meta">
+                        <span class="article-date">
+                            <i class="fas fa-clock"></i>
+                            {{formatDate lastModified}}
+                        </span>
+                        <span class="article-uuid">
+                            <i class="fas fa-fingerprint"></i>
+                            {{uuid}}
+                        </span>
+                    </div>
+                    
+                    <div class="article-actions">
+                        <button class="btn btn-secondary" onclick="editArticle('{{uuid}}')">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="btn btn-info" onclick="viewArticle('{{uuid}}')">
+                            <i class="fas fa-eye"></i> View
+                        </button>
+                        <button class="btn btn-danger" onclick="deleteArticle('{{uuid}}')">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                </div>
+                {{/each}}
+            </div>
+
+            <!-- Loading state -->
+            <div class="loading-state" id="loadingState" style="display: none;">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Loading articles...</p>
+            </div>
+
+            <!-- Empty state -->
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <i class="fas fa-file-alt"></i>
+                <h3>No Articles Found</h3>
+                <p>Create your first article to get started.</p>
+                <button class="btn btn-primary" onclick="createNewArticle()">
+                    <i class="fas fa-plus"></i> Create First Article
+                </button>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2024 Neon Mobile Client POC</p>
+        </footer>
+    </div>
+
+    <!-- Modal for confirmations -->
+    <div class="modal" id="confirmModal" style="display: none;">
+        <div class="modal-content">
+            <h3>Confirm Action</h3>
+            <p id="confirmMessage"></p>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-danger" id="confirmButton" onclick="confirmAction()">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/mobile-client.js"></script>
+</body>
+</html>

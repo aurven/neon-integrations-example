@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node --env-file=.env server.js"
+    "dev": "nodemon --env-file=.env server.js",
+    "dev:legacy": "node --env-file=.env server.js"
   },
   "dependencies": {
     "@fastify/formbody": "^7.4.0",
@@ -37,5 +38,8 @@
   "license": "MIT",
   "keywords": [
     "node"
-  ]
+  ],
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
 }

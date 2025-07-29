@@ -19,9 +19,24 @@ fastify.register(require('@fastify/multipart'));
 fastify.register(require("@fastify/formbody"));
 
 // View is a templating manager for fastify
+const handlebars = require("handlebars");
+
+// Register Handlebars helpers
+handlebars.registerHelper('formatDate', function(dateString) {
+  if (!dateString) return 'Unknown';
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+});
+
 fastify.register(require("@fastify/view"), {
   engine: {
-    handlebars: require("handlebars"),
+    handlebars: handlebars,
   },
 });
 
@@ -29,8 +44,9 @@ fastify.register(require("@fastify/view"), {
 
 // Load and parse SEO data
 const seo = require("./src/seo.json");
-if (seo.url === "glitch-default") {
-  seo.url = `https://${process.env.PROJECT_DOMAIN}.glitch.me`;
+if (seo.url === "default") {
+  seo.url = process.env.PROJECT_DOMAIN;
+  seo.image = process.env.PROJECT_DOMAIN + seo.image;
 }
 
 fastify.get("/", function (request, reply) {
@@ -69,6 +85,12 @@ fastify.get("/services", function (request, reply) {
       { name: "Document Drop", endpoint: "GET /widgets/drop", description: "Drop and upload documents" },
       { name: "Document Upload", endpoint: "POST /widgets/drop/upload", description: "Process uploaded documents" },
       { name: "Wires Widget", endpoint: "GET /widgets/wires", description: "Wire management interface" }
+    ],
+    webhooks: [
+      { name: "Neon Webhook Handler", endpoint: "POST /in/neon/webhook", description: "Process incoming Neon CMS webhooks with multi-site routing" },
+      { name: "Neon Webhook Test", endpoint: "POST /in/neon/webhook/test", description: "Test webhook handler with sample data" },
+      { name: "Telegram Integration", endpoint: "N/A", description: "Automatic posting to Telegram channels for TheGlobe articles" }
+    ],
     ]
   };
 
@@ -76,7 +98,7 @@ fastify.get("/services", function (request, reply) {
     seo: seo, 
     integrations: integrations,
     location: process.env.NEON_EXT_LOCATION || "Unknown",
-    version: "1.1.0"
+    version: process.env.NEON_EXT_VERSION || "Unknown"
   };
 
   return reply.view("/src/pages/services-dashboard.hbs", params);
@@ -94,7 +116,7 @@ fastify.get("/test", async function handler(request, reply) {
 
   return reply.status(200).send({
     message: "Neon Integrations Up and Running",
-    version: '1.1.0',
+    version: process.env.NEON_EXT_VERSION || "Unknown",
     location: process.env.NEON_EXT_LOCATION || "Unknown",
   });
 });
@@ -139,6 +161,12 @@ fastify.post("/out/sendgrid", neonExportHandlers.postSendgridHandler);
 fastify.get("/out/mailjet", neonExportHandlers.getMailjetHandler);
 fastify.post("/out/mailjet", neonExportHandlers.postMailjetHandler);
 
+// Neon Webhooks
+const neonWebhookHandlers = require("./src/requestHandlers/neon-webhooks.js");
+fastify.get("/in/neon/webhook", neonWebhookHandlers.getNeonWebhookHandler);
+fastify.post("/in/neon/webhook", neonWebhookHandlers.postNeonWebhookHandler);
+fastify.post("/in/neon/webhook/test", neonWebhookHandlers.postNeonWebhookTest);
+
 /**
  *
  * From the World to Neon
@@ -171,13 +199,28 @@ fastify.post("/in/trello/neon", trelloHandlers.trelloToNeonHandler);
  * Run the server and report out to the logs
  *
  */
+// Configure server host and port
+const port = process.env.PORT || 3000;
+const host = process.env.HOST || "0.0.0.0";
+
 fastify.listen(
-  { port: process.env.PORT, host: "0.0.0.0" },
+  { port: port, host: host },
   function (err, address) {
     if (err) {
       console.error(err);
       process.exit(1);
     }
-    console.log(`Your app is listening on ${address}`);
+    
+    console.log(`🚀 Server is running on ${address}`);
+    
+    // Show additional access information
+    if (host === "0.0.0.0") {
+      console.log(`📱 Local access: http://localhost:${port}`);
+      console.log(`🌐 Network access: http://[your-ip]:${port}`);
+      console.log(`📋 Services dashboard: http://localhost:${port}/services`);
+      console.log(`📲 Mobile client: http://localhost:${port}/mobileclient`);
+    } else {
+      console.log(`🏠 Available at: http://${host}:${port}`);
+    }
   }
 );

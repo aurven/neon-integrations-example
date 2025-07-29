@@ -54,6 +54,12 @@
         font-size: 1.2em;
         opacity: 0.9;
       }
+
+      .footer p {
+        margin: 0;
+        font-size: 0.9em;
+        color: #666;
+      }
       
       .status-info {
         background: #f8f9fa;
@@ -123,6 +129,8 @@
       .outbound .section-icon { background: #dc3545; }
       .utilities .section-icon { background: #ffc107; }
       .widgets .section-icon { background: #6f42c1; }
+      .webhooks .section-icon { background: #c1429b; }
+      .poc .section-icon { background: #0022ff; }
       
       .integration-grid {
         display: grid;
@@ -296,6 +304,38 @@
         </div>
         <div class="integration-grid">
           {{#each integrations.widgets}}
+          <div class="integration-card">
+            <div class="integration-name">{{name}}</div>
+            <div class="integration-endpoint">{{endpoint}}</div>
+            <div class="integration-description">{{description}}</div>
+          </div>
+          {{/each}}
+        </div>
+      </div>
+
+      <div class="integration-section webhooks">
+        <div class="section-title">
+          <div class="section-icon"></div>
+          Webhooks Interfaces
+        </div>
+        <div class="integration-grid">
+          {{#each integrations.webhooks}}
+          <div class="integration-card">
+            <div class="integration-name">{{name}}</div>
+            <div class="integration-endpoint">{{endpoint}}</div>
+            <div class="integration-description">{{description}}</div>
+          </div>
+          {{/each}}
+        </div>
+      </div>
+
+      <div class="integration-section poc">
+        <div class="section-title">
+          <div class="section-icon"></div>
+          Editor POC Interfaces
+        </div>
+        <div class="integration-grid">
+          {{#each integrations.poc}}
           <div class="integration-card">
             <div class="integration-name">{{name}}</div>
             <div class="integration-endpoint">{{endpoint}}</div>
