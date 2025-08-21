@@ -34,6 +34,7 @@ function cardOptionsTransformer (trelloCard) {
 function getOptionsFromTopic(topic) {
   
     return {
+        mainImageReference: topic.mainImageReference,
         caption: null,
         credit: null,
         figureUrl: topic.figureUrl,
