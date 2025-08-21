@@ -4,7 +4,7 @@ const neon = require('../helpers/neon-bo-api.js');
 const images = require('../images-importer.js');
 
 const defaultSite = 'TheGlobe';
-const defaultWorkspace = '/Convergente/Attualità';
+const defaultWorkspace = '/Convergent/News';
 
 function cardOptionsTransformer (trelloCard) {
   const topic = {
