@@ -156,9 +156,90 @@ function wiresWidgetHandler (request, reply) {
   return reply.view("/src/widgets/wires-list.hbs", params);
 }
 
+function breakingNewsWidgetHandler(request, reply) {
+  // params is an object we'll pass to our handlebars template
+  let params = { seo: seo, neonAppUrl: process.env.NEON_APP_URL };
+
+  // The Handlebars code will be able to access the parameter values and build them into the page
+  return reply.view("/src/widgets/breakingnews.hbs", params);
+}
+
+async function breakingNewsPublishHandler(request, reply) {
+  console.log("breakingNewsPublishHandler << IN:");
+  console.log("Request Body:", request.body);
+  
+  const { headline, summary, body } = request.body;
+  
+  if (!headline) {
+    const errorResponse = {
+      message: 'Headline is required'
+    };
+    console.log("breakingNewsPublishHandler << ERROR:");
+    console.log("Error Response:", errorResponse);
+    return reply.status(400).send(errorResponse);
+  }
+  
+  try {
+    const timestamp = Date.now();
+    const id = `breakingnews_${timestamp}.xml`;
+    
+    const neonPopulatorOptions = {
+      "site": "TheGlobe",
+      "section": "/News",
+      "workspace": "/Convergent/News",
+      "directPublish": true,
+      "siteAsChannel": false
+    };
+    
+    const processResult = await storiesPopulator.populateNeonInstance([
+      {
+        "id": id,
+        "itemUrl": null,
+        "overhead": "Breaking News",
+        "headline": headline,
+        "summary": summary || "",
+        "byline": "The Newsroom",
+        "figureURL": null,
+        "localFigurePath": null,
+        "figureCaption": null,
+        "figureCredit": null,
+        "mainContentHtml": body ? `<p>${body}</p>` : null,
+        "metadata": null,
+        "type": "article/breakingnews"
+      }
+    ], neonPopulatorOptions);
+    
+    const responseBody = {
+      message: 'Breaking news published successfully!',
+      neon: processResult
+    };
+    
+    console.log('breakingNewsPublishHandler - Success!', responseBody);
+    console.log("breakingNewsPublishHandler << OUT:");
+    console.log("Response Data:", responseBody);
+
+    return reply.status(200).send(responseBody);
+    
+  } catch (error) {
+    console.error('breakingNewsPublishHandler - Error:', error);
+    
+    const errorResponse = {
+      message: `Failed to publish breaking news: ${error.message}`,
+      error: error.toString()
+    };
+    
+    console.log("breakingNewsPublishHandler << ERROR:");
+    console.log("Error Response:", errorResponse);
+
+    return reply.status(500).send(errorResponse);
+  }
+}
+
 module.exports = {
   testWidgetHandler,
   dropWidgetHandler,
   asyncDropUploadWidgetHandler,
-  wiresWidgetHandler
+  wiresWidgetHandler,
+  breakingNewsWidgetHandler,
+  breakingNewsPublishHandler
 };

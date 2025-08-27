@@ -625,6 +625,34 @@ async function promoteNode(familyRef = null, { targetSite, targetSection, mode }
         .catch((error) => {
             console.error(`❌ ERROR during promoteNode: ${error.code}`);
             console.error(JSON.stringify(error.response.data));
+            return error.response.data
+        });
+}
+
+async function promoteNodeEverywhere(familyRef = null, { mode }) {
+    if (familyRef === null) return null;
+  
+    const data = JSON.stringify({});
+
+    const config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        url: `${NEON_BASEURL}/contents/nodes/${familyRef}/promote/${mode || 'PREVIEW'}`,
+        headers: {
+            'Content-Type': 'application/json',
+            'neon-bo-access-key': NEON_BO_APIKEY
+        },
+        data
+    };
+
+    return await client.request(config)
+        .then((response) => {
+            console.log(`Node ${familyRef} promoted everywhere`);
+            return response.data;
+        })
+        .catch((error) => {
+            console.error(`❌ ERROR during promoteNodeEverywhere: ${error.code}`);
+            console.error(JSON.stringify(error.response.data));
         });
 }
 
@@ -676,5 +704,6 @@ module.exports = {
   nextStepAssignment,
   putNode,
   promoteNode,
+  promoteNodeEverywhere,
   discoveryServices
 };

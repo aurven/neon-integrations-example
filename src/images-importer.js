@@ -69,13 +69,17 @@ async function uploadImage(options = {
   
   // const imageUrl = !isTrelloUrl(options.imageUrl) ? options.imageUrl : await getTrelloCoverUrl(options.story);
   const imageUrl = options.imageUrl;
+
+  console.log('Fetching image from URL: ' + imageUrl);
   
   const { mimeType, base64 } = await imageToBase64(imageUrl);
+
+  console.log('Detected Image MIME type: ' + mimeType);
   
   const imageType = mimeType.split('/')[1];
   const imageName = utils.hasFileExtension(options.imageName) ? options.imageName : options.imageName + '.' + imageType;
   
-  //return { mimeType, base64 };
+  console.log('Uploading image: ' + imageName + ' with ' + imageType + ' type to workspace: ' + options.workspace);
   
   const boundary = 'WebKitFormBoundary4B2922fkRo7Alk4m';
   
@@ -188,45 +192,6 @@ async function uploadImageToMethode(options = {
     channel: '',
     issueDate: ''
   }) {
-  
-  /*
-  const { fileName, mimeType, base64 } = options.neonImage;
-  
-  const boundary = 'WebKitFormBoundary4B2922fkRo7Alk4m';
-  
-  // Prepare the image part
-  const imagePart = `--${boundary}\r\n` +
-                    `Content-Disposition: form-data; name="content"; filename="${fileName}"\r\n` +
-                    `Content-Type: ${mimeType}\r\n` +
-                    `Content-Transfer-Encoding: base64\r\n\r\n` +
-                    `${base64}\r\n`;
-                    
-  // Prepare the objectModel part (JSON metadata)
-  const optionsModel = {
-    "databaseId": 33,
-    "application": "neonToMethodeApp",
-    "type": "Image",
-    "workFolder": options.workFolder,
-    "name": fileName,
-    "options": {
-          "showPath": true,
-          "showSystemAttributes": true,
-          "showAttributes": true,
-          "createMode": "NEW_VERSION"
-    },
-    // "attributes": "<!DOCTYPE metadata SYSTEM \"/SysConfig/Shared/Classify/classify.dtd\"><metadata>\n\t<general>\n\t\t<type/>\n\t\t<title/>\n\t\t<description/>\n\t\t<authors>\n\t\t\t<author/>\n\t\t</authors>\n\t</general>\n\t<mediaInfo>\n\t\t<caption/>\n\t\t<credit/>\n\t\t<duration/>\n\t\t<width/>\n\t\t<height/>\n\t\t<mediaUrl/>\n\t\t<mediaSource/>\n\t</mediaInfo>\n\t<location>\n\t\t<address/>\n\t\t<city/>\n\t\t<state/>\n\t\t<zip/>\n\t\t<country/>\n\t\t<latitude/>\n\t\t<longitude/>\n\t</location>\t\n<classification><keywords><keyword>Earth</keyword><keyword>K2-18b</keyword><keyword>Planet</keyword><keyword>Exoplanet</keyword><keyword>Star</keyword></keywords></classification><archive><archiveDate/></archive><source><sourceType/><sourceProvider/><sourceVersion/><sourceTransmissionDateTime/><sourceCreationDateTime/><sourceModificationDateTime/><sourcePriority/><sourceUrgency/></source><legal><copyrightHolder/><copyrightNotice/><usageTerms/></legal></metadata>",
-    "systemAttributes": `<props><workFolder>${options.workFolder}</workFolder><productInfo><name>${options.channel}</name><issueDate>${options.issueDate}</issueDate></productInfo></props>`,
-  };
-  
-  const optionsPart = `--${boundary}\r\n` +
-                          `Content-Disposition: form-data; name="options"; filename="blob"\r\n` +
-                          `Content-Type: application/json\r\n\r\n` +
-                          `${JSON.stringify(optionsModel)}\r\n`;
-
-  const finalBoundary = `--${boundary}--`;
-
-  const requestBody = imagePart + optionsPart + finalBoundary;
-  */
   
   const form = new FormData();
   

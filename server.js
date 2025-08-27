@@ -1,9 +1,29 @@
 const path = require("path");
+const fs = require('fs');
 
 // Require the fastify framework and instantiate it
+
+// HTTPS configuration
+let httpsOptions = {};
+const sslCertPath = path.join(__dirname, 'ssl', 'neon-integrations-example.neon.com+3.pem');
+const sslKeyPath = path.join(__dirname, 'ssl', 'neon-integrations-example.neon.com+3-key.pem');
+
+if (fs.existsSync(sslCertPath) && fs.existsSync(sslKeyPath)) {
+  httpsOptions = {
+    https: {
+      cert: fs.readFileSync(sslCertPath),
+      key: fs.readFileSync(sslKeyPath)
+    }
+  };
+  console.log('🔒 HTTPS enabled with local SSL certificates');
+} else {
+  console.log('⚠️  SSL certificates not found, running in HTTP mode');
+}
+
 const fastify = require("fastify")({
   // Set this to true for detailed logging:
   logger: false,
+  ...httpsOptions
 });
 
 // Setup our static files
@@ -88,7 +108,9 @@ fastify.get("/services", function (request, reply) {
       { name: "Test Widget", endpoint: "GET /widgets/test", description: "Test widget interface" },
       { name: "Document Drop", endpoint: "GET /widgets/drop", description: "Drop and upload documents" },
       { name: "Document Upload", endpoint: "POST /widgets/drop/upload", description: "Process uploaded documents" },
-      { name: "Wires Widget", endpoint: "GET /widgets/wires", description: "Wire management interface" }
+      { name: "Wires Widget", endpoint: "GET /widgets/wires", description: "Wire management interface" },
+      { name: "Breaking News", endpoint: "GET /widgets/breakingnews", description: "Breaking news publisher interface" },
+      { name: "Breaking News Publish", endpoint: "POST /widgets/breakingnews/publish", description: "Publish breaking news to Neon" }
     ],
     webhooks: [
       { name: "Neon Webhook Handler", endpoint: "POST /in/neon/webhook", description: "Process incoming Neon CMS webhooks with multi-site routing" },
@@ -148,6 +170,8 @@ fastify.get("/widgets/test", widgetHandlers.testWidgetHandler);
 fastify.get("/widgets/drop", widgetHandlers.dropWidgetHandler);
 fastify.post("/widgets/drop/upload", widgetHandlers.asyncDropUploadWidgetHandler);
 fastify.get("/widgets/wires", widgetHandlers.wiresWidgetHandler);
+fastify.get("/widgets/breakingnews", widgetHandlers.breakingNewsWidgetHandler);
+fastify.post("/widgets/breakingnews/publish", widgetHandlers.breakingNewsPublishHandler);
 
 /**
  *
@@ -236,13 +260,21 @@ fastify.listen(
     console.log(`🚀 Server is running on ${address}`);
 
     // Show additional access information
+    const protocol = httpsOptions.https ? 'https' : 'http';
+    const defaultPort = httpsOptions.https ? 443 : 80;
+    const portDisplay = port == defaultPort ? '' : `:${port}`;
+    
     if (host === "0.0.0.0") {
-      console.log(`📱 Local access: http://localhost:${port}`);
+      console.log(`📱 Local access: ${protocol}://localhost${portDisplay}`);
       console.log(`🌐 Network access: ${projectDomain}`);
       console.log(`📋 Services dashboard: ${projectDomain}/services`);
       console.log(`📲 Mobile client: ${projectDomain}/mobileclient`);
+      
+      if (httpsOptions.https) {
+        console.log(`🔒 Custom domain: ${protocol}://neon-integrations-example.neon.com${portDisplay}`);
+      }
     } else {
-      console.log(`🏠 Available at: http://${host}:${port}`);
+      console.log(`🏠 Available at: ${protocol}://${host}${portDisplay}`);
     }
   }
 );

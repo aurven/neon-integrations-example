@@ -16,8 +16,10 @@ function getCreationOptions(itemData) {
     const cleanedUpTitle = utils.removeNonAlphanumeric(itemData.id || itemData.title);
     const fileName = cleanedUpTitle + '_' + (translation || language) + '.xml';
 
+    const type = itemData.type || 'article';
+
     const options = {
-        "type": "article",
+        "type": type,
         "name": fileName,
         "template": "story.xml",
         "issueDate": issueDate,
@@ -91,7 +93,8 @@ async function newNodeFromStory(story, publishStory = true) {
                 if (publishStory) {
                   await workflowTransitionTo(familyRef, 'Ready');
                   console.log(`${familyRef} updated successfully!`);
-                  await neon.promoteNode(familyRef, { targetSite: story.tgtSite, targetSection: story.tgtSection, mode: 'LIVE' });
+                  const promotionResponse = await neon.promoteNode(familyRef, { targetSite: story.tgtSite, targetSection: story.tgtSection, mode: 'LIVE' });
+                  await neon.promoteNodeEverywhere(familyRef, { mode: 'LIVE' });
                 } else {
                   await workflowTransitionTo(familyRef, 'Revision');  
                 }
@@ -150,6 +153,7 @@ async function populateNeonInstance(data, options = {site: null, workspace: null
         story.language = options.language;
         story.translate = options.translate;
         story.siteAsChannel = options.siteAsChannel;
+        story.type = options.type || 'article';
         const directPublish = options.directPublish;
 
         return await promiseAcc.then(async () => {

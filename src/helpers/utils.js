@@ -17,15 +17,15 @@ function polyfills() {
 polyfills();
 
 function removeNonAlphanumeric(str) {
-  return str.replace?.(/[^a-zA-Z0-9_-]/g, "") || str;
+  return str?.replace?.(/[^a-zA-Z0-9_-]/g, "") || str;
 }
 
 function removeNonAlphanumericPreserveDot(str) {
-  return str.replace?.(/[^a-zA-Z0-9._-]/g, "") || str;
+  return str?.replace?.(/[^a-zA-Z0-9._-]/g, "") || str;
 }
 
 function removeATags(htmlString) {
-  return htmlString.replace?.(/<a\b[^>]*>|<\/a>/gi, "");
+  return htmlString?.replace?.(/<a\b[^>]*>|<\/a>/gi, "");
 }
 
 /**
