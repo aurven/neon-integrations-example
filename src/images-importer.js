@@ -165,7 +165,7 @@ async function modelImagesToMethode(model, {workFolder, channel, issueDate}) {
   
   const siteName = model.pubInfo.siteName;
   
-  const images = model.links?.hyperlink?.image?.map?.(image => image.targetId);
+  const images = model.links?.hyperlink?.image?.map?.(image => image.targetId) || [];
   const methodeImages = {};
   
   for (let i = 0; i < images.length; i++) {
