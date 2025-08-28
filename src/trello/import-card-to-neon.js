@@ -62,7 +62,8 @@ function getCreationOptions(topic) {
         "creationMode": "AUTO_RENAME",
         "timeSuffix": false,
         "storageFolder": "SELECTED_WORKFOLDER",
-        "outputChannel": topic.neon.site
+        "outputChannel": topic.neon.site,
+        "externalRef": topic.trello.id,
     }
 }
 
