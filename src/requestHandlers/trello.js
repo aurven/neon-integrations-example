@@ -39,7 +39,7 @@ async function trelloToNeonHandler(request, reply) {
     return reply.status(401).send({ error: "Unauthorized" });
   }
   
-  const body = JSON.parse(request.body);
+  const body = typeof request.body !== 'object' ? JSON.parse(request.body) : request.body;
   
   console.log("Request received:");
   console.log(body);

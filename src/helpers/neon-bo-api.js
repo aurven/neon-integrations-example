@@ -154,7 +154,7 @@ async function updateNodeContent(familyRef, xmlBodyString) {
         },
         data: data
     };
-  
+
     console.log(`Updating Node Content for ${familyRef}`);
     console.log('xmlBodyString', xmlBodyString);
     
@@ -219,10 +219,11 @@ async function createNewStory(options) {
 
     return await client.request(config)
         .then((response) => {
-            const familyRef = response.data.node.familyRef;
+            const node = response.data.node;
+            const familyRef = node.familyRef;
             // console.log(JSON.stringify(response.data));
             console.log(`Created new Story: ${familyRef}`);
-            return familyRef;
+            return node;
         })
         .catch((error) => {
             console.error(`❌ ERROR during createNewStory: ${error.code}`);

@@ -1,5 +1,6 @@
 const dayjs = require('dayjs');
 const utils = require('../helpers/utils.js');
+const neonUtils = require('../helpers/neon-utils.js');
 const neon = require('../helpers/neon-bo-api.js');
 const images = require('../images-importer.js');
 
@@ -9,7 +10,8 @@ const defaultWorkspace = '/Convergent/News';
 function cardOptionsTransformer (trelloCard) {
   const topic = {
     neon: {
-      username: trelloCard.neonUsername,
+      username: trelloCard.neon.username,
+      priority: trelloCard.neon.priority || 0,
       site: defaultSite,
       workspace: defaultWorkspace
     },
@@ -59,34 +61,21 @@ function getCreationOptions(topic) {
         "template": "story.xml",
         "issueDate": issueDate,
         "workFolder": topic.neon.workspace,
-        "creationMode": "AUTO_RENAME",
+        "creationMode": "RETURN_EXISTING",
         "timeSuffix": false,
         "storageFolder": "SELECTED_WORKFOLDER",
         "outputChannel": topic.neon.site,
-        //"externalRef": topic.trello.id,
+        "externalRef": "trello:" + topic.trello.id,
+        "externalSource": "Trello"
     }
-}
-
-async function workflowTransitionTo(familyRef, targetStateName) {
-  const getNextStepsResult = await neon.getNextSteps(familyRef);
-  if (getNextStepsResult.data?.node?.familyRef === familyRef) {
-    try {
-      const nextStepBody = utils.nextStepAssignmentBodyGenerator(getNextStepsResult.data, targetStateName);
-      // console.log(nextStepBody);
-      return await neon.nextStepAssignment(familyRef, nextStepBody);
-    } catch (error) {
-        console.error(error.message);
-    }
-  } else {
-    console.error(`Cannot transition to ${targetStateName} for ${familyRef}`);
-  }
 }
 
 async function newNodeFromTopic(topic) {
     return new Promise(async (resolve, reject) => {
 
         const creationOptions = getCreationOptions(topic);
-        const familyRef = await neon.createNewStory(creationOptions);
+        const node = await neon.createNewStory(creationOptions);
+        const familyRef = node.familyRef;
         const imageUpload = await images.uploadImageFromStory(topic);
         const mainImageReference = images.mainImageReferenceGenerator(imageUpload.node);
         topic.mainImageReference = mainImageReference ? mainImageReference : null;
@@ -96,12 +85,13 @@ async function newNodeFromTopic(topic) {
             const updateStatus = await neon.updateNodeContent(familyRef, utils.bodyGenerator(bodyOptions));
             if (updateStatus) {
                 await neon.unlockNode(familyRef);
-                await workflowTransitionTo(familyRef, 'Edit');
+                await neonUtils.workflowTransitionTo({ familyRef, targetWorkflowName: 'Story', targetStateName: 'Created' });
+                await neonUtils.workflowTransitionTo({ familyRef, targetWorkflowName: 'Story', targetStateName: 'Edit', priority: topic.neon.priority });
                 console.log(`${familyRef} updated successfully!`);
                 resolve(familyRef);
             } else {
-                console.warn(`Error during content Update, deletion of ${familyRef} in progress...`);
-                await neon.deleteNode(familyRef, true);
+                //console.warn(`Error during content Update, deletion of ${familyRef} in progress...`);
+                //await neon.deleteNode(familyRef, true);
                 resolve();
             }
         } else {

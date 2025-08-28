@@ -286,33 +286,6 @@ function metadataGenerator(meta) {
     return body.replaceAll('\n', '').replaceAll('    ', '').trim();
 }
 
-function nextStepAssignmentBodyGenerator(getNextStepsResult, targetStateName) {
-    const processName = getNextStepsResult.associatedWorkflow?.processInstance?.processName;
-    const matchingStep = getNextStepsResult.associatedWorkflow?.steps?.find?.(step => 
-        step.state.name === targetStateName
-    );
-    const nodeTitle = getNextStepsResult.node.title || 'Automatically transitioned by a Neon Integration';
-
-    if (!matchingStep) {
-        console.error(`Step with state name '${targetStateName}' not found`);
-    }
-
-    const nextStepAssignmentBody = {
-      "workflowAssignment": {
-        "title": nodeTitle,
-        "comment": "",
-        "principals": [],
-        "prioprity": 0
-      },
-      "workflowStep": {
-        "connectorName": matchingStep.name,
-        "workflowName": processName
-      }
-    };
-
-    return nextStepAssignmentBody;
-}
-
 /**
  * Parses a srcset string and returns an array of { url, width } entries.
  * Supports width descriptors (e.g., 640w) and pixel density descriptors (e.g., 2x).
@@ -382,6 +355,5 @@ module.exports = {
   generateAutoId,
   bodyGenerator,
   metadataGenerator,
-  nextStepAssignmentBodyGenerator,
   getLargestSrcFromPicture
 };

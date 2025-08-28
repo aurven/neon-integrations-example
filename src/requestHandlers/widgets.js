@@ -4,6 +4,12 @@ const openai = require("../ai/openai.js");
 const storiesPopulator = require("../stories-populator.js");
 
 function testWidgetHandler(request, reply) {
+  const apikey = request.query.apikey;
+
+  if (!apikey || apikey !== process.env.NEON_EXT_APIKEY) {
+    return reply.status(401).send({ error: "Unauthorized" });
+  }
+
   // params is an object we'll pass to our handlebars template
   let params = { seo: seo };
 
@@ -12,6 +18,12 @@ function testWidgetHandler(request, reply) {
 }
 
 function dropWidgetHandler (request, reply) {
+  const apikey = request.query.apikey;
+
+  if (!apikey || apikey !== process.env.NEON_EXT_APIKEY) {
+    return reply.status(401).send({ error: "Unauthorized" });
+  }
+
   // params is an object we'll pass to our handlebars template
   let params = { seo: seo, neonAppUrl: process.env.NEON_APP_URL };
 
@@ -153,6 +165,12 @@ async function asyncDropUploadWidgetHandler(request, reply) {
 }
 
 function wiresWidgetHandler (request, reply) {
+  const apikey = request.query.apikey;
+
+  if (!apikey || apikey !== process.env.NEON_EXT_APIKEY) {
+    return reply.status(401).send({ error: "Unauthorized" });
+  }
+
   // params is an object we'll pass to our handlebars template
   let params = { seo: seo, apiKey: process.env.NEON_EXT_APIKEY, neonAppUrl: process.env.NEON_APP_URL };
 
@@ -161,6 +179,12 @@ function wiresWidgetHandler (request, reply) {
 }
 
 function breakingNewsWidgetHandler(request, reply) {
+  const apikey = request.query.apikey;
+
+  if (!apikey || apikey !== process.env.NEON_EXT_APIKEY) {
+    return reply.status(401).send({ error: "Unauthorized" });
+  }
+
   // params is an object we'll pass to our handlebars template
   let params = { seo: seo, neonAppUrl: process.env.NEON_APP_URL };
 

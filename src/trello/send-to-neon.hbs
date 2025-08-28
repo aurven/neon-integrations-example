@@ -33,7 +33,7 @@
     <form id="neon">
       <label for="prioritySize">Priority:</label>
       <select name="prioritySize" id="prioritySize">
-        <option value="9">🟥 Critical!</option>
+        <option value="9">🟥 Critical</option>
         <option value="8">🟧 High</option>
         <option value="5">🟨 Medium</option>
         <option value="0">🟩 Low</option>
@@ -106,9 +106,10 @@
                   console.log(memberInfo);
                   
                   const token = memberInfo.authToken;
-                  const neonUsername = memberInfo.neonUsername;
                   
-                  data.neonUsername = neonUsername;
+                  data.neon = {};
+                  data.neon.username = memberInfo.neonUsername;
+                  data.neon.priority = window.prioritySize.value;
 
                   const requestHeaders = new Headers();
                   requestHeaders.append("ApiKey", token);
