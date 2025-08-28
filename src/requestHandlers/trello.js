@@ -2,7 +2,7 @@ const seo = require("../seo.json");
 const trelloToNeon = require("../trello/import-card-to-neon.js");
 
 function mainPageHandler(request, reply) {
-  let params = { seo: seo };
+  let params = { seo: seo, iconHost: process.env.PROJECT_DOMAIN };
 
   return reply.view("/src/trello/trello.hbs", params);
 };
