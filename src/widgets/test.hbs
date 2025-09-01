@@ -105,9 +105,9 @@
   </style>
 </head>
 <body>
-  <div class="header" hidden>
+  <div class="header" id="dashboard-header">
     <h1>Newsroom Analytics Dashboard</h1>
-    <p>Data for April 23-29, 2025</p>
+    <p id="date-range">Loading...</p>
   </div>
 
   <div class="site-legend" hidden>
@@ -176,7 +176,7 @@
   <a hidden href="https://demo-neon-app.eks-dev.dev.eidosmedia.io/neon/app/neon.html#editor/0296-1d247168969c-778722851d41-1000" target="_blank">Test</a>
 
   <script>
-    // Generate fake data
+    // Generate fake data with consistent daily seeding
     const sites = ['The Globe', 'Sports Arena', 'Next Frontier'];
     const siteColors = {
       'The Globe': '#EE609C',
@@ -184,15 +184,115 @@
       'Next Frontier': '#78B7FF'
     };
     
-    const dates = ['04-23', '04-24', '04-25', '04-26', '04-27', '04-28', '04-29'];
+    // Date generation function - starts from yesterday and goes back 7 days
+    function generateDates() {
+      const dates = [];
+      const today = new Date();
+      
+      // Start from yesterday (day -1) and go back 6 more days for a total of 7 days
+      for (let i = 1; i <= 7; i++) {
+        const date = new Date(today);
+        date.setDate(today.getDate() - i);
+        
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        dates.push(`${month}-${day}`);
+      }
+      
+      return dates.reverse(); // Oldest to newest (left to right in charts)
+    }
+    
+    // Generate dates with full date info for display
+    function generateDateRange() {
+      const dates = [];
+      const today = new Date();
+      
+      for (let i = 6; i >= 0; i--) {
+        const date = new Date(today);
+        date.setDate(today.getDate() - i);
+        dates.push(new Date(date));
+      }
+      
+      return dates;
+    }
+    
+    // Seeded random function for consistent daily values
+    function seededRandom(seed) {
+      const x = Math.sin(seed) * 10000;
+      return x - Math.floor(x);
+    }
+    
+    // Get daily seed based on current date (consistent throughout the day)
+    function getDailySeed() {
+      const today = new Date();
+      const dateStr = today.getFullYear() + '-' + 
+                     String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+                     String(today.getDate()).padStart(2, '0');
+      
+      // Create numeric seed from date string
+      let seed = 0;
+      for (let i = 0; i < dateStr.length; i++) {
+        seed += dateStr.charCodeAt(i) * (i + 1);
+      }
+      return seed;
+    }
+    
+    const dates = generateDates();
+    const dateRange = generateDateRange();
+    const dailySeed = getDailySeed();
+    
+    // Helper function to get month-year range for axis labels
+    function getMonthYearRange() {
+      const firstDate = dateRange[0];
+      const lastDate = dateRange[dateRange.length - 1];
+      
+      const firstMonth = firstDate.toLocaleDateString('en-US', { month: 'short' });
+      const lastMonth = lastDate.toLocaleDateString('en-US', { month: 'short' });
+      const year = firstDate.getFullYear();
+      
+      if (firstMonth === lastMonth) {
+        return `${firstMonth} ${year}`;
+      } else {
+        return `${firstMonth}-${lastMonth} ${year}`;
+      }
+    }
+    
+    // Function to update header with current date range
+    function updateHeaderDateRange() {
+      const firstDate = dateRange[0];
+      const lastDate = dateRange[dateRange.length - 1];
+      
+      const formatOptions = { 
+        month: 'short', 
+        day: 'numeric'
+      };
+      
+      const firstFormatted = firstDate.toLocaleDateString('en-US', formatOptions);
+      const lastFormatted = lastDate.toLocaleDateString('en-US', formatOptions);
+      const year = firstDate.getFullYear();
+      
+      const dateRangeElement = document.getElementById('date-range');
+      if (dateRangeElement) {
+        dateRangeElement.textContent = `Data for ${firstFormatted} - ${lastFormatted}, ${year}`;
+      }
+    }
     
     // Visit data per site per day
-    const visitsData = sites.flatMap(site => 
+    const visitsData = sites.flatMap((site, siteIndex) => 
       dates.map((date, i) => {
         const baseVisits = site === 'The Globe' ? 45000 : 
                           site === 'Sports Arena' ? 32000 : 20000;
-        const weekdayFactor = (i < 5) ? 1.2 : 0.8; // More visits on weekdays
-        const randomFactor = 0.9 + Math.random() * 0.2;
+        
+        // Use actual date to determine if it's weekend
+        const actualDate = dateRange[i];
+        const dayOfWeek = actualDate.getDay(); // 0 = Sunday, 6 = Saturday
+        const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+        const weekdayFactor = isWeekend ? 0.8 : 1.2; // More visits on weekdays
+        
+        // Seeded randomness based on daily seed, site, and date index
+        const seedForThisDataPoint = dailySeed + siteIndex * 1000 + i * 100;
+        const randomFactor = 0.9 + seededRandom(seedForThisDataPoint) * 0.2;
+        
         return {
           site,
           date,
@@ -202,7 +302,7 @@
     );
     
     // Engagement data (avg. time on page, pages per session, bounce rate)
-    const engagementData = sites.map(site => {
+    const engagementData = sites.map((site, siteIndex) => {
       const timeBase = site === 'Next Frontier' ? 4.2 : 
                       site === 'The Globe' ? 2.8 : 3.5;
       const pagesBase = site === 'Next Frontier' ? 2.4 : 
@@ -213,50 +313,63 @@
       return {
         site,
         metrics: [
-          { name: 'Avg. Time (min)', value: timeBase + Math.random() * 0.8 },
-          { name: 'Pages/Session', value: pagesBase + Math.random() * 0.6 },
-          { name: 'Bounce Rate (%)', value: bounceBase + Math.random() * 5 }
+          { name: 'Avg. Time (min)', value: timeBase + seededRandom(dailySeed + siteIndex * 100 + 1) * 0.8 },
+          { name: 'Pages/Session', value: pagesBase + seededRandom(dailySeed + siteIndex * 100 + 2) * 0.6 },
+          { name: 'Bounce Rate (%)', value: bounceBase + seededRandom(dailySeed + siteIndex * 100 + 3) * 5 }
         ]
       };
     });
     
-    // Top articles data
-    const topArticlesData = [
-      { site: 'The Globe', title: 'New Economic Policy Announced', views: 26543 },
-      { site: 'Sports Arena', title: 'Championship Finals Set for Weekend', views: 23189 },
-      { site: 'Next Frontier', title: 'Breakthrough in Quantum Computing', views: 18276 },
-      { site: 'The Globe', title: 'Mayor Unveils City Development Plan', views: 17894 },
-      { site: 'Sports Arena', title: 'Star Player Signs Record Contract', views: 15632 },
-      { site: 'Next Frontier', title: 'Climate Study Reveals Surprising Trends', views: 14521 },
-      { site: 'The Globe', title: 'Global Summit to Begin Tomorrow', views: 12786 },
-      { site: 'Sports Arena', title: 'Team Announces New Head Coach', views: 11458 },
-      { site: 'Next Frontier', title: 'Space Mission Discovers Water on Distant Planet', views: 10923 },
+    // Top articles data with seeded view counts
+    const baseTopArticlesData = [
+      { site: 'The Globe', title: 'New Economic Policy Announced', baseViews: 26000 },
+      { site: 'Sports Arena', title: 'Championship Finals Set for Weekend', baseViews: 23000 },
+      { site: 'Next Frontier', title: 'Breakthrough in Quantum Computing', baseViews: 18000 },
+      { site: 'The Globe', title: 'Mayor Unveils City Development Plan', baseViews: 17500 },
+      { site: 'Sports Arena', title: 'Star Player Signs Record Contract', baseViews: 15500 },
+      { site: 'Next Frontier', title: 'Climate Study Reveals Surprising Trends', baseViews: 14200 },
+      { site: 'The Globe', title: 'Global Summit to Begin Tomorrow', baseViews: 12500 },
+      { site: 'Sports Arena', title: 'Team Announces New Head Coach', baseViews: 11200 },
+      { site: 'Next Frontier', title: 'Space Mission Discovers Water on Distant Planet', baseViews: 10700 },
     ];
     
-    // Keywords data
-    const keywordsData = [
-      { site: 'The Globe', keyword: 'policy', count: 143 },
-      { site: 'The Globe', keyword: 'economy', count: 128 },
-      { site: 'The Globe', keyword: 'election', count: 115 },
-      { site: 'The Globe', keyword: 'development', count: 98 },
-      { site: 'The Globe', keyword: 'government', count: 92 },
-      { site: 'Sports Arena', keyword: 'championship', count: 167 },
-      { site: 'Sports Arena', keyword: 'finals', count: 152 },
-      { site: 'Sports Arena', keyword: 'contract', count: 131 },
-      { site: 'Sports Arena', keyword: 'tournament', count: 119 },
-      { site: 'Sports Arena', keyword: 'injury', count: 104 },
-      { site: 'Next Frontier', keyword: 'research', count: 138 },
-      { site: 'Next Frontier', keyword: 'discovery', count: 129 },
-      { site: 'Next Frontier', keyword: 'climate', count: 117 },
-      { site: 'Next Frontier', keyword: 'quantum', count: 106 },
-      { site: 'Next Frontier', keyword: 'space', count: 98 }
+    const topArticlesData = baseTopArticlesData.map((article, index) => ({
+      site: article.site,
+      title: article.title,
+      views: Math.round(article.baseViews + seededRandom(dailySeed + 5000 + index * 50) * 2000)
+    }));
+    
+    // Keywords data with seeded counts
+    const baseKeywordsData = [
+      { site: 'The Globe', keyword: 'policy', baseCount: 140 },
+      { site: 'The Globe', keyword: 'economy', baseCount: 125 },
+      { site: 'The Globe', keyword: 'election', baseCount: 110 },
+      { site: 'The Globe', keyword: 'development', baseCount: 95 },
+      { site: 'The Globe', keyword: 'government', baseCount: 90 },
+      { site: 'Sports Arena', keyword: 'championship', baseCount: 160 },
+      { site: 'Sports Arena', keyword: 'finals', baseCount: 145 },
+      { site: 'Sports Arena', keyword: 'contract', baseCount: 125 },
+      { site: 'Sports Arena', keyword: 'tournament', baseCount: 115 },
+      { site: 'Sports Arena', keyword: 'injury', baseCount: 100 },
+      { site: 'Next Frontier', keyword: 'research', baseCount: 135 },
+      { site: 'Next Frontier', keyword: 'discovery', baseCount: 125 },
+      { site: 'Next Frontier', keyword: 'climate', baseCount: 115 },
+      { site: 'Next Frontier', keyword: 'quantum', baseCount: 105 },
+      { site: 'Next Frontier', keyword: 'space', baseCount: 95 }
     ];
+    
+    const keywordsData = baseKeywordsData.map((keyword, index) => ({
+      site: keyword.site,
+      keyword: keyword.keyword,
+      count: Math.round(keyword.baseCount + seededRandom(dailySeed + 6000 + index * 25) * 20)
+    }));
     
     // Active site filter
     let activeSite = 'all';
 
     // Initialize dashboard
     function initDashboard() {
+      updateHeaderDateRange();
       drawVisitsChart();
       drawEngagementChart();
       drawTopArticlesChart();
@@ -342,7 +455,7 @@
         .attr('text-anchor', 'middle')
         .attr('transform', `translate(${width/2},${height + margin.bottom - 5})`)
         .style('font-size', '12px')
-        .text('Date (April 2025)');
+        .text(`Date (${getMonthYearRange()})`);
         
       svg.append('text')
         .attr('text-anchor', 'middle')
