@@ -112,6 +112,10 @@ fastify.get("/services", function (request, reply) {
       { name: "Breaking News", endpoint: "GET /widgets/breakingnews", description: "Breaking news publisher interface" },
       { name: "Breaking News Publish", endpoint: "POST /widgets/breakingnews/publish", description: "Publish breaking news to Neon" }
     ],
+    panels: [
+      { name: "Trello Panel", endpoint: "GET /panels/trello", description: "Trello card management panel for Neon CMS iframe embedding with PostMessage API" },
+      { name: "Trello API Proxy", endpoint: "ALL /panels/trello/api/*", description: "Proxy for Trello API calls with authentication" }
+    ],
     webhooks: [
       { name: "Neon Webhook Handler", endpoint: "POST /in/neon/webhook", description: "Process incoming Neon CMS webhooks with multi-site routing" },
       { name: "Neon Webhook Test", endpoint: "POST /in/neon/webhook/test", description: "Test webhook handler with sample data" },
@@ -172,6 +176,21 @@ fastify.post("/widgets/drop/upload", widgetHandlers.asyncDropUploadWidgetHandler
 fastify.get("/widgets/wires", widgetHandlers.wiresWidgetHandler);
 fastify.get("/widgets/breakingnews", widgetHandlers.breakingNewsWidgetHandler);
 fastify.post("/widgets/breakingnews/publish", widgetHandlers.breakingNewsPublishHandler);
+
+/**
+ *
+ * Panels
+ *
+ */
+const panelHandlers = require("./src/requestHandlers/panels.js");
+fastify.get("/panels/trello", panelHandlers.trelloPanelHandler);
+fastify.register(async function (fastify) {
+  fastify.route({
+    method: ['GET', 'POST', 'PUT', 'DELETE'],
+    url: '/panels/trello/api/*',
+    handler: panelHandlers.trelloApiProxyHandler
+  });
+});
 
 /**
  *
