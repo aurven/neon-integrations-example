@@ -93,7 +93,8 @@ const processWebhookData = async (model) => {
   };
 
   const info = generateInfoFromModel(model);
-  const name = generateNameFromModel(model);
+  //const name = generateNameFromModel(model);
+  const name = `neon_${info.id}.xml`;
   const { content, xmlDeclarations, $doc } = await generateContentFromModel(model);
 
   return { info, name, content, xmlDeclarations, $doc };
