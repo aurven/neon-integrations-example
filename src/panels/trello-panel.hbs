@@ -103,14 +103,22 @@
         <!-- Card Display -->
         <div id="card-display" class="hidden space-y-6">
             <div class="bg-white rounded-lg shadow-md p-6">
-                <div class="flex items-start justify-between mb-4">
-                    <h1 id="card-title" class="text-2xl font-bold text-gray-800 flex-1 mr-4"></h1>
+                <div class="flex items-center justify-between space-x-2">
                     <div class="flex items-center space-x-2">
                         <span id="card-board" class="px-2 py-1 text-xs font-medium bg-primary-100 text-primary-800 rounded-full"></span>
-                        <select id="card-list-select" class="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded border-0 focus:outline-none focus:ring-2 focus:ring-primary-500">
-                            <option value="">Loading lists...</option>
-                        </select>
+                        <a id="trello-link" href="#" target="_blank" class="inline-flex items-center px-2 py-1 text-xs font-medium text-primary-600 hover:text-primary-800 hover:bg-primary-50 rounded-md transition-colors" title="Open in Trello">
+                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M21 2H3c-.6 0-1 .4-1 1v18c0 .6.4 1 1 1h18c.6 0 1-.4 1-1V3c0-.6-.4-1-1-1zM10.5 17.5c0 .3-.2.5-.5.5H6c-.3 0-.5-.2-.5-.5v-11c0-.3.2-.5.5-.5h4c.3 0 .5.2.5.5v11M18.5 12.5c0 .3-.2.5-.5.5h-4c-.3 0-.5-.2-.5-.5V6.5c0-.3.2-.5.5-.5h4c.3 0 .5.2.5.5v6z"/>
+                            </svg>
+                            Trello
+                        </a>
                     </div>
+                    <select id="card-list-select" class="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded border-0 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                        <option value="">Loading lists...</option>
+                    </select>
+                </div>
+                <div class="flex items-start mt-4 mb-4">
+                    <h1 id="card-title" class="text-2xl font-bold text-gray-800 flex-1 mr-4"></h1>
                 </div>
                 <div id="card-description" class="text-gray-700 prose prose-sm max-w-none"></div>
             </div>
@@ -219,27 +227,34 @@
 
         // PostMessage API for Neon CMS communication
         function setupPostMessageApi() {
+            console.log('Setting up PostMessage API');
+
             window.addEventListener('message', (event) => {
                 // Security check - you might want to restrict origin
-                console.log('Received message:', event.data);
-                
-                if (event.data && event.data.type === 'neon-context') {
-                    state.neonContext = event.data.ctx;
-                    
-                    // Try to get externalRef from Neon context
-                    if (state.neonContext && state.neonContext.activeObject) {
-                        state.neonContext.activeObject.getInfo().then(info => {
-                            if (info.externalRef) {
-                                state.externalRef = info.externalRef;
-                                loadCard();
-                            }
-                        });
-                    }
+                if (event.origin !== 'https://sandbox-app.neon.com') {
+                    console.warn('Received message from unwanted origin:', event.origin);
+                    return;
                 }
+                console.log('Received message:', event, event.data);
+
+                //event.source.postMessage("wellwellwell", "*" /*event.origin*/);
+                
+                if (event.data && event.data.type === 'neonContext') {
+                    state.neonContext = event.info;
+                    
+                // Try to get externalRef from Neon context
+                if (state?.neonContext?.info?.externalRef) {
+                        state.externalRef = info.externalRef;
+                        loadCard();
+                    };
+                }
+                
             });
 
             // Send ready message to parent
-            window.parent.postMessage({ type: 'panel-ready' }, '*');
+            console.log('Sending ready message to parent');
+            window.parent.postMessage({ type: 'panel-ready', info: { op: 'getInfo' } }, 'https://sandbox-app.neon.com');
+            console.log('Ready message sent');
         }
 
         // Load boards for card selection
@@ -381,6 +396,12 @@
             document.getElementById('card-title').textContent = card.name;
             document.getElementById('card-board').textContent = card.board.name;
             document.getElementById('card-description').innerHTML = formatDescription(card.desc);
+            
+            // Update Trello link
+            const trelloLink = document.getElementById('trello-link');
+            if (trelloLink) {
+                trelloLink.href = card.url || `https://trello.com/c/${card.shortLink}`;
+            }
 
             // Populate list dropdown
             const listSelect = document.getElementById('card-list-select');
@@ -420,7 +441,7 @@
             
             attachments.forEach(attachment => {
                 const item = document.createElement('div');
-                item.className = 'attachment-item p-4 border border-gray-200 rounded-lg cursor-move';
+                item.className = 'attachment-item p-4 border bg-white border-gray-200 rounded-lg cursor-move';
                 item.draggable = true;
                 
                 const isImage = attachment.previews && attachment.previews.length > 0;
@@ -459,6 +480,12 @@
                 });
                 
                 list.appendChild(item);
+
+                item.addEventListener('dropover', (e) => {
+                    e.preventDefault();
+                    const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+                    console.log('Dropped attachment:', data);
+                });
             });
         }
 
@@ -654,6 +681,7 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
+            console.log('Document loaded, initializing...');
             setupPostMessageApi();
             
             if (state.externalRef && state.externalRef !== 'null') {
