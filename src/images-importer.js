@@ -195,38 +195,44 @@ async function uploadImageToMethode(options = {
   
   const form = new FormData();
   
-  const { fileName, mimeType, data } = options.neonImage;
-  
-  form.append('content', data, {
-    filename: fileName,
-    contentType: mimeType,
-    contentDisposition: 'form-data'
-  });
-  
-  // Prepare the objectModel part (JSON metadata)
-  const optionsModel = {
-    "databaseId": 33,
-    "application": "neonToMethodeApp",
-    "type": "Image",
-    "workFolder": options.workFolder,
-    "name": fileName,
-    "options": {
-          "showPath": true,
-          "showSystemAttributes": true,
-          "showAttributes": true,
-          "createMode": "NEW_VERSION"
-    },
-    // "attributes": "<!DOCTYPE metadata SYSTEM \"/SysConfig/Shared/Classify/classify.dtd\"><metadata>\n\t<general>\n\t\t<type/>\n\t\t<title/>\n\t\t<description/>\n\t\t<authors>\n\t\t\t<author/>\n\t\t</authors>\n\t</general>\n\t<mediaInfo>\n\t\t<caption/>\n\t\t<credit/>\n\t\t<duration/>\n\t\t<width/>\n\t\t<height/>\n\t\t<mediaUrl/>\n\t\t<mediaSource/>\n\t</mediaInfo>\n\t<location>\n\t\t<address/>\n\t\t<city/>\n\t\t<state/>\n\t\t<zip/>\n\t\t<country/>\n\t\t<latitude/>\n\t\t<longitude/>\n\t</location>\t\n<classification><keywords><keyword>Earth</keyword><keyword>K2-18b</keyword><keyword>Planet</keyword><keyword>Exoplanet</keyword><keyword>Star</keyword></keywords></classification><archive><archiveDate/></archive><source><sourceType/><sourceProvider/><sourceVersion/><sourceTransmissionDateTime/><sourceCreationDateTime/><sourceModificationDateTime/><sourcePriority/><sourceUrgency/></source><legal><copyrightHolder/><copyrightNotice/><usageTerms/></legal></metadata>",
-    "systemAttributes": `<props><workFolder>${options.workFolder}</workFolder><productInfo><name>${options.channel}</name><issueDate>${options.issueDate}</issueDate></productInfo></props>`,
-  };
-  
-  form.append('options', JSON.stringify(optionsModel), {
-    filename: 'blob',
-    contentType: 'application/json',
-    contentDisposition: 'form-data'
-  });
-  
-  return edapi.createObject(form);
+  try {
+    const { fileName, mimeType, data } = options.neonImage;
+    
+    form.append('content', data, {
+      filename: fileName,
+      contentType: mimeType,
+      contentDisposition: 'form-data'
+    });
+    
+    // Prepare the objectModel part (JSON metadata)
+    const optionsModel = {
+      "databaseId": 33,
+      "application": "neonToMethodeApp",
+      "type": "Image",
+      "workFolder": options.workFolder,
+      "name": fileName,
+      "options": {
+            "showPath": true,
+            "showSystemAttributes": true,
+            "showAttributes": true,
+            "createMode": "NEW_VERSION"
+      },
+      // "attributes": "<!DOCTYPE metadata SYSTEM \"/SysConfig/Shared/Classify/classify.dtd\"><metadata>\n\t<general>\n\t\t<type/>\n\t\t<title/>\n\t\t<description/>\n\t\t<authors>\n\t\t\t<author/>\n\t\t</authors>\n\t</general>\n\t<mediaInfo>\n\t\t<caption/>\n\t\t<credit/>\n\t\t<duration/>\n\t\t<width/>\n\t\t<height/>\n\t\t<mediaUrl/>\n\t\t<mediaSource/>\n\t</mediaInfo>\n\t<location>\n\t\t<address/>\n\t\t<city/>\n\t\t<state/>\n\t\t<zip/>\n\t\t<country/>\n\t\t<latitude/>\n\t\t<longitude/>\n\t</location>\t\n<classification><keywords><keyword>Earth</keyword><keyword>K2-18b</keyword><keyword>Planet</keyword><keyword>Exoplanet</keyword><keyword>Star</keyword></keywords></classification><archive><archiveDate/></archive><source><sourceType/><sourceProvider/><sourceVersion/><sourceTransmissionDateTime/><sourceCreationDateTime/><sourceModificationDateTime/><sourcePriority/><sourceUrgency/></source><legal><copyrightHolder/><copyrightNotice/><usageTerms/></legal></metadata>",
+      "systemAttributes": `<props><workFolder>${options.workFolder}</workFolder><productInfo><name>${options.channel}</name><issueDate>${options.issueDate}</issueDate></productInfo></props>`,
+    };
+    
+    form.append('options', JSON.stringify(optionsModel), {
+      filename: 'blob',
+      contentType: 'application/json',
+      contentDisposition: 'form-data'
+    });
+    
+    return edapi.createObject(form);
+
+  } catch (error) {
+    console.error('Error preparing image upload:', error.message);
+    return null;
+  }
 }
 
 module.exports = {

@@ -2,6 +2,7 @@ const openaiPrompts = require("../ai/openai.js");
 const pexels = require('../connectors/pexels-connector.js');
 const cleaner = require('../content-cleaner.js');
 const neon = require('../helpers/neon-bo-api.js');
+const { safeLogRequest } = require("../helpers/utils.js");
 
 async function cleanupHandler(request, reply) {
   const { apikey } = request.headers?.apikey
@@ -10,8 +11,9 @@ async function cleanupHandler(request, reply) {
   const { familyRefs } = request.body;
 
   console.log("cleanupHandler << IN:");
-  console.log("Request Headers:", request.headers);
-  console.log("Request Body:", request.body);
+  const safeRequest = safeLogRequest(request?.headers || {}, request?.body || {});
+  console.log("Request Headers:", JSON.stringify(safeRequest.headers));
+  console.log("Request Body:", JSON.stringify(safeRequest.body));
 
   if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
     console.log("cleanupHandler << ERROR: Unauthorized");
@@ -38,8 +40,9 @@ async function openAiHandler(request, reply) {
     : { apikey: null };
 
   console.log("openAiHandler << IN:");
-  console.log("Request Headers:", request.headers);
-  console.log("Request Body:", request.body);
+  const safeRequest = safeLogRequest(request?.headers || {}, request?.body || {});
+  console.log("Request Headers:", JSON.stringify(safeRequest.headers));
+  console.log("Request Body:", JSON.stringify(safeRequest.body));
 
   if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
     console.log("openAiHandler << ERROR: Unauthorized");
@@ -47,7 +50,7 @@ async function openAiHandler(request, reply) {
   }
   
   console.log("Request received:");
-  console.log(request.body);
+  console.log(JSON.stringify(safeRequest.body));
   
 
   return await openaiPrompts.test()
@@ -68,7 +71,8 @@ async function pexelsPhotosHandler(request, reply) {
     : { apikey: null };
 
   console.log("pexelsPhotosHandler << IN:");
-  console.log("Request Headers:", request.headers);
+  const safeRequest = safeLogRequest(request?.headers || {}, {});
+  console.log("Request Headers:", JSON.stringify(safeRequest.headers));
   console.log("Request Query:", request.query);
 
   if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
@@ -95,7 +99,8 @@ async function pexelsPhotosHandler(request, reply) {
 
 async function neonDiscoveryHandler (request, reply) {
   console.log("neonDiscoveryHandler << IN:");
-  console.log("Request Headers:", request.headers);
+  const safeRequest = safeLogRequest(request?.headers || {}, {});
+  console.log("Request Headers:", JSON.stringify(safeRequest.headers));
   console.log("Request Query:", request.query);
 
   return await neon.discoveryServices()

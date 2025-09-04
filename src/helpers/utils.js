@@ -343,6 +343,47 @@ function getLargestSrcFromPicture(picture) {
   return candidates.sort((a, b) => b.width - a.width)[0].url;
 }
 
+function safeLogRequest(headers, body) {
+  // If DISABLE_SAFE_LOGGING is set to true, return original data without redaction
+  if (process.env.DISABLE_SAFE_LOGGING === 'true') {
+    return {
+      headers: headers,
+      body: body
+    };
+  }
+  
+  const sensitiveKeys = [
+    'apikey', 'authorization', 'auth', 'token', 'password', 'secret', 
+    'key', 'x-api-key', 'x-auth-token', 'cookie', 'set-cookie',
+    'x-forwarded-for', 'x-real-ip'
+  ];
+  
+  const safeHeaders = { ...headers };
+  
+  // Remove or redact sensitive headers
+  Object.keys(safeHeaders).forEach(key => {
+    if (sensitiveKeys.some(sensitive => key.toLowerCase().includes(sensitive.toLowerCase()))) {
+      safeHeaders[key] = '[REDACTED]';
+    }
+  });
+  
+  const safeBody = { ...body };
+  
+  // Remove or redact sensitive body fields
+  if (safeBody && typeof safeBody === 'object') {
+    Object.keys(safeBody).forEach(key => {
+      if (sensitiveKeys.some(sensitive => key.toLowerCase().includes(sensitive.toLowerCase()))) {
+        safeBody[key] = '[REDACTED]';
+      }
+    });
+  }
+  
+  return {
+    headers: safeHeaders,
+    body: safeBody
+  };
+}
+
 
 module.exports = {
   polyfills,
@@ -355,5 +396,6 @@ module.exports = {
   generateAutoId,
   bodyGenerator,
   metadataGenerator,
-  getLargestSrcFromPicture
+  getLargestSrcFromPicture,
+  safeLogRequest
 };

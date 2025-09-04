@@ -1,4 +1,5 @@
 const neonToMethode = require("../neon-to-methode.js");
+const { safeLogRequest } = require("../helpers/utils.js");
 
 async function getMethodeHandler(request, reply) {
   return {"status":"success"};
@@ -11,8 +12,9 @@ async function postMethodeHandler(request, reply) {
   const { model, rootData } = request.body;
 
   console.log("postMethodeHandler << IN:");
-  console.log("Request Headers:", request.headers);
-  console.log("Request Body:", request.body);
+  const safeRequest = safeLogRequest(request?.headers || {}, request?.body || {});
+  console.log("Request Headers:", JSON.stringify(safeRequest.headers));
+  console.log("Request Body:", JSON.stringify(safeRequest.body));
 
   // TODO - Restore when we can add ApiKeys to Webhooks headers
   // if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
@@ -21,7 +23,7 @@ async function postMethodeHandler(request, reply) {
   // }
   
   console.log("Hook received:");
-  console.log(request.body);
+  console.log(JSON.stringify(safeRequest.body));
 
   if (!model && !rootData) {
     console.error("Missing model in request body");
@@ -48,8 +50,9 @@ async function postMethodeImageHandler(request, reply) {
   const { model, rootData } = request.body;
 
   console.log("postMethodeImageHandler << IN:");
-  console.log("Request Headers:", request.headers);
-  console.log("Request Body:", request.body);
+  const safeRequest2 = safeLogRequest(request?.headers || {}, request?.body || {});
+  console.log("Request Headers:", JSON.stringify(safeRequest2.headers));
+  console.log("Request Body:", JSON.stringify(safeRequest2.body));
 
   // TODO - Restore when we can add ApiKeys to Webhooks headers
   // if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
@@ -58,7 +61,7 @@ async function postMethodeImageHandler(request, reply) {
   // }
   
   console.log("Hook received:");
-  console.log(request.body);
+  console.log(JSON.stringify(safeRequest2.body));
 
   if (!model && !rootData) {
     console.error("postMethodeImageHandler << ERROR: Missing model in request body");
@@ -85,8 +88,9 @@ async function postMethodeTest(request, reply) {
   const { model, rootData } = request.body;
 
   console.log("postMethodeTest << IN:");
-  console.log("Request Headers:", request.headers);
-  console.log("Request Body:", request.body);
+  const safeRequest3 = safeLogRequest(request?.headers || {}, request?.body || {});
+  console.log("Request Headers:", JSON.stringify(safeRequest3.headers));
+  console.log("Request Body:", JSON.stringify(safeRequest3.body));
 
   // TODO - Restore when we can add ApiKeys to Webhooks headers
   // if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
@@ -95,7 +99,7 @@ async function postMethodeTest(request, reply) {
   // }
   
   console.log("Hook received:");
-  console.log(request.body);
+  console.log(JSON.stringify(safeRequest3.body));
 
   if (!model && !rootData) {
     console.error("postMethodeTest << ERROR: Missing model in request body");

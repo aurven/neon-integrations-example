@@ -2,6 +2,7 @@ const mammoth = require("mammoth");
 const seo = require("../seo.json");
 const openai = require("../ai/openai.js");
 const storiesPopulator = require("../stories-populator.js");
+const { safeLogRequest } = require("../helpers/utils.js");
 
 function testWidgetHandler(request, reply) {
   const apikey = request.query.apikey;
@@ -45,7 +46,8 @@ async function asyncDropUploadWidgetHandler(request, reply) {
   ];
   
   console.log("asyncDropUploadWidgetHandler << IN:");
-  console.log("Request Headers:", request.headers);
+  const safeRequest = safeLogRequest(request?.headers || {}, request?.body || {});
+  console.log("Request Headers:", JSON.stringify(safeRequest.headers));
   
   // params is an object we'll pass to our handlebars template
   let params = { seo: seo };
@@ -198,7 +200,8 @@ function breakingNewsWidgetHandler(request, reply) {
 
 async function breakingNewsPublishHandler(request, reply) {
   console.log("breakingNewsPublishHandler << IN:");
-  console.log("Request Body:", request.body);
+  const safeRequest = safeLogRequest(request?.headers || {}, request?.body || {});
+  console.log("Request Body:", JSON.stringify(safeRequest.body));
   
   const { headline, summary, body } = request.body;
   

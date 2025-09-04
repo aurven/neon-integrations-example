@@ -3,6 +3,7 @@ const imagesImporter = require("../images-importer.js");
 const guardianConnector = require("../connectors/guardian-connector.js");
 const rssConnector = require("../connectors/rss-connector.js");
 const gdocsToNeon = require("../gdocs-to-neon.js");
+const { safeLogRequest } = require("../helpers/utils.js");
 
 // External Source to Neon
 async function importHandler(request, reply) {
@@ -12,8 +13,9 @@ async function importHandler(request, reply) {
   const { site, workspace, items } = request.body;
 
   console.log("importHandler << IN:");
-  console.log("Request Headers:", request.headers);
-  console.log("Request Body:", request.body);
+  const safeRequest = safeLogRequest(request?.headers || {}, request?.body || {});
+  console.log("Request Headers:", JSON.stringify(safeRequest.headers));
+  console.log("Request Body:", JSON.stringify(safeRequest.body));
 
   if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
     console.log("importHandler << ERROR: Unauthorized");
@@ -51,8 +53,9 @@ async function importFromGuardianHandler(request, reply) {
   const options = request.body;
   
   console.log("importFromGuardianHandler << IN:");
-  console.log("Request Headers:", request.headers);
-  console.log("Request Body:", request.body);
+  const safeRequest = safeLogRequest(request?.headers || {}, request?.body || {});
+  console.log("Request Headers:", JSON.stringify(safeRequest.headers));
+  console.log("Request Body:", JSON.stringify(safeRequest.body));
   
   console.log('Options:');
   console.log(options);
@@ -125,8 +128,9 @@ async function importFromRssHandler(request, reply) {
   const options = request.body;
 
   console.log("importFromRssHandler << IN:");
-  console.log("Request Headers:", request.headers);
-  console.log("Request Body:", request.body);
+  const safeRequest = safeLogRequest(request?.headers || {}, request?.body || {});
+  console.log("Request Headers:", JSON.stringify(safeRequest.headers));
+  console.log("Request Body:", JSON.stringify(safeRequest.body));
 
   const rssUrl = options.rssUrl || null;
   const maxItems = options.maxItems || null;
@@ -185,8 +189,9 @@ function importFromGoogleDocsHandler(request, reply) {
   const { processedDocument } = request.body;
 
   console.log("importFromGoogleDocsHandler << IN:");
-  console.log("Request Headers:", request.headers);
-  console.log("Request Body:", request.body);
+  const safeRequest = safeLogRequest(request?.headers || {}, request?.body || {});
+  console.log("Request Headers:", JSON.stringify(safeRequest.headers));
+  console.log("Request Body:", JSON.stringify(safeRequest.body));
 
   if (!processedDocument) {
     console.error("importFromGoogleDocsHandler << ERROR: Missing processedDocument in request body");
@@ -217,8 +222,9 @@ async function importBinaryHandler(request, reply) {
   const { model, rootData } = request.body;
 
   console.log("importBinaryHandler << IN:");
-  console.log("Request Headers:", request.headers);
-  console.log("Request Body:", request.body);
+  const safeRequest = safeLogRequest(request?.headers || {}, request?.body || {});
+  console.log("Request Headers:", JSON.stringify(safeRequest.headers));
+  console.log("Request Body:", JSON.stringify(safeRequest.body));
 
   if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
     console.log("importBinaryHandler << ERROR: Unauthorized");
@@ -226,7 +232,7 @@ async function importBinaryHandler(request, reply) {
   }
   
   console.log("Request received:");
-  console.log(request.body);
+  console.log(JSON.stringify(safeRequest.body));
   
   const { urls } = request.body;
 
@@ -259,8 +265,9 @@ async function importTest(request, reply) {
   const options = request.body;
 
   console.log("importTest << IN:");
-  console.log("Request Headers:", request.headers);
-  console.log("Request Body:", request.body);
+  const safeRequest = safeLogRequest(request?.headers || {}, request?.body || {});
+  console.log("Request Headers:", JSON.stringify(safeRequest.headers));
+  console.log("Request Body:", JSON.stringify(safeRequest.body));
 
   const pageSize = options.pageSize || null;
   const fromDate = options.fromDate || null;

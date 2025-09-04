@@ -1,5 +1,6 @@
 const neonToSendgrid = require("../sendgrid/sendgrid.js");
 const mailjetService = require("../mailjet/mailjet.js");
+const { safeLogRequest } = require("../helpers/utils.js");
 
 async function getSendgridHandler(request, reply) {
   return {"status":"success"};
@@ -11,8 +12,9 @@ async function postSendgridHandler(request, reply) {
     : { apikey: null };
 
   console.log("postSendgridHandler << IN:");
-  console.log("Request Headers:", request.headers);
-  console.log("Request Body:", request.body);
+  const safeRequest = safeLogRequest(request?.headers || {}, request?.body || {});
+  console.log("Request Headers:", JSON.stringify(safeRequest.headers));
+  console.log("Request Body:", JSON.stringify(safeRequest.body));
 
   // TODO - Restore when we can add ApiKeys to Webhooks headers
   // if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
@@ -56,8 +58,9 @@ async function postMailjetHandler(request, reply) {
     : { apikey: null };
 
   console.log("postMailjetHandler << IN:");
-  console.log("Request Headers:", request.headers);
-  console.log("Request Body:", request.body);
+  const safeRequest = safeLogRequest(request?.headers || {}, request?.body || {});
+  console.log("Request Headers:", JSON.stringify(safeRequest.headers));
+  console.log("Request Body:", JSON.stringify(safeRequest.body));
 
   // if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
   //   console.log("Received call, but no API key was passed.");
@@ -65,7 +68,7 @@ async function postMailjetHandler(request, reply) {
   // }
   
   console.log("Mailjet request received:");
-  console.log(JSON.stringify(request.body));
+  console.log(JSON.stringify(safeRequest.body));
 
   if (!request.body) {
     console.error("postMailjetHandler << ERROR: Missing request body");

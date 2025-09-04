@@ -1,3 +1,5 @@
+const { safeLogRequest } = require("../helpers/utils.js");
+
 async function getNeonWebhookHandler(request, reply) {
   return {"status":"success"};
 }
@@ -8,8 +10,9 @@ async function postNeonWebhookHandler(request, reply) {
     : { apikey: null };
 
   console.log("postNeonWebhookHandler << IN:");
-  console.log("Request Headers:", request.headers);
-  console.log("Request Body:", request.body);
+  const safeRequest = safeLogRequest(request?.headers || {}, request?.body || {});
+  console.log("Request Headers:", JSON.stringify(safeRequest.headers));
+  console.log("Request Body:", JSON.stringify(safeRequest.body));
 
   // TODO - Restore when we can add ApiKeys to Webhooks headers
   // if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
@@ -18,7 +21,7 @@ async function postNeonWebhookHandler(request, reply) {
   // }
   
   console.log("Neon webhook received:");
-  console.log(JSON.stringify(request.body));
+  console.log(JSON.stringify(safeRequest.body));
 
   if (!request.body) {
     console.error("postNeonWebhookHandler << ERROR: Missing request body");
@@ -368,8 +371,9 @@ async function postNeonWebhookTest(request, reply) {
     : { apikey: null };
 
   console.log("postNeonWebhookTest << IN:");
-  console.log("Request Headers:", request.headers);
-  console.log("Request Body:", request.body);
+  const safeRequest = safeLogRequest(request?.headers || {}, request?.body || {});
+  console.log("Request Headers:", JSON.stringify(safeRequest.headers));
+  console.log("Request Body:", JSON.stringify(safeRequest.body));
 
   // TODO - Restore when we can add ApiKeys to Webhooks headers
   // if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
@@ -378,7 +382,7 @@ async function postNeonWebhookTest(request, reply) {
   // }
   
   console.log("Neon webhook test received:");
-  console.log(JSON.stringify(request.body));
+  console.log(JSON.stringify(safeRequest.body));
 
   if (!request.body) {
     console.error("postNeonWebhookTest << ERROR: Missing request body");

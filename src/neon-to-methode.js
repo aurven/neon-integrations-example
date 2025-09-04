@@ -174,13 +174,14 @@ async function processNeonStoryV2 (model) {
       channel: CHANNEL,
       workFolder: WORKFOLDER,
       // attributes: info.attributes,
-      attributes: {
-        metadata: {
-          general: {
-            priority: 'High'
-          }
-        }
-      }
+      // attributes: {
+      //   metadata: {
+      //     general: {
+      //       priority: 'High'
+      //     }
+      //   }
+      // },
+      attributes: null
     });
     const imageReferences = await images.modelImagesToMethode(model, { channel: CHANNEL, workFolder: WORKFOLDER, issueDate });
     
