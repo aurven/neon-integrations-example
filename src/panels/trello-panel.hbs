@@ -104,9 +104,17 @@
         <div id="card-display" class="hidden space-y-6">
             <div class="bg-white rounded-lg shadow-md p-6">
                 <div class="flex items-center justify-between space-x-2">
-                    <div class="flex items-center space-x-2">
+                    {{!-- <div class="flex items-center space-x-2">
                         <span id="card-board" class="px-2 py-1 text-xs font-medium bg-primary-100 text-primary-800 rounded-full"></span>
                         <a id="trello-link" href="#" target="_blank" class="inline-flex items-center px-2 py-1 text-xs font-medium text-primary-600 hover:text-primary-800 hover:bg-primary-50 rounded-md transition-colors" title="Open in Trello">
+                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M21 2H3c-.6 0-1 .4-1 1v18c0 .6.4 1 1 1h18c.6 0 1-.4 1-1V3c0-.6-.4-1-1-1zM10.5 17.5c0 .3-.2.5-.5.5H6c-.3 0-.5-.2-.5-.5v-11c0-.3.2-.5.5-.5h4c.3 0 .5.2.5.5v11M18.5 12.5c0 .3-.2.5-.5.5h-4c-.3 0-.5-.2-.5-.5V6.5c0-.3.2-.5.5-.5h4c.3 0 .5.2.5.5v6z"/>
+                            </svg>
+                            Trello
+                        </a>
+                    </div> --}}
+                    <div class="flex items-center">
+                        <a id="trello-link" href="#" target="_blank" class="inline-flex items-center py-1 text-xs font-medium text-primary-600 hover:text-primary-800 hover:bg-primary-50 rounded-md transition-colors" title="Open in Trello">
                             <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M21 2H3c-.6 0-1 .4-1 1v18c0 .6.4 1 1 1h18c.6 0 1-.4 1-1V3c0-.6-.4-1-1-1zM10.5 17.5c0 .3-.2.5-.5.5H6c-.3 0-.5-.2-.5-.5v-11c0-.3.2-.5.5-.5h4c.3 0 .5.2.5.5v11M18.5 12.5c0 .3-.2.5-.5.5h-4c-.3 0-.5-.2-.5-.5V6.5c0-.3.2-.5.5-.5h4c.3 0 .5.2.5.5v6z"/>
                             </svg>
@@ -180,6 +188,7 @@
         // Global state
         let state = {
             apiKey: '{{{apiKey}}}',
+            neonAppUrl: '{{{neonAppUrl}}}',
             trelloApiKey: '{{{trelloApiKey}}}',
             trelloToken: '{{{trelloToken}}}',
             trelloOrganizationId: '{{{trelloOrganizationId}}}',
@@ -230,11 +239,11 @@
             console.log('Setting up PostMessage API');
 
             window.addEventListener('message', (event) => {
-                // Security check - you might want to restrict origin
-                // if (event.origin !== 'https://sandbox-app.neon.com') {
-                //    console.warn('Received message from unwanted origin:', event.origin);
-                //    return;
-                // }
+                Security check - you might want to restrict origin
+                if (event.origin !== state.neonAppUrl) {
+                    console.warn('Received message from unwanted origin:', event.origin);
+                    return;
+                }
                 console.log('Received message:', event, event.data);
 
                 //event.source.postMessage("wellwellwell", "*" /*event.origin*/);
@@ -253,7 +262,7 @@
 
             // Send ready message to parent
             console.log('Sending ready message to parent');
-            window.parent.postMessage({ type: 'panel-ready', info: { op: 'getInfo' } }, 'https://sandbox-app.neon.com');
+            window.parent.postMessage({ type: 'panel-ready', info: { op: 'getInfo' } }, state.neonAppUrl);
             console.log('Ready message sent');
         }
 

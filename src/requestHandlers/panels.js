@@ -13,6 +13,7 @@ function trelloPanelHandler(request, reply) {
   let params = { 
     seo: seo, 
     apiKey: process.env.NEON_EXT_APIKEY,
+    neonAppUrl: process.env.NEON_APP_URL,
     trelloApiKey: process.env.TRELLO_APIKEY,
     trelloToken: process.env.TRELLO_TOKEN,
     trelloOrganizationId: process.env.TRELLO_ORGANIZATION_ID,
