@@ -249,11 +249,24 @@
                 //event.source.postMessage("wellwellwell", "*" /*event.origin*/);
                 
                 if (event.data && event.data.type === 'neonContext') {
-                    state.neonContext = event.info;
+                    state.neonContext = event.data.info;
+                    console.log('Neon context updated:', state.neonContext);
+                    const originalNeonNode = state.neonContext?.originalNode;
+                    const externalRef = originalNeonNode?.externalRef;
+                    const externalSource = originalNeonNode?.externalSource;
+
+                    if (externalSource && externalSource !== 'Trello') {
+                        console.warn('External source is not Trello:', externalSource);
+                        state.externalRef = null;
+                        showNoCard();
+                        return;
+                    }
+                    // externalRef format: "trello:cardId"
+                    const trelloId = externalRef?.startsWith('trello:') ? externalRef.split(':')[1] : null;
                     
-                // Try to get externalRef from Neon context
-                if (state?.neonContext?.info?.externalRef) {
-                        state.externalRef = info.externalRef;
+                    // Try to get externalRef from Neon context
+                    if (trelloId) {
+                        state.externalRef = trelloId;
                         loadCard();
                     };
                 }
