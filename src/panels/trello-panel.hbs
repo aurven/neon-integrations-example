@@ -239,7 +239,7 @@
             console.log('Setting up PostMessage API');
 
             window.addEventListener('message', (event) => {
-                Security check - you might want to restrict origin
+                // Security check - you might want to restrict origin
                 if (event.origin !== state.neonAppUrl) {
                     console.warn('Received message from unwanted origin:', event.origin);
                     return;
