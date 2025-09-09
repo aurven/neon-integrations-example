@@ -60,7 +60,11 @@ fastify.register(require("@fastify/view"), {
   },
 });
 
-
+// Add X-Robots-Tag: noindex header to all responses
+fastify.addHook('onSend', async (request, reply, payload) => {
+  reply.header('X-Robots-Tag', 'noindex');
+  return payload;
+});
 
 // Load application version from package.json
 const packageJson = require("./package.json");
