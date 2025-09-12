@@ -188,6 +188,8 @@ fastify.post("/widgets/breakingnews/publish", widgetHandlers.breakingNewsPublish
  */
 const panelHandlers = require("./src/requestHandlers/panels.js");
 fastify.get("/panels/trello", panelHandlers.trelloPanelHandler);
+fastify.get("/panels/external-sources", panelHandlers.externalSourcesPanelHandler);
+fastify.post("/panels/upload-asset", panelHandlers.uploadAssetHandler);
 fastify.register(async function (fastify) {
   fastify.route({
     method: ['GET', 'POST', 'PUT', 'DELETE'],

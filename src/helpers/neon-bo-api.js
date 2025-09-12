@@ -1,9 +1,21 @@
 const axios = require('axios');
+const https = require('https');
 const { wrapper } = require('axios-cookiejar-support');
 const { CookieJar } = require('tough-cookie');
 
 const jar = new CookieJar();
-const client = wrapper(axios.create({ jar }));
+
+// Create base axios instance
+const baseClient = axios.create({ jar });
+
+// Configure conditional SSL handling for local development
+if (process.env.NEON_EXT_LOCATION === 'Local') {
+    // For local development, we need to bypass SSL verification
+    // We'll handle this per-request instead of at the client level
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+}
+
+const client = wrapper(baseClient);
 
 const NEON_BASEURL = process.env.NEON_BO_URL;
 const NEON_USERNAME = process.env.NEON_USERNAME;

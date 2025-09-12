@@ -1,5 +1,7 @@
 const seo = require("../seo.json");
 const axios = require("axios");
+const neon = require("../helpers/neon-bo-api.js");
+const imagesImporter = require("../images-importer.js");
 
 function trelloPanelHandler(request, reply) {
   const apikey = request.query.apikey;
@@ -17,7 +19,8 @@ function trelloPanelHandler(request, reply) {
     trelloApiKey: process.env.TRELLO_APIKEY,
     trelloToken: process.env.TRELLO_TOKEN,
     trelloOrganizationId: process.env.TRELLO_ORGANIZATION_ID,
-    externalRef: externalRef || null
+    externalRef: externalRef || null,
+    isDraggable: !!process.env.TRELLO_PANEL_DRAGGABLE
   };
 
   // The Handlebars code will be able to access the parameter values and build them into the page
@@ -139,9 +142,65 @@ async function pexelsApiProxyHandler(request, reply) {
   }
 }
 
+async function uploadAssetHandler(request, reply) {
+  const apikey = request.headers.apikey || request.query.apikey;
+  
+  if (!apikey || apikey !== process.env.NEON_EXT_APIKEY) {
+    return reply.status(401).send({ error: "Unauthorized" });
+  }
+  
+  const { imageUrl, imageName, workspace } = request.body;
+  
+  if (!imageUrl) {
+    return reply.status(400).send({ error: "imageUrl is required" });
+  }
+  
+  try {
+    console.log(`Starting Neon session for asset upload: ${imageUrl}`);
+    
+    // Login to Neon
+    await neon.login();
+    
+    // Upload the image
+    const uploadResult = await imagesImporter.uploadImage({
+      imageName: imageName || `trello-asset-${Date.now()}`,
+      imageUrl: imageUrl,
+      workspace: workspace,
+      story: {}
+    });
+    
+    // Logout from Neon
+    await neon.logout();
+    
+    console.log(`Asset uploaded successfully:`, uploadResult);
+    
+    return reply.send({
+      success: true,
+      result: uploadResult,
+      message: 'Asset uploaded successfully to Neon'
+    });
+    
+  } catch (error) {
+    console.error('Asset upload error:', error.message);
+    
+    // Ensure logout even on error
+    try {
+      await neon.logout();
+    } catch (logoutError) {
+      console.error('Error during cleanup logout:', logoutError.message);
+    }
+    
+    return reply.status(500).send({
+      error: 'Asset upload failed',
+      details: error.message
+    });
+  }
+}
+
 module.exports = {
   trelloPanelHandler,
   trelloApiProxyHandler,
   externalSourcesPanelHandler,
-  pexelsApiProxyHandler
+  pexelsApiProxyHandler,
+  uploadAssetHandler
 };
