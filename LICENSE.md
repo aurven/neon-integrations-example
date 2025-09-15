@@ -1,6 +1,3 @@
-******************************************************************************
-~neon-integrations-example
-******************************************************************************
 MIT License
 
 Copyright (c) 2025, Eidosmedia S.p.A. <https://www.eidosmedia.com>
@@ -22,5 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
-******************************************************************************
