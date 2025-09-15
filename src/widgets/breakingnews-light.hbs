@@ -422,6 +422,9 @@
       if(window.location != window.parent.location) {
         document.getElementById('breaking-news-header').style.display = 'none';
         document.getElementById('main-container').classList.remove('p-6');
+        document.getElementById('formContainer').style.marginTop = '0';
+        document.querySelector('#formContainer .bg-card').classList.remove('shadow-sm');
+        document.querySelector('#formContainer .bg-card').classList.remove('border');
       }
     </script>
   </body>
