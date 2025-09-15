@@ -34,23 +34,23 @@ async function getItemsFromSite(options, saveLocally = false) {
     const fromDate = options.fromDate || dayjs().subtract(1, 'month').format('YYYY-MM-DD');
     const toDate = options.toDate || dayjs().format('YYYY-MM-DD');
     const showFields = options.showFields || 'all';
-  
+
     const importDate = dayjs().format('YYYYMMDD');
     const importPath = `./imports/guardian/${importDate}`;
     const jsonFileName = `guardian_${section}_${fromDate}_${toDate}.json`;
-  
+
 
     console.log(`⏬ Getting ${pageSize} items from "${section}" section from ${fromDate} to ${toDate}...`);
     console.log(`🎯 Target: ${importPath}/${jsonFileName}`);
 
     if (saveLocally) {
-      try {
-          if (!fs.existsSync(importPath)) {
-              fs.mkdirSync(importPath + '/assets', { recursive: true });
-          }
-      } catch (err) {
-          console.error('❌', err);
-      }
+        try {
+            if (!fs.existsSync(importPath)) {
+                fs.mkdirSync(importPath + '/assets', { recursive: true });
+            }
+        } catch (err) {
+            console.error('❌', err);
+        }
     }
 
     // Build the API request URL
@@ -83,6 +83,9 @@ async function getItemsFromSite(options, saveLocally = false) {
                         const figureCredit = figureRoot.querySelector('figcaption .element-image__credit')?.textContent || null;
                         const localFigurePath = `${importPath}/assets/${idString}.jpg`;
 
+                        const prunedHtmlContent = article.fields.body
+                            .replace(/<aside.*?<\/aside>/g, '');
+
                         items.push({
                             id: idString,
                             itemUrl: article.webUrl,
@@ -95,7 +98,7 @@ async function getItemsFromSite(options, saveLocally = false) {
                             figureCaption: figureCaption,
                             figureCredit: figureCredit,
                             mainContent: article.fields.bodyText,
-                            mainContentHtml: article.fields.body
+                            mainContentHtml: prunedHtmlContent
                         });
 
                         console.log(`✅ Got item ${idString} (${article.webUrl})`)
@@ -111,39 +114,39 @@ async function getItemsFromSite(options, saveLocally = false) {
         })
         .finally(() => {
             const jsonContent = JSON.stringify(items);
-        
+
             if (saveLocally) {
-              const tmpFilePath = 'tmp/scrapedItems.json';
-              const filePath = `${importPath}/${jsonFileName}`;
-              try {
-                  fs.writeFileSync(tmpFilePath, jsonContent);
-                  fs.writeFileSync(filePath, jsonContent);
-                  console.log('💾 JSON data saved!');
-              } catch (error) {
-                  console.log('❌ Error', error);
-              }
+                const tmpFilePath = 'tmp/scrapedItems.json';
+                const filePath = `${importPath}/${jsonFileName}`;
+                try {
+                    fs.writeFileSync(tmpFilePath, jsonContent);
+                    fs.writeFileSync(filePath, jsonContent);
+                    console.log('💾 JSON data saved!');
+                } catch (error) {
+                    console.log('❌ Error', error);
+                }
 
-              console.log('🖼️ Downloading images...')
+                console.log('🖼️ Downloading images...')
 
-              items.reduce((acc, item) => {
-                  const imgUrl = item.figureURL;
-                  const localPath = item.localFigurePath;
-                  console.log(`⏬ Downloading image from ${imgUrl}`);
+                items.reduce((acc, item) => {
+                    const imgUrl = item.figureURL;
+                    const localPath = item.localFigurePath;
+                    console.log(`⏬ Downloading image from ${imgUrl}`);
 
-                  if (imgUrl) {
-                      return acc.then(async () => {
-                          return await downloadImage(imgUrl, localPath);
-                      });
-                  }
-                  return acc;
+                    if (imgUrl) {
+                        return acc.then(async () => {
+                            return await downloadImage(imgUrl, localPath);
+                        });
+                    }
+                    return acc;
 
-              }, Promise.resolve());
+                }, Promise.resolve());
             }
         });
-  
+
     return items;
 }
 
 module.exports = {
-  getItems: getItemsFromSite,
+    getItems: getItemsFromSite,
 };

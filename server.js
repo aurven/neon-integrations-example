@@ -1,9 +1,29 @@
 const path = require("path");
+const fs = require('fs');
 
 // Require the fastify framework and instantiate it
+
+// HTTPS configuration
+let httpsOptions = {};
+const sslCertPath = path.join(__dirname, 'ssl', 'neon-integrations-example.neon.com+3.pem');
+const sslKeyPath = path.join(__dirname, 'ssl', 'neon-integrations-example.neon.com+3-key.pem');
+
+if (fs.existsSync(sslCertPath) && fs.existsSync(sslKeyPath)) {
+  httpsOptions = {
+    https: {
+      cert: fs.readFileSync(sslCertPath),
+      key: fs.readFileSync(sslKeyPath)
+    }
+  };
+  console.log('🔒 HTTPS enabled with local SSL certificates');
+} else {
+  console.log('⚠️  SSL certificates not found, running in HTTP mode');
+}
+
 const fastify = require("fastify")({
   // Set this to true for detailed logging:
   logger: false,
+  ...httpsOptions
 });
 
 // Setup our static files
@@ -19,18 +39,42 @@ fastify.register(require('@fastify/multipart'));
 fastify.register(require("@fastify/formbody"));
 
 // View is a templating manager for fastify
+const handlebars = require("handlebars");
+
+// Register Handlebars helpers
+handlebars.registerHelper('formatDate', function(dateString) {
+  if (!dateString) return 'Unknown';
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+});
+
 fastify.register(require("@fastify/view"), {
   engine: {
-    handlebars: require("handlebars"),
+    handlebars: handlebars,
   },
 });
 
+// Add X-Robots-Tag: noindex header to all responses
+fastify.addHook('onSend', async (request, reply, payload) => {
+  reply.header('X-Robots-Tag', 'noindex');
+  return payload;
+});
 
+// Load application version from package.json
+const packageJson = require("./package.json");
+const appVersion = packageJson.version;
 
 // Load and parse SEO data
 const seo = require("./src/seo.json");
-if (seo.url === "glitch-default") {
-  seo.url = `https://${process.env.PROJECT_DOMAIN}.glitch.me`;
+if (seo.url === "default") {
+  seo.url = process.env.PROJECT_DOMAIN;
+  seo.image = process.env.PROJECT_DOMAIN + seo.image;
 }
 
 fastify.get("/", function (request, reply) {
@@ -68,7 +112,25 @@ fastify.get("/services", function (request, reply) {
       { name: "Test Widget", endpoint: "GET /widgets/test", description: "Test widget interface" },
       { name: "Document Drop", endpoint: "GET /widgets/drop", description: "Drop and upload documents" },
       { name: "Document Upload", endpoint: "POST /widgets/drop/upload", description: "Process uploaded documents" },
-      { name: "Wires Widget", endpoint: "GET /widgets/wires", description: "Wire management interface" }
+      { name: "Wires Widget", endpoint: "GET /widgets/wires", description: "Wire management interface" },
+      { name: "Breaking News", endpoint: "GET /widgets/breakingnews", description: "Breaking news publisher interface" },
+      { name: "Breaking News Publish", endpoint: "POST /widgets/breakingnews/publish", description: "Publish breaking news to Neon" }
+    ],
+    panels: [
+      { name: "Trello Panel", endpoint: "GET /panels/trello", description: "Trello card management panel for Neon CMS iframe embedding with PostMessage API" },
+      { name: "Trello API Proxy", endpoint: "ALL /panels/trello/api/*", description: "Proxy for Trello API calls with authentication" }
+    ],
+    webhooks: [
+      { name: "Neon Webhook Handler", endpoint: "POST /in/neon/webhook", description: "Process incoming Neon CMS webhooks with multi-site routing" },
+      { name: "Neon Webhook Test", endpoint: "POST /in/neon/webhook/test", description: "Test webhook handler with sample data" },
+      { name: "Telegram Integration", endpoint: "N/A", description: "Automatic posting to Telegram channels for TheGlobe articles" }
+    ],
+    poc: [
+      { name: "Mobile Client Dashboard", endpoint: "GET /mobileclient", description: "Mobile-optimized article management interface with cards view" },
+      { name: "Mobile Rich Text Editor", endpoint: "GET /mobileclient/editor", description: "Quill.js-based editor for creating/editing articles with XML generation" },
+      { name: "Save Article", endpoint: "POST /mobileclient/save", description: "Save article content and generate XML for Neon CMS integration" },
+      { name: "Articles API - List", endpoint: "GET /mobileclient/api/articles", description: "RESTful API to retrieve list of articles with metadata" },
+      { name: "Articles API - Single", endpoint: "GET /mobileclient/api/articles/:id", description: "RESTful API to retrieve specific article by UUID for editing" }
     ]
   };
 
@@ -76,7 +138,7 @@ fastify.get("/services", function (request, reply) {
     seo: seo, 
     integrations: integrations,
     location: process.env.NEON_EXT_LOCATION || "Unknown",
-    version: "1.1.0"
+    version: appVersion
   };
 
   return reply.view("/src/pages/services-dashboard.hbs", params);
@@ -94,7 +156,7 @@ fastify.get("/test", async function handler(request, reply) {
 
   return reply.status(200).send({
     message: "Neon Integrations Up and Running",
-    version: '1.1.0',
+    version: appVersion,
     location: process.env.NEON_EXT_LOCATION || "Unknown",
   });
 });
@@ -116,6 +178,25 @@ fastify.get("/widgets/test", widgetHandlers.testWidgetHandler);
 fastify.get("/widgets/drop", widgetHandlers.dropWidgetHandler);
 fastify.post("/widgets/drop/upload", widgetHandlers.asyncDropUploadWidgetHandler);
 fastify.get("/widgets/wires", widgetHandlers.wiresWidgetHandler);
+fastify.get("/widgets/breakingnews", widgetHandlers.breakingNewsWidgetHandler);
+fastify.post("/widgets/breakingnews/publish", widgetHandlers.breakingNewsPublishHandler);
+
+/**
+ *
+ * Panels
+ *
+ */
+const panelHandlers = require("./src/requestHandlers/panels.js");
+fastify.get("/panels/trello", panelHandlers.trelloPanelHandler);
+fastify.get("/panels/external-sources", panelHandlers.externalSourcesPanelHandler);
+fastify.post("/panels/upload-asset", panelHandlers.uploadAssetHandler);
+fastify.register(async function (fastify) {
+  fastify.route({
+    method: ['GET', 'POST', 'PUT', 'DELETE'],
+    url: '/panels/trello/api/*',
+    handler: panelHandlers.trelloApiProxyHandler
+  });
+});
 
 /**
  *
@@ -138,6 +219,12 @@ fastify.post("/out/sendgrid", neonExportHandlers.postSendgridHandler);
 // Mailjet
 fastify.get("/out/mailjet", neonExportHandlers.getMailjetHandler);
 fastify.post("/out/mailjet", neonExportHandlers.postMailjetHandler);
+
+// Neon Webhooks
+const neonWebhookHandlers = require("./src/requestHandlers/neon-webhooks.js");
+fastify.get("/in/neon/webhook", neonWebhookHandlers.getNeonWebhookHandler);
+fastify.post("/in/neon/webhook", neonWebhookHandlers.postNeonWebhookHandler);
+fastify.post("/in/neon/webhook/test", neonWebhookHandlers.postNeonWebhookTest);
 
 /**
  *
@@ -165,19 +252,54 @@ fastify.get("/in/trello/authorization.html", trelloHandlers.authorizationPageHan
 fastify.get("/in/trello/neon/login.html", trelloHandlers.loginPageHandler);
 fastify.post("/in/trello/neon", trelloHandlers.trelloToNeonHandler);
 
+/**
+ *
+ * Mobile Client POC
+ *
+ */
+const mobileClientHandlers = require("./src/requestHandlers/mobile-client.js");
+fastify.get("/mobileclient", mobileClientHandlers.getMobileClientHandler);
+fastify.get("/mobileclient/editor", mobileClientHandlers.getMobileClientEditorHandler);
+fastify.post("/mobileclient/save", mobileClientHandlers.postMobileClientSaveHandler);
+fastify.get("/mobileclient/api/articles", mobileClientHandlers.getMobileClientApiArticlesHandler);
+fastify.get("/mobileclient/api/articles/:id", mobileClientHandlers.getMobileClientApiArticleHandler);
 
 /**
  *
  * Run the server and report out to the logs
  *
  */
+// Configure server host and port
+const port = process.env.PORT || 3000;
+const host = process.env.HOST || "0.0.0.0";
+const projectDomain = process.env.PROJECT_DOMAIN || "http://localhost:" + port;
+
 fastify.listen(
-  { port: process.env.PORT, host: "0.0.0.0" },
+  { port: port, host: host },
   function (err, address) {
     if (err) {
       console.error(err);
       process.exit(1);
     }
-    console.log(`Your app is listening on ${address}`);
+    
+    console.log(`🚀 Server is running on ${address}`);
+
+    // Show additional access information
+    const protocol = httpsOptions.https ? 'https' : 'http';
+    const defaultPort = httpsOptions.https ? 443 : 80;
+    const portDisplay = port == defaultPort ? '' : `:${port}`;
+    
+    if (host === "0.0.0.0") {
+      console.log(`📱 Local access: ${protocol}://localhost${portDisplay}`);
+      console.log(`🌐 Network access: ${projectDomain}`);
+      console.log(`📋 Services dashboard: ${projectDomain}/services`);
+      console.log(`📲 Mobile client: ${projectDomain}/mobileclient`);
+      
+      if (httpsOptions.https) {
+        console.log(`🔒 Custom domain: ${protocol}://neon-integrations-example.neon.com${portDisplay}`);
+      }
+    } else {
+      console.log(`🏠 Available at: ${protocol}://${host}${portDisplay}`);
+    }
   }
 );

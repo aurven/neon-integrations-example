@@ -1,5 +1,6 @@
 const dayjs = require('dayjs');
 const utils = require('./helpers/utils.js');
+const neonUtils = require('./helpers/neon-utils.js');
 const neon = require('./helpers/neon-bo-api.js');
 const deepl = require('deepl-node');
 const images = require('./images-importer.js');
@@ -16,8 +17,10 @@ function getCreationOptions(itemData) {
     const cleanedUpTitle = utils.removeNonAlphanumeric(itemData.id || itemData.title);
     const fileName = cleanedUpTitle + '_' + (translation || language) + '.xml';
 
+    const type = itemData.type || 'article';
+
     const options = {
-        "type": "article",
+        "type": type,
         "name": fileName,
         "template": "story.xml",
         "issueDate": issueDate,
@@ -54,25 +57,13 @@ function getOptionsFromData(itemData) {
     }
 }
 
-async function workflowTransitionTo(familyRef, targetStateName) {
-  const getNextStepsResult = await neon.getNextSteps(familyRef);
-  if (getNextStepsResult.data?.node?.familyRef === familyRef) {
-    try {
-      const nextStepBody = utils.nextStepAssignmentBodyGenerator(getNextStepsResult.data, targetStateName);
-      // console.log(nextStepBody);
-      return await neon.nextStepAssignment(familyRef, nextStepBody);
-    } catch (error) {
-        console.error(error.message);
-    }
-  } else {
-    console.error(`Cannot transition to ${targetStateName} for ${familyRef}`);
-  }
-}
+
 
 async function newNodeFromStory(story, publishStory = true) {
     return new Promise(async (resolve, reject) => {
         const creationOptions = getCreationOptions(story);
-        const familyRef = await neon.createNewStory(creationOptions);
+        const node = await neon.createNewStory(creationOptions);
+        const familyRef = node.familyRef;
         const imageUpload = await images.uploadImageFromStory(story);
         const mainImageReference = imageUpload.node ? images.mainImageReferenceGenerator(imageUpload.node) : null;
         story.mainImageReference = mainImageReference ? mainImageReference : null;
@@ -86,14 +77,15 @@ async function newNodeFromStory(story, publishStory = true) {
           
             if (updateStatus) {
                 await neon.unlockNode(familyRef);
-                await workflowTransitionTo(familyRef, 'Edit');
+                await neonUtils.workflowTransitionTo({ familyRef, targetWorkflowName: 'Story', targetStateName: 'Edit' });
               
                 if (publishStory) {
-                  await workflowTransitionTo(familyRef, 'Ready');
+                  await neonUtils.workflowTransitionTo({ familyRef, targetWorkflowName: 'Story', targetStateName: 'Ready' });
                   console.log(`${familyRef} updated successfully!`);
-                  await neon.promoteNode(familyRef, { targetSite: story.tgtSite, targetSection: story.tgtSection, mode: 'LIVE' });
+                  const promotionResponse = await neon.promoteNode(familyRef, { targetSite: story.tgtSite, targetSection: story.tgtSection, mode: 'LIVE' });
+                  await neon.promoteNodeEverywhere(familyRef, { mode: 'LIVE' });
                 } else {
-                  await workflowTransitionTo(familyRef, 'Revision');  
+                  await neonUtils.workflowTransitionTo({ familyRef, targetWorkflowName: 'Story', targetStateName: 'Revision' });  
                 }
               
                 resolve();
@@ -150,6 +142,7 @@ async function populateNeonInstance(data, options = {site: null, workspace: null
         story.language = options.language;
         story.translate = options.translate;
         story.siteAsChannel = options.siteAsChannel;
+        story.type = options.type || 'article';
         const directPublish = options.directPublish;
 
         return await promiseAcc.then(async () => {

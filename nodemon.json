@@ -1,0 +1,22 @@
+{
+  "watch": [
+    "src/",
+    "public/",
+    "server.js",
+    "package.json"
+  ],
+  "ignore": [
+    "node_modules/",
+    "*.log",
+    "*.md",
+    ".git/",
+    ".env"
+  ],
+  "ext": "js,json,hbs,css,html",
+  "env": {
+    "NODE_ENV": "development"
+  },
+  "delay": 1000,
+  "verbose": true,
+  "colours": true
+}

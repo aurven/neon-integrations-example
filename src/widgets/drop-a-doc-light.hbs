@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="/assets/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>{{seo.title}}</title>
+    
+    <!-- Meta tags for SEO and social sharing -->
+    <link rel="canonical" href="{{seo.url}}">
+    <meta name="description" content="{{seo.description}}">
+    <meta property="og:title" content="{{seo.title}} - Drop a Doc Integration">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="{{seo.url}}">
+    <meta property="og:description" content="{{seo.description}}">
+    <meta property="og:image" content="{{seo.image}}">
+    <meta name="twitter:card" content="summary">
+
+    <!-- Tailwind CSS CDN for shadcn/ui styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              border: "hsl(214.3 31.8% 91.4%)",
+              input: "hsl(214.3 31.8% 91.4%)",
+              ring: "hsl(221.2 83.2% 53.3%)",
+              background: "hsl(0 0% 100%)",
+              foreground: "hsl(222.2 84% 4.9%)",
+              primary: {
+                DEFAULT: "hsl(221.2 83.2% 53.3%)",
+                foreground: "hsl(210 40% 98%)",
+              },
+              secondary: {
+                DEFAULT: "hsl(210 40% 96%)",
+                foreground: "hsl(222.2 84% 4.9%)",
+              },
+              destructive: {
+                DEFAULT: "hsl(0 84.2% 60.2%)",
+                foreground: "hsl(210 40% 98%)",
+              },
+              muted: {
+                DEFAULT: "hsl(210 40% 96%)",
+                foreground: "hsl(215.4 16.3% 46.9%)",
+              },
+              accent: {
+                DEFAULT: "hsl(210 40% 96%)",
+                foreground: "hsl(222.2 84% 4.9%)",
+              },
+              popover: {
+                DEFAULT: "hsl(0 0% 100%)",
+                foreground: "hsl(222.2 84% 4.9%)",
+              },
+              card: {
+                DEFAULT: "hsl(0 0% 100%)",
+                foreground: "hsl(222.2 84% 4.9%)",
+              },
+            },
+          }
+        }
+      }
+    </script>
+    <!-- FilePond CSS -->
+    <link href="https://unpkg.com/filepond@^4/dist/filepond.css" rel="stylesheet" />
+    <style>
+      /* Custom FilePond styling for light theme */
+      .filepond--root {
+        font-family: inherit;
+      }
+      
+      .filepond--drop-label {
+        background: hsl(0 0% 100%);
+        border: 2px dashed hsl(214.3 31.8% 91.4%);
+        border-radius: 0.5rem;
+        color: hsl(222.2 84% 4.9%);
+        min-height: 200px;
+        transition: all 0.2s ease;
+      }
+      
+      .filepond--drop-label:hover {
+        border-color: hsl(221.2 83.2% 53.3%);
+        background: hsl(210 40% 98%);
+      }
+      
+      .filepond--label-action {
+        color: hsl(221.2 83.2% 53.3%);
+        font-weight: 600;
+        text-decoration: underline;
+        text-decoration-color: hsl(221.2 83.2% 53.3%);
+      }
+      
+      .filepond--panel-root {
+        background: hsl(0 0% 100%);
+        border: 1px solid hsl(214.3 31.8% 91.4%);
+        border-radius: 0.375rem;
+      }
+      
+      .filepond--item {
+        background: hsl(210 40% 96%);
+        border-radius: 0.375rem;
+      }
+      
+      .filepond--file-status-main {
+        color: hsl(222.2 84% 4.9%);
+      }
+      
+      .filepond--file-status-sub {
+        color: hsl(215.4 16.3% 46.9%);
+      }
+      
+      .filepond--file-info-main {
+        color: hsl(222.2 84% 4.9%);
+      }
+      
+      .filepond--file-info-sub {
+        color: hsl(215.4 16.3% 46.9%);
+      }
+      
+      .filepond--action-process-item {
+        background: hsl(221.2 83.2% 53.3%);
+      }
+      
+      .filepond--action-remove-item {
+        background: hsl(0 84.2% 60.2%);
+      }
+      
+      .filepond--progress-indicator {
+        background: hsl(221.2 83.2% 53.3%);
+      }
+    </style>
+  </head>
+  <body class="bg-background text-foreground min-h-screen font-sans antialiased">
+    <div class="container mx-auto p-6 max-w-2xl">
+      <div class="space-y-8">
+        <div class="text-center space-y-2">
+          <h1 class="text-3xl font-bold tracking-tight">Import a file, create an experience</h1>
+          <p class="text-muted-foreground">Upload documents and audio files to automatically generate structured content</p>
+        </div>
+        
+        <!-- File Drop Area -->
+        <div class="bg-card rounded-lg border shadow-sm p-6">
+          <form id="dropADoc" method="post">
+            <input type="file" />
+          </form>
+        </div>
+          
+        <!-- Progress Message Container -->
+        <div id="progressContainer" class="progress-container hidden">
+          <div class="bg-card rounded-lg border shadow-sm p-6">
+            <div id="progressMessage" class="progress-message text-center mb-4"></div>
+            <div id="progressButtons" class="progress-buttons flex gap-2 justify-center flex-wrap"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <script src="https://unpkg.com/filepond@^4/dist/filepond.js"></script>
+    <script>
+      let interval;
+      
+      // Progress Message API with shadcn/ui styling
+      class ProgressMessageAPI {
+        constructor(containerId, messageId, buttonsId) {
+          this.container = document.getElementById(containerId);
+          this.messageEl = document.getElementById(messageId);
+          this.buttonsEl = document.getElementById(buttonsId);
+          this.isVisible = false;
+        }
+
+        show() {
+          if (!this.isVisible) {
+            this.container.classList.remove('hidden');
+            this.container.classList.add('animate-in', 'fade-in-0', 'slide-in-from-bottom-2');
+            this.isVisible = true;
+
+            setTimeout(() => {
+              this.messageEl.classList.add('animate-in', 'fade-in-0');
+              this.buttonsEl.classList.add('animate-in', 'fade-in-0', 'slide-in-from-bottom-1');
+            }, 100);
+          }
+          return this;
+        }
+
+        hide() {
+          this.messageEl.classList.add('animate-out', 'fade-out-0');
+          this.buttonsEl.classList.add('animate-out', 'fade-out-0');
+
+          setTimeout(() => {
+            this.container.classList.add('hidden');
+            this.container.classList.remove('animate-in', 'fade-in-0', 'slide-in-from-bottom-2');
+            this.messageEl.classList.remove('animate-in', 'fade-in-0', 'animate-out', 'fade-out-0');
+            this.buttonsEl.classList.remove('animate-in', 'fade-in-0', 'slide-in-from-bottom-1', 'animate-out', 'fade-out-0');
+            this.isVisible = false;
+          }, 300);
+
+          return this;
+        }
+
+        updateMessage(message) {
+          this.messageEl.innerHTML = message;
+          return this;
+        }
+
+        setStyle(style) {
+          // Reset classes
+          this.container.className = 'progress-container';
+          this.container.classList.remove('hidden');
+          
+          // Apply base card styling
+          const cardDiv = this.container.querySelector('.bg-card');
+          cardDiv.className = 'bg-card rounded-lg border shadow-sm p-6';
+          
+          // Apply style-specific classes
+          if (style === 'success') {
+            cardDiv.classList.add('border-green-200', 'bg-green-50');
+            this.messageEl.className = 'progress-message text-center mb-4 text-green-800';
+          } else if (style === 'error') {
+            cardDiv.classList.add('border-red-200', 'bg-red-50');
+            this.messageEl.className = 'progress-message text-center mb-4 text-red-800';
+          } else if (style === 'warning') {
+            cardDiv.classList.add('border-yellow-200', 'bg-yellow-50');
+            this.messageEl.className = 'progress-message text-center mb-4 text-yellow-800';
+          } else {
+            this.messageEl.className = 'progress-message text-center mb-4';
+          }
+          
+          return this;
+        }
+
+        clearButtons() {
+          this.buttonsEl.innerHTML = '';
+          return this;
+        }
+
+        addButton(text, onclick, style = 'primary') {
+          const button = document.createElement('button');
+          button.textContent = text;
+          button.onclick = onclick;
+          
+          // Base button classes
+          let buttonClasses = 'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2';
+          
+          // Style-specific classes
+          if (style === 'success') {
+            buttonClasses += ' bg-green-600 text-white hover:bg-green-700';
+          } else if (style === 'danger') {
+            buttonClasses += ' bg-destructive text-destructive-foreground hover:bg-destructive/90';
+          } else if (style === 'secondary') {
+            buttonClasses += ' bg-secondary text-secondary-foreground hover:bg-secondary/80';
+          } else {
+            buttonClasses += ' bg-primary text-primary-foreground hover:bg-primary/90';
+          }
+          
+          button.className = buttonClasses;
+          this.buttonsEl.appendChild(button);
+          return this;
+        }
+
+        update(options = {}) {
+          const hasMessage = options.message !== undefined;
+          const hasButtons = options.buttons !== undefined;
+          const hasStyle = options.style !== undefined;
+
+          if (hasStyle) {
+            this.setStyle(options.style);
+          }
+
+          if (hasMessage) {
+            this.updateMessage(options.message);
+          }
+
+          if (hasButtons) {
+            this.buttonsEl.innerHTML = '';
+            options.buttons.forEach(btn => {
+              this.addButton(btn.text, btn.onclick, btn.style || 'primary');
+            });
+          }
+
+          if (options.show !== false && !this.isVisible) {
+            this.show();
+          }
+
+          return this;
+        }
+      }
+      
+      // Initialize the Progress Message API
+      const progressAPI = new ProgressMessageAPI('progressContainer', 'progressMessage', 'progressButtons');
+      
+      
+      // Progress Demo Sequence
+      class ProgressDemoSequence {
+        constructor() {
+          this.step = 0;
+          this.timeoutId = null;
+          this.isRunning = false;
+          this.onComplete = null;
+          this.onInterrupt = null;
+
+          this.steps = [
+            {
+              message: `
+                <div class="flex items-center justify-center gap-2">
+                  <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  File uploaded <strong>successfully</strong>! Processing...
+                </div>
+              `,
+              style: 'default',
+              delay: 5000
+            },
+            {
+              message: `
+                <div class="flex items-center justify-center gap-2">
+                  <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Contacting <strong>Transcription</strong> service...
+                </div>
+              `,
+              style: 'default',
+              delay: 3000
+            },
+            {
+              message: `
+                <div class="flex items-center justify-center gap-2">
+                  <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <strong>Transcription</strong> in progress...
+                </div>
+              `,
+              style: 'default',
+              delay: 15000
+            },
+            {
+              message: `
+                <div class="flex items-center justify-center gap-2">
+                  <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Arranging <strong>text</strong> content...
+                </div>
+              `,
+              style: 'default',
+              delay: 20000
+            },
+            {
+              message: `
+                <div class="flex items-center justify-center gap-2">
+                  <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Generating <strong>Headline</strong>, <strong>Summary</strong> and relevant <strong>Metadata</strong>...
+                </div>
+              `,
+              style: 'default',
+              delay: 10000
+            },
+            {
+              message: `
+                <div class="flex items-center justify-center gap-2">
+                  <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Generating <strong>Story object</strong>...
+                </div>
+              `,
+              style: 'default',
+              delay: 6000
+            },
+            {
+              message: `
+                <div class="flex items-center justify-center gap-2">
+                  <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Almost there!
+                </div>
+              `,
+              style: 'default',
+              delay: 3000
+            },
+            {
+              message: `
+                <div class="flex items-center justify-center gap-2">
+                  <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Any second now!
+                </div>
+              `,
+              style: 'default',
+              delay: 2000
+            },
+            {
+              message: `
+                <div class="flex items-center justify-center gap-2">
+                  <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Did you know that all good things come with time?
+                </div>
+              `,
+              style: 'default',
+              delay: 4000
+            },
+          ];
+        }
+
+        start(onComplete = null, onInterrupt = null) {
+          if (this.isRunning) {
+            console.warn('Sequence is already running');
+            return false;
+          }
+
+          this.step = 0;
+          this.isRunning = true;
+          this.onComplete = onComplete;
+          this.onInterrupt = onInterrupt;
+
+          this.showNextStep();
+          return true;
+        }
+
+        stop(reason = 'manual') {
+          if (!this.isRunning) {
+            return false;
+          }
+
+          this.isRunning = false;
+
+          if (this.timeoutId) {
+            clearTimeout(this.timeoutId);
+            this.timeoutId = null;
+          }
+
+          console.log(`Demo sequence stopped: ${reason}`);
+
+          // Call interrupt callback if provided
+          if (this.onInterrupt) {
+            this.onInterrupt(reason, this.step);
+          }
+
+          return true;
+        }
+
+        showNextStep() {
+          if (!this.isRunning || this.step >= this.steps.length) {
+            if (this.isRunning) {
+              // Sequence completed naturally
+              this.isRunning = false;
+              if (this.onComplete) {
+                this.onComplete();
+              }
+            }
+            return;
+          }
+
+          progressAPI.update(this.steps[this.step]);
+
+          // Schedule next step
+          if (this.step + 1 < this.steps.length) {
+            this.timeoutId = setTimeout(() => {
+              this.step++;
+              this.showNextStep();
+            }, this.steps[this.step].delay);
+          } else {
+            this.step++;
+          }
+        }
+
+        getCurrentStep() {
+          return this.step;
+        }
+
+        getTotalSteps() {
+          return this.steps.length;
+        }
+
+        getProgress() {
+          return {
+            current: this.step,
+            total: this.steps.length,
+            percentage: Math.round((this.step / this.steps.length) * 100)
+          };
+        }
+      }
+      
+      // Global instance
+      let progressDemo = null;
+
+      // Start the demo sequence
+      function demoProgressStates() {
+        // Stop any existing sequence
+        if (progressDemo) {
+          progressDemo.stop('new_sequence');
+        }
+
+        progressDemo = new ProgressDemoSequence();
+
+        progressDemo.start(
+          // onComplete callback
+          () => {
+            console.log('Demo sequence completed successfully');
+          },
+          // onInterrupt callback
+          (reason, step) => {
+            console.log(`Demo sequence interrupted at step ${step}. Reason: ${reason}`);
+          }
+        );
+
+        return progressDemo;
+      }
+
+      // External method to stop the demo
+      function stopDemoProgress(reason = 'external_event') {
+        if (progressDemo && progressDemo.isRunning) {
+          return progressDemo.stop(reason);
+        }
+        return false;
+      }
+
+      // Additional utility functions
+      function getDemoProgress() {
+        return progressDemo ? progressDemo.getProgress() : null;
+      }
+
+      function isDemoRunning() {
+        return progressDemo ? progressDemo.isRunning : false;
+      }
+      
+      
+      // Get a reference to the file input element
+      const inputElement = document.querySelector('input[type="file"]');
+
+      // Create a FilePond instance
+      const pond = FilePond.create(inputElement, {
+        allowMultiple: true,
+        acceptedFileTypes: [
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document", //.docx
+          "audio/mpeg", //.mp3
+          "audio/ogg", //.ogg / .oga
+        ],
+        server: {
+          revert: null,
+          process: (fieldName, file, metadata, load, error, progress, abort, transfer, options) => {
+              // fieldName is the name of the input field
+              // file is the actual file object to send
+              const formData = new FormData();
+              formData.append(fieldName, file, file.name);
+
+              const request = new XMLHttpRequest();
+              request.open('POST', './drop/upload');
+
+              // Should call the progress method to update the progress to 100% before calling load
+              // Setting computable to false switches the loading indicator to infinite mode
+              request.upload.onprogress = (e) => {
+                  console.log('Progress: ', e.loaded, e.total);
+                  progress(false, e.loaded, e.total);
+                  
+                  // Update progress message
+                  const percentage = Math.round((e.loaded / e.total) * 100);
+                  progressAPI.updateMessage(`
+                    <div class="flex items-center justify-center gap-2">
+                      <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Uploading <em>${file.name}</em>... <strong>${percentage}%</strong> complete
+                    </div>
+                  `);
+                
+                  if (percentage === 100) {
+                    // Add messages while waiting
+                    demoProgressStates()
+                  }
+              };
+
+              // Should call the load method when done and pass the returned server file id
+              // this server file id is then used later on when reverting or restoring a file
+              // so your server knows which file to return without exposing that info to the client
+              request.onload = function () {
+                  stopDemoProgress();
+                
+                  if (request.status >= 200 && request.status < 300) {
+                      // Upload successful
+                      const responseJson = JSON.parse(request.response);
+                      const familyRef = responseJson.neon[0];
+                    
+                      progressAPI.update({
+                        message: `
+                          <div class="flex items-center justify-center gap-2 text-green-700">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <em>${file.name}</em> processed <strong>successfully</strong>!
+                          </div>
+                        `,
+                        style: 'success',
+                        buttons: [
+                          {
+                            text: 'Open your new Story',
+                            style: 'success',
+                            onclick: () => {
+                              window.open(`{{neonAppUrl}}/neon/app/neon.html#open/${familyRef}`);
+                            }
+                          },
+                          {
+                            text: 'Upload Another',
+                            style: 'secondary',
+                            onclick: () => {
+                              pond.removeFiles();
+                              progressAPI.hide();
+                            }
+                          }
+                        ]
+                      });
+                      
+                      // the load method accepts either a string (id) or an object
+                      load(request.responseText);
+                  } else {
+                      // Upload failed
+                      progressAPI.update({
+                        message: `
+                          <div class="flex items-center justify-center gap-2 text-red-700">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                            Failed to upload <em>${file.name}</em>. Please try again.
+                          </div>
+                        `,
+                        style: 'error',
+                        buttons: [
+                          {
+                            text: 'Retry',
+                            style: 'danger',
+                            onclick: () => {
+                              // Reset and retry
+                              progressAPI.update({
+                                message: `
+                                  <div class="flex items-center justify-center gap-2">
+                                    <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    Retrying upload...
+                                  </div>
+                                `,
+                                style: 'default',
+                                buttons: []
+                              });
+                              pond.processFile(file);
+                            }
+                          },
+                          {
+                            text: 'Cancel',
+                            style: 'secondary',
+                            onclick: () => {
+                              pond.removeFiles();
+                              progressAPI.hide();
+                            }
+                          }
+                        ]
+                      });
+                      
+                      // Can call the error method if something is wrong, should exit after
+                      error('Upload failed');
+                  }
+              };
+
+              request.send(formData);
+
+              // Should expose an abort method so the request can be cancelled
+              return {
+                  abort: () => {
+                      // This function is entered if the user has tapped the cancel button
+                      request.abort();
+                      
+                      // Update progress message
+                      progressAPI.update({
+                        message: `
+                          <div class="flex items-center justify-center gap-2 text-yellow-700">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 18.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                            </svg>
+                            Upload cancelled by user
+                          </div>
+                        `,
+                        style: 'warning',
+                        buttons: [
+                          {
+                            text: 'Try Again',
+                            style: 'primary',
+                            onclick: () => {
+                              progressAPI.hide();
+                            }
+                          }
+                        ]
+                      });
+
+                      // Let FilePond know the request has been cancelled
+                      abort();
+                  },
+              };
+          },
+        },
+        labelIdle: 'Drag & Drop your file or <span class="filepond--label-action"> Browse </span>',
+        labelFileProcessing: 'Processing...',
+        labelFileProcessingComplete: 'Done!'
+      });
+      
+      // FilePond event listeners for progress updates
+      pond.on('addfile', (error, file) => {
+        if (!error) {
+          progressAPI.update({
+            message: `
+              <div class="flex items-center justify-center gap-2">
+                <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                File <em>"${file.file.name}"</em> added. Ready to upload...
+              </div>
+            `,
+            style: 'default',
+            buttons: []
+          });
+        }
+      });
+      
+      pond.on('processfilestart', (file) => {
+        progressAPI.update({
+          message: `
+            <div class="flex items-center justify-center gap-2">
+              <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Starting upload of <em>${file.file.name}</em>...
+            </div>
+          `,
+          style: 'default',
+          buttons: []
+        });
+      });
+      
+      pond.on('removefile', (error, file) => {
+        if (!error) {
+          progressAPI.hide();
+        }
+      });
+    </script> 
+  </body>
+</html>

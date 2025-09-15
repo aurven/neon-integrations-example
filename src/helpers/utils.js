@@ -17,15 +17,15 @@ function polyfills() {
 polyfills();
 
 function removeNonAlphanumeric(str) {
-  return str.replace?.(/[^a-zA-Z0-9_-]/g, "") || str;
+  return str?.replace?.(/[^a-zA-Z0-9_-]/g, "") || str;
 }
 
 function removeNonAlphanumericPreserveDot(str) {
-  return str.replace?.(/[^a-zA-Z0-9._-]/g, "") || str;
+  return str?.replace?.(/[^a-zA-Z0-9._-]/g, "") || str;
 }
 
 function removeATags(htmlString) {
-  return htmlString.replace?.(/<a\b[^>]*>|<\/a>/gi, "");
+  return htmlString?.replace?.(/<a\b[^>]*>|<\/a>/gi, "");
 }
 
 /**
@@ -161,7 +161,9 @@ function bodyGenerator({
 }
 
 function metadataGenerator(meta) {
-    const { seoTitle, seoMeta, keywords } = meta;
+    const seoTitle = meta?.seoTitle || '';
+    const seoMeta = meta?.seoMeta || '';
+    const keywords = meta?.keywords || '';
     const body = `
         <?xml version="1.0" encoding="UTF-8"?>
         <!DOCTYPE ObjectMetadata SYSTEM "/common/rules/classify.dtd">
@@ -284,33 +286,6 @@ function metadataGenerator(meta) {
     return body.replaceAll('\n', '').replaceAll('    ', '').trim();
 }
 
-function nextStepAssignmentBodyGenerator(getNextStepsResult, targetStateName) {
-    const processName = getNextStepsResult.associatedWorkflow?.processInstance?.processName;
-    const matchingStep = getNextStepsResult.associatedWorkflow?.steps?.find?.(step => 
-        step.state.name === targetStateName
-    );
-    const nodeTitle = getNextStepsResult.node.title || 'Automatically transitioned by a Neon Integration';
-
-    if (!matchingStep) {
-        console.error(`Step with state name '${targetStateName}' not found`);
-    }
-
-    const nextStepAssignmentBody = {
-      "workflowAssignment": {
-        "title": nodeTitle,
-        "comment": "",
-        "principals": [],
-        "prioprity": 0
-      },
-      "workflowStep": {
-        "connectorName": matchingStep.name,
-        "workflowName": processName
-      }
-    };
-
-    return nextStepAssignmentBody;
-}
-
 /**
  * Parses a srcset string and returns an array of { url, width } entries.
  * Supports width descriptors (e.g., 640w) and pixel density descriptors (e.g., 2x).
@@ -368,6 +343,47 @@ function getLargestSrcFromPicture(picture) {
   return candidates.sort((a, b) => b.width - a.width)[0].url;
 }
 
+function safeLogRequest(headers, body) {
+  // If DISABLE_SAFE_LOGGING is set to true, return original data without redaction
+  if (process.env.DISABLE_SAFE_LOGGING === 'true') {
+    return {
+      headers: headers,
+      body: body
+    };
+  }
+  
+  const sensitiveKeys = [
+    'apikey', 'authorization', 'auth', 'token', 'password', 'secret', 
+    'key', 'x-api-key', 'x-auth-token', 'cookie', 'set-cookie',
+    'x-forwarded-for', 'x-real-ip'
+  ];
+  
+  const safeHeaders = { ...headers };
+  
+  // Remove or redact sensitive headers
+  Object.keys(safeHeaders).forEach(key => {
+    if (sensitiveKeys.some(sensitive => key.toLowerCase().includes(sensitive.toLowerCase()))) {
+      safeHeaders[key] = '[REDACTED]';
+    }
+  });
+  
+  const safeBody = { ...body };
+  
+  // Remove or redact sensitive body fields
+  if (safeBody && typeof safeBody === 'object') {
+    Object.keys(safeBody).forEach(key => {
+      if (sensitiveKeys.some(sensitive => key.toLowerCase().includes(sensitive.toLowerCase()))) {
+        safeBody[key] = '[REDACTED]';
+      }
+    });
+  }
+  
+  return {
+    headers: safeHeaders,
+    body: safeBody
+  };
+}
+
 
 module.exports = {
   polyfills,
@@ -380,6 +396,6 @@ module.exports = {
   generateAutoId,
   bodyGenerator,
   metadataGenerator,
-  nextStepAssignmentBodyGenerator,
-  getLargestSrcFromPicture
+  getLargestSrcFromPicture,
+  safeLogRequest
 };

@@ -2,8 +2,15 @@ const mammoth = require("mammoth");
 const seo = require("../seo.json");
 const openai = require("../ai/openai.js");
 const storiesPopulator = require("../stories-populator.js");
+const { safeLogRequest } = require("../helpers/utils.js");
 
 function testWidgetHandler(request, reply) {
+  const apikey = request.query.apikey;
+
+  if (!apikey || apikey !== process.env.NEON_EXT_APIKEY) {
+    return reply.status(401).send({ error: "Unauthorized" });
+  }
+
   // params is an object we'll pass to our handlebars template
   let params = { seo: seo };
 
@@ -12,11 +19,21 @@ function testWidgetHandler(request, reply) {
 }
 
 function dropWidgetHandler (request, reply) {
+  const apikey = request.query.apikey;
+
+  if (!apikey || apikey !== process.env.NEON_EXT_APIKEY) {
+    return reply.status(401).send({ error: "Unauthorized" });
+  }
+
   // params is an object we'll pass to our handlebars template
   let params = { seo: seo, neonAppUrl: process.env.NEON_APP_URL };
 
+  // Check for theme query parameter
+  const theme = request.query.theme;
+  const templatePath = theme === 'light' ? "/src/widgets/drop-a-doc-light.hbs" : "/src/widgets/drop-a-doc.hbs";
+
   // The Handlebars code will be able to access the parameter values and build them into the page
-  return reply.view("/src/widgets/drop-a-doc.hbs", params);
+  return reply.view(templatePath, params);
 }
 
 async function asyncDropUploadWidgetHandler(request, reply) {
@@ -27,6 +44,10 @@ async function asyncDropUploadWidgetHandler(request, reply) {
     'audio/mpeg',
     'audio/ogg'
   ];
+  
+  console.log("asyncDropUploadWidgetHandler << IN:");
+  const safeRequest = safeLogRequest(request?.headers || {}, request?.body || {});
+  console.log("Request Headers:", JSON.stringify(safeRequest.headers));
   
   // params is an object we'll pass to our handlebars template
   let params = { seo: seo };
@@ -74,10 +95,15 @@ async function asyncDropUploadWidgetHandler(request, reply) {
     console.log(resultMessage);
     console.log(parsedDoc);
 
-    return reply.status(200).send({
+    const docResponse = {
       message: resultMessage,
       document: parsedDoc
-    });
+    };
+
+    console.log("asyncDropUploadWidgetHandler << OUT:");
+    console.log("Response Data:", docResponse);
+
+    return reply.status(200).send(docResponse);
   }
   
   if (isAudio) {
@@ -120,19 +146,33 @@ async function asyncDropUploadWidgetHandler(request, reply) {
     
     console.log('asyncDropUploadWidgetHandler - Done!', responseBody);
 
+    console.log("asyncDropUploadWidgetHandler << OUT:");
+    console.log("Response Data:", responseBody);
+
     return reply.status(200).send(responseBody);
   }
   
-  return reply.status(400).send({
+  const errorResponse = {
     message: 'Unsupported MIME type',
     supportedTypes: {
       documentTypes: supportedDocs,
       audioTypes: supportedAudios
     }
-  });
+  };
+
+  console.log("asyncDropUploadWidgetHandler << ERROR:");
+  console.log("Error Response:", errorResponse);
+
+  return reply.status(400).send(errorResponse);
 }
 
 function wiresWidgetHandler (request, reply) {
+  const apikey = request.query.apikey;
+
+  if (!apikey || apikey !== process.env.NEON_EXT_APIKEY) {
+    return reply.status(401).send({ error: "Unauthorized" });
+  }
+
   // params is an object we'll pass to our handlebars template
   let params = { seo: seo, apiKey: process.env.NEON_EXT_APIKEY, neonAppUrl: process.env.NEON_APP_URL };
 
@@ -140,9 +180,101 @@ function wiresWidgetHandler (request, reply) {
   return reply.view("/src/widgets/wires-list.hbs", params);
 }
 
+function breakingNewsWidgetHandler(request, reply) {
+  const apikey = request.query.apikey;
+
+  if (!apikey || apikey !== process.env.NEON_EXT_APIKEY) {
+    return reply.status(401).send({ error: "Unauthorized" });
+  }
+
+  // params is an object we'll pass to our handlebars template
+  let params = { seo: seo, neonAppUrl: process.env.NEON_APP_URL };
+
+  // Check for theme query parameter
+  const theme = request.query.theme;
+  const templatePath = theme === 'light' ? "/src/widgets/breakingnews-light.hbs" : "/src/widgets/breakingnews.hbs";
+
+  // The Handlebars code will be able to access the parameter values and build them into the page
+  return reply.view(templatePath, params);
+}
+
+async function breakingNewsPublishHandler(request, reply) {
+  console.log("breakingNewsPublishHandler << IN:");
+  const safeRequest = safeLogRequest(request?.headers || {}, request?.body || {});
+  console.log("Request Body:", JSON.stringify(safeRequest.body));
+  
+  const { headline, summary, body } = request.body;
+  
+  if (!headline) {
+    const errorResponse = {
+      message: 'Headline is required'
+    };
+    console.log("breakingNewsPublishHandler << ERROR:");
+    console.log("Error Response:", errorResponse);
+    return reply.status(400).send(errorResponse);
+  }
+  
+  try {
+    const timestamp = Date.now();
+    const id = `breakingnews_${timestamp}.xml`;
+    
+    const neonPopulatorOptions = {
+      "site": "TheGlobe",
+      "section": "/News",
+      "workspace": "/Convergent/News",
+      "directPublish": true,
+      "siteAsChannel": false
+    };
+    
+    const processResult = await storiesPopulator.populateNeonInstance([
+      {
+        "id": id,
+        "itemUrl": null,
+        "overhead": "Breaking News",
+        "headline": headline,
+        "summary": summary || "",
+        "byline": "The Newsroom",
+        "figureURL": null,
+        "localFigurePath": null,
+        "figureCaption": null,
+        "figureCredit": null,
+        "mainContentHtml": body ? `<p>${body}</p>` : null,
+        "metadata": null,
+        "type": "article/breakingnews"
+      }
+    ], neonPopulatorOptions);
+    
+    const responseBody = {
+      message: 'Breaking news published successfully!',
+      neon: processResult
+    };
+    
+    console.log('breakingNewsPublishHandler - Success!', responseBody);
+    console.log("breakingNewsPublishHandler << OUT:");
+    console.log("Response Data:", responseBody);
+
+    return reply.status(200).send(responseBody);
+    
+  } catch (error) {
+    console.error('breakingNewsPublishHandler - Error:', error);
+    
+    const errorResponse = {
+      message: `Failed to publish breaking news: ${error.message}`,
+      error: error.toString()
+    };
+    
+    console.log("breakingNewsPublishHandler << ERROR:");
+    console.log("Error Response:", errorResponse);
+
+    return reply.status(500).send(errorResponse);
+  }
+}
+
 module.exports = {
   testWidgetHandler,
   dropWidgetHandler,
   asyncDropUploadWidgetHandler,
-  wiresWidgetHandler
+  wiresWidgetHandler,
+  breakingNewsWidgetHandler,
+  breakingNewsPublishHandler
 };

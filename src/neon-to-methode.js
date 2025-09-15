@@ -93,7 +93,8 @@ const processWebhookData = async (model) => {
   };
 
   const info = generateInfoFromModel(model);
-  const name = generateNameFromModel(model);
+  //const name = generateNameFromModel(model);
+  const name = `neon_${info.id}.xml`;
   const { content, xmlDeclarations, $doc } = await generateContentFromModel(model);
 
   return { info, name, content, xmlDeclarations, $doc };
@@ -173,13 +174,14 @@ async function processNeonStoryV2 (model) {
       channel: CHANNEL,
       workFolder: WORKFOLDER,
       // attributes: info.attributes,
-      attributes: {
-        metadata: {
-          general: {
-            priority: 'High'
-          }
-        }
-      }
+      // attributes: {
+      //   metadata: {
+      //     general: {
+      //       priority: 'High'
+      //     }
+      //   }
+      // },
+      attributes: null
     });
     const imageReferences = await images.modelImagesToMethode(model, { channel: CHANNEL, workFolder: WORKFOLDER, issueDate });
     

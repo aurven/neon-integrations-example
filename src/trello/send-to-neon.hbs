@@ -5,6 +5,27 @@
       select {
         height: 30px;
       }
+      .loading {
+        opacity: 0.6;
+        pointer-events: none;
+      }
+      .spinner {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border: 2px solid #f3f3f3;
+        border-top: 2px solid #026aa7;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-right: 5px;
+      }
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      .hidden {
+        display: none;
+      }
     </style>
     <script src="https://p.trellocdn.com/power-up.min.js"></script>
   </head>
@@ -12,15 +33,16 @@
     <form id="neon">
       <label for="prioritySize">Priority:</label>
       <select name="prioritySize" id="prioritySize">
-        <option value="9">🟥 Critical!</option>
+        <option value="9">🟥 Critical</option>
         <option value="8">🟧 High</option>
         <option value="5">🟨 Medium</option>
         <option value="0">🟩 Low</option>
       </select>
       <label for="neonId">Neon Id:</label>
       <input type="text" name="neonId" id="neonId" placeholder="None" disabled/>
-      <button type="submit" class="mod-primary">Create in Neon</button>
-      <button id="openInNeon" type="button" class="mod-primary">Open in Neon</button>
+      <button type="submit" class="mod-primary" id="submitBtn">Create in Neon</button>
+      <button id="openInNeon" type="button" class="mod-primary hidden">Open in Neon</button>
+      <button id="cleanCard" type="button" class="hidden" title="Clean this topic">🧹</button>
     </form>
     <script>
       var t = TrelloPowerUp.iframe();
@@ -31,9 +53,44 @@
         familyRef && window.open(`{{neonAppUrl}}/neon/app/neon.html#open/${familyRef}`);
       });
       
+      window.cleanCard.addEventListener("click", function(event) {
+        event.preventDefault();
+        t.set("card", "shared", "neonId", null)
+          .then(function() {
+            return t.set("card", "shared", "priority", null);
+          })
+          .then(function() {
+            window.neonId.value = '';
+            window.prioritySize.value = '0';
+            updateButtonVisibility(false);
+            t.sizeTo("#neon").done();
+          })
+          .catch(function(error) {
+            console.error('Error cleaning card:', error);
+          });
+      });
+      
+      function updateButtonVisibility(hasNeonId) {
+        if (hasNeonId) {
+          window.submitBtn.classList.add('hidden');
+          window.openInNeon.classList.remove('hidden');
+          window.cleanCard.classList.remove('hidden');
+        } else {
+          window.submitBtn.classList.remove('hidden');
+          window.openInNeon.classList.add('hidden');
+          window.cleanCard.classList.add('hidden');
+        }
+      }
+      
       window.neon.addEventListener("submit", function (event) {
         // Stop the browser trying to submit the form itself.
         event.preventDefault();
+        
+        // Show loading state
+        const submitBtn = window.submitBtn;
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<span class="spinner"></span>Creating...';
+        submitBtn.classList.add('loading');
         return t
           .set("card", "shared", "priority", window.prioritySize.value)
           .then(function () {
@@ -49,9 +106,10 @@
                   console.log(memberInfo);
                   
                   const token = memberInfo.authToken;
-                  const neonUsername = memberInfo.neonUsername;
                   
-                  data.neonUsername = neonUsername;
+                  data.neon = {};
+                  data.neon.username = memberInfo.neonUsername;
+                  data.neon.priority = window.prioritySize.value;
 
                   const requestHeaders = new Headers();
                   requestHeaders.append("ApiKey", token);
@@ -74,10 +132,18 @@
                         .then((result) => {
                           console.log("result after set");
                           console.log(result);
+                          // Reset button state
+                          submitBtn.innerHTML = originalText;
+                          submitBtn.classList.remove('loading');
                           t.closePopup();
                         });
                     })
-                    .catch((error) => console.error(error))
+                    .catch((error) => {
+                      console.error(error);
+                      // Reset button state on error
+                      submitBtn.innerHTML = originalText;
+                      submitBtn.classList.remove('loading');
+                    })
                 });
               });
           });
@@ -88,11 +154,12 @@
             .get("card", "shared")
             .then(function (cardInfo) {
               const {priority, neonId} = cardInfo;
-              window.prioritySize.value = priority;
+              window.prioritySize.value = priority || '0';
               window.neonId.value = neonId || '';
               if (!neonId) {
                 window.neonId.style.display = 'none';
               }
+              updateButtonVisibility(!!neonId);
             })
             .then(function () {
               t.sizeTo("#neon").done();

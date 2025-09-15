@@ -1,8 +1,9 @@
 const seo = require("../seo.json");
 const trelloToNeon = require("../trello/import-card-to-neon.js");
+const { safeLogRequest } = require("../helpers/utils.js");
 
 function mainPageHandler(request, reply) {
-  let params = { seo: seo };
+  let params = { seo: seo, iconHost: process.env.PROJECT_DOMAIN };
 
   return reply.view("/src/trello/trello.hbs", params);
 };
@@ -30,15 +31,20 @@ async function trelloToNeonHandler(request, reply) {
     ? request.headers
     : { apikey: null };
 
+  console.log("trelloToNeonHandler << IN:");
+  const safeRequest = safeLogRequest(request?.headers || {}, request?.body || {});
+  console.log("Request Headers:", JSON.stringify(safeRequest.headers));
+  console.log("Request Body:", JSON.stringify(safeRequest.body));
+
   if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
-    console.log("Received call, but no API key was passed.");
+    console.log("trelloToNeonHandler << ERROR: Unauthorized");
     return reply.status(401).send({ error: "Unauthorized" });
   }
   
-  const body = JSON.parse(request.body);
+  const body = typeof request.body !== 'object' ? JSON.parse(request.body) : request.body;
   
   console.log("Request received:");
-  console.log(body);
+  console.log(JSON.stringify(safeRequest.body));
   
   return await trelloToNeon.importCard(body)
     .then(result => {
@@ -46,7 +52,8 @@ async function trelloToNeonHandler(request, reply) {
             message: "Processed",
             data: result,
         }
-        console.log(message);
+        console.log("trelloToNeonHandler << OUT:");
+        console.log("Response Data:", message);
         return reply.status(200).send(message);
     });
 };

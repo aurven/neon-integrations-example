@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trello Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .scrollbar-thin {
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e0 transparent;
+        }
+        .scrollbar-thin::-webkit-scrollbar {
+            width: 6px;
+        }
+        .scrollbar-thin::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 3px;
+        }
+        .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+            background: #a0aec0;
+        }
+        .attachment-item {
+            transition: all 0.2s ease;
+        }
+        .attachment-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .attachment-item.non-draggable {
+            cursor: default;
+        }
+        .attachment-item.non-draggable:hover {
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* Smooth transitions for updates */
+        .update-transition {
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+        
+        .updating {
+            opacity: 0.7;
+        }
+        
+        .card-title, .card-description {
+            transition: opacity 0.3s ease-in-out;
+        }
+        
+        .list-item-updated {
+            background-color: #dcfce7;
+            transition: background-color 2s ease-out;
+        }
+        
+        .comment-new {
+            opacity: 0;
+            transform: translateY(-10px);
+            animation: slideInNew 0.5s ease-out forwards;
+        }
+        
+        @keyframes slideInNew {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .checklist-item {
+            transition: all 0.2s ease;
+        }
+        .checklist-item.completed {
+            opacity: 0.6;
+        }
+        .checklist-item.completed .checklist-text {
+            text-decoration: line-through;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans">
+    <div id="app" class="container mx-auto p-4 max-w-4xl">
+        <!-- Loading State -->
+        <div id="loading" class="flex flex-col items-center justify-center min-h-screen">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+            <p class="mt-4 text-gray-600">Loading Trello card...</p>
+        </div>
+
+        <!-- No Card State -->
+        <div id="no-card" class="hidden flex flex-col items-center justify-center min-h-screen text-center">
+            <div class="bg-white rounded-lg shadow-md p-8 max-w-md w-full">
+                <div class="text-gray-400 mb-4">
+                    <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                </div>
+                <h2 class="text-xl font-semibold text-gray-800 mb-2">No Trello Card Linked</h2>
+                <p class="text-gray-600 mb-6">There is no Trello Card associated to this object. Do you want to link a free card on your board?</p>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Select Board</label>
+                        <select id="board-select" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                            <option value="">Loading boards...</option>
+                        </select>
+                    </div>
+                    
+                    <div id="cards-container" class="hidden">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Select Card</label>
+                        <div id="cards-list" class="max-h-64 overflow-y-auto scrollbar-thin space-y-2">
+                            <!-- Cards will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card Display -->
+        <div id="card-display" class="hidden space-y-6">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center justify-between space-x-2">
+                    {{!-- <div class="flex items-center space-x-2">
+                        <span id="card-board" class="px-2 py-1 text-xs font-medium bg-primary-100 text-primary-800 rounded-full"></span>
+                        <a id="trello-link" href="#" target="_blank" class="inline-flex items-center px-2 py-1 text-xs font-medium text-primary-600 hover:text-primary-800 hover:bg-primary-50 rounded-md transition-colors" title="Open in Trello">
+                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M21 2H3c-.6 0-1 .4-1 1v18c0 .6.4 1 1 1h18c.6 0 1-.4 1-1V3c0-.6-.4-1-1-1zM10.5 17.5c0 .3-.2.5-.5.5H6c-.3 0-.5-.2-.5-.5v-11c0-.3.2-.5.5-.5h4c.3 0 .5.2.5.5v11M18.5 12.5c0 .3-.2.5-.5.5h-4c-.3 0-.5-.2-.5-.5V6.5c0-.3.2-.5.5-.5h4c.3 0 .5.2.5.5v6z"/>
+                            </svg>
+                            Trello
+                        </a>
+                    </div> --}}
+                    <div class="flex items-center">
+                        <a id="trello-link" href="#" target="_blank" class="inline-flex items-center py-1 text-xs font-medium text-primary-600 hover:text-primary-800 hover:bg-primary-50 rounded-md transition-colors" title="Open in Trello">
+                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M21 2H3c-.6 0-1 .4-1 1v18c0 .6.4 1 1 1h18c.6 0 1-.4 1-1V3c0-.6-.4-1-1-1zM10.5 17.5c0 .3-.2.5-.5.5H6c-.3 0-.5-.2-.5-.5v-11c0-.3.2-.5.5-.5h4c.3 0 .5.2.5.5v11M18.5 12.5c0 .3-.2.5-.5.5h-4c-.3 0-.5-.2-.5-.5V6.5c0-.3.2-.5.5-.5h4c.3 0 .5.2.5.5v6z"/>
+                            </svg>
+                            Trello
+                        </a>
+                    </div>
+                    <select id="card-list-select" class="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded border-0 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                        <option value="">Loading lists...</option>
+                    </select>
+                </div>
+                <div class="flex items-start mt-4 mb-4">
+                    <h1 id="card-title" class="text-2xl font-bold text-gray-800 flex-1 mr-4"></h1>
+                </div>
+                <div id="card-description" class="text-gray-700 prose prose-sm max-w-none"></div>
+            </div>
+
+            <!-- Attachments -->
+            <div id="attachments-section" class="hidden bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
+                    </svg>
+                    Attachments
+                </h2>
+                <div id="attachments-list" class="grid grid-cols-1 gap-4">
+                    <!-- Attachments will be populated here -->
+                </div>
+            </div>
+
+            <!-- Checklists -->
+            <div id="checklists-section" class="hidden bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Checklists
+                </h2>
+                <div id="checklists-list" class="space-y-4">
+                    <!-- Checklists will be populated here -->
+                </div>
+            </div>
+
+            <!-- Comments -->
+            <div id="comments-section" class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.955 8.955 0 01-4.906-1.442l-3.458 1.153a1 1 0 01-1.296-1.296l1.153-3.458A8.955 8.955 0 013 12c0-4.418 3.582-8 8-8s8 3.582 8 8z"></path>
+                    </svg>
+                    Activity & Comments
+                </h2>
+                
+                <!-- Add Comment Form -->
+                <div class="mb-6">
+                    <textarea id="new-comment" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none" rows="3" placeholder="Write a comment..."></textarea>
+                    <div class="mt-2 flex justify-end">
+                        <button id="add-comment-btn" class="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors">
+                            Add Comment
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Comments List -->
+                <div id="comments-list" class="space-y-4">
+                    <!-- Comments will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let state = {
+            apiKey: '{{{apiKey}}}',
+            neonAppUrl: '{{{neonAppUrl}}}',
+            trelloApiKey: '{{{trelloApiKey}}}',
+            trelloToken: '{{{trelloToken}}}',
+            trelloOrganizationId: '{{{trelloOrganizationId}}}',
+            externalRef: '{{{externalRef}}}',
+            isDraggable: {{{isDraggable}}},
+            currentCard: null,
+            neonContext: null,
+            pollingInterval: null,
+            lastUpdateHash: null
+        };
+
+        // Utility functions
+        function apiCall(endpoint, method = 'GET', body = null) {
+            const url = `/panels/trello/api/${endpoint}`;
+            const options = {
+                method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apikey': state.apiKey  // Pass our API key in header instead of query param
+                },
+            };
+            
+            if (body) {
+                options.body = JSON.stringify(body);
+            }
+            
+            return fetch(url, options).then(res => res.json());
+        }
+
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function formatDescription(text) {
+            if (!text) return '';
+            // Simple markdown-like formatting
+            return text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/\n/g, '<br>');
+        }
+
+        // PostMessage API for Neon CMS communication
+        function setupPostMessageApi() {
+            console.log('Setting up PostMessage API');
+
+            window.addEventListener('message', (event) => {
+                // Security check - you might want to restrict origin
+                if (event.origin !== state.neonAppUrl) {
+                    console.warn('Received message from unwanted origin:', event.origin);
+                    return;
+                }
+                console.log('Received message:', event, event.data);
+                
+                if (event.data) {
+                    switch (event.data.key) {
+                        case 'getInfo':
+
+                            state.neonContext = event.data.info;
+                            console.log('Neon context updated:', state.neonContext);
+
+                            if (event.data.type === 'neonStartingContest') {
+                                const originalNeonNode = state.neonContext?.originalNode;
+                                const externalRef = originalNeonNode?.externalRef;
+                                const externalSource = originalNeonNode?.externalSource;
+
+                                if (externalSource && externalSource !== 'Trello') {
+                                    console.warn('External source is not Trello:', externalSource);
+                                    state.externalRef = null;
+                                    showNoCard();
+                                    return;
+                                }
+                                // externalRef format: "trello:cardId"
+                                const trelloId = externalRef?.startsWith('trello:') ? externalRef.split(':')[1] : null;
+                                
+                                // Try to get externalRef from Neon context
+                                if (trelloId) {
+                                    state.externalRef = trelloId;
+                                    loadCard();
+                                };
+                            }
+
+                            break;
+                        default:
+                            console.warn('Unknown neonContext key:', event.data.key);
+                    }
+
+                }
+                
+            });
+
+            // Send ready message to parent
+            console.log('Sending ready message to parent');
+            window.parent.postMessage({ type: 'panel-ready', info: { op: 'getInfo' } }, state.neonAppUrl);
+            console.log('Ready message sent');
+        }
+
+        // Load boards for card selection
+        async function loadBoards() {
+            try {
+                const boards = await apiCall(`organizations/${state.trelloOrganizationId}/boards`);
+                const select = document.getElementById('board-select');
+                select.innerHTML = '<option value="">Select a board...</option>';
+                
+                const openBoards = boards.filter(board => !board.closed);
+                
+                if (openBoards.length === 0) {
+                    select.innerHTML = '<option value="">No boards available</option>';
+                    return;
+                }
+
+                openBoards.forEach(board => {
+                    const option = document.createElement('option');
+                    option.value = board.id;
+                    option.textContent = board.name;
+                    select.appendChild(option);
+                });
+
+                if (openBoards.length === 1) {
+                    select.value = openBoards[0].id;
+                    loadCards(openBoards[0].id);
+                }
+
+            } catch (error) {
+                console.error('Error loading boards:', error);
+            }
+        }
+
+        // Load cards for selected board
+        async function loadCards(boardId) {
+            try {
+                const cards = await apiCall(`boards/${boardId}/cards`);
+                const container = document.getElementById('cards-container');
+                const list = document.getElementById('cards-list');
+                
+                // Filter cards without neonId in pluginData
+                const availableCards = cards.filter(card => {
+                    return !card.pluginData || !card.pluginData.some(data => data.value && JSON.parse(data.value).neonId);
+                });
+                
+                // Sort by creation date (newest first)
+                availableCards.sort((a, b) => new Date(b.dateLastActivity) - new Date(a.dateLastActivity));
+                
+                list.innerHTML = '';
+                
+                if (availableCards.length === 0) {
+                    list.innerHTML = '<p class="text-gray-500 text-sm p-4">No available cards found on this board.</p>';
+                } else {
+                    availableCards.forEach(card => {
+                        const cardElement = document.createElement('div');
+                        cardElement.className = 'p-3 border border-gray-200 rounded-md hover:bg-gray-50 cursor-pointer transition-colors';
+                        cardElement.innerHTML = `
+                            <h4 class="font-medium text-gray-800">${card.name}</h4>
+                            <p class="text-sm text-gray-600 mt-1">Last updated: ${formatDate(card.dateLastActivity)}</p>
+                        `;
+                        cardElement.onclick = () => selectCard(card.id);
+                        list.appendChild(cardElement);
+                    });
+                }
+                
+                container.classList.remove('hidden');
+            } catch (error) {
+                console.error('Error loading cards:', error);
+            }
+        }
+
+        // Select a card and link it
+        async function selectCard(cardId) {
+            try {
+                // Here you would typically update the Neon object's externalRef
+                // and update the Trello card's pluginData with neonId
+                
+                state.externalRef = `trello:${cardId}`;
+                
+                // Notify parent about the selection
+                if (window.parent !== window) {
+                    /* window.parent.postMessage({
+                        type: 'card-linked',
+                        cardId: cardId,
+                        externalRef: state.externalRef
+                    }, '*'); */
+
+                    if (typeof state.neonContext === 'undefined' || typeof state.neonContext === 'null' || !state.neonContext) {
+                        console.warn('Neon context is not available, asking for parent panel.');
+                        window.parent.postMessage({ type: 'request-context', info: { op: 'getInfo' } }, state.neonAppUrl);
+                    }
+                }
+                
+                loadCard();
+            } catch (error) {
+                console.error('Error selecting card:', error);
+            }
+        }
+
+        // Load board lists
+        async function loadBoardLists(boardId) {
+            try {
+                const lists = await apiCall(`boards/${boardId}/lists`);
+                return lists;
+            } catch (error) {
+                console.error('Error loading board lists:', error);
+                return [];
+            }
+        }
+
+        // Load and display card details
+        async function loadCard() {
+            if (!state.externalRef) {
+                showNoCard();
+                return;
+            }
+
+            // Extract card ID from externalRef (format: "trello:cardId")
+            const cardId = state.externalRef.replace('trello:', '');
+            
+            try {
+                // Load card details with all associated data
+                const [card, checklists, comments] = await Promise.all([
+                    apiCall(`cards/${cardId}?attachments=true&members=true&board=true&list=true`),
+                    apiCall(`cards/${cardId}/checklists`),
+                    apiCall(`cards/${cardId}/actions?filter=commentCard&limit=50`)
+                ]);
+
+                // Load board lists for the dropdown
+                const boardLists = await loadBoardLists(card.board.id);
+
+                const newCardData = { ...card, checklists, comments, boardLists };
+                
+                if (state.currentCard) {
+                    // Update existing card with diff detection
+                    updateCardWithDiff(state.currentCard, newCardData);
+                } else {
+                    // First time loading
+                    state.currentCard = newCardData;
+                    displayCard();
+                    startPolling();
+                }
+                
+                state.currentCard = newCardData;
+            } catch (error) {
+                console.error('Error loading card:', error);
+                if (!state.currentCard) {
+                    showNoCard();
+                }
+            }
+        }
+
+        // Display card information
+        function displayCard() {
+            const card = state.currentCard;
+            
+            document.getElementById('card-title').textContent = card.name;
+            // document.getElementById('card-board').textContent = card.board.name;
+            document.getElementById('card-description').innerHTML = formatDescription(card.desc);
+            
+            // Update Trello link
+            const trelloLink = document.getElementById('trello-link');
+            if (trelloLink) {
+                trelloLink.href = card.url || `https://trello.com/c/${card.shortLink}`;
+            }
+
+            // Populate list dropdown
+            const listSelect = document.getElementById('card-list-select');
+            listSelect.innerHTML = '';
+            
+            if (card.boardLists && card.boardLists.length > 0) {
+                card.boardLists.forEach(list => {
+                    const option = document.createElement('option');
+                    option.value = list.id;
+                    option.textContent = list.name;
+                    option.selected = list.id === card.list.id;
+                    listSelect.appendChild(option);
+                });
+            }
+
+            displayAttachments(card.attachments || []);
+            displayChecklists(card.checklists || []);
+            displayComments(card.comments || []);
+
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('no-card').classList.add('hidden');
+            document.getElementById('card-display').classList.remove('hidden');
+        }
+
+        // Display attachments
+        function displayAttachments(attachments) {
+            const section = document.getElementById('attachments-section');
+            const list = document.getElementById('attachments-list');
+            
+            if (attachments.length === 0) {
+                section.classList.add('hidden');
+                return;
+            }
+            
+            section.classList.remove('hidden');
+            list.innerHTML = '';
+            
+            attachments.forEach(attachment => {
+                const item = document.createElement('div');
+                const baseClasses = 'attachment-item p-4 border bg-white border-gray-200 rounded-lg';
+                const dragClasses = state.isDraggable ? 'cursor-move' : 'non-draggable';
+                item.className = `${baseClasses} ${dragClasses}`;
+                item.draggable = state.isDraggable;
+                
+                const isImage = attachment.previews && attachment.previews.length > 0;
+                const thumbnail = isImage ? attachment.previews[0].url : null;
+                
+                const insertButton = state.isDraggable ? '' : `
+                    <button onclick="insertAsset('${attachment.url}')" class="insert-btn text-green-600 hover:text-green-800 transition-colors ml-2 relative" title="Upload to Neon and insert">
+                        <svg class="w-5 h-5 upload-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                        </svg>
+                        <svg class="w-5 h-5 loading-icon hidden animate-spin" fill="none" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"></circle>
+                            <path fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" class="opacity-75"></path>
+                        </svg>
+                    </button>
+                `;
+                
+                item.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        ${thumbnail ? 
+                            `<img src="${thumbnail}" alt="${attachment.name}" class="w-12 h-12 object-cover rounded">` :
+                            `<div class="w-12 h-12 bg-gray-200 rounded flex items-center justify-center">
+                                <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                            </div>`
+                        }
+                        <div class="flex-1">
+                            <h4 class="font-medium text-gray-800">${attachment.name}</h4>
+                            <p class="text-sm text-gray-600">
+                                ${Math.round(attachment.bytes / 1024)}KB • Added ${formatDate(attachment.date)}
+                            </p>
+                        </div>
+                        <div class="flex items-center">
+                            <a href="${attachment.url}" target="_blank" class="text-primary-600 hover:text-primary-800 transition-colors">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                </svg>
+                            </a>
+                            ${insertButton}
+                        </div>
+                    </div>
+                `;
+                
+                // Add drag and drop functionality only if draggable
+                if (state.isDraggable) {
+                    item.addEventListener('dragstart', (e) => {
+                        e.dataTransfer.setData('text/plain', JSON.stringify({
+                            type: 'trello-attachment',
+                            attachment: attachment
+                        }));
+                    });
+                    
+                    item.addEventListener('dropover', (e) => {
+                        e.preventDefault();
+                        const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+                        console.log('Dropped attachment:', data);
+                    });
+                }
+                
+                list.appendChild(item);
+            });
+        }
+
+        // Display checklists with interactive functionality
+        function displayChecklists(checklists) {
+            const section = document.getElementById('checklists-section');
+            const list = document.getElementById('checklists-list');
+            
+            if (checklists.length === 0) {
+                section.classList.add('hidden');
+                return;
+            }
+            
+            section.classList.remove('hidden');
+            list.innerHTML = '';
+            
+            checklists.forEach(checklist => {
+                const checklistDiv = document.createElement('div');
+                checklistDiv.className = 'border border-gray-200 rounded-lg p-4';
+                
+                const completedItems = checklist.checkItems.filter(item => item.state === 'complete').length;
+                const totalItems = checklist.checkItems.length;
+                const progressPercent = totalItems > 0 ? (completedItems / totalItems) * 100 : 0;
+                
+                checklistDiv.innerHTML = `
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="font-medium text-gray-800">${checklist.name}</h3>
+                        <span class="text-sm text-gray-600">${completedItems}/${totalItems}</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2 mb-4">
+                        <div class="bg-primary-600 h-2 rounded-full transition-all duration-300" style="width: ${progressPercent}%"></div>
+                    </div>
+                    <div class="space-y-2">
+                        ${checklist.checkItems.map(item => `
+                            <div class="checklist-item flex items-center space-x-3 ${item.state === 'complete' ? 'completed' : ''}">
+                                <input type="checkbox" 
+                                       class="rounded border-gray-300 text-primary-600 focus:ring-primary-500" 
+                                       ${item.state === 'complete' ? 'checked' : ''}
+                                       onchange="toggleChecklistItem('${checklist.id}', '${item.id}', this.checked)">
+                                <span class="checklist-text flex-1">${item.name}</span>
+                                ${item.due ? `<span class="text-xs text-gray-500">${formatDate(item.due)}</span>` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                
+                list.appendChild(checklistDiv);
+            });
+        }
+
+        // Toggle checklist item
+        async function toggleChecklistItem(checklistId, itemId, completed) {
+            try {
+                const checklistItemState = completed ? 'complete' : 'incomplete';
+                await apiCall(`cards/${state.currentCard.id}/checkItem/${itemId}?state=${checklistItemState}`, 'PUT', {});
+                
+                // Update local state
+                const checklist = state.currentCard.checklists.find(cl => cl.id === checklistId);
+                const item = checklist.checkItems.find(ci => ci.id === itemId);
+                item.state = checklistItemState;
+                
+                // Refresh checklist display
+                displayChecklists(state.currentCard.checklists);
+            } catch (error) {
+                console.error('Error updating checklist item:', error);
+            }
+        }
+
+        // Display comments
+        function displayComments(comments) {
+            const list = document.getElementById('comments-list');
+            list.innerHTML = '';
+            
+            comments.forEach(comment => {
+                const commentDiv = document.createElement('div');
+                commentDiv.className = 'p-4 bg-gray-50 rounded-lg';
+                commentDiv.innerHTML = `
+                    <div class="flex items-start space-x-3">
+                        <div class="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
+                            <span class="text-sm font-medium text-primary-800">${comment.memberCreator.initials}</span>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-2 mb-1">
+                                <span class="font-medium text-gray-800">${comment.memberCreator.fullName}</span>
+                                <span class="text-sm text-gray-500">${formatDate(comment.date)}</span>
+                            </div>
+                            <p class="text-gray-700">${formatDescription(comment.data.text)}</p>
+                        </div>
+                    </div>
+                `;
+                list.appendChild(commentDiv);
+            });
+        }
+
+        // Move card to different list
+        async function moveCard(newListId) {
+            if (!state.currentCard || newListId === state.currentCard.list.id) {
+                return; // No change needed
+            }
+
+            try {
+                // Update card's list via Trello API
+                await apiCall(`cards/${state.currentCard.id}`, 'PUT', { 
+                    idList: newListId 
+                });
+
+                // Update local state
+                const newList = state.currentCard.boardLists.find(list => list.id === newListId);
+                if (newList) {
+                    state.currentCard.list = newList;
+                    console.log(`Card moved to: ${newList.name}`);
+                    
+                    // Show success feedback
+                    const listSelect = document.getElementById('card-list-select');
+                    const originalBg = listSelect.style.backgroundColor;
+                    listSelect.style.backgroundColor = '#dcfce7'; // Light green
+                    setTimeout(() => {
+                        listSelect.style.backgroundColor = originalBg;
+                    }, 1500);
+                }
+            } catch (error) {
+                console.error('Error moving card:', error);
+                
+                // Revert selection on error
+                const listSelect = document.getElementById('card-list-select');
+                listSelect.value = state.currentCard.list.id;
+                
+                // Show error feedback
+                listSelect.style.backgroundColor = '#fecaca'; // Light red
+                setTimeout(() => {
+                    listSelect.style.backgroundColor = '';
+                }, 1500);
+            }
+        }
+
+        // Add new comment
+        async function addComment() {
+            const textarea = document.getElementById('new-comment');
+            const text = textarea.value.trim();
+            
+            if (!text) return;
+            
+            try {
+                await apiCall(`cards/${state.currentCard.id}/actions/comments`, 'POST', { text });
+                textarea.value = '';
+                
+                // Reload comments
+                const comments = await apiCall(`cards/${state.currentCard.id}/actions?filter=commentCard&limit=50`);
+                state.currentCard.comments = comments;
+                displayComments(comments);
+            } catch (error) {
+                console.error('Error adding comment:', error);
+            }
+        }
+
+        // Show no card state
+        function showNoCard() {
+            stopPolling();
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('card-display').classList.add('hidden');
+            document.getElementById('no-card').classList.remove('hidden');
+            loadBoards();
+        }
+
+        // Event listeners
+        document.getElementById('board-select').addEventListener('change', (e) => {
+            if (e.target.value) {
+                loadCards(e.target.value);
+            } else {
+                document.getElementById('cards-container').classList.add('hidden');
+            }
+        });
+
+        document.getElementById('add-comment-btn').addEventListener('click', addComment);
+        
+        document.getElementById('new-comment').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                addComment();
+            }
+        });
+
+        // Add event listener for list select dropdown - needs to be added dynamically
+        document.addEventListener('change', (e) => {
+            if (e.target.id === 'card-list-select') {
+                const newListId = e.target.value;
+                if (newListId) {
+                    moveCard(newListId);
+                }
+            }
+        });
+
+        // Polling functionality
+        function startPolling() {
+            if (state.pollingInterval) {
+                clearInterval(state.pollingInterval);
+            }
+            
+            state.pollingInterval = setInterval(async () => {
+                if (state.currentCard && !document.hidden) {
+                    await loadCard();
+                }
+            }, 5000); // Poll every 5 seconds
+            
+            // Stop polling when page is hidden, resume when visible
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    clearInterval(state.pollingInterval);
+                    state.pollingInterval = null;
+                } else if (state.currentCard && !state.pollingInterval) {
+                    startPolling();
+                }
+            });
+        }
+        
+        function stopPolling() {
+            if (state.pollingInterval) {
+                clearInterval(state.pollingInterval);
+                state.pollingInterval = null;
+            }
+        }
+        
+        // Update card with diff detection
+        function updateCardWithDiff(oldCard, newCard) {
+            // Check for title changes
+            if (oldCard.name !== newCard.name) {
+                updateCardTitle(newCard.name);
+            }
+            
+            // Check for description changes
+            if (oldCard.desc !== newCard.desc) {
+                updateCardDescription(newCard.desc);
+            }
+            
+            // Check for list changes
+            if (oldCard.list.id !== newCard.list.id) {
+                updateCardList(newCard.list, newCard.boardLists);
+            }
+            
+            // Check for attachment changes
+            if (JSON.stringify(oldCard.attachments) !== JSON.stringify(newCard.attachments)) {
+                updateAttachments(newCard.attachments || []);
+            }
+            
+            // Check for checklist changes
+            if (JSON.stringify(oldCard.checklists) !== JSON.stringify(newCard.checklists)) {
+                updateChecklists(newCard.checklists || []);
+            }
+            
+            // Check for comment changes
+            if (JSON.stringify(oldCard.comments) !== JSON.stringify(newCard.comments)) {
+                updateComments(newCard.comments || [], oldCard.comments || []);
+            }
+        }
+        
+        // Smooth update functions
+        function updateCardTitle(newTitle) {
+            const titleElement = document.getElementById('card-title');
+            titleElement.style.opacity = '0.5';
+            setTimeout(() => {
+                titleElement.textContent = newTitle;
+                titleElement.style.opacity = '1';
+            }, 150);
+        }
+        
+        function updateCardDescription(newDesc) {
+            const descElement = document.getElementById('card-description');
+            descElement.style.opacity = '0.5';
+            setTimeout(() => {
+                descElement.innerHTML = formatDescription(newDesc);
+                descElement.style.opacity = '1';
+            }, 150);
+        }
+        
+        function updateCardList(newList, boardLists) {
+            const listSelect = document.getElementById('card-list-select');
+            listSelect.innerHTML = '';
+            
+            if (boardLists && boardLists.length > 0) {
+                boardLists.forEach(list => {
+                    const option = document.createElement('option');
+                    option.value = list.id;
+                    option.textContent = list.name;
+                    option.selected = list.id === newList.id;
+                    listSelect.appendChild(option);
+                });
+                
+                // Add visual feedback for list change
+                listSelect.classList.add('list-item-updated');
+                setTimeout(() => {
+                    listSelect.classList.remove('list-item-updated');
+                }, 2000);
+            }
+        }
+        
+        function updateAttachments(attachments) {
+            const section = document.getElementById('attachments-section');
+            const list = document.getElementById('attachments-list');
+            
+            list.style.opacity = '0.5';
+            setTimeout(() => {
+                displayAttachments(attachments);
+                list.style.opacity = '1';
+            }, 150);
+        }
+        
+        function updateChecklists(checklists) {
+            const list = document.getElementById('checklists-list');
+            list.style.opacity = '0.5';
+            setTimeout(() => {
+                displayChecklists(checklists);
+                list.style.opacity = '1';
+            }, 150);
+        }
+        
+        function updateComments(newComments, oldComments) {
+            const list = document.getElementById('comments-list');
+            
+            // Check if new comments were added
+            if (newComments.length > oldComments.length) {
+                displayComments(newComments);
+                // Add animation to new comments
+                const commentElements = list.children;
+                for (let i = 0; i < newComments.length - oldComments.length; i++) {
+                    if (commentElements[i]) {
+                        commentElements[i].classList.add('comment-new');
+                    }
+                }
+            } else {
+                // Just update normally
+                list.style.opacity = '0.5';
+                setTimeout(() => {
+                    displayComments(newComments);
+                    list.style.opacity = '1';
+                }, 150);
+            }
+        }
+
+        // insertAsset function for non-draggable mode
+        async function insertAsset(url) {
+            // Find the button that was clicked
+            const button = event.target.closest('.insert-btn');
+            const uploadIcon = button?.querySelector('.upload-icon');
+            const loadingIcon = button?.querySelector('.loading-icon');
+            
+            try {
+                // Show loading state
+                if (uploadIcon && loadingIcon) {
+                    uploadIcon.classList.add('hidden');
+                    loadingIcon.classList.remove('hidden');
+                    button.disabled = true;
+                    button.classList.add('opacity-50', 'cursor-not-allowed');
+                }
+                
+                console.log('Uploading asset to Neon:', url);
+                
+                // Url asset Example: https://trello.com/1/cards/68a71b39030e98bd21e44678/attachments/68b56c34c92950c3bddf9ede/download/7663.png
+                const urlParts = url.split('/');
+                const attachmentIndex = urlParts.indexOf('attachments');
+                const attachmentId = attachmentIndex >= 0 && attachmentIndex + 1 < urlParts.length ? urlParts[attachmentIndex + 1] : null;
+                const filename = url.split('/').pop().split('?')[0]; // Get filename without query params
+                const nameFromUrl = attachmentId ? `${attachmentId}-${filename}` : `trello-asset-${filename}`;
+                console.log('Derived filename:', nameFromUrl);
+
+                const targetWorkspace = state.neonContext?.workfolder || null;
+                console.log('Target workspace:', targetWorkspace);
+                
+                // Call our API proxy to upload to Neon
+                const response = await fetch('/panels/upload-asset', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': state.apiKey
+                    },
+                    body: JSON.stringify({
+                        imageUrl: url,
+                        imageName: nameFromUrl,
+                        workspace: targetWorkspace,
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    console.log('Asset uploaded successfully:', result.result);
+                    
+                    // Show success state
+                    if (uploadIcon && loadingIcon) {
+                        loadingIcon.classList.add('hidden');
+                        uploadIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>';
+                        button.classList.remove('text-green-600', 'hover:text-green-800');
+                        button.classList.add('text-green-700');
+                        button.title = 'Successfully uploaded to Neon';
+                        uploadIcon.classList.remove('hidden');
+                        
+                        // Reset after 3 seconds
+                        setTimeout(() => {
+                            uploadIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>';
+                            button.classList.remove('text-green-700');
+                            button.classList.add('text-green-600', 'hover:text-green-800');
+                            button.title = 'Upload to Neon and insert';
+                            button.disabled = false;
+                            button.classList.remove('opacity-50', 'cursor-not-allowed');
+                        }, 3000);
+                    }
+                    
+                    // Send success message to parent window
+                    if (window.parent !== window) {
+                        window.parent.postMessage({
+                            type: 'asset-uploaded',
+                            info: {
+                                op: 'insertObject',
+                                success: true,
+                                url: url,
+                                familyRef: result.result.node.familyRef,
+                                message: 'Asset uploaded successfully to Neon'
+                            }
+                        }, state.neonAppUrl);
+                    }
+                } else {
+                    throw new Error(result.details || 'Upload failed');
+                }
+                
+            } catch (error) {
+                console.error('Asset upload failed:', error);
+                
+                // Show error state
+                if (uploadIcon && loadingIcon) {
+                    loadingIcon.classList.add('hidden');
+                    uploadIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>';
+                    button.classList.remove('text-green-600', 'hover:text-green-800');
+                    button.classList.add('text-red-600');
+                    button.title = 'Upload failed - click to retry';
+                    uploadIcon.classList.remove('hidden');
+                    button.disabled = false;
+                    button.classList.remove('opacity-50', 'cursor-not-allowed');
+                    
+                    // Reset after 5 seconds
+                    setTimeout(() => {
+                        uploadIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>';
+                        button.classList.remove('text-red-600');
+                        button.classList.add('text-green-600', 'hover:text-green-800');
+                        button.title = 'Upload to Neon and insert';
+                    }, 5000);
+                }
+                
+                // Send error message to parent window
+                if (window.parent !== window) {
+                    window.parent.postMessage({
+                        type: 'asset-uploaded',
+                        success: false,
+                        url: url,
+                        error: error.message,
+                        message: 'Asset upload failed'
+                    }, state.neonAppUrl);
+                }
+            }
+        }
+
+        // Make functions globally available
+        window.toggleChecklistItem = toggleChecklistItem;
+        window.insertAsset = insertAsset;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Document loaded, initializing...');
+            setupPostMessageApi();
+            
+            if (state.externalRef && state.externalRef !== 'null') {
+                loadCard();
+            } else {
+                showNoCard();
+            }
+        });
+        
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            stopPolling();
+        });
+    </script>
+</body>
+</html>

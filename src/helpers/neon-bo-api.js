@@ -1,9 +1,21 @@
 const axios = require('axios');
+const https = require('https');
 const { wrapper } = require('axios-cookiejar-support');
 const { CookieJar } = require('tough-cookie');
 
 const jar = new CookieJar();
-const client = wrapper(axios.create({ jar }));
+
+// Create base axios instance
+const baseClient = axios.create({ jar });
+
+// Configure conditional SSL handling for local development
+if (process.env.NEON_EXT_LOCATION === 'Local') {
+    // For local development, we need to bypass SSL verification
+    // We'll handle this per-request instead of at the client level
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+}
+
+const client = wrapper(baseClient);
 
 const NEON_BASEURL = process.env.NEON_BO_URL;
 const NEON_USERNAME = process.env.NEON_USERNAME;
@@ -154,7 +166,7 @@ async function updateNodeContent(familyRef, xmlBodyString) {
         },
         data: data
     };
-  
+
     console.log(`Updating Node Content for ${familyRef}`);
     console.log('xmlBodyString', xmlBodyString);
     
@@ -219,10 +231,11 @@ async function createNewStory(options) {
 
     return await client.request(config)
         .then((response) => {
-            const familyRef = response.data.node.familyRef;
+            const node = response.data.node;
+            const familyRef = node.familyRef;
             // console.log(JSON.stringify(response.data));
             console.log(`Created new Story: ${familyRef}`);
-            return familyRef;
+            return node;
         })
         .catch((error) => {
             console.error(`❌ ERROR during createNewStory: ${error.code}`);
@@ -625,6 +638,34 @@ async function promoteNode(familyRef = null, { targetSite, targetSection, mode }
         .catch((error) => {
             console.error(`❌ ERROR during promoteNode: ${error.code}`);
             console.error(JSON.stringify(error.response.data));
+            return error.response.data
+        });
+}
+
+async function promoteNodeEverywhere(familyRef = null, { mode }) {
+    if (familyRef === null) return null;
+  
+    const data = JSON.stringify({});
+
+    const config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        url: `${NEON_BASEURL}/contents/nodes/${familyRef}/promote/${mode || 'PREVIEW'}`,
+        headers: {
+            'Content-Type': 'application/json',
+            'neon-bo-access-key': NEON_BO_APIKEY
+        },
+        data
+    };
+
+    return await client.request(config)
+        .then((response) => {
+            console.log(`Node ${familyRef} promoted everywhere`);
+            return response.data;
+        })
+        .catch((error) => {
+            console.error(`❌ ERROR during promoteNodeEverywhere: ${error.code}`);
+            console.error(JSON.stringify(error.response.data));
         });
 }
 
@@ -652,29 +693,30 @@ async function discoveryServices() {
 
 
 module.exports = {
-  login,
-  logout,
-  deleteNode,
-  lockNode,
-  unlockNode,
-  updateNodeContent,
-  updateNodeMetadata,
-  createNewStory,
-  getSites,
-  createNewSiteNode,
-  publishSiteNode,
-  createUser,
-  getUsers,
-  addUserToGroup,
-  createGroup,
-  updateGroup,
-  getWorkspace,
-  updateWorkspace,
-  updateWorkspaceTemplates,
-  createBasefolder,
-  getNextSteps,
-  nextStepAssignment,
-  putNode,
-  promoteNode,
-  discoveryServices
+    login,
+    logout,
+    deleteNode,
+    lockNode,
+    unlockNode,
+    updateNodeContent,
+    updateNodeMetadata,
+    createNewStory,
+    getSites,
+    createNewSiteNode,
+    publishSiteNode,
+    createUser,
+    getUsers,
+    addUserToGroup,
+    createGroup,
+    updateGroup,
+    getWorkspace,
+    updateWorkspace,
+    updateWorkspaceTemplates,
+    createBasefolder,
+    getNextSteps,
+    nextStepAssignment,
+    putNode,
+    promoteNode,
+    promoteNodeEverywhere,
+    discoveryServices
 };
