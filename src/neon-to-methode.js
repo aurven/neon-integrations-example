@@ -183,16 +183,20 @@ async function processNeonStoryV2 (model) {
       // },
       attributes: null
     });
-    const imageReferences = await images.modelImagesToMethode(model, { channel: CHANNEL, workFolder: WORKFOLDER, issueDate });
+    const imageReferences = await images.modelImagesToMethode(
+      model, { 
+        channel: CHANNEL,
+        workFolder: WORKFOLDER,
+        issueDate
+      }
+    );
     
     Object.values(imageReferences).forEach(imageReference => {
       addPrintImageGroup($doc, imageReference);
     });
     
     const content = xmlDeclarations + $doc.html();
-    
     const cleanedContent = utils.stripAllCData(content);
-    
     loid && (await edapi.putContentToStory(loid, cleanedContent));
     
     await edapi.logout();
@@ -203,7 +207,7 @@ async function processNeonStoryV2 (model) {
       source: info,
       target: {
         storyId: loid,
-        imageReferences
+        imageReferences: simplifyImageReferences(imageReferences)
       },
     };
   } catch (error) {
@@ -232,6 +236,30 @@ async function processNeonImages(model) {
     console.error(error);
   }
 };
+
+/**
+ * Simplifies the imageReferences structure to contain only loid and uuid
+ * @param {Object} imageReferences - The complex imageReferences object
+ * @returns {Object} Simplified object with only loid and uuid for each image
+ */
+function simplifyImageReferences(imageReferences) {
+  if (!imageReferences || typeof imageReferences !== 'object') {
+    return {};
+  }
+
+  const simplified = {};
+  
+  for (const [key, imageData] of Object.entries(imageReferences)) {
+    if (imageData && typeof imageData === 'object' && imageData.loid && imageData.uuid) {
+      simplified[key] = {
+        loid: imageData.loid,
+        uuid: imageData.uuid
+      };
+    }
+  }
+  
+  return simplified;
+}
 
 module.exports = {
   processNeonStory,

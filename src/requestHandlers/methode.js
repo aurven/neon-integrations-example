@@ -36,7 +36,9 @@ async function postMethodeHandler(request, reply) {
   
   console.log("Response Data:", processResult);
   
-  const payload = processResult?.target ? { ...processResult?.target } : {};
+  const timestamp = new Date().toISOString(); 
+
+  const payload = processResult?.target ? { ...processResult?.target, lastSend: timestamp } : {};
   console.log("Payload Data:", payload);
   
   console.log("postMethodeHandler << OUT:");
