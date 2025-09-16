@@ -22,8 +22,8 @@ async function postMethodeHandler(request, reply) {
   //   return reply.status(401).send({ error: "Unauthorized" });
   // }
   
-  console.log("Hook received:");
-  console.log(JSON.stringify(safeRequest.body));
+  // console.log("Hook received:");
+  // console.log(JSON.stringify(safeRequest.body));
 
   if (!model && !rootData) {
     console.error("Missing model in request body");
@@ -33,13 +33,17 @@ async function postMethodeHandler(request, reply) {
   const neonModel = (model && model.data) || rootData || model;
 
   const processResult = await neonToMethode.processNeonStoryV2(neonModel);
-
-  console.log("postMethodeHandler << OUT:");
+  
   console.log("Response Data:", processResult);
-
+  
+  const payload = processResult?.target ? { ...processResult?.target } : {};
+  console.log("Payload Data:", payload);
+  
+  console.log("postMethodeHandler << OUT:");
   return reply.status(200).send({
-    message: "Webhook processed",
-    data: processResult,
+    action: "writeback",
+    payload,
+    processResult,
   });
 }
 
@@ -60,8 +64,8 @@ async function postMethodeImageHandler(request, reply) {
   //   return reply.status(401).send({ error: "Unauthorized" });
   // }
   
-  console.log("Hook received:");
-  console.log(JSON.stringify(safeRequest2.body));
+  // console.log("Hook received:");
+  // console.log(JSON.stringify(safeRequest2.body));
 
   if (!model && !rootData) {
     console.error("postMethodeImageHandler << ERROR: Missing model in request body");
@@ -98,8 +102,8 @@ async function postMethodeTest(request, reply) {
   //   return reply.status(401).send({ error: "Unauthorized" });
   // }
   
-  console.log("Hook received:");
-  console.log(JSON.stringify(safeRequest3.body));
+  // console.log("Hook received:");
+  // console.log(JSON.stringify(safeRequest3.body));
 
   if (!model && !rootData) {
     console.error("postMethodeTest << ERROR: Missing model in request body");
@@ -110,12 +114,15 @@ async function postMethodeTest(request, reply) {
 
   const processResult = await neonToMethode.processNeonStoryV2(neonModel);
 
-  console.log("postMethodeTest << OUT:");
   console.log("Response Data:", processResult);
-
+  
+  const payload = processResult?.target ? { ...processResult?.target } : {};
+    
+  console.log("postMethodeTest << OUT:");
   return reply.status(200).send({
-    message: "Webhook processed",
-    data: processResult,
+    action: "writeback",
+    payload,
+    processResult,
   });
 }
 
