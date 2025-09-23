@@ -84,6 +84,18 @@ function nextStepAssignmentBodyGenerator({ getNextStepsResult, targetWorkflowNam
     return nextStepAssignmentBody;
 }
 
+async function deleteObjectsByQuery(query) {
+    const searchResult = await neon.searchNodes({ query, limit: 100 });
+    const nodes = searchResult?.data?.nodes || [];
+    console.log(`Found ${nodes.length} nodes to delete`);
+    for (let i = 0; i < nodes.length; i++) {
+        const node = nodes[i];
+        console.log(`Deleting node ${node.familyRef} - ${node.title}`);
+        await neon.deleteNode(node.familyRef);
+    }
+}
+
 module.exports = {
     workflowTransitionTo,
+    deleteObjectsByQuery
 };

@@ -2,6 +2,8 @@ const seo = require("../seo.json");
 const axios = require("axios");
 const neon = require("../helpers/neon-bo-api.js");
 const imagesImporter = require("../images-importer.js");
+const { MethodeClient } = require("../helpers/methode-bo-api.js");
+const { createStoryPreviewWithSetup } = require("../helpers/edapi-utils.js");
 
 function trelloPanelHandler(request, reply) {
   const apikey = request.query.apikey;
@@ -197,10 +199,160 @@ async function uploadAssetHandler(request, reply) {
   }
 }
 
+function methodePanelHandler(request, reply) {
+  const apikey = request.query.apikey;
+  const methodeId = request.query.methodeId;
+
+  if (!apikey || apikey !== process.env.NEON_EXT_APIKEY) {
+    return reply.status(401).send({ error: "Unauthorized" });
+  }
+
+  // params is an object we'll pass to our handlebars template
+  let params = {
+    seo: seo,
+    apiKey: process.env.NEON_EXT_APIKEY,
+    neonAppUrl: process.env.NEON_APP_URL,
+    swingAppUrl: process.env.SWING_APP_URL,
+    swingHost: process.env.SWING_HOST,
+    methodeId: methodeId || null
+  };
+
+  // The Handlebars code will be able to access the parameter values and build them into the page
+  return reply.view("/src/panels/methode-panel.hbs", params);
+}
+
+async function methodeApiProxyHandler(request, reply) {
+  const apikey = request.headers.apikey || request.query.apikey;
+
+  if (!apikey || apikey !== process.env.NEON_EXT_APIKEY) {
+    return reply.status(401).send({ error: "Unauthorized" });
+  }
+
+  // Extract endpoint from the full URL path
+  const fullPath = request.url.split('?')[0];
+  const endpoint = fullPath.replace('/panels/methode/api/', '');
+  const method = request.method.toLowerCase();
+  
+  try {
+    // Create a temporary Méthode client for this request
+    const methodeClient = new MethodeClient();
+    
+    // Login with credentials from environment
+    await methodeClient.login({
+      username: process.env.EDAPI_USERNAME,
+      password: process.env.EDAPI_PASSWORD
+    });
+
+    let result;
+    
+    // Handle different endpoint patterns
+    if (endpoint.startsWith('object/')) {
+      const objectId = endpoint.split('/')[1];
+      if (!objectId) {
+        return reply.status(400).send({ error: "Object ID is required" });
+      }
+
+      // Get the Méthode object
+      const methodeObject = await methodeClient.getObject(objectId);
+
+      if (!methodeObject) {
+        return reply.status(404).send({ error: "Object not found" });
+      }
+
+      // Transform the raw Méthode object into our panel format
+      const transformedObject = {
+        id: methodeObject.id || objectId,
+        title: methodeObject.systemAttributes?.props?.title || 'Untitled',
+        workflowStatus: methodeObject.statusInfo?.name || 'unknown',
+        workflowStatusColor: methodeObject.statusInfo?.identifier || '#000000',
+        pdfUrl: methodeObject.pdfUrl || null,
+        publicationInfo: {
+          products: methodeObject.products || [],
+          editions: methodeObject.editions || [],
+          pages: methodeObject.pages || []
+        }
+      };
+
+      result = { result: transformedObject };
+    } else if (endpoint === 'preview/create' && method === 'post') {
+      const { loid, options } = request.body;
+
+      if (!loid) {
+        return reply.status(400).send({ error: "LOID is required" });
+      }
+
+      console.log(`Creating story preview for LOID: ${loid} with options:`, options);
+
+      // Use the edapi-utils function to create story preview with setup
+      const previewResult = await createStoryPreviewWithSetup(loid, options);
+
+      console.log('Preview creation result:', previewResult);
+
+      result = {
+        success: true,
+        data: previewResult,
+        message: 'Story preview creation initiated'
+      };
+    } else if (endpoint.startsWith('content/') && method === 'get') {
+      // Handle binary content requests like content/lowres/{loid}
+      const pathParts = endpoint.split('/');
+      if (pathParts.length >= 3) {
+        const format = pathParts[1]; // e.g., 'lowres'
+        const loid = pathParts[2]; // the LOID
+        const maxSize = request.query.maxSize || 4;
+
+        if (!loid) {
+          return reply.status(400).send({ error: "LOID is required" });
+        }
+
+        console.log(`Fetching ${format} content for LOID: ${loid} with maxSize: ${maxSize}`);
+
+        try {
+          // Get the binary content using the new API method
+          const binaryData = await methodeClient.getBinaryContent(loid, format, maxSize);
+
+          // Set appropriate headers for binary content
+          reply.header('Content-Type', 'image/png'); // Assuming PNG format, adjust as needed
+          reply.header('Cache-Control', 'public, max-age=3600'); // Cache for 1 hour
+
+          // Cleanup the client before sending response
+          await methodeClient.cleanup();
+
+          return reply.send(Buffer.from(binaryData));
+        } catch (error) {
+          console.error(`Binary content retrieval failed for ${format}/${loid}:`, error.message);
+          return reply.status(error.response?.status || 500).send({
+            error: 'Binary content retrieval failed',
+            details: error.message
+          });
+        }
+      } else {
+        return reply.status(400).send({ error: "Invalid content endpoint format" });
+      }
+    } else {
+      // Handle other endpoints as needed
+      return reply.status(400).send({ error: "Unknown endpoint" });
+    }
+
+    // Cleanup the client
+    await methodeClient.cleanup();
+
+    return reply.send(result);
+  } catch (error) {
+    console.error('Méthode API proxy error:', error.response?.data || error.message);
+    return reply.status(error.response?.status || 500).send({
+      error: 'Méthode API error',
+      details: error.response?.data || error.message
+    });
+  }
+}
+
 module.exports = {
   trelloPanelHandler,
   trelloApiProxyHandler,
   externalSourcesPanelHandler,
   pexelsApiProxyHandler,
-  uploadAssetHandler
+  uploadAssetHandler,
+  methodePanelHandler,
+  methodeApiProxyHandler
 };

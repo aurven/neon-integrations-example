@@ -279,6 +279,152 @@ async function putContentToStory(loid, content) {
     return null;
 }
 
+/**
+ * Helper function to get story shape and handle complex workflow for PDF preview generation
+ * This retrieves the story shape JSON which contains layout information needed for preview
+ */
+async function getStoryShapeWithContent(loid) {
+    const { MethodeClient } = require('./methode-bo-api.js');
+    
+    try {
+        // Create a temporary Méthode client for this request
+        const methodeClient = new MethodeClient();
+        
+        // Login with credentials from environment
+        await methodeClient.login({
+            username: process.env.EDAPI_USERNAME,
+            password: process.env.EDAPI_PASSWORD
+        });
+
+        // Get the story object metadata (JSON)
+        const storyObject = await methodeClient.getObject(loid);
+        if (!storyObject) {
+            throw new Error('Failed to retrieve story object');
+        }
+
+        // Get links to find the print page this story is connected to
+        let printPageId = null;
+        let targetBundleChannel = null;
+        let targetWorkfolder = null;
+        let linkId = null;
+        let linkedPagePath = null;
+
+        const linkedObjects = await methodeClient.getObjectLinked(loid, 'EOM::PrintPageLinked');
+        console.log(`Found ${linkedObjects.count || 0} EOM::PrintPageLinked objects for story ${loid}`);
+
+        if (linkedObjects.roles && linkedObjects.roles.length > 0) {
+            // Get the first linked print page
+            const firstRole = linkedObjects.roles[0];
+            linkId = firstRole.name || null;
+            printPageId = firstRole.object?.id || null;
+            targetBundleChannel = firstRole.bundleChildChannel || null;
+            targetWorkfolder = firstRole.object?.system_attributes?.workfolder || null;
+            linkedPagePath = firstRole.object?.path || null;
+
+            console.log(`Story ${loid} is linked to print page: ${printPageId}, bundle channel: ${targetBundleChannel}, page path: ${linkedPagePath}`);
+        } else {
+            console.log(`No EOM::PrintPageLinked objects found for story ${loid}`);
+        }
+
+        const getStoryShapeOptions = {};
+
+        if (targetBundleChannel) getStoryShapeOptions.channel = targetBundleChannel;
+        if (targetWorkfolder) getStoryShapeOptions.workFolder = targetWorkfolder;
+        if (printPageId) getStoryShapeOptions.pageId = printPageId;
+
+        // Get the story shape information using the new API method
+        const shapeResult = await methodeClient.getStoryShape(loid, getStoryShapeOptions);
+
+        // Extract and format the pgx XML string from shapeResult
+        const pgxContent = shapeResult?.pgx?.xml || null;
+        const pgxValue = pgxContent ? `<?xml version="1.0" encoding="utf-8"?><pgx>${pgxContent}</pgx>` : null;
+
+        pgxValue && console.log(`Extracted and formatted pgx XML for story ${loid}`);
+
+        // Get the actual XML content using readContent method
+        const token = methodeClient.getCurrentToken();
+        const xmlContentData = await methodeClient.readContent(token, loid);
+        const xmlContent = xmlContentData || null;
+        
+        // Cleanup the client
+        await methodeClient.cleanup();
+        
+        return {
+            shape: pgxValue,
+            storyObject: storyObject,
+            xmlContent: xmlContent,
+            printPageId: printPageId,
+            targetBundleChannel: targetBundleChannel,
+            linkId: linkId,
+            linkedPagePath: linkedPagePath
+        };
+
+    } catch (error) {
+        console.error(`Get story shape with content failed for LOID ${loid}:`, error.message);
+        throw error;
+    }
+}
+
+/**
+ * Helper function to create story preview with complex payload handling
+ * This handles the middle steps for retrieving content, XML, and shape data
+ * before sending to the print service for PDF generation
+ */
+async function createStoryPreviewWithSetup(loid, previewOptions = {}) {
+    const { MethodeClient } = require('./methode-bo-api.js');
+    
+    try {
+        console.log(`Starting story preview generation for LOID: ${loid}`);
+        
+        // Create a temporary Méthode client for this request
+        const methodeClient = new MethodeClient();
+        
+        // Login with credentials from environment
+        await methodeClient.login({
+            username: process.env.EDAPI_USERNAME,
+            password: process.env.EDAPI_PASSWORD
+        });
+        
+        // Get all required data using the helper function
+        const { shape, storyObject, xmlContent, printPageId, targetBundleChannel, linkId, linkedPagePath } = await getStoryShapeWithContent(loid);
+
+        // Log the extracted link information
+        console.log(`Preview setup - Print Page ID: ${printPageId}, Target Bundle Channel: ${targetBundleChannel}, Linked Page Path: ${linkedPagePath}`);
+
+        // Build the payload structure as specified
+        const previewPayload = {
+            requestID: `U${Date.now()}${Math.random().toString(36).substring(2, 8)}`,
+            content: xmlContent,
+            pgx: shape,
+            parameters: {
+                id: storyObject.id,
+                border: previewOptions.border || "yes",
+                hrefPdf: previewOptions.hrefPdf !== false,
+                channel: targetBundleChannel,
+                lid: linkId,
+                page: linkedPagePath
+            },
+            op: "preview",
+            forcePdfCreation: previewOptions.forcePdfCreation !== false
+        };
+
+        console.log('Preview payload structure:', JSON.stringify(previewPayload, null, 2));
+
+        // Use the updated API method with proper parameters
+        const getPdf = previewOptions.getPdf !== false;
+        const previewResult = await methodeClient.createStoryPreview(loid, previewPayload, getPdf);
+        
+        // Cleanup the client
+        await methodeClient.cleanup();
+
+        return previewResult;
+
+    } catch (error) {
+        console.error(`Create story preview with setup failed for LOID ${loid}:`, error.message);
+        throw error;
+    }
+}
+
 module.exports = {
     login,
     logout,
@@ -287,5 +433,7 @@ module.exports = {
     createStory,
     createObject,
     readContent,
-    putContentToStory
+    putContentToStory,
+    getStoryShapeWithContent,
+    createStoryPreviewWithSetup
 };

@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Méthode Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a'
+                        },
+                        methode: {
+                            50: '#fdf4ff',
+                            100: '#fae8ff',
+                            200: '#f5d0fe',
+                            300: '#f0abfc',
+                            400: '#e879f9',
+                            500: '#d946ef',
+                            600: '#c026d3',
+                            700: '#a21caf',
+                            800: '#86198f',
+                            900: '#701a75'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .scrollbar-thin {
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e0 transparent;
+        }
+        .scrollbar-thin::-webkit-scrollbar {
+            width: 6px;
+        }
+        .scrollbar-thin::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 3px;
+        }
+        .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+            background: #a0aec0;
+        }
+        
+        /* Smooth transitions for updates */
+        .update-transition {
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+        
+        .updating {
+            opacity: 0.7;
+        }
+        
+        .object-title, .object-status {
+            transition: opacity 0.3s ease-in-out;
+        }
+        
+        .status-updated {
+            background-color: #dcfce7;
+            transition: background-color 2s ease-out;
+        }
+        
+        .pdf-container {
+            transition: opacity 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans">
+    <div id="app" class="container mx-auto p-4 max-w-4xl">
+        <!-- Loading State -->
+        <div id="loading" class="flex flex-col items-center justify-center min-h-screen">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-methode-600"></div>
+            <p class="mt-4 text-gray-600">Loading Méthode object...</p>
+        </div>
+
+        <!-- No Object State -->
+        <div id="no-object" class="hidden flex flex-col items-center justify-center min-h-screen text-center">
+            <div class="bg-white rounded-lg shadow-md p-8 max-w-md w-full">
+                <div class="text-gray-400 mb-4">
+                    <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                </div>
+                <h2 class="text-xl font-semibold text-gray-800 mb-2">No Méthode Object Found</h2>
+                <p class="text-gray-600 mb-6">The specified Méthode object could not be found or is not accessible.</p>
+            </div>
+        </div>
+
+        <!-- Object Display -->
+        <div id="object-display" class="hidden space-y-6">
+            <!-- Header Section -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center justify-between space-x-2">
+                    <div class="flex items-center space-x-3">
+                        <div class="flex-shrink-0">
+                            <svg class="w-8 h-8 text-methode-600" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
+                                <polyline points="14,2 14,8 20,8"/>
+                                <line x1="16" y1="13" x2="8" y2="13"/>
+                                <line x1="16" y1="17" x2="8" y2="17"/>
+                                <polyline points="10,9 9,9 8,9"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Méthode Object</p>
+                            <p id="object-id" class="font-mono text-sm text-gray-700"></p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button id="swing-btn" class="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-methode-600 hover:bg-methode-700 rounded-md transition-colors" title="Open in Swing">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                            </svg>
+                            Swing
+                        </button>
+                        <div id="last-updated" class="text-xs text-gray-500 px-2 py-1 bg-gray-100 rounded">
+                            Updated: <span id="update-time">--</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <h1 id="object-title" class="text-2xl font-bold text-gray-800 object-title"></h1>
+                    <div class="flex items-center space-x-4 mt-2">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-sm text-gray-500">Status:</span>
+                            <span id="workflow-status" class="px-2 py-1 text-xs font-medium rounded-full object-status"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PDF Viewer Section -->
+            <div id="pdf-section" class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                    </svg>
+                    Preview
+                </h2>
+                <div id="preview-container" class="relative">
+                    <!-- Loading overlay for initial load -->
+                    <div id="preview-loading" class="hidden flex items-center justify-center h-96 bg-gray-100 rounded">
+                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-methode-600"></div>
+                        <span class="ml-3 text-gray-600">Loading preview...</span>
+                    </div>
+
+                    <!-- Error state -->
+                    <div id="preview-error" class="hidden flex items-center justify-center h-96 bg-gray-100 rounded">
+                        <div class="text-center">
+                            <svg class="w-12 h-12 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <p class="text-gray-600">Preview not available</p>
+                        </div>
+                    </div>
+
+                    <!-- Preview image container -->
+                    <div id="preview-image-container" class="hidden relative">
+                        <!-- Subtle loading chip for refresh -->
+                        <div id="preview-refresh-chip" class="hidden absolute top-2 right-2 z-10 bg-white shadow-md rounded-full px-3 py-1 text-xs text-gray-600 border border-gray-200 transition-opacity duration-300">
+                            <div class="flex items-center">
+                                <div class="animate-spin rounded-full h-3 w-3 border border-methode-600 border-t-transparent mr-2"></div>
+                                Updating...
+                            </div>
+                        </div>
+                        <img id="preview-image" class="w-full h-96 object-contain border border-gray-200 rounded" alt="Story Preview" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Publication Info Section -->
+            <div id="publication-section" class="hidden bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
+                    </svg>
+                    Print Publication Info
+                </h2>
+                <div id="publication-info" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <h3 class="font-medium text-gray-800 mb-2">Products</h3>
+                        <div id="products-list" class="space-y-1">
+                            <!-- Products will be populated here -->
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="font-medium text-gray-800 mb-2">Editions</h3>
+                        <div id="editions-list" class="space-y-1">
+                            <!-- Editions will be populated here -->
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="font-medium text-gray-800 mb-2">Pages</h3>
+                        <div id="pages-list" class="space-y-1">
+                            <!-- Pages will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let state = {
+            apiKey: '{{{apiKey}}}',
+            neonAppUrl: '{{{neonAppUrl}}}',
+            swingAppUrl: '{{{swingAppUrl}}}',
+            swingHost: '{{{swingHost}}}',
+            methodeId: '{{{methodeId}}}',
+            currentObject: null,
+            pollingInterval: null,
+            lastUpdateHash: null,
+            neonContext: null,
+            siteId: null,
+            methodeHookData: null,
+            currentPreviewUrl: null
+        };
+
+        // Utility functions
+        function apiCall(endpoint, method = 'GET', body = null) {
+            const url = `/panels/methode/api/${endpoint}`;
+            const options = {
+                method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apikey': state.apiKey
+                },
+            };
+            
+            if (body) {
+                options.body = JSON.stringify(body);
+            }
+            
+            return fetch(url, options).then(res => res.json());
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '--';
+            return new Date(dateString).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function updateTimestamp() {
+            document.getElementById('update-time').textContent = formatDate(new Date());
+        }
+
+        // Create story preview using edapi-utils.js
+        async function createStoryPreview() {
+            if (!state.methodeId) {
+                console.log('No methodeId available for preview generation');
+                return null;
+            }
+
+            try {
+                console.log('Creating story preview for methodeId:', state.methodeId);
+
+                // Build the preview payload
+                const previewPayload = {
+                    loid: state.methodeId,
+                    options: {}
+                };
+
+                console.log('Preview payload:', previewPayload);
+
+                // Call the backend API to create story preview using edapi-utils
+                const previewResult = await apiCall('preview/create', 'POST', previewPayload);
+
+                console.log('Preview creation result:', previewResult);
+
+                return previewResult;
+            } catch (error) {
+                console.error('Error creating story preview:', error);
+                throw error;
+            }
+        }
+
+        // Extract image URL from preview result
+        function extractImageUrlFromPreview(hrefPdf) {
+            try {
+                console.log('hrefPdf URL:', hrefPdf);
+
+                // Extract dbid and eomid from query parameters
+                const url = new URL(hrefPdf, window.location.origin);
+                const dbid = url.searchParams.get('dbid');
+                const eomid = url.searchParams.get('eomid');
+
+                if (dbid && eomid) {
+                    const loid = `${dbid}$${eomid}`;
+                    console.log('Extracted loid from hrefPdf:', loid);
+
+                    // Generate the proxied image URL
+                    const imageUrl = `/panels/methode/api/content/lowres/${loid}?maxSize=4`;
+                    console.log('Generated image URL:', imageUrl);
+
+                    return imageUrl;
+                } else {
+                    console.warn('Could not extract dbid/eomid from hrefPdf:', hrefPdf);
+                    return null;
+                }
+            } catch (error) {
+                console.error('Error extracting image URL from hrefPdf:', error);
+                return null;
+            }
+        }
+
+        // PostMessage API for Neon CMS communication
+        function setupPostMessageApi() {
+            console.log('Setting up PostMessage API');
+
+            window.addEventListener('message', (event) => {
+                if (event.origin !== state.neonAppUrl) {
+                    console.warn('Received message from unwanted origin:', event.origin);
+                    return;
+                }
+                console.log('Received message:', event, event.data);
+
+                if (event.data) {
+                    switch (event.data.key) {
+                        case 'getInfo':
+                            state.neonContext = event.data.info;
+                            console.log('Neon context updated:', state.neonContext);
+
+                            // Extract methodeHook from publishInfos
+                            const publishInfos = state.neonContext?.originalNode?.publishInfos;
+                            let methodeHook = null;
+                            let siteFound = null;
+
+                            if (publishInfos) {
+                                // Search through all sites to find one with methodeHook
+                                for (const [siteId, publishInfo] of Object.entries(publishInfos)) {
+                                    if (publishInfo.webhookData?.methodeHook) {
+                                        methodeHook = publishInfo.webhookData.methodeHook;
+                                        siteFound = siteId;
+                                        console.log(`Found methodeHook in site: ${siteId}`, methodeHook);
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (methodeHook && methodeHook.storyId) {
+                                // We found methodeHook data, use the storyId as methodeId
+                                state.methodeId = methodeHook.storyId;
+                                state.siteId = siteFound;
+                                state.methodeHookData = methodeHook;
+                                console.log(`Using Méthode ID: ${state.methodeId} from site: ${siteFound}`);
+                                loadObject();
+                            } else {
+                                console.warn('No methodeHook found in publishInfos');
+                                showNoObject();
+                            }
+                            break;
+
+                        default:
+                            console.warn('Unknown neonContext key:', event.data.key);
+                    }
+                }
+            });
+
+            // Send ready message to parent
+            console.log('Sending ready message to parent');
+            window.parent.postMessage({ type: 'panel-ready', info: { op: 'getInfo' } }, state.neonAppUrl);
+            console.log('Ready message sent');
+        }
+
+        // Load and display object details
+        async function loadObject() {
+            if (!state.methodeId) {
+                showNoObject();
+                return;
+            }
+
+            try {
+                const objectData = await apiCall(`object/${state.methodeId}`);
+
+                if (objectData.error) {
+                    throw new Error(objectData.error);
+                }
+
+                const newObjectData = objectData.result;
+
+                if (state.currentObject) {
+                    // Update existing object with diff detection
+                    updateObjectWithDiff(state.currentObject, newObjectData);
+                } else {
+                    // First time loading
+                    state.currentObject = newObjectData;
+                    displayObject();
+                    startPolling();
+                }
+
+                state.currentObject = newObjectData;
+                updateTimestamp();
+
+                // Generate preview asynchronously after object is loaded
+                generatePreviewAsync();
+            } catch (error) {
+                console.error('Error loading object:', error);
+                if (!state.currentObject) {
+                    showNoObject();
+                }
+            }
+        }
+
+        // Generate preview asynchronously without blocking the UI
+        async function generatePreviewAsync() {
+            const isFirstLoad = !state.currentPreviewUrl;
+
+            if (isFirstLoad) {
+                showPreviewLoading();
+            } else {
+                showPreviewRefreshChip();
+            }
+
+            try {
+                const previewResult = await createStoryPreview();
+                if (previewResult && previewResult.success && previewResult.data?.hrefPdf) {
+                    const imageUrl = extractImageUrlFromPreview(previewResult.data.hrefPdf);
+                    if (imageUrl) {
+                        await displayPreviewImage(imageUrl);
+                        state.currentPreviewUrl = imageUrl;
+                    }
+                }
+            } catch (error) {
+                console.error('Preview generation failed:', error);
+                showPreviewError();
+            } finally {
+                hidePreviewRefreshChip();
+            }
+        }
+
+        // Display object information
+        function displayObject() {
+            const obj = state.currentObject;
+            
+            document.getElementById('object-id').textContent = obj.id || state.methodeId;
+            document.getElementById('object-title').textContent = obj.title || 'Untitled';
+            
+            // Update workflow status
+            const statusElement = document.getElementById('workflow-status');
+            if (obj.workflowStatus) {
+                statusElement.textContent = obj.workflowStatus;
+                statusElement.className = 'px-2 py-1 text-xs font-medium rounded-full object-status ' + getStatusColor(obj.workflowStatus);
+            }
+
+            // Setup Swing button
+            const swingBtn = document.getElementById('swing-btn');
+            if (state.swingHost && obj.id) {
+                swingBtn.onclick = () => {
+                    const swingUrl = `${state.swingHost}/swing/app/swing.html?open=editor&id=${obj.id}`;
+                    console.log('Opening Swing editor:', swingUrl);
+                    window.open(swingUrl, '_blank');
+                };
+            }
+
+            // Display publication info if available
+            displayPublicationInfo(obj.publicationInfo);
+
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('no-object').classList.add('hidden');
+            document.getElementById('object-display').classList.remove('hidden');
+        }
+
+        // Get status color based on workflow status
+        function getStatusColor(status) {
+            const statusColors = {
+                'draft': 'bg-gray-100 text-gray-800',
+                'in-progress': 'bg-yellow-100 text-yellow-800',
+                'review': 'bg-blue-100 text-blue-800',
+                'approved': 'bg-green-100 text-green-800',
+                'published': 'bg-methode-100 text-methode-800',
+                'archived': 'bg-gray-100 text-gray-600'
+            };
+            return statusColors[status?.toLowerCase()] || 'bg-gray-100 text-gray-800';
+        }
+
+        // Preview loading state management
+        function showPreviewLoading() {
+            document.getElementById('preview-loading').classList.remove('hidden');
+            document.getElementById('preview-error').classList.add('hidden');
+            document.getElementById('preview-image-container').classList.add('hidden');
+        }
+
+        function showPreviewError() {
+            document.getElementById('preview-loading').classList.add('hidden');
+            document.getElementById('preview-error').classList.remove('hidden');
+            document.getElementById('preview-image-container').classList.add('hidden');
+        }
+
+        function showPreviewRefreshChip() {
+            const chip = document.getElementById('preview-refresh-chip');
+            chip.classList.remove('hidden');
+            chip.style.opacity = '1';
+        }
+
+        function hidePreviewRefreshChip() {
+            const chip = document.getElementById('preview-refresh-chip');
+            chip.style.opacity = '0';
+            setTimeout(() => {
+                chip.classList.add('hidden');
+            }, 300);
+        }
+
+        // Display preview image from generated content
+        async function displayPreviewImage(imageUrl) {
+            return new Promise((resolve, reject) => {
+                const previewImage = new Image();
+                previewImage.onload = () => {
+                    // Hide loading and error states
+                    document.getElementById('preview-loading').classList.add('hidden');
+                    document.getElementById('preview-error').classList.add('hidden');
+
+                    // Update the image source and show container
+                    const imageElement = document.getElementById('preview-image');
+                    imageElement.src = imageUrl;
+                    document.getElementById('preview-image-container').classList.remove('hidden');
+
+                    console.log('Preview image displayed successfully');
+                    resolve();
+                };
+                previewImage.onerror = () => {
+                    console.error('Failed to load preview image:', imageUrl);
+                    showPreviewError();
+                    reject(new Error('Failed to load preview image'));
+                };
+                previewImage.src = imageUrl;
+            });
+        }
+
+        // Display publication information
+        function displayPublicationInfo(pubInfo) {
+            const section = document.getElementById('publication-section');
+            
+            if (!pubInfo || (!pubInfo.products && !pubInfo.editions && !pubInfo.pages)) {
+                section.classList.add('hidden');
+                return;
+            }
+
+            section.classList.remove('hidden');
+            
+            // Display products
+            const productsList = document.getElementById('products-list');
+            productsList.innerHTML = '';
+            if (pubInfo.products && pubInfo.products.length > 0) {
+                pubInfo.products.forEach(product => {
+                    const productDiv = document.createElement('div');
+                    productDiv.className = 'text-sm text-gray-600 bg-gray-50 px-2 py-1 rounded';
+                    productDiv.textContent = product;
+                    productsList.appendChild(productDiv);
+                });
+            } else {
+                productsList.innerHTML = '<span class="text-sm text-gray-400">None</span>';
+            }
+
+            // Display editions
+            const editionsList = document.getElementById('editions-list');
+            editionsList.innerHTML = '';
+            if (pubInfo.editions && pubInfo.editions.length > 0) {
+                pubInfo.editions.forEach(edition => {
+                    const editionDiv = document.createElement('div');
+                    editionDiv.className = 'text-sm text-gray-600 bg-gray-50 px-2 py-1 rounded';
+                    editionDiv.textContent = edition;
+                    editionsList.appendChild(editionDiv);
+                });
+            } else {
+                editionsList.innerHTML = '<span class="text-sm text-gray-400">None</span>';
+            }
+
+            // Display pages
+            const pagesList = document.getElementById('pages-list');
+            pagesList.innerHTML = '';
+            if (pubInfo.pages && pubInfo.pages.length > 0) {
+                pubInfo.pages.forEach(page => {
+                    const pageDiv = document.createElement('div');
+                    pageDiv.className = 'text-sm text-gray-600 bg-gray-50 px-2 py-1 rounded';
+                    pageDiv.textContent = page;
+                    pagesList.appendChild(pageDiv);
+                });
+            } else {
+                pagesList.innerHTML = '<span class="text-sm text-gray-400">None</span>';
+            }
+        }
+
+        // Polling functionality
+        function startPolling() {
+            if (state.pollingInterval) {
+                clearInterval(state.pollingInterval);
+            }
+            
+            state.pollingInterval = setInterval(async () => {
+                if (state.currentObject && !document.hidden) {
+                    await loadObject();
+                }
+            }, 60000); // Poll every minuti
+            
+            // Stop polling when page is hidden, resume when visible
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    clearInterval(state.pollingInterval);
+                    state.pollingInterval = null;
+                } else if (state.currentObject && !state.pollingInterval) {
+                    startPolling();
+                }
+            });
+        }
+        
+        function stopPolling() {
+            if (state.pollingInterval) {
+                clearInterval(state.pollingInterval);
+                state.pollingInterval = null;
+            }
+        }
+        
+        // Update object with diff detection
+        function updateObjectWithDiff(oldObj, newObj) {
+            // Check for title changes
+            if (oldObj.title !== newObj.title) {
+                updateObjectTitle(newObj.title);
+            }
+            
+            // Check for workflow status changes
+            if (oldObj.workflowStatus !== newObj.workflowStatus) {
+                updateWorkflowStatus(newObj.workflowStatus);
+            }
+            
+            // Check for PDF changes
+            if (oldObj.pdfUrl !== newObj.pdfUrl) {
+                updatePDF(newObj.pdfUrl);
+            }
+            
+            // Check for publication info changes
+            if (JSON.stringify(oldObj.publicationInfo) !== JSON.stringify(newObj.publicationInfo)) {
+                updatePublicationInfo(newObj.publicationInfo);
+            }
+        }
+        
+        // Smooth update functions
+        function updateObjectTitle(newTitle) {
+            const titleElement = document.getElementById('object-title');
+            titleElement.style.opacity = '0.5';
+            setTimeout(() => {
+                titleElement.textContent = newTitle || 'Untitled';
+                titleElement.style.opacity = '1';
+            }, 150);
+        }
+        
+        function updateWorkflowStatus(newStatus) {
+            const statusElement = document.getElementById('workflow-status');
+            statusElement.style.opacity = '0.5';
+            setTimeout(() => {
+                statusElement.textContent = newStatus;
+                statusElement.className = 'px-2 py-1 text-xs font-medium rounded-full object-status ' + getStatusColor(newStatus);
+                statusElement.style.opacity = '1';
+                
+                // Add visual feedback for status change
+                statusElement.classList.add('status-updated');
+                setTimeout(() => {
+                    statusElement.classList.remove('status-updated');
+                }, 2000);
+            }, 150);
+        }
+        
+        function updatePDF(newPdfUrl) {
+            const container = document.getElementById('pdf-container');
+            container.style.opacity = '0.5';
+            setTimeout(() => {
+                displayPDF(newPdfUrl);
+                container.style.opacity = '1';
+            }, 150);
+        }
+        
+        function updatePublicationInfo(newPubInfo) {
+            const section = document.getElementById('publication-section');
+            section.style.opacity = '0.5';
+            setTimeout(() => {
+                displayPublicationInfo(newPubInfo);
+                section.style.opacity = '1';
+            }, 150);
+        }
+
+        // Show no object state
+        function showNoObject() {
+            stopPolling();
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('object-display').classList.add('hidden');
+            document.getElementById('no-object').classList.remove('hidden');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Document loaded, initializing Méthode panel...');
+            setupPostMessageApi();
+            
+            // Check if we have a direct methodeId (from URL parameter)
+            if (state.methodeId && state.methodeId !== 'null' && state.methodeId !== '') {
+                console.log(`Using direct Méthode ID: ${state.methodeId}`);
+                loadObject();
+            } else {
+                // Wait for Neon context to provide methodeId through PostMessage
+                console.log('Waiting for Neon context to provide methodeHook data...');
+            }
+        });
+        
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            stopPolling();
+        });
+    </script>
+</body>
+</html>

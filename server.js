@@ -118,7 +118,11 @@ fastify.get("/services", function (request, reply) {
     ],
     panels: [
       { name: "Trello Panel", endpoint: "GET /panels/trello", description: "Trello card management panel for Neon CMS iframe embedding with PostMessage API" },
-      { name: "Trello API Proxy", endpoint: "ALL /panels/trello/api/*", description: "Proxy for Trello API calls with authentication" }
+      { name: "Trello API Proxy", endpoint: "ALL /panels/trello/api/*", description: "Proxy for Trello API calls with authentication" },
+      { name: "External Sources Panel", endpoint: "GET /panels/external-sources", description: "External assets panel for searching and inserting Pexels photos/videos into Neon CMS" },
+      { name: "Pexels API Proxy", endpoint: "ALL /panels/external-sources/api/*", description: "Proxy for Pexels API calls with authentication" },
+      { name: "Méthode Panel", endpoint: "GET /panels/methode", description: "Méthode object management panel with PDF preview, workflow status, and Swing integration" },
+      { name: "Méthode API Proxy", endpoint: "ALL /panels/methode/api/*", description: "Proxy for Méthode Editorial API calls with authentication and object retrieval" }
     ],
     webhooks: [
       { name: "Neon Webhook Handler", endpoint: "POST /in/neon/webhook", description: "Process incoming Neon CMS webhooks with multi-site routing" },
@@ -189,12 +193,27 @@ fastify.post("/widgets/breakingnews/publish", widgetHandlers.breakingNewsPublish
 const panelHandlers = require("./src/requestHandlers/panels.js");
 fastify.get("/panels/trello", panelHandlers.trelloPanelHandler);
 fastify.get("/panels/external-sources", panelHandlers.externalSourcesPanelHandler);
+fastify.get("/panels/methode", panelHandlers.methodePanelHandler);
 fastify.post("/panels/upload-asset", panelHandlers.uploadAssetHandler);
 fastify.register(async function (fastify) {
   fastify.route({
     method: ['GET', 'POST', 'PUT', 'DELETE'],
     url: '/panels/trello/api/*',
     handler: panelHandlers.trelloApiProxyHandler
+  });
+});
+fastify.register(async function (fastify) {
+  fastify.route({
+    method: ['GET', 'POST', 'PUT', 'DELETE'],
+    url: '/panels/external-sources/api/*',
+    handler: panelHandlers.pexelsApiProxyHandler
+  });
+});
+fastify.register(async function (fastify) {
+  fastify.route({
+    method: ['GET', 'POST', 'PUT', 'DELETE'],
+    url: '/panels/methode/api/*',
+    handler: panelHandlers.methodeApiProxyHandler
   });
 });
 
