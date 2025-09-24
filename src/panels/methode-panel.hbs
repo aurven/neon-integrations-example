@@ -469,8 +469,19 @@
             // Update workflow status
             const statusElement = document.getElementById('workflow-status');
             if (obj.workflowStatus) {
-                statusElement.textContent = obj.workflowStatus;
-                statusElement.className = 'px-2 py-1 text-xs font-medium rounded-full object-status ' + getStatusColor(obj.workflowStatus);
+                // Create colored dot element
+                const dotColor = obj.workflowStatusColor || 'RGB(128,128,128)'; // Default to gray if no color
+                const colorStyle = dotColor.startsWith('RGB(') ?
+                    dotColor.replace('RGB(', 'rgb(').replace(')', '') :
+                    dotColor;
+
+                statusElement.innerHTML = `
+                    <span class="inline-flex items-center">
+                        <span class="w-2 h-2 rounded-full mr-2" style="background-color: ${colorStyle}"></span>
+                        ${obj.workflowStatus}
+                    </span>
+                `;
+                statusElement.className = 'px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800 object-status';
             }
 
             // Setup Swing button
@@ -491,18 +502,6 @@
             document.getElementById('object-display').classList.remove('hidden');
         }
 
-        // Get status color based on workflow status
-        function getStatusColor(status) {
-            const statusColors = {
-                'draft': 'bg-gray-100 text-gray-800',
-                'in-progress': 'bg-yellow-100 text-yellow-800',
-                'review': 'bg-blue-100 text-blue-800',
-                'approved': 'bg-green-100 text-green-800',
-                'published': 'bg-methode-100 text-methode-800',
-                'archived': 'bg-gray-100 text-gray-600'
-            };
-            return statusColors[status?.toLowerCase()] || 'bg-gray-100 text-gray-800';
-        }
 
         // Preview loading state management
         function showPreviewLoading() {
@@ -660,7 +659,7 @@
             
             // Check for workflow status changes
             if (oldObj.workflowStatus !== newObj.workflowStatus) {
-                updateWorkflowStatus(newObj.workflowStatus);
+                updateWorkflowStatus(newObj.workflowStatus, newObj.workflowStatusColor);
             }
             
             // Check for PDF changes
@@ -684,14 +683,25 @@
             }, 150);
         }
         
-        function updateWorkflowStatus(newStatus) {
+        function updateWorkflowStatus(newStatus, newStatusColor) {
             const statusElement = document.getElementById('workflow-status');
             statusElement.style.opacity = '0.5';
             setTimeout(() => {
-                statusElement.textContent = newStatus;
-                statusElement.className = 'px-2 py-1 text-xs font-medium rounded-full object-status ' + getStatusColor(newStatus);
+                // Create colored dot element
+                const dotColor = newStatusColor || 'RGB(128,128,128)'; // Default to gray if no color
+                const colorStyle = dotColor.startsWith('RGB(') ?
+                    dotColor.replace('RGB(', 'rgb(').replace(')', '') :
+                    dotColor;
+
+                statusElement.innerHTML = `
+                    <span class="inline-flex items-center">
+                        <span class="w-2 h-2 rounded-full mr-2" style="background-color: ${colorStyle}"></span>
+                        ${newStatus}
+                    </span>
+                `;
+                statusElement.className = 'px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800 object-status';
                 statusElement.style.opacity = '1';
-                
+
                 // Add visual feedback for status change
                 statusElement.classList.add('status-updated');
                 setTimeout(() => {
