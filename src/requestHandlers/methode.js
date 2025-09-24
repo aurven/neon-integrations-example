@@ -39,14 +39,17 @@ async function postMethodeHandler(request, reply) {
   const timestamp = new Date().toISOString(); 
 
   const payload = processResult?.target ? { ...processResult?.target, lastSend: timestamp } : {};
-  console.log("Payload Data:", payload);
-  
-  console.log("postMethodeHandler << OUT:");
-  return reply.status(200).send({
+
+  const returnMessage = {
     action: "writeback",
     payload,
-    processResult,
-  });
+    //processResult,
+  }
+
+  console.log("Returned Message Data:", returnMessage);
+  
+  console.log("postMethodeHandler << OUT:");
+  return reply.status(200).send(returnMessage);
 }
 
 async function postMethodeImageHandler(request, reply) {
