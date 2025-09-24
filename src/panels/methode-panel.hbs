@@ -148,12 +148,20 @@
 
             <!-- PDF Viewer Section -->
             <div id="pdf-section" class="bg-white rounded-lg shadow-md p-6">
-                <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
-                    </svg>
-                    Preview
-                </h2>
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-semibold text-gray-800 flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                        </svg>
+                        Preview
+                    </h2>
+                    <button id="open-preview-btn" class="hidden inline-flex items-center px-3 py-1 text-sm font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md transition-colors" title="Open preview in new tab">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                        </svg>
+                        Open
+                    </button>
+                </div>
                 <div id="preview-container" class="relative">
                     <!-- Loading overlay for initial load -->
                     <div id="preview-loading" class="hidden flex items-center justify-center h-96 bg-gray-100 rounded">
@@ -501,12 +509,14 @@
             document.getElementById('preview-loading').classList.remove('hidden');
             document.getElementById('preview-error').classList.add('hidden');
             document.getElementById('preview-image-container').classList.add('hidden');
+            document.getElementById('open-preview-btn').classList.add('hidden');
         }
 
         function showPreviewError() {
             document.getElementById('preview-loading').classList.add('hidden');
             document.getElementById('preview-error').classList.remove('hidden');
             document.getElementById('preview-image-container').classList.add('hidden');
+            document.getElementById('open-preview-btn').classList.add('hidden');
         }
 
         function showPreviewRefreshChip() {
@@ -536,6 +546,14 @@
                     const imageElement = document.getElementById('preview-image');
                     imageElement.src = imageUrl;
                     document.getElementById('preview-image-container').classList.remove('hidden');
+
+                    // Show the open preview button and set up click handler
+                    const openBtn = document.getElementById('open-preview-btn');
+                    openBtn.classList.remove('hidden');
+                    openBtn.onclick = () => {
+                        console.log('Opening preview image in new tab:', imageUrl);
+                        window.open(imageUrl, '_blank');
+                    };
 
                     console.log('Preview image displayed successfully');
                     resolve();
