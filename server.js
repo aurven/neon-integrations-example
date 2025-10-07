@@ -38,6 +38,12 @@ fastify.register(require('@fastify/multipart'));
 // Formbody lets us parse incoming forms
 fastify.register(require("@fastify/formbody"));
 
+// Cookie support for session-based authentication
+fastify.register(require("@fastify/cookie"), {
+  secret: process.env.NEON_EXT_APIKEY,
+  parseOptions: {}
+});
+
 // View is a templating manager for fastify
 const handlebars = require("handlebars");
 
@@ -122,7 +128,8 @@ fastify.get("/services", function (request, reply) {
       { name: "External Sources Panel", endpoint: "GET /panels/external-sources", description: "External assets panel for searching and inserting Pexels photos/videos into Neon CMS" },
       { name: "Pexels API Proxy", endpoint: "ALL /panels/external-sources/api/*", description: "Proxy for Pexels API calls with authentication" },
       { name: "Méthode Panel", endpoint: "GET /panels/methode", description: "Méthode object management panel with PDF preview, workflow status, and Swing integration" },
-      { name: "Méthode API Proxy", endpoint: "ALL /panels/methode/api/*", description: "Proxy for Méthode Editorial API calls with authentication and object retrieval" }
+      { name: "Méthode API Proxy", endpoint: "ALL /panels/methode/api/*", description: "Proxy for Méthode Editorial API calls with authentication and object retrieval" },
+      { name: "QuickChart Panel", endpoint: "GET /panels/quickchart", description: "QuickChart.io gallery panel for browsing and importing chart examples as PNG assets into Neon CMS" }
     ],
     webhooks: [
       { name: "Neon Webhook Handler", endpoint: "POST /in/neon/webhook", description: "Process incoming Neon CMS webhooks with multi-site routing" },
@@ -194,6 +201,7 @@ const panelHandlers = require("./src/requestHandlers/panels.js");
 fastify.get("/panels/trello", panelHandlers.trelloPanelHandler);
 fastify.get("/panels/external-sources", panelHandlers.externalSourcesPanelHandler);
 fastify.get("/panels/methode", panelHandlers.methodePanelHandler);
+fastify.get("/panels/quickchart", panelHandlers.quickchartPanelHandler);
 fastify.post("/panels/upload-asset", panelHandlers.uploadAssetHandler);
 fastify.register(async function (fastify) {
   fastify.route({

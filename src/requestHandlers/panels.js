@@ -5,18 +5,41 @@ const imagesImporter = require("../images-importer.js");
 const { MethodeClient } = require("../helpers/methode-bo-api.js");
 const { createStoryPreviewWithSetup } = require("../helpers/edapi-utils.js");
 
-function trelloPanelHandler(request, reply) {
-  const apikey = request.query.apikey;
-  const externalRef = request.query.externalRef;
+/**
+ * Authentication helper for panels
+ * Checks for API key in headers, query params, or cookies
+ * Sets a cookie if authentication is successful
+ */
+function authenticatePanel(request, reply) {
+  const apikey = request.headers.apikey || request.query.apikey || request.cookies.apikey;
 
   if (!apikey || apikey !== process.env.NEON_EXT_APIKEY) {
+    return { authenticated: false, apikey: null };
+  }
+
+  // Set cookie for future requests (24 hours expiry)
+  reply.setCookie('apikey', apikey, {
+    path: '/',
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 24 * 60 * 60 // 24 hours in seconds
+  });
+
+  return { authenticated: true, apikey };
+}
+
+function trelloPanelHandler(request, reply) {
+  const auth = authenticatePanel(request, reply);
+  if (!auth.authenticated) {
     return reply.status(401).send({ error: "Unauthorized" });
   }
 
+  const externalRef = request.query.externalRef;
+
   // params is an object we'll pass to our handlebars template
-  let params = { 
-    seo: seo, 
-    apiKey: process.env.NEON_EXT_APIKEY,
+  let params = {
+    seo: seo,
+    apiKey: auth.apikey,
     neonAppUrl: process.env.NEON_APP_URL,
     trelloApiKey: process.env.TRELLO_APIKEY,
     trelloToken: process.env.TRELLO_TOKEN,
@@ -30,18 +53,17 @@ function trelloPanelHandler(request, reply) {
 }
 
 function externalSourcesPanelHandler(request, reply) {
-  const apikey = request.query.apikey;
-
-  if (!apikey || apikey !== process.env.NEON_EXT_APIKEY) {
+  const auth = authenticatePanel(request, reply);
+  if (!auth.authenticated) {
     return reply.status(401).send({ error: "Unauthorized" });
   }
 
   // params is an object we'll pass to our handlebars template
-  let params = { 
-    seo: seo, 
-    apiKey: process.env.NEON_EXT_APIKEY,
+  let params = {
+    seo: seo,
+    apiKey: auth.apikey,
     pexelsApiKey: process.env.PEXELS_APIKEY,
-    integrationsApiKey: process.env.NEON_EXT_APIKEY
+    integrationsApiKey: auth.apikey
   };
 
   // The Handlebars code will be able to access the parameter values and build them into the page
@@ -49,9 +71,8 @@ function externalSourcesPanelHandler(request, reply) {
 }
 
 async function trelloApiProxyHandler(request, reply) {
-  const apikey = request.headers.apikey || request.query.apikey;
-
-  if (!apikey || apikey !== process.env.NEON_EXT_APIKEY) {
+  const auth = authenticatePanel(request, reply);
+  if (!auth.authenticated) {
     return reply.status(401).send({ error: "Unauthorized" });
   }
 
@@ -97,9 +118,8 @@ async function trelloApiProxyHandler(request, reply) {
 }
 
 async function pexelsApiProxyHandler(request, reply) {
-  const apikey = request.headers.apikey || request.query.apikey;
-
-  if (!apikey || apikey !== process.env.NEON_EXT_APIKEY) {
+  const auth = authenticatePanel(request, reply);
+  if (!auth.authenticated) {
     return reply.status(401).send({ error: "Unauthorized" });
   }
 
@@ -145,9 +165,8 @@ async function pexelsApiProxyHandler(request, reply) {
 }
 
 async function uploadAssetHandler(request, reply) {
-  const apikey = request.headers.apikey || request.query.apikey;
-  
-  if (!apikey || apikey !== process.env.NEON_EXT_APIKEY) {
+  const auth = authenticatePanel(request, reply);
+  if (!auth.authenticated) {
     return reply.status(401).send({ error: "Unauthorized" });
   }
   
@@ -200,17 +219,17 @@ async function uploadAssetHandler(request, reply) {
 }
 
 function methodePanelHandler(request, reply) {
-  const apikey = request.query.apikey;
-  const methodeId = request.query.methodeId;
-
-  if (!apikey || apikey !== process.env.NEON_EXT_APIKEY) {
+  const auth = authenticatePanel(request, reply);
+  if (!auth.authenticated) {
     return reply.status(401).send({ error: "Unauthorized" });
   }
+
+  const methodeId = request.query.methodeId;
 
   // params is an object we'll pass to our handlebars template
   let params = {
     seo: seo,
-    apiKey: process.env.NEON_EXT_APIKEY,
+    apiKey: auth.apikey,
     neonAppUrl: process.env.NEON_APP_URL,
     swingAppUrl: process.env.SWING_APP_URL,
     swingHost: process.env.SWING_HOST,
@@ -221,10 +240,26 @@ function methodePanelHandler(request, reply) {
   return reply.view("/src/panels/methode-panel.hbs", params);
 }
 
-async function methodeApiProxyHandler(request, reply) {
-  const apikey = request.headers.apikey || request.query.apikey;
+function quickchartPanelHandler(request, reply) {
+  const auth = authenticatePanel(request, reply);
+  if (!auth.authenticated) {
+    return reply.status(401).send({ error: "Unauthorized" });
+  }
 
-  if (!apikey || apikey !== process.env.NEON_EXT_APIKEY) {
+  // params is an object we'll pass to our handlebars template
+  let params = {
+    seo: seo,
+    apiKey: auth.apikey,
+    neonAppUrl: process.env.NEON_APP_URL
+  };
+
+  // The Handlebars code will be able to access the parameter values and build them into the page
+  return reply.view("/src/panels/quickchart-panel.hbs", params);
+}
+
+async function methodeApiProxyHandler(request, reply) {
+  const auth = authenticatePanel(request, reply);
+  if (!auth.authenticated) {
     return reply.status(401).send({ error: "Unauthorized" });
   }
 
@@ -354,5 +389,6 @@ module.exports = {
   pexelsApiProxyHandler,
   uploadAssetHandler,
   methodePanelHandler,
-  methodeApiProxyHandler
+  methodeApiProxyHandler,
+  quickchartPanelHandler
 };

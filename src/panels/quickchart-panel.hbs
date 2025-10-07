@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickChart Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .scrollbar-thin {
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e0 transparent;
+        }
+        .scrollbar-thin::-webkit-scrollbar {
+            width: 6px;
+        }
+        .scrollbar-thin::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 3px;
+        }
+        .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+            background: #a0aec0;
+        }
+        .chart-card {
+            transition: all 0.2s ease;
+        }
+        .chart-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.7);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            max-width: 90%;
+            max-height: 90%;
+            position: relative;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #666;
+            cursor: pointer;
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .close-modal:hover {
+            background-color: #f3f4f6;
+            color: #000;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans" style="min-height: 95vh;">
+    <div id="app" class="container mx-auto p-4 max-w-6xl">
+        <!-- Header -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800">QuickChart Gallery</h1>
+                    <p class="text-gray-600 mt-1">Select a chart to preview or import into Neon</p>
+                </div>
+                <a href="https://quickchart.io" target="_blank" class="inline-flex items-center px-4 py-2 text-sm font-medium text-primary-600 hover:text-primary-800 hover:bg-primary-50 rounded-md transition-colors">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                    QuickChart.io
+                </a>
+            </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div id="charts-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Charts will be populated here -->
+        </div>
+    </div>
+
+    <!-- Preview Modal -->
+    <div id="preview-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <div id="modal-body" class="text-center">
+                <h2 id="modal-title" class="text-2xl font-bold text-gray-800 mb-4"></h2>
+                <img id="modal-image" src="" alt="Chart Preview" class="max-w-full h-auto mb-4 rounded-lg shadow-lg">
+                <p id="modal-description" class="text-gray-600 mb-6"></p>
+                <div class="flex justify-center space-x-4">
+                    <button id="modal-download" class="inline-flex items-center px-6 py-3 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                        </svg>
+                        <span class="button-text">Import to Neon</span>
+                        <svg class="w-5 h-5 loading-spinner hidden animate-spin ml-2" fill="none" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"></circle>
+                            <path fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" class="opacity-75"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let state = {
+            apiKey: '{{{apiKey}}}',
+            neonAppUrl: '{{{neonAppUrl}}}',
+            charts: [],
+            neonContext: null
+        };
+
+        // QuickChart examples configuration
+        const chartExamples = [
+            {
+                id: 'bar-chart',
+                name: 'Bar Chart',
+                description: 'Vertical bar chart showing quarterly sales data',
+                type: 'bar',
+                url: 'https://quickchart.io/chart?c={type:%27bar%27,data:{labels:[%27Q1%27,%27Q2%27,%27Q3%27,%27Q4%27],datasets:[{label:%27Sales%27,data:[50,60,70,180]}]}}'
+            },
+            {
+                id: 'line-chart',
+                name: 'Line Chart',
+                description: 'Line chart displaying monthly trend data',
+                type: 'line',
+                url: 'https://quickchart.io/chart?c={type:%27line%27,data:{labels:[%27Jan%27,%27Feb%27,%27Mar%27,%27Apr%27,%27May%27],datasets:[{label:%27Revenue%27,data:[100,120,115,134,168],fill:false,borderColor:%27rgb(75,192,192)%27}]}}'
+            },
+            {
+                id: 'pie-chart',
+                name: 'Pie Chart',
+                description: 'Pie chart showing market share distribution',
+                type: 'pie',
+                url: 'https://quickchart.io/chart?c={type:%27pie%27,data:{labels:[%27Product%20A%27,%27Product%20B%27,%27Product%20C%27,%27Product%20D%27],datasets:[{data:[30,25,20,25],backgroundColor:[%27rgb(255,99,132)%27,%27rgb(54,162,235)%27,%27rgb(255,205,86)%27,%27rgb(75,192,192)%27]}]}}'
+            },
+            {
+                id: 'doughnut-chart',
+                name: 'Doughnut Chart',
+                description: 'Doughnut chart for category breakdown',
+                type: 'doughnut',
+                url: 'https://quickchart.io/chart?c={type:%27doughnut%27,data:{labels:[%27Red%27,%27Blue%27,%27Yellow%27],datasets:[{data:[300,50,100],backgroundColor:[%27rgb(255,99,132)%27,%27rgb(54,162,235)%27,%27rgb(255,205,86)%27]}]}}'
+            },
+            {
+                id: 'radar-chart',
+                name: 'Radar Chart',
+                description: 'Radar chart for multi-dimensional comparison',
+                type: 'radar',
+                url: 'https://quickchart.io/chart?c={type:%27radar%27,data:{labels:[%27Speed%27,%27Reliability%27,%27Comfort%27,%27Safety%27,%27Efficiency%27],datasets:[{label:%27Vehicle%20A%27,data:[65,75,90,81,56],fill:true,backgroundColor:%27rgba(255,99,132,0.2)%27,borderColor:%27rgb(255,99,132)%27}]}}'
+            },
+            {
+                id: 'horizontal-bar-chart',
+                name: 'Horizontal Bar Chart',
+                description: 'Horizontal bar chart for rankings',
+                type: 'horizontalBar',
+                url: 'https://quickchart.io/chart?c={type:%27horizontalBar%27,data:{labels:[%27Team%20A%27,%27Team%20B%27,%27Team%20C%27],datasets:[{label:%27Points%27,data:[85,92,78],backgroundColor:%27rgba(54,162,235,0.5)%27}]}}'
+            },
+            {
+                id: 'mixed-chart',
+                name: 'Mixed Chart',
+                description: 'Combined bar and line chart',
+                type: 'bar',
+                url: 'https://quickchart.io/chart?c={type:%27bar%27,data:{labels:[%27Jan%27,%27Feb%27,%27Mar%27,%27Apr%27],datasets:[{type:%27line%27,label:%27Target%27,data:[80,80,80,80],fill:false,borderColor:%27rgb(255,99,132)%27},{type:%27bar%27,label:%27Actual%27,data:[65,75,70,85],backgroundColor:%27rgba(54,162,235,0.5)%27}]}}'
+            },
+            {
+                id: 'scatter-chart',
+                name: 'Scatter Chart',
+                description: 'Scatter plot showing data distribution',
+                type: 'scatter',
+                url: 'https://quickchart.io/chart?c={type:%27scatter%27,data:{datasets:[{label:%27Dataset%27,data:[{x:-10,y:0},{x:0,y:10},{x:10,y:5},{x:0.5,y:5.5}],backgroundColor:%27rgb(255,99,132)%27}]},options:{scales:{x:{type:%27linear%27,position:%27bottom%27}}}}'
+            },
+            {
+                id: 'bubble-chart',
+                name: 'Bubble Chart',
+                description: 'Bubble chart with three-dimensional data',
+                type: 'bubble',
+                url: 'https://quickchart.io/chart?c={type:%27bubble%27,data:{datasets:[{label:%27Dataset%27,data:[{x:20,y:30,r:15},{x:40,y:10,r:10},{x:30,y:20,r:20}],backgroundColor:%27rgb(255,99,132)%27}]}}'
+            },
+            {
+                id: 'stacked-bar-chart',
+                name: 'Stacked Bar Chart',
+                description: 'Stacked bar chart for cumulative data',
+                type: 'bar',
+                url: 'https://quickchart.io/chart?c={type:%27bar%27,data:{labels:[%27Q1%27,%27Q2%27,%27Q3%27,%27Q4%27],datasets:[{label:%27Product%20A%27,data:[40,50,60,70],backgroundColor:%27rgb(255,99,132)%27},{label:%27Product%20B%27,data:[30,40,50,60],backgroundColor:%27rgb(54,162,235)%27}]},options:{scales:{x:{stacked:true},y:{stacked:true}}}}'
+            },
+            {
+                id: 'area-chart',
+                name: 'Area Chart',
+                description: 'Area chart showing volume over time',
+                type: 'line',
+                url: 'https://quickchart.io/chart?c={type:%27line%27,data:{labels:[%27Jan%27,%27Feb%27,%27Mar%27,%27Apr%27,%27May%27],datasets:[{label:%27Volume%27,data:[50,75,60,90,100],fill:true,backgroundColor:%27rgba(75,192,192,0.2)%27,borderColor:%27rgb(75,192,192)%27}]}}'
+            },
+            {
+                id: 'polar-area-chart',
+                name: 'Polar Area Chart',
+                description: 'Polar area chart for circular data representation',
+                type: 'polarArea',
+                url: 'https://quickchart.io/chart?c={type:%27polarArea%27,data:{labels:[%27Red%27,%27Green%27,%27Yellow%27,%27Grey%27,%27Blue%27],datasets:[{data:[11,16,7,3,14],backgroundColor:[%27rgb(255,99,132)%27,%27rgb(75,192,192)%27,%27rgb(255,205,86)%27,%27rgb(201,203,207)%27,%27rgb(54,162,235)%27]}]}}'
+            }
+        ];
+
+        // PostMessage API for Neon CMS communication
+        function setupPostMessageApi() {
+            console.log('Setting up PostMessage API');
+
+            window.addEventListener('message', (event) => {
+                if (event.origin !== state.neonAppUrl) {
+                    console.warn('Received message from unwanted origin:', event.origin);
+                    return;
+                }
+                console.log('Received message:', event.data);
+
+                if (event.data) {
+                    switch (event.data.key) {
+                        case 'getInfo':
+                            state.neonContext = event.data.info;
+                            console.log('Neon context updated:', state.neonContext);
+                            break;
+                        default:
+                            console.warn('Unknown message key:', event.data.key);
+                    }
+                }
+            });
+
+            // Send ready message to parent
+            console.log('Sending ready message to parent');
+            window.parent.postMessage({ type: 'panel-ready', info: { op: 'getInfo' } }, state.neonAppUrl);
+            console.log('Ready message sent');
+        }
+
+        // Render charts grid
+        function renderCharts() {
+            const grid = document.getElementById('charts-grid');
+            grid.innerHTML = '';
+
+            chartExamples.forEach(chart => {
+                const card = document.createElement('div');
+                card.className = 'chart-card bg-white rounded-lg shadow-md overflow-hidden cursor-pointer';
+                card.onclick = () => openModal(chart);
+
+                card.innerHTML = `
+                    <div class="relative">
+                        <img src="${chart.url}" alt="${chart.name}" class="w-full h-48 object-contain bg-gray-50 p-4">
+                        <div class="absolute top-2 right-2">
+                            <span class="inline-flex items-center px-2 py-1 text-xs font-medium bg-primary-100 text-primary-800 rounded-full">
+                                ${chart.type}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">${chart.name}</h3>
+                        <p class="text-sm text-gray-600">${chart.description}</p>
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
+        }
+
+        // Open preview modal
+        function openModal(chart) {
+            const modal = document.getElementById('preview-modal');
+            const title = document.getElementById('modal-title');
+            const image = document.getElementById('modal-image');
+            const description = document.getElementById('modal-description');
+            const downloadBtn = document.getElementById('modal-download');
+
+            title.textContent = chart.name;
+            image.src = chart.url;
+            description.textContent = chart.description;
+
+            // Store current chart in download button
+            downloadBtn.onclick = () => downloadAndUpload(chart);
+
+            modal.classList.add('active');
+        }
+
+        // Close modal
+        function closeModal() {
+            const modal = document.getElementById('preview-modal');
+            modal.classList.remove('active');
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('preview-modal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // Download chart and upload to Neon
+        async function downloadAndUpload(chart) {
+            const downloadBtn = document.getElementById('modal-download');
+            const buttonText = downloadBtn.querySelector('.button-text');
+            const loadingSpinner = downloadBtn.querySelector('.loading-spinner');
+
+            try {
+                // Show loading state
+                buttonText.textContent = 'Uploading...';
+                loadingSpinner.classList.remove('hidden');
+                downloadBtn.disabled = true;
+                downloadBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+                console.log('Uploading chart to Neon:', chart);
+
+                const targetWorkspace = state.neonContext?.workfolder || null;
+                const fileName = `${chart.id}.png`;
+
+                // Call our API to upload to Neon
+                const response = await fetch('/panels/upload-asset', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': state.apiKey
+                    },
+                    body: JSON.stringify({
+                        imageUrl: chart.url,
+                        imageName: fileName,
+                        workspace: targetWorkspace,
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    console.log('Chart uploaded successfully:', result.result);
+
+                    // Show success state
+                    buttonText.textContent = 'Uploaded!';
+                    loadingSpinner.classList.add('hidden');
+                    downloadBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    downloadBtn.classList.remove('bg-primary-600', 'hover:bg-primary-700');
+                    downloadBtn.classList.add('bg-green-600');
+
+                    // Send success message to parent window
+                    if (window.parent !== window) {
+                        window.parent.postMessage({
+                            type: 'asset-uploaded',
+                            info: {
+                                op: 'insertObject',
+                                success: true,
+                                url: chart.url,
+                                familyRef: result.result.node.familyRef,
+                                message: 'Chart uploaded successfully to Neon'
+                            }
+                        }, state.neonAppUrl);
+                    }
+
+                    // Close modal after 1.5 seconds
+                    setTimeout(() => {
+                        closeModal();
+                        // Reset button state
+                        buttonText.textContent = 'Import to Neon';
+                        downloadBtn.disabled = false;
+                        downloadBtn.classList.remove('bg-green-600');
+                        downloadBtn.classList.add('bg-primary-600', 'hover:bg-primary-700');
+                    }, 1500);
+
+                } else {
+                    throw new Error(result.details || 'Upload failed');
+                }
+
+            } catch (error) {
+                console.error('Chart upload failed:', error);
+
+                // Show error state
+                buttonText.textContent = 'Upload Failed - Retry';
+                loadingSpinner.classList.add('hidden');
+                downloadBtn.disabled = false;
+                downloadBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                downloadBtn.classList.remove('bg-primary-600', 'hover:bg-primary-700');
+                downloadBtn.classList.add('bg-red-600', 'hover:bg-red-700');
+
+                // Send error message to parent window
+                if (window.parent !== window) {
+                    window.parent.postMessage({
+                        type: 'asset-uploaded',
+                        success: false,
+                        url: chart.url,
+                        error: error.message,
+                        message: 'Chart upload failed'
+                    }, state.neonAppUrl);
+                }
+
+                // Reset after 3 seconds
+                setTimeout(() => {
+                    buttonText.textContent = 'Import to Neon';
+                    downloadBtn.classList.remove('bg-red-600', 'hover:bg-red-700');
+                    downloadBtn.classList.add('bg-primary-600', 'hover:bg-primary-700');
+                }, 3000);
+            }
+        }
+
+        // Make functions globally available
+        window.closeModal = closeModal;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Document loaded, initializing...');
+            setupPostMessageApi();
+            renderCharts();
+        });
+    </script>
+</body>
+</html>

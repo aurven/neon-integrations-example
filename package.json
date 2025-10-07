@@ -9,6 +9,7 @@
     "dev:legacy": "node --env-file=.env server.js"
   },
   "dependencies": {
+    "@fastify/cookie": "^9.4.0",
     "@fastify/formbody": "^7.4.0",
     "@fastify/multipart": "^8.3.1",
     "@fastify/static": "^6.10.2",
