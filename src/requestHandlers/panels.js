@@ -186,7 +186,7 @@ async function uploadAssetHandler(request, reply) {
     const uploadResult = await imagesImporter.uploadImage({
       imageName: imageName || `trello-asset-${Date.now()}`,
       imageUrl: imageUrl,
-      workspace: workspace,
+      workspace: workspace || '/Convergent/News',
       story: {}
     });
     
