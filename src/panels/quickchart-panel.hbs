@@ -46,11 +46,7 @@
             background: #a0aec0;
         }
         .chart-card {
-            transition: all 0.2s ease;
-        }
-        .chart-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.2s ease;
         }
 
         /* Modal styles */
@@ -303,8 +299,7 @@
 
             chartExamples.forEach(chart => {
                 const card = document.createElement('div');
-                card.className = 'chart-card bg-white rounded-lg shadow-md overflow-hidden cursor-pointer';
-                card.onclick = () => openModal(chart);
+                card.className = 'chart-card bg-white rounded-lg shadow-md overflow-hidden';
 
                 card.innerHTML = `
                     <div class="relative">
@@ -317,7 +312,34 @@
                     </div>
                     <div class="p-4">
                         <h3 class="text-lg font-semibold text-gray-800 mb-2">${chart.name}</h3>
-                        <p class="text-sm text-gray-600">${chart.description}</p>
+                        <p class="text-sm text-gray-600 mb-4">${chart.description}</p>
+                        <div class="flex items-center justify-end space-x-2">
+                            <button
+                                onclick="importChart('${chart.id}')"
+                                class="import-btn inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors"
+                                title="Import to Neon"
+                            >
+                                <svg class="w-4 h-4 mr-1 upload-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                                </svg>
+                                <span class="button-text">Import</span>
+                                <svg class="w-4 h-4 ml-1 loading-icon hidden animate-spin" fill="none" viewBox="0 0 24 24">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"></circle>
+                                    <path fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" class="opacity-75"></path>
+                                </svg>
+                            </button>
+                            <button
+                                onclick="openModalById('${chart.id}')"
+                                class="inline-flex items-center px-3 py-2 text-sm font-medium text-primary-600 bg-primary-50 rounded-md hover:bg-primary-100 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors"
+                                title="Preview"
+                            >
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                </svg>
+                                <span>Preview</span>
+                            </button>
+                        </div>
                     </div>
                 `;
 
@@ -349,6 +371,137 @@
             modal.classList.remove('active');
         }
 
+        // Open modal by chart ID
+        function openModalById(chartId) {
+            const chart = chartExamples.find(c => c.id === chartId);
+            if (chart) {
+                openModal(chart);
+            }
+        }
+
+        // Import chart directly from card button
+        async function importChart(chartId) {
+            const chart = chartExamples.find(c => c.id === chartId);
+            if (!chart) return;
+
+            // Find the button that was clicked by finding the card with this chart ID
+            const cards = document.querySelectorAll('.chart-card');
+            let targetButton = null;
+
+            for (const card of cards) {
+                const btn = card.querySelector('.import-btn');
+                if (btn && btn.getAttribute('onclick').includes(chartId)) {
+                    targetButton = btn;
+                    break;
+                }
+            }
+
+            if (!targetButton) return;
+
+            const buttonText = targetButton.querySelector('.button-text');
+            const uploadIcon = targetButton.querySelector('.upload-icon');
+            const loadingIcon = targetButton.querySelector('.loading-icon');
+
+            try {
+                // Show loading state
+                buttonText.textContent = 'Importing...';
+                uploadIcon.classList.add('hidden');
+                loadingIcon.classList.remove('hidden');
+                targetButton.disabled = true;
+                targetButton.classList.add('opacity-50', 'cursor-not-allowed');
+
+                console.log('Uploading chart to Neon:', chart);
+
+                const targetWorkspace = state.neonContext?.workfolder || null;
+                const fileName = `${chart.id}.png`;
+
+                // Call our API to upload to Neon
+                const response = await fetch('/panels/upload-asset', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': state.apiKey
+                    },
+                    body: JSON.stringify({
+                        imageUrl: chart.url,
+                        imageName: fileName,
+                        workspace: targetWorkspace,
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    console.log('Chart uploaded successfully:', result.result);
+
+                    // Show success state
+                    buttonText.textContent = 'Imported!';
+                    loadingIcon.classList.add('hidden');
+                    uploadIcon.classList.remove('hidden');
+                    uploadIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>';
+                    targetButton.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-green-600', 'hover:bg-green-700');
+                    targetButton.classList.add('bg-green-700');
+
+                    // Send success message to parent window
+                    if (window.parent !== window) {
+                        window.parent.postMessage({
+                            type: 'asset-uploaded',
+                            info: {
+                                op: 'insertObject',
+                                success: true,
+                                url: chart.url,
+                                familyRef: result.result.node.familyRef,
+                                message: 'Chart imported successfully to Neon'
+                            }
+                        }, state.neonAppUrl);
+                    }
+
+                    // Reset after 3 seconds
+                    setTimeout(() => {
+                        buttonText.textContent = 'Import';
+                        uploadIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>';
+                        targetButton.disabled = false;
+                        targetButton.classList.remove('bg-green-700');
+                        targetButton.classList.add('bg-green-600', 'hover:bg-green-700');
+                    }, 3000);
+
+                } else {
+                    throw new Error(result.details || 'Upload failed');
+                }
+
+            } catch (error) {
+                console.error('Chart upload failed:', error);
+
+                // Show error state
+                buttonText.textContent = 'Failed';
+                loadingIcon.classList.add('hidden');
+                uploadIcon.classList.remove('hidden');
+                uploadIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>';
+                targetButton.disabled = false;
+                targetButton.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-green-600', 'hover:bg-green-700');
+                targetButton.classList.add('bg-red-600', 'hover:bg-red-700');
+
+                // Send error message to parent window
+                if (window.parent !== window) {
+                    window.parent.postMessage({
+                        type: 'asset-uploaded',
+                        success: false,
+                        url: chart.url,
+                        error: error.message,
+                        message: 'Chart import failed'
+                    }, state.neonAppUrl);
+                }
+
+                // Reset after 5 seconds
+                setTimeout(() => {
+                    buttonText.textContent = 'Import';
+                    uploadIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>';
+                    targetButton.classList.remove('bg-red-600', 'hover:bg-red-700');
+                    targetButton.classList.add('bg-green-600', 'hover:bg-green-700');
+                }, 5000);
+            }
+        }
+
         // Close modal when clicking outside
         window.onclick = function(event) {
             const modal = document.getElementById('preview-modal');
@@ -357,7 +510,7 @@
             }
         }
 
-        // Download chart and upload to Neon
+        // Download chart and upload to Neon (from modal)
         async function downloadAndUpload(chart) {
             const downloadBtn = document.getElementById('modal-download');
             const buttonText = downloadBtn.querySelector('.button-text');
