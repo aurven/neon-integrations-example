@@ -4,23 +4,22 @@ const guardianConnector = require("../connectors/guardian-connector.js");
 const rssConnector = require("../connectors/rss-connector.js");
 const gdocsToNeon = require("../gdocs-to-neon.js");
 const { safeLogRequest } = require("../helpers/utils.js");
+const { authenticate } = require("../helpers/auth.js");
 
 // External Source to Neon
 async function importHandler(request, reply) {
-  const { apikey } = request.headers?.apikey
-    ? request.headers
-    : { apikey: null };
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) {
+    console.log("importHandler << ERROR: Unauthorized");
+    return reply.status(401).send({ error: "Unauthorized" });
+  }
+
   const { site, workspace, items } = request.body;
 
   console.log("importHandler << IN:");
   const safeRequest = safeLogRequest(request?.headers || {}, request?.body || {});
   console.log("Request Headers:", JSON.stringify(safeRequest.headers));
   console.log("Request Body:", JSON.stringify(safeRequest.body));
-
-  if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
-    console.log("importHandler << ERROR: Unauthorized");
-    return reply.status(401).send({ error: "Unauthorized" });
-  }
 
   if (!items || items.length === 0) {
     console.error("importHandler << ERROR: No items provided");
@@ -46,17 +45,20 @@ async function importHandler(request, reply) {
 // External Source to Neon
 async function importFromGuardianHandler(request, reply) {
   console.log('Called importFromGuardianHandler');
-  
-  const { apikey } = request.headers?.apikey
-    ? request.headers
-    : { apikey: null };
+
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) {
+    console.log("importFromGuardianHandler << ERROR: Unauthorized");
+    return reply.status(401).send({ error: "Unauthorized" });
+  }
+
   const options = request.body;
-  
+
   console.log("importFromGuardianHandler << IN:");
   const safeRequest = safeLogRequest(request?.headers || {}, request?.body || {});
   console.log("Request Headers:", JSON.stringify(safeRequest.headers));
   console.log("Request Body:", JSON.stringify(safeRequest.body));
-  
+
   console.log('Options:');
   console.log(options);
 
@@ -70,11 +72,6 @@ async function importFromGuardianHandler(request, reply) {
   const originalLanguage = options.originalLanguage;
   const targetTranslation = options.targetTranslation;
   const siteAsChannel = options.siteAsChannel === 'true' || options.siteAsChannel === true;
-
-  if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
-    console.log("importFromGuardianHandler << ERROR: Unauthorized");
-    return reply.status(401).send({ error: "Unauthorized" });
-  }
 
   if (!section || section.length === 0) {
     console.error("importFromGuardianHandler << ERROR: No target section provided");
@@ -122,9 +119,12 @@ async function importFromGuardianHandler(request, reply) {
 };
 
 async function importFromRssHandler(request, reply) {
-  const { apikey } = request.headers?.apikey
-    ? request.headers
-    : { apikey: null };
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) {
+    console.log("importFromRssHandler << ERROR: Unauthorized");
+    return reply.status(401).send({ error: "Unauthorized" });
+  }
+
   const options = request.body;
 
   console.log("importFromRssHandler << IN:");
@@ -139,11 +139,6 @@ async function importFromRssHandler(request, reply) {
   const targetSection = options.targetSection;
   const targetTranslation = options.targetTranslation;
   const siteAsChannel = options.siteAsChannel;
-
-  if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
-    console.log("importFromRssHandler << ERROR: Unauthorized");
-    return reply.status(401).send({ error: "Unauthorized" });
-  }
 
   if (!rssUrl || rssUrl.length === 0) {
     console.error("importFromRssHandler << ERROR: No rssUrl provided");
@@ -216,20 +211,18 @@ function importFromGoogleDocsHandler(request, reply) {
 }
 
 async function importBinaryHandler(request, reply) {
-  const { apikey } = request.headers?.apikey
-    ? request.headers
-    : { apikey: null };
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) {
+    console.log("importBinaryHandler << ERROR: Unauthorized");
+    return reply.status(401).send({ error: "Unauthorized" });
+  }
+
   const { model, rootData } = request.body;
 
   console.log("importBinaryHandler << IN:");
   const safeRequest = safeLogRequest(request?.headers || {}, request?.body || {});
   console.log("Request Headers:", JSON.stringify(safeRequest.headers));
   console.log("Request Body:", JSON.stringify(safeRequest.body));
-
-  if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
-    console.log("importBinaryHandler << ERROR: Unauthorized");
-    return reply.status(401).send({ error: "Unauthorized" });
-  }
   
   console.log("Request received:");
   console.log(JSON.stringify(safeRequest.body));

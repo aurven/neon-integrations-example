@@ -3,11 +3,11 @@ const seo = require("../seo.json");
 const openai = require("../ai/openai.js");
 const storiesPopulator = require("../stories-populator.js");
 const { safeLogRequest } = require("../helpers/utils.js");
+const { authenticate } = require("../helpers/auth.js");
 
 function testWidgetHandler(request, reply) {
-  const apikey = request.query.apikey;
-
-  if (!apikey || apikey !== process.env.NEON_EXT_APIKEY) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) {
     return reply.status(401).send({ error: "Unauthorized" });
   }
 
@@ -19,9 +19,8 @@ function testWidgetHandler(request, reply) {
 }
 
 function dropWidgetHandler (request, reply) {
-  const apikey = request.query.apikey;
-
-  if (!apikey || apikey !== process.env.NEON_EXT_APIKEY) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) {
     return reply.status(401).send({ error: "Unauthorized" });
   }
 
@@ -167,23 +166,21 @@ async function asyncDropUploadWidgetHandler(request, reply) {
 }
 
 function wiresWidgetHandler (request, reply) {
-  const apikey = request.query.apikey;
-
-  if (!apikey || apikey !== process.env.NEON_EXT_APIKEY) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) {
     return reply.status(401).send({ error: "Unauthorized" });
   }
 
   // params is an object we'll pass to our handlebars template
-  let params = { seo: seo, apiKey: process.env.NEON_EXT_APIKEY, neonAppUrl: process.env.NEON_APP_URL };
+  let params = { seo: seo, apiKey: auth.apikey, neonAppUrl: process.env.NEON_APP_URL };
 
   // The Handlebars code will be able to access the parameter values and build them into the page
   return reply.view("/src/widgets/wires-list.hbs", params);
 }
 
 function breakingNewsWidgetHandler(request, reply) {
-  const apikey = request.query.apikey;
-
-  if (!apikey || apikey !== process.env.NEON_EXT_APIKEY) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) {
     return reply.status(401).send({ error: "Unauthorized" });
   }
 

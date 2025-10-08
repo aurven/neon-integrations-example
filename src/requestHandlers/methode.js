@@ -1,14 +1,12 @@
 const neonToMethode = require("../neon-to-methode.js");
 const { safeLogRequest } = require("../helpers/utils.js");
+const { authenticate } = require("../helpers/auth.js");
 
 async function getMethodeHandler(request, reply) {
   return {"status":"success"};
 }
 
 async function postMethodeHandler(request, reply) {
-  const { apikey } = request.headers?.apikey
-    ? request.headers
-    : { apikey: null };
   const { model, rootData } = request.body;
 
   console.log("postMethodeHandler << IN:");
@@ -17,7 +15,8 @@ async function postMethodeHandler(request, reply) {
   console.log("Request Body:", JSON.stringify(safeRequest.body));
 
   // TODO - Restore when we can add ApiKeys to Webhooks headers
-  // if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
+  // const auth = authenticate(request, reply);
+  // if (!auth.authenticated) {
   //   console.log("Received call, but no API key was passed.");
   //   return reply.status(401).send({ error: "Unauthorized" });
   // }
@@ -53,9 +52,6 @@ async function postMethodeHandler(request, reply) {
 }
 
 async function postMethodeImageHandler(request, reply) {
-  const { apikey } = request.headers?.apikey
-    ? request.headers
-    : { apikey: null };
   const { model, rootData } = request.body;
 
   console.log("postMethodeImageHandler << IN:");
@@ -64,7 +60,8 @@ async function postMethodeImageHandler(request, reply) {
   console.log("Request Body:", JSON.stringify(safeRequest2.body));
 
   // TODO - Restore when we can add ApiKeys to Webhooks headers
-  // if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
+  // const auth = authenticate(request, reply);
+  // if (!auth.authenticated) {
   //   console.log("Received call, but no API key was passed.");
   //   return reply.status(401).send({ error: "Unauthorized" });
   // }
@@ -91,9 +88,6 @@ async function postMethodeImageHandler(request, reply) {
 }
 
 async function postMethodeTest(request, reply) {
-  const { apikey } = request.headers?.apikey
-    ? request.headers
-    : { apikey: null };
   const { model, rootData } = request.body;
 
   console.log("postMethodeTest << IN:");
@@ -102,7 +96,8 @@ async function postMethodeTest(request, reply) {
   console.log("Request Body:", JSON.stringify(safeRequest3.body));
 
   // TODO - Restore when we can add ApiKeys to Webhooks headers
-  // if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
+  // const auth = authenticate(request, reply);
+  // if (!auth.authenticated) {
   //   console.log("Received call, but no API key was passed.");
   //   return reply.status(401).send({ error: "Unauthorized" });
   // }

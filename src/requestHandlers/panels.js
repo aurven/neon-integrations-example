@@ -4,32 +4,10 @@ const neon = require("../helpers/neon-bo-api.js");
 const imagesImporter = require("../images-importer.js");
 const { MethodeClient } = require("../helpers/methode-bo-api.js");
 const { createStoryPreviewWithSetup } = require("../helpers/edapi-utils.js");
-
-/**
- * Authentication helper for panels
- * Checks for API key in headers, query params, or cookies
- * Sets a cookie if authentication is successful
- */
-function authenticatePanel(request, reply) {
-  const apikey = request.headers.apikey || request.query.apikey || request.cookies.apikey;
-
-  if (!apikey || apikey !== process.env.NEON_EXT_APIKEY) {
-    return { authenticated: false, apikey: null };
-  }
-
-  // Set cookie for future requests (24 hours expiry)
-  reply.setCookie('apikey', apikey, {
-    path: '/',
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    maxAge: 24 * 60 * 60 // 24 hours in seconds
-  });
-
-  return { authenticated: true, apikey };
-}
+const { authenticate } = require("../helpers/auth.js");
 
 function trelloPanelHandler(request, reply) {
-  const auth = authenticatePanel(request, reply);
+  const auth = authenticate(request, reply);
   if (!auth.authenticated) {
     return reply.status(401).send({ error: "Unauthorized" });
   }
@@ -53,7 +31,7 @@ function trelloPanelHandler(request, reply) {
 }
 
 function externalSourcesPanelHandler(request, reply) {
-  const auth = authenticatePanel(request, reply);
+  const auth = authenticate(request, reply);
   if (!auth.authenticated) {
     return reply.status(401).send({ error: "Unauthorized" });
   }
@@ -71,7 +49,7 @@ function externalSourcesPanelHandler(request, reply) {
 }
 
 async function trelloApiProxyHandler(request, reply) {
-  const auth = authenticatePanel(request, reply);
+  const auth = authenticate(request, reply);
   if (!auth.authenticated) {
     return reply.status(401).send({ error: "Unauthorized" });
   }
@@ -118,7 +96,7 @@ async function trelloApiProxyHandler(request, reply) {
 }
 
 async function pexelsApiProxyHandler(request, reply) {
-  const auth = authenticatePanel(request, reply);
+  const auth = authenticate(request, reply);
   if (!auth.authenticated) {
     return reply.status(401).send({ error: "Unauthorized" });
   }
@@ -165,7 +143,7 @@ async function pexelsApiProxyHandler(request, reply) {
 }
 
 async function uploadAssetHandler(request, reply) {
-  const auth = authenticatePanel(request, reply);
+  const auth = authenticate(request, reply);
   if (!auth.authenticated) {
     return reply.status(401).send({ error: "Unauthorized" });
   }
@@ -219,7 +197,7 @@ async function uploadAssetHandler(request, reply) {
 }
 
 function methodePanelHandler(request, reply) {
-  const auth = authenticatePanel(request, reply);
+  const auth = authenticate(request, reply);
   if (!auth.authenticated) {
     return reply.status(401).send({ error: "Unauthorized" });
   }
@@ -241,7 +219,7 @@ function methodePanelHandler(request, reply) {
 }
 
 function quickchartPanelHandler(request, reply) {
-  const auth = authenticatePanel(request, reply);
+  const auth = authenticate(request, reply);
   if (!auth.authenticated) {
     return reply.status(401).send({ error: "Unauthorized" });
   }
@@ -258,7 +236,7 @@ function quickchartPanelHandler(request, reply) {
 }
 
 async function methodeApiProxyHandler(request, reply) {
-  const auth = authenticatePanel(request, reply);
+  const auth = authenticate(request, reply);
   if (!auth.authenticated) {
     return reply.status(401).send({ error: "Unauthorized" });
   }
