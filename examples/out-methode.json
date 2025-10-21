@@ -1,0 +1,1533 @@
+{
+  "userRef": {
+    "userId": "62038d84-f161-3579-a5f1-7aba053f999a",
+    "alias": "Aureliano"
+  },
+  "publicationTimestamp": "2025-09-04T15:29:44.666Z",
+  "eventType": "updated",
+  "rootData": {
+    "id": "029c-1e9888864149-e1a672d6992e-1000",
+    "version": "029c-1e9888864149-e1a672d6992e-1000-336929384666",
+    "timestamp": "2025-09-04T15:29:44.666Z",
+    "foreignId": "trello:68a71b39030e98bd21e44678",
+    "foreignSource": "Trello",
+    "title": "SEC's Bold Climate Disclosure Proposal: A Game Changer for Corporate Reporting",
+    "summary": "Breaking analysis of proposed regulations requiring companies to disclose climate-related risks and greenhouse gas emissions in annual reports. Cover impact on Fortune 500 compliance costs and timeline.",
+    "authors": [
+      "Aureliano"
+    ],
+    "sys": {
+      "kind": "content",
+      "baseType": "article",
+      "type": "article",
+      "creationTime": "2025-08-29T13:45:43.621Z",
+      "createdBy": {
+        "userId": "62038d84-f161-3579-a5f1-7aba053f999a",
+        "userName": "Aureliano"
+      },
+      "updateTime": "2025-09-04T15:29:44.666Z",
+      "updatedBy": {
+        "userId": "62038d84-f161-3579-a5f1-7aba053f999a",
+        "userName": "Aureliano"
+      }
+    },
+    "pubInfo": {
+      "siteName": "TheGlobe",
+      "status": "LIVE",
+      "publicationTime": "2025-09-04T15:29:44.666Z",
+      "publishedBy": {
+        "userId": "62038d84-f161-3579-a5f1-7aba053f999a",
+        "userName": "Aureliano"
+      },
+      "sectionPath": "/news/",
+      "priority": 4,
+      "paywallLevel": "FREE",
+      "visible": true
+    },
+    "attributes": {
+      "tags": [],
+      "teaser": {},
+      "contentIds": {
+        "teaserTitle": "UHgmv10B3jp68r",
+        "teaserSummary": "U9h3e17eGLxyRz",
+        "title": "UbaeGlEKisadkz",
+        "summary": "UCVLJIXawZiqop"
+      },
+      "title": "SEC's Bold Climate Disclosure Proposal: A Game Changer for Corporate Reporting",
+      "comment": "",
+      "modifiable": true
+    },
+    "files": {
+      "content": {
+        "fileName": "SECProposesNewClimateDisclosureRulesforPublicCompanies.xml",
+        "mimeType": "application/json",
+        "updatedBy": {
+          "userId": "62038d84-f161-3579-a5f1-7aba053f999a",
+          "userName": "Aureliano"
+        },
+        "updateTime": "2025-09-04T15:29:37.095Z",
+        "size": 11836,
+        "data": {
+          "elements": [
+            {
+              "nodeType": "story",
+              "attributes": {
+                "id": "U34360720570cqM"
+              },
+              "elements": [
+                {
+                  "nodeType": "web-image-group",
+                  "attributes": {
+                    "enabledcropslist": "Wide,Square,Portrait,Ultrawide",
+                    "id": "Uy8L2mnnKGIb2n"
+                  },
+                  "elements": [
+                    {
+                      "nodeType": "image",
+                      "attributes": {
+                        "align": "top",
+                        "src": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/:1200x675:c2NhbGUoMC4zMTM1NjIgMC4zMTM1NjIp/summer_corner_originalwidthxoriginalheigth.jpeg?s=-dVaxY0QDUYtloAEYtZE-1WXBolZVtC6sU47Vp3psy0",
+                        "id": "UiRQGDQlmA1jpn",
+                        "softCrop": "Wide",
+                        "softcropenabled": "enabled",
+                        "tmx": "3827 5947 1200 675",
+                        "units": "pixels",
+                        "xtransform": "scale(0.313562 0.313562)"
+                      },
+                      "elements": []
+                    },
+                    {
+                      "nodeType": "image",
+                      "attributes": {
+                        "align": "top",
+                        "src": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/:490x490:c2NhbGUoMC4xMjgwMzggMC4xMjgwMzgp/summer_corner_originalwidthxoriginalheigth.jpeg?s=vIOjCzBEtqtxu-voY-NVMdkxmMO7pXbah1taOE7a6kM",
+                        "id": "UVJXMSeEyzuKDR",
+                        "softCrop": "Square",
+                        "softcropenabled": "enabled",
+                        "tmx": "3827 5947 490 490",
+                        "units": "pixels",
+                        "xtransform": "scale(0.128038 0.128038)"
+                      },
+                      "elements": []
+                    },
+                    {
+                      "nodeType": "image",
+                      "attributes": {
+                        "align": "top",
+                        "src": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/:556x988:c2NhbGUoMC4xNjYxMzQgMC4xNjYxMzQp/summer_corner_originalwidthxoriginalheigth.jpeg?s=jDsK8Ff5VME55SZ_ewGK5M4lVADkwtCvDVoP5I7APow",
+                        "id": "U41JFWgiPQVGkC",
+                        "softCrop": "Portrait",
+                        "softcropenabled": "enabled",
+                        "tmx": "3827 5947 556 988",
+                        "units": "pixels",
+                        "xtransform": "scale(0.166134 0.166134)"
+                      },
+                      "elements": []
+                    },
+                    {
+                      "nodeType": "image",
+                      "attributes": {
+                        "align": "top",
+                        "src": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/:2048x800:c2NhbGUoMC41MzUxNDUgMC41MzUxNDUp/summer_corner_originalwidthxoriginalheigth.jpeg?s=hIS7cZIiws7OXa-slup2LwORwKkpQtKVHQYGP-_SC90",
+                        "id": "UODm0tgzZzSLfZ",
+                        "softCrop": "Ultrawide",
+                        "softcropenabled": "enabled",
+                        "tmx": "3827 5947 2048 800",
+                        "units": "pixels",
+                        "xtransform": "scale(0.535145 0.535145)"
+                      },
+                      "elements": []
+                    },
+                    {
+                      "nodeType": "web-image-caption",
+                      "attributes": {},
+                      "elements": [
+                        {
+                          "nodeType": "caption",
+                          "attributes": {
+                            "emxed-trx-captiongroup": "web-image-caption",
+                            "emxed-trx-captionsequence": "0",
+                            "emxed-trx-captiontitle": "Caption",
+                            "emxed-trx-captiontype": "caption",
+                            "emxed-trx-iscaption": "true",
+                            "id": "Ufqb88NZY8kM3D"
+                          },
+                          "elements": [
+                            {
+                              "nodeType": "p",
+                              "attributes": {},
+                              "elements": [
+                                {
+                                  "nodeType": "plainText",
+                                  "value": "Summer Corner"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "nodeType": "credit",
+                          "attributes": {
+                            "emxed-trx-captiongroup": "web-image-caption",
+                            "emxed-trx-captionsequence": "0",
+                            "emxed-trx-captiontitle": "Credit",
+                            "emxed-trx-captiontype": "credit",
+                            "emxed-trx-iscaption": "true",
+                            "id": "UWEjxmMz2NHEmy"
+                          },
+                          "elements": [
+                            {
+                              "nodeType": "p",
+                              "attributes": {},
+                              "elements": [
+                                {
+                                  "nodeType": "plainText",
+                                  "value": "Pexels® Image"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "nodeType": "grouphead",
+                  "attributes": {},
+                  "elements": [
+                    {
+                      "nodeType": "overhead",
+                      "attributes": {
+                        "id": "Ujnj3wHkAv45wI"
+                      },
+                      "elements": [
+                        {
+                          "nodeType": "p",
+                          "attributes": {},
+                          "elements": [
+                            {
+                              "nodeType": "plainText",
+                              "value": "Demo"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "nodeType": "headline",
+                      "attributes": {
+                        "id": "UbaeGlEKisadkz"
+                      },
+                      "elements": [
+                        {
+                          "nodeType": "p",
+                          "attributes": {},
+                          "elements": [
+                            {
+                              "nodeType": "plainText",
+                              "value": "SEC's Bold Climate Disclosure Proposal: A Game Changer for Corporate Reporting"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "nodeType": "summary",
+                  "attributes": {
+                    "id": "UCVLJIXawZiqop"
+                  },
+                  "elements": [
+                    {
+                      "nodeType": "p",
+                      "attributes": {},
+                      "elements": [
+                        {
+                          "nodeType": "plainText",
+                          "value": "Breaking analysis of proposed regulations requiring companies to disclose climate-related risks and greenhouse gas emissions in annual reports. Cover impact on Fortune 500 compliance costs and timeline."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "nodeType": "byline",
+                  "attributes": {
+                    "id": "UAsy90PG0EjdS2"
+                  },
+                  "elements": [
+                    {
+                      "nodeType": "p",
+                      "attributes": {},
+                      "elements": []
+                    }
+                  ]
+                },
+                {
+                  "nodeType": "text",
+                  "attributes": {
+                    "id": "U5GsacfEgABqcs"
+                  },
+                  "elements": [
+                    {
+                      "nodeType": "p",
+                      "attributes": {},
+                      "elements": [
+                        {
+                          "nodeType": "plainText",
+                          "value": "The Securities and Exchange Commission unveiled comprehensive climate disclosure requirements today that would fundamentally reshape corporate reporting obligations for thousands of publicly traded companies. The proposed rules would mandate detailed reporting of climate-related risks, greenhouse gas emissions data, and transition plans in annual 10-K filings and registration statements, marking the most significant expansion of disclosure requirements in decades."
+                        }
+                      ]
+                    },
+                    {
+                      "nodeType": "p",
+                      "attributes": {},
+                      "elements": [
+                        {
+                          "nodeType": "plainText",
+                          "value": "Under the proposed framework, companies would be required to disclose Scope 1 and Scope 2 greenhouse gas emissions, with large accelerated filers also reporting Scope 3 emissions if material or if the company has set emissions reduction targets that include downstream activities. The emissions data would need third-party attestation, similar to financial audit requirements, creating a new compliance infrastructure that industry analysts estimate could cost Fortune 500 companies between $420,000 and $530,000 annually in the first year of implementation alone.."
+                        }
+                      ]
+                    },
+                    {
+                      "nodeType": "inline-media-group",
+                      "attributes": {
+                        "class": "detailMedia",
+                        "data-target": "show",
+                        "emxed-trx-picturedesk": "true",
+                        "emxed-trx-section-container": "true",
+                        "emxed-trx-show-images-button": "true",
+                        "emxed-trx-softctop-enabled-list": "Available crops: Wide / Square / Portrait / Ultrawide",
+                        "enabledcropslist": "Wide,Square,Portrait,Ultrawide",
+                        "group": "detailMedia",
+                        "id": "U32321184564thD",
+                        "picturedesklite": "true"
+                      },
+                      "elements": [
+                        {
+                          "nodeType": "image",
+                          "attributes": {
+                            "emxed-trx-picturedesk-image": "true",
+                            "src": "/resources/029d-1e9eae767d4a-050afbd61547-1000/:1200x675:dHJhbnNsYXRlKC0xMDY1LjAxMTU4IC04MjguMzUyMjYpIHNjYWxlKDEuMTc4MjUgMS4xNzgxNjgp/free_stock_photo_of_bremenpexelsmeetup_confident_editorial_originalwidthxoriginalheigth.jpeg?s=gCdc6hJn4KdoPjyzIg7waedOdRvHwOOgkBo_JjbdcIE",
+                            "id": "U35640465614OMW",
+                            "softCrop": "Wide",
+                            "softcropenabled": "enabled",
+                            "tmx": "2880 1920 1200 675",
+                            "xtransform": "translate(-1065.01158 -828.35226) scale(1.17825 1.178168)"
+                          },
+                          "elements": []
+                        },
+                        {
+                          "nodeType": "image",
+                          "attributes": {
+                            "emxed-trx-picturedesk-image": "true",
+                            "src": "/resources/029d-1e9eae767d4a-050afbd61547-1000/:490x490:dHJhbnNsYXRlKC00MzQuODc5MjYgLTIzMS4wNDk5NCkgc2NhbGUoMC40ODExMTcgMC40ODEwNzcp/free_stock_photo_of_bremenpexelsmeetup_confident_editorial_originalwidthxoriginalheigth.jpeg?s=DGIT_gZWbvih2sSkGfxjQ-SOA8VCqTzVuMq3kIAavHs",
+                            "id": "U42537766113Kzq",
+                            "softCrop": "Square",
+                            "softcropenabled": "enabled",
+                            "tmx": "2880 1920 490 490",
+                            "xtransform": "translate(-434.87926 -231.04994) scale(0.481117 0.481077)"
+                          },
+                          "elements": []
+                        },
+                        {
+                          "nodeType": "image",
+                          "attributes": {
+                            "emxed-trx-picturedesk-image": "true",
+                            "src": "/resources/029d-1e9eae767d4a-050afbd61547-1000/:556x988:dHJhbnNsYXRlKC00OTMuNDU0NzggLTQ2LjIxNTk0KSBzY2FsZSgwLjU0NTkyMiAwLjU0NTkyMik=/free_stock_photo_of_bremenpexelsmeetup_confident_editorial_originalwidthxoriginalheigth.jpeg?s=Cs8sOp_178PYDWWxGHdSJsL5CTEa30B9hcBa3VDye8o",
+                            "id": "U00284125650NKG",
+                            "softCrop": "Portrait",
+                            "softcropenabled": "enabled",
+                            "tmx": "2880 1920 556 988",
+                            "xtransform": "translate(-493.45478 -46.21594) scale(0.545922 0.545922)"
+                          },
+                          "elements": []
+                        },
+                        {
+                          "nodeType": "image",
+                          "attributes": {
+                            "emxed-trx-picturedesk-image": "true",
+                            "src": "/resources/029d-1e9eae767d4a-050afbd61547-1000/:2048x800:c2NhbGUoMC43MTExMSAwLjcxMTExKQ==/free_stock_photo_of_bremenpexelsmeetup_confident_editorial_originalwidthxoriginalheigth.jpeg?s=zRD1919EBOVM5_at4opOJjCBKD_NS_UYOUBK9kZvOFM",
+                            "id": "U06356716074Uda",
+                            "softCrop": "Ultrawide",
+                            "softcropenabled": "enabled-preferred",
+                            "tmx": "2880 1920 2048 800",
+                            "xtransform": "scale(0.71111 0.71111)"
+                          },
+                          "elements": []
+                        },
+                        {
+                          "nodeType": "image-caption",
+                          "attributes": {},
+                          "elements": [
+                            {
+                              "nodeType": "caption",
+                              "attributes": {
+                                "emxed-trx-captiongroup": "image-caption",
+                                "emxed-trx-captionsequence": "0",
+                                "emxed-trx-captiontitle": "Caption",
+                                "emxed-trx-captiontype": "caption",
+                                "emxed-trx-iscaption": "true"
+                              },
+                              "elements": [
+                                {
+                                  "nodeType": "p",
+                                  "attributes": {},
+                                  "elements": [
+                                    {
+                                      "nodeType": "plainText",
+                                      "value": "Free stock photo of bremenpexelsmeetup, confident, editorial OriginalWidthxOriginalHeigth"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "nodeType": "credit",
+                              "attributes": {
+                                "emxed-trx-captiongroup": "image-caption",
+                                "emxed-trx-captionsequence": "0",
+                                "emxed-trx-captiontitle": "Credit",
+                                "emxed-trx-captiontype": "credit",
+                                "emxed-trx-iscaption": "true"
+                              },
+                              "elements": [
+                                {
+                                  "nodeType": "p",
+                                  "attributes": {},
+                                  "elements": [
+                                    {
+                                      "nodeType": "plainText",
+                                      "value": "Pexels® Image"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "nodeType": "p",
+                      "attributes": {},
+                      "elements": [
+                        {
+                          "nodeType": "plainText",
+                          "value": "The rules would establish a phased compliance timeline, with large accelerated filers required to begin reporting climate-related disclosures for fiscal year 2024, followed by accelerated and non-accelerated filers in subsequent years. Companies would need to describe their governance structures for climate risk oversight, including board expertise and management’s role in assessing and managing climate-related risks, effectively making climate competency a boardroom imperative."
+                        }
+                      ]
+                    },
+                    {
+                      "nodeType": "p",
+                      "attributes": {},
+                      "elements": [
+                        {
+                          "nodeType": "plainText",
+                          "value": "Physical and transition risks would require quantitative disclosure when they exceed one percent of any financial statement line item, a threshold that corporate attorneys argue could capture virtually every major business decision. Companies must detail how climate risks affect their strategy, business model, and outlook, including scenario analysis if used, and disclose any internal carbon pricing mechanisms or climate-related targets and goals."
+                        }
+                      ]
+                    },
+                    {
+                      "nodeType": "p",
+                      "attributes": {},
+                      "elements": [
+                        {
+                          "nodeType": "plainText",
+                          "value": "The proposed regulations extend beyond environmental metrics to encompass financial statement impacts, requiring companies to separately identify climate-related costs, expenditures, charges, and losses in audited financial statements. This granular approach would create new challenges for corporate accounting departments, potentially requiring system overhauls to track climate-related financial impacts across operations, from supply chain disruptions to stranded assets."
+                        }
+                      ]
+                    },
+                    {
+                      "nodeType": "p",
+                      "attributes": {},
+                      "elements": [
+                        {
+                          "nodeType": "plainText",
+                          "value": "Industry response has been sharply divided, with investor groups representing $130 trillion in assets under management supporting standardized disclosure while business coalitions warn of excessive compliance burdens. The U.S. Chamber of Commerce projects that mid-sized companies could face first-year implementation costs exceeding $200,000, with ongoing annual compliance costs of $75,000 to $150,000, potentially disadvantaging American companies relative to international competitors not subject to similar requirements."
+                        }
+                      ]
+                    },
+                    {
+                      "nodeType": "p",
+                      "attributes": {},
+                      "elements": [
+                        {
+                          "nodeType": "plainText",
+                          "value": "Legal challenges appear inevitable, with several industry groups already signaling constitutional objections based on the major questions doctrine and arguments that climate disclosure exceeds the SEC’s statutory authority. The West Virginia Attorney General has assembled a coalition of 24 states preparing to challenge the rules, arguing they represent backdoor environmental regulation disguised as investor protection, setting up a likely Supreme Court showdown over the scope of securities regulation."
+                        }
+                      ]
+                    },
+                    {
+                      "nodeType": "p",
+                      "attributes": {},
+                      "elements": [
+                        {
+                          "nodeType": "plainText",
+                          "value": "The 60-day public comment period has already generated over 14,000 submissions, reflecting intense stakeholder engagement that could result in significant modifications to the final rules. Key areas of contention include the Scope 3 emissions requirement, the one percent materiality threshold for financial statement impacts, and the attestation requirements timeline, with the SEC likely to face pressure to provide additional implementation time and safe harbors for good-faith compliance efforts as companies navigate this unprecedented expansion of disclosure obligations."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "nodeType": "teaser",
+              "attributes": {},
+              "elements": [
+                {
+                  "nodeType": "web-image-group",
+                  "attributes": {
+                    "id": "U8nHgboVaAbmmQ"
+                  },
+                  "elements": [
+                    {
+                      "nodeType": "image",
+                      "attributes": {
+                        "align": "top",
+                        "id": "Uz30Nj4d6lxluz",
+                        "softCrop": "Wide",
+                        "units": "pixels"
+                      },
+                      "elements": []
+                    },
+                    {
+                      "nodeType": "image",
+                      "attributes": {
+                        "align": "top",
+                        "id": "U7dFa90P0286x0",
+                        "softCrop": "Square",
+                        "units": "pixels"
+                      },
+                      "elements": []
+                    },
+                    {
+                      "nodeType": "image",
+                      "attributes": {
+                        "align": "top",
+                        "id": "UFxonYSVEp9jmj",
+                        "softCrop": "Portrait",
+                        "units": "pixels"
+                      },
+                      "elements": []
+                    },
+                    {
+                      "nodeType": "image",
+                      "attributes": {
+                        "align": "top",
+                        "id": "UVMyeWyt7S7e1T",
+                        "softCrop": "Ultrawide",
+                        "units": "pixels"
+                      },
+                      "elements": []
+                    }
+                  ]
+                },
+                {
+                  "nodeType": "grouphead",
+                  "attributes": {},
+                  "elements": [
+                    {
+                      "nodeType": "headline",
+                      "attributes": {
+                        "id": "UHgmv10B3jp68r"
+                      },
+                      "elements": [
+                        {
+                          "nodeType": "p",
+                          "attributes": {},
+                          "elements": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "nodeType": "summary",
+                  "attributes": {
+                    "id": "U9h3e17eGLxyRz"
+                  },
+                  "elements": [
+                    {
+                      "nodeType": "p",
+                      "attributes": {},
+                      "elements": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "nodeType": "style",
+              "attributes": {
+                "id": "U52445875685gam",
+                "type": "text/css"
+              },
+              "elements": [
+                {
+                  "nodeType": "plainText",
+                  "value": "{}\n#U52445875685gam {\ndisplay: none;\n}\n"
+                }
+              ]
+            }
+          ],
+          "attributes": {},
+          "nodeType": "doc"
+        },
+        "jsonFileEmbeddedNoImage": true
+      }
+    },
+    "links": {
+      "hyperlink": {
+        "image": [
+          {
+            "targetId": "029d-1e9eae767d4a-050afbd61547-1000",
+            "metadata": {
+              "baseType": "image",
+              "type": "image/pexelsimage",
+              "metadataType": "generic",
+              "softCrops": {
+                "Wide": {
+                  "id": "U35640465614OMW",
+                  "tmx": "2880 1920 1200 675",
+                  "xtransform": "translate(-1065.01158 -828.35226) scale(1.17825 1.178168)"
+                },
+                "Square": {
+                  "id": "U42537766113Kzq",
+                  "tmx": "2880 1920 490 490",
+                  "xtransform": "translate(-434.87926 -231.04994) scale(0.481117 0.481077)"
+                },
+                "Ultrawide": {
+                  "id": "U06356716074Uda",
+                  "tmx": "2880 1920 2048 800",
+                  "xtransform": "scale(0.71111 0.71111)"
+                },
+                "Portrait": {
+                  "id": "U00284125650NKG",
+                  "tmx": "2880 1920 556 988",
+                  "xtransform": "translate(-493.45478 -46.21594) scale(0.545922 0.545922)"
+                }
+              },
+              "groupId": "U32321184564thD"
+            },
+            "key": 3504881374004815000,
+            "dynamicCropsResourceUrls": {
+              "Square_thumb": "/resources/029d-1e9eae767d4a-050afbd61547-1000/format/thumb:490x490:dHJhbnNsYXRlKC00MzQuODc5MjYgLTIzMS4wNDk5NCkgc2NhbGUoMC40ODExMTcgMC40ODEwNzcp/free_stock_photo_of_bremenpexelsmeetup_confident_editorial_originalwidthxoriginalheigth.webp?s=3jhdSHuaXDasF5VjcmQOkMnCZVCklNUSynqsOQZ5-W4",
+              "Wide_large": "/resources/029d-1e9eae767d4a-050afbd61547-1000/format/large:1200x675:dHJhbnNsYXRlKC0xMDY1LjAxMTU4IC04MjguMzUyMjYpIHNjYWxlKDEuMTc4MjUgMS4xNzgxNjgp/free_stock_photo_of_bremenpexelsmeetup_confident_editorial_originalwidthxoriginalheigth.webp?s=1azWp_wn5teCJ4KCE9HDBLGN21J-bKyH78pcrO2iUKM",
+              "Ultrawide_large": "/resources/029d-1e9eae767d4a-050afbd61547-1000/format/large:2048x800:c2NhbGUoMC43MTExMSAwLjcxMTExKQ==/free_stock_photo_of_bremenpexelsmeetup_confident_editorial_originalwidthxoriginalheigth.webp?s=FqZY8Tdf_CavwIQUjPylEdyCRtONpERzu4H9GwrnumY",
+              "Portrait_small": "/resources/029d-1e9eae767d4a-050afbd61547-1000/format/small:556x988:dHJhbnNsYXRlKC00OTMuNDU0NzggLTQ2LjIxNTk0KSBzY2FsZSgwLjU0NTkyMiAwLjU0NTkyMik=/free_stock_photo_of_bremenpexelsmeetup_confident_editorial_originalwidthxoriginalheigth.webp?s=SSOQyvpP5sow9pfiJXzjk5yE8wfCLV_ZyH1CU90uesE",
+              "Ultrawide_small": "/resources/029d-1e9eae767d4a-050afbd61547-1000/format/small:2048x800:c2NhbGUoMC43MTExMSAwLjcxMTExKQ==/free_stock_photo_of_bremenpexelsmeetup_confident_editorial_originalwidthxoriginalheigth.webp?s=JRX9GXW43bCyHbjTEygy4v9TjlSKHnPVntpKKsr0uQM",
+              "Square_large": "/resources/029d-1e9eae767d4a-050afbd61547-1000/format/large:490x490:dHJhbnNsYXRlKC00MzQuODc5MjYgLTIzMS4wNDk5NCkgc2NhbGUoMC40ODExMTcgMC40ODEwNzcp/free_stock_photo_of_bremenpexelsmeetup_confident_editorial_originalwidthxoriginalheigth.webp?s=v6c_Z1Xg2xYCUcuuuv7UmYf9tfl3E7FCCEvK2CsrnFY",
+              "Wide_thumb": "/resources/029d-1e9eae767d4a-050afbd61547-1000/format/thumb:1200x675:dHJhbnNsYXRlKC0xMDY1LjAxMTU4IC04MjguMzUyMjYpIHNjYWxlKDEuMTc4MjUgMS4xNzgxNjgp/free_stock_photo_of_bremenpexelsmeetup_confident_editorial_originalwidthxoriginalheigth.webp?s=Zy4vSmZyDrmShkhSIomyYRKi5UYFbFDe0SgkfP9gJQ0",
+              "Ultrawide_thumb": "/resources/029d-1e9eae767d4a-050afbd61547-1000/format/thumb:2048x800:c2NhbGUoMC43MTExMSAwLjcxMTExKQ==/free_stock_photo_of_bremenpexelsmeetup_confident_editorial_originalwidthxoriginalheigth.webp?s=40jbryBkfRwaViUz9xTssremi3iOAWN_rYhej6iQAk4",
+              "Square_small": "/resources/029d-1e9eae767d4a-050afbd61547-1000/format/small:490x490:dHJhbnNsYXRlKC00MzQuODc5MjYgLTIzMS4wNDk5NCkgc2NhbGUoMC40ODExMTcgMC40ODEwNzcp/free_stock_photo_of_bremenpexelsmeetup_confident_editorial_originalwidthxoriginalheigth.webp?s=pgt_wqwXSpHiwskeegIfrO9eWFAVBUjNwIuvbvZzLyY",
+              "Wide_small": "/resources/029d-1e9eae767d4a-050afbd61547-1000/format/small:1200x675:dHJhbnNsYXRlKC0xMDY1LjAxMTU4IC04MjguMzUyMjYpIHNjYWxlKDEuMTc4MjUgMS4xNzgxNjgp/free_stock_photo_of_bremenpexelsmeetup_confident_editorial_originalwidthxoriginalheigth.webp?s=dX7beU5EJJRhh_OIqz-JhHXOqNpzzPTl5W8--Q6Sqlo",
+              "Portrait_thumb": "/resources/029d-1e9eae767d4a-050afbd61547-1000/format/thumb:556x988:dHJhbnNsYXRlKC00OTMuNDU0NzggLTQ2LjIxNTk0KSBzY2FsZSgwLjU0NTkyMiAwLjU0NTkyMik=/free_stock_photo_of_bremenpexelsmeetup_confident_editorial_originalwidthxoriginalheigth.webp?s=xZI5V6MUYsAz1KAd3c9lrjWdoXMGmBcdpviWTQwvxV0",
+              "Portrait_large": "/resources/029d-1e9eae767d4a-050afbd61547-1000/format/large:556x988:dHJhbnNsYXRlKC00OTMuNDU0NzggLTQ2LjIxNTk0KSBzY2FsZSgwLjU0NTkyMiAwLjU0NTkyMik=/free_stock_photo_of_bremenpexelsmeetup_confident_editorial_originalwidthxoriginalheigth.webp?s=F0LOMLolqJyX4v_KVyvHX326senHz7in2_PT5sa2g7o"
+            }
+          },
+          {
+            "targetId": "029d-1ea4bf8036a5-95fa445598ff-1000",
+            "metadata": {
+              "baseType": "image",
+              "type": "image/pexelsimage",
+              "metadataType": "generic",
+              "softCrops": {
+                "Square": {
+                  "id": "UVJXMSeEyzuKDR",
+                  "tmx": "3827 5947 490 490",
+                  "xtransform": "scale(0.128038 0.128038)"
+                },
+                "Portrait": {
+                  "id": "U41JFWgiPQVGkC",
+                  "tmx": "3827 5947 556 988",
+                  "xtransform": "scale(0.166134 0.166134)"
+                },
+                "Ultrawide": {
+                  "id": "UODm0tgzZzSLfZ",
+                  "tmx": "3827 5947 2048 800",
+                  "xtransform": "scale(0.535145 0.535145)"
+                },
+                "Wide": {
+                  "id": "UiRQGDQlmA1jpn",
+                  "tmx": "3827 5947 1200 675",
+                  "xtransform": "scale(0.313562 0.313562)"
+                }
+              },
+              "groupId": "Uy8L2mnnKGIb2n"
+            },
+            "key": 3947603231773844000,
+            "dynamicCropsResourceUrls": {
+              "Square_thumb": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/thumb:490x490:c2NhbGUoMC4xMjgwMzggMC4xMjgwMzgp/summer_corner_originalwidthxoriginalheigth.webp?s=aLwUwJ4tQroW1huJFo1pP7eYlHVBmo0Cqb7VoJMo_54",
+              "Ultrawide_large": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/large:2048x800:c2NhbGUoMC41MzUxNDUgMC41MzUxNDUp/summer_corner_originalwidthxoriginalheigth.webp?s=Pj0H1gYCZrgXElkpjb4YzPJv27FvobwJB1CVDeL_oQo",
+              "Wide_large": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/large:1200x675:c2NhbGUoMC4zMTM1NjIgMC4zMTM1NjIp/summer_corner_originalwidthxoriginalheigth.webp?s=XbhMUZLKqgs5A4I_a0GE7hxbsTKkzBkWp2FnEVAg8KE",
+              "Portrait_small": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/small:556x988:c2NhbGUoMC4xNjYxMzQgMC4xNjYxMzQp/summer_corner_originalwidthxoriginalheigth.webp?s=4fr7iZ_XFiD1UP3aI28Xlmue7eRt_qmZRyXAG3aoCew",
+              "Ultrawide_small": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/small:2048x800:c2NhbGUoMC41MzUxNDUgMC41MzUxNDUp/summer_corner_originalwidthxoriginalheigth.webp?s=0YdlfyvXAiI4gaARTONrgXPU-K78-1smH1mJmVe0SVM",
+              "Square_large": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/large:490x490:c2NhbGUoMC4xMjgwMzggMC4xMjgwMzgp/summer_corner_originalwidthxoriginalheigth.webp?s=9VYGmOlI6zsc6z2L8Ax9We-HbBpaBL3sHj5PSZZZcOY",
+              "Ultrawide_thumb": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/thumb:2048x800:c2NhbGUoMC41MzUxNDUgMC41MzUxNDUp/summer_corner_originalwidthxoriginalheigth.webp?s=hdOmYc7OjIjU8X87F_KZQAmuqj1YClb-HwnbjMgkgRc",
+              "Wide_thumb": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/thumb:1200x675:c2NhbGUoMC4zMTM1NjIgMC4zMTM1NjIp/summer_corner_originalwidthxoriginalheigth.webp?s=Srs_aWz9Pn-j1JqzscLs0Ft-wVnzJE8Faoe0VVQ6Z5c",
+              "Square_small": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/small:490x490:c2NhbGUoMC4xMjgwMzggMC4xMjgwMzgp/summer_corner_originalwidthxoriginalheigth.webp?s=I4AwqDJgrO1m2b9HKGYaQPtKsdgLVkO-yfLHx3WeSUA",
+              "Portrait_thumb": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/thumb:556x988:c2NhbGUoMC4xNjYxMzQgMC4xNjYxMzQp/summer_corner_originalwidthxoriginalheigth.webp?s=9c4f3JtyA3jEH4BdWi_3cpWVynpbxq9PUNgNG0bAHP0",
+              "Wide_small": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/small:1200x675:c2NhbGUoMC4zMTM1NjIgMC4zMTM1NjIp/summer_corner_originalwidthxoriginalheigth.webp?s=GaIMQNCMvsQE8D_SqFXrdZ86eue0GDfQBC82zmINWwc",
+              "Portrait_large": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/large:556x988:c2NhbGUoMC4xNjYxMzQgMC4xNjYxMzQp/summer_corner_originalwidthxoriginalheigth.webp?s=tIiDZT3K9Qz6lHjFm0792AeRRWWXh7k1za_SDOyH320"
+            }
+          }
+        ]
+      },
+      "system": {
+        "mainPicture": [
+          {
+            "targetId": "029d-1ea4bf8036a5-95fa445598ff-1000",
+            "metadata": {
+              "baseType": "image",
+              "type": "image/pexelsimage",
+              "metadataType": "generic",
+              "softCrops": {
+                "Square": {
+                  "id": "UVJXMSeEyzuKDR",
+                  "tmx": "3827 5947 490 490",
+                  "xtransform": "scale(0.128038 0.128038)"
+                },
+                "Portrait": {
+                  "id": "U41JFWgiPQVGkC",
+                  "tmx": "3827 5947 556 988",
+                  "xtransform": "scale(0.166134 0.166134)"
+                },
+                "Ultrawide": {
+                  "id": "UODm0tgzZzSLfZ",
+                  "tmx": "3827 5947 2048 800",
+                  "xtransform": "scale(0.535145 0.535145)"
+                },
+                "Wide": {
+                  "id": "UiRQGDQlmA1jpn",
+                  "tmx": "3827 5947 1200 675",
+                  "xtransform": "scale(0.313562 0.313562)"
+                }
+              },
+              "groupId": "Uy8L2mnnKGIb2n"
+            },
+            "key": 3504881374004815000,
+            "dynamicCropsResourceUrls": {
+              "Square_thumb": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/thumb:490x490:c2NhbGUoMC4xMjgwMzggMC4xMjgwMzgp/summer_corner_originalwidthxoriginalheigth.webp?s=aLwUwJ4tQroW1huJFo1pP7eYlHVBmo0Cqb7VoJMo_54",
+              "Ultrawide_large": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/large:2048x800:c2NhbGUoMC41MzUxNDUgMC41MzUxNDUp/summer_corner_originalwidthxoriginalheigth.webp?s=Pj0H1gYCZrgXElkpjb4YzPJv27FvobwJB1CVDeL_oQo",
+              "Wide_large": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/large:1200x675:c2NhbGUoMC4zMTM1NjIgMC4zMTM1NjIp/summer_corner_originalwidthxoriginalheigth.webp?s=XbhMUZLKqgs5A4I_a0GE7hxbsTKkzBkWp2FnEVAg8KE",
+              "Portrait_small": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/small:556x988:c2NhbGUoMC4xNjYxMzQgMC4xNjYxMzQp/summer_corner_originalwidthxoriginalheigth.webp?s=4fr7iZ_XFiD1UP3aI28Xlmue7eRt_qmZRyXAG3aoCew",
+              "Ultrawide_small": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/small:2048x800:c2NhbGUoMC41MzUxNDUgMC41MzUxNDUp/summer_corner_originalwidthxoriginalheigth.webp?s=0YdlfyvXAiI4gaARTONrgXPU-K78-1smH1mJmVe0SVM",
+              "Square_large": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/large:490x490:c2NhbGUoMC4xMjgwMzggMC4xMjgwMzgp/summer_corner_originalwidthxoriginalheigth.webp?s=9VYGmOlI6zsc6z2L8Ax9We-HbBpaBL3sHj5PSZZZcOY",
+              "Ultrawide_thumb": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/thumb:2048x800:c2NhbGUoMC41MzUxNDUgMC41MzUxNDUp/summer_corner_originalwidthxoriginalheigth.webp?s=hdOmYc7OjIjU8X87F_KZQAmuqj1YClb-HwnbjMgkgRc",
+              "Wide_thumb": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/thumb:1200x675:c2NhbGUoMC4zMTM1NjIgMC4zMTM1NjIp/summer_corner_originalwidthxoriginalheigth.webp?s=Srs_aWz9Pn-j1JqzscLs0Ft-wVnzJE8Faoe0VVQ6Z5c",
+              "Square_small": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/small:490x490:c2NhbGUoMC4xMjgwMzggMC4xMjgwMzgp/summer_corner_originalwidthxoriginalheigth.webp?s=I4AwqDJgrO1m2b9HKGYaQPtKsdgLVkO-yfLHx3WeSUA",
+              "Portrait_thumb": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/thumb:556x988:c2NhbGUoMC4xNjYxMzQgMC4xNjYxMzQp/summer_corner_originalwidthxoriginalheigth.webp?s=9c4f3JtyA3jEH4BdWi_3cpWVynpbxq9PUNgNG0bAHP0",
+              "Wide_small": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/small:1200x675:c2NhbGUoMC4zMTM1NjIgMC4zMTM1NjIp/summer_corner_originalwidthxoriginalheigth.webp?s=GaIMQNCMvsQE8D_SqFXrdZ86eue0GDfQBC82zmINWwc",
+              "Portrait_large": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/large:556x988:c2NhbGUoMC4xNjYxMzQgMC4xNjYxMzQp/summer_corner_originalwidthxoriginalheigth.webp?s=tIiDZT3K9Qz6lHjFm0792AeRRWWXh7k1za_SDOyH320"
+            }
+          }
+        ]
+      }
+    },
+    "pubInfoEx": {
+      "TheGlobe": {
+        "siteName": "TheGlobe",
+        "status": "LIVE",
+        "publicationTime": "2025-09-04T15:29:44.666Z",
+        "publishedBy": {
+          "userId": "62038d84-f161-3579-a5f1-7aba053f999a",
+          "userName": "Aureliano"
+        },
+        "liveInfo": {
+          "version": "029c-1e9888864149-e1a672d6992e-1000-336929384666",
+          "sourceVersion": "029c-1e9888864149-e1a672d6992e-1000-n336929378978",
+          "publicationTime": "2025-09-04T15:29:44.666Z",
+          "publishedBy": {
+            "userId": "62038d84-f161-3579-a5f1-7aba053f999a",
+            "userName": "Aureliano"
+          }
+        },
+        "stageInfo": {
+          "version": "029c-1e9888864149-e1a672d6992e-1000-n336929378978",
+          "publicationTime": "2025-09-04T15:29:38.978Z",
+          "publishedBy": {
+            "userId": "62038d84-f161-3579-a5f1-7aba053f999a",
+            "userName": "Aureliano"
+          }
+        },
+        "previewInfo": {
+          "version": "029c-1e9888864149-e1a672d6992e-1000-n336929378978",
+          "publicationTime": "2025-09-04T15:29:38.978Z",
+          "publishedBy": {
+            "userId": "62038d84-f161-3579-a5f1-7aba053f999a",
+            "userName": "Aureliano"
+          }
+        },
+        "sectionPath": "/news/",
+        "priority": 4,
+        "paywallLevel": "FREE",
+        "visible": true
+      }
+    },
+    "url": "/news/029c-1e9888864149-e1a672d6992e-1000/index.html",
+    "resourceUrl": "/resources/029c-1e9888864149-e1a672d6992e-1000/sec_s_bold_climate_disclosure_proposal_a_game_changer_for_corporate_reporting.json",
+    "picture": "029d-1ea4bf8036a5-95fa445598ff-1000",
+    "lastModified": 1756999784666,
+    "etag": "029c-1e9888864149-e1a672d6992e-1000-336929384666",
+    "dataType": "node"
+  },
+  "contentData": {
+    "id": "model://029c-1e9888864149-e1a672d6992e-1000/1/null/NE",
+    "data": {
+      "id": "029c-1e9888864149-e1a672d6992e-1000",
+      "version": "029c-1e9888864149-e1a672d6992e-1000-336929384666",
+      "foreignId": "trello:68a71b39030e98bd21e44678",
+      "title": "SEC's Bold Climate Disclosure Proposal: A Game Changer for Corporate Reporting",
+      "summary": "Breaking analysis of proposed regulations requiring companies to disclose climate-related risks and greenhouse gas emissions in annual reports. Cover impact on Fortune 500 compliance costs and timeline.",
+      "authors": [
+        "Aureliano"
+      ],
+      "sys": {
+        "baseType": "article",
+        "type": "article"
+      },
+      "pubInfo": {
+        "publicationTime": "2025-09-04T15:29:44.666Z",
+        "publishedBy": {
+          "userName": "Aureliano"
+        },
+        "priority": 4,
+        "paywallLevel": "FREE",
+        "visible": true
+      },
+      "attributes": {
+        "tags": [],
+        "teaser": {},
+        "contentIds": {
+          "teaserTitle": "UHgmv10B3jp68r",
+          "teaserSummary": "U9h3e17eGLxyRz",
+          "title": "UbaeGlEKisadkz",
+          "summary": "UCVLJIXawZiqop"
+        },
+        "title": "SEC's Bold Climate Disclosure Proposal: A Game Changer for Corporate Reporting",
+        "comment": "",
+        "modifiable": true
+      },
+      "files": {
+        "content": {
+          "mimeType": "application/json",
+          "data": {
+            "elements": [
+              {
+                "nodeType": "story",
+                "attributes": {
+                  "id": "U34360720570cqM"
+                },
+                "elements": [
+                  {
+                    "nodeType": "web-image-group",
+                    "attributes": {
+                      "enabledcropslist": "Wide,Square,Portrait,Ultrawide",
+                      "id": "Uy8L2mnnKGIb2n"
+                    },
+                    "elements": [
+                      {
+                        "nodeType": "image",
+                        "attributes": {
+                          "align": "top",
+                          "src": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/:1200x675:c2NhbGUoMC4zMTM1NjIgMC4zMTM1NjIp/summer_corner_originalwidthxoriginalheigth.jpeg?s=-dVaxY0QDUYtloAEYtZE-1WXBolZVtC6sU47Vp3psy0",
+                          "id": "UiRQGDQlmA1jpn",
+                          "softCrop": "Wide",
+                          "softcropenabled": "enabled",
+                          "tmx": "3827 5947 1200 675",
+                          "units": "pixels",
+                          "xtransform": "scale(0.313562 0.313562)"
+                        },
+                        "elements": []
+                      },
+                      {
+                        "nodeType": "image",
+                        "attributes": {
+                          "align": "top",
+                          "src": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/:490x490:c2NhbGUoMC4xMjgwMzggMC4xMjgwMzgp/summer_corner_originalwidthxoriginalheigth.jpeg?s=vIOjCzBEtqtxu-voY-NVMdkxmMO7pXbah1taOE7a6kM",
+                          "id": "UVJXMSeEyzuKDR",
+                          "softCrop": "Square",
+                          "softcropenabled": "enabled",
+                          "tmx": "3827 5947 490 490",
+                          "units": "pixels",
+                          "xtransform": "scale(0.128038 0.128038)"
+                        },
+                        "elements": []
+                      },
+                      {
+                        "nodeType": "image",
+                        "attributes": {
+                          "align": "top",
+                          "src": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/:556x988:c2NhbGUoMC4xNjYxMzQgMC4xNjYxMzQp/summer_corner_originalwidthxoriginalheigth.jpeg?s=jDsK8Ff5VME55SZ_ewGK5M4lVADkwtCvDVoP5I7APow",
+                          "id": "U41JFWgiPQVGkC",
+                          "softCrop": "Portrait",
+                          "softcropenabled": "enabled",
+                          "tmx": "3827 5947 556 988",
+                          "units": "pixels",
+                          "xtransform": "scale(0.166134 0.166134)"
+                        },
+                        "elements": []
+                      },
+                      {
+                        "nodeType": "image",
+                        "attributes": {
+                          "align": "top",
+                          "src": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/:2048x800:c2NhbGUoMC41MzUxNDUgMC41MzUxNDUp/summer_corner_originalwidthxoriginalheigth.jpeg?s=hIS7cZIiws7OXa-slup2LwORwKkpQtKVHQYGP-_SC90",
+                          "id": "UODm0tgzZzSLfZ",
+                          "softCrop": "Ultrawide",
+                          "softcropenabled": "enabled",
+                          "tmx": "3827 5947 2048 800",
+                          "units": "pixels",
+                          "xtransform": "scale(0.535145 0.535145)"
+                        },
+                        "elements": []
+                      },
+                      {
+                        "nodeType": "web-image-caption",
+                        "attributes": {},
+                        "elements": [
+                          {
+                            "nodeType": "caption",
+                            "attributes": {
+                              "emxed-trx-captiongroup": "web-image-caption",
+                              "emxed-trx-captionsequence": "0",
+                              "emxed-trx-captiontitle": "Caption",
+                              "emxed-trx-captiontype": "caption",
+                              "emxed-trx-iscaption": "true",
+                              "id": "Ufqb88NZY8kM3D"
+                            },
+                            "elements": [
+                              {
+                                "nodeType": "p",
+                                "attributes": {},
+                                "elements": [
+                                  {
+                                    "nodeType": "plainText",
+                                    "value": "Summer Corner"
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "nodeType": "credit",
+                            "attributes": {
+                              "emxed-trx-captiongroup": "web-image-caption",
+                              "emxed-trx-captionsequence": "0",
+                              "emxed-trx-captiontitle": "Credit",
+                              "emxed-trx-captiontype": "credit",
+                              "emxed-trx-iscaption": "true",
+                              "id": "UWEjxmMz2NHEmy"
+                            },
+                            "elements": [
+                              {
+                                "nodeType": "p",
+                                "attributes": {},
+                                "elements": [
+                                  {
+                                    "nodeType": "plainText",
+                                    "value": "Pexels® Image"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "nodeType": "grouphead",
+                    "attributes": {},
+                    "elements": [
+                      {
+                        "nodeType": "overhead",
+                        "attributes": {
+                          "id": "Ujnj3wHkAv45wI"
+                        },
+                        "elements": [
+                          {
+                            "nodeType": "p",
+                            "attributes": {},
+                            "elements": [
+                              {
+                                "nodeType": "plainText",
+                                "value": "Demo"
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "nodeType": "headline",
+                        "attributes": {
+                          "id": "UbaeGlEKisadkz"
+                        },
+                        "elements": [
+                          {
+                            "nodeType": "p",
+                            "attributes": {},
+                            "elements": [
+                              {
+                                "nodeType": "plainText",
+                                "value": "SEC's Bold Climate Disclosure Proposal: A Game Changer for Corporate Reporting"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "nodeType": "summary",
+                    "attributes": {
+                      "id": "UCVLJIXawZiqop"
+                    },
+                    "elements": [
+                      {
+                        "nodeType": "p",
+                        "attributes": {},
+                        "elements": [
+                          {
+                            "nodeType": "plainText",
+                            "value": "Breaking analysis of proposed regulations requiring companies to disclose climate-related risks and greenhouse gas emissions in annual reports. Cover impact on Fortune 500 compliance costs and timeline."
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "nodeType": "byline",
+                    "attributes": {
+                      "id": "UAsy90PG0EjdS2"
+                    },
+                    "elements": [
+                      {
+                        "nodeType": "p",
+                        "attributes": {},
+                        "elements": []
+                      }
+                    ]
+                  },
+                  {
+                    "nodeType": "text",
+                    "attributes": {
+                      "id": "U5GsacfEgABqcs"
+                    },
+                    "elements": [
+                      {
+                        "nodeType": "p",
+                        "attributes": {},
+                        "elements": [
+                          {
+                            "nodeType": "plainText",
+                            "value": "The Securities and Exchange Commission unveiled comprehensive climate disclosure requirements today that would fundamentally reshape corporate reporting obligations for thousands of publicly traded companies. The proposed rules would mandate detailed reporting of climate-related risks, greenhouse gas emissions data, and transition plans in annual 10-K filings and registration statements, marking the most significant expansion of disclosure requirements in decades."
+                          }
+                        ]
+                      },
+                      {
+                        "nodeType": "p",
+                        "attributes": {},
+                        "elements": [
+                          {
+                            "nodeType": "plainText",
+                            "value": "Under the proposed framework, companies would be required to disclose Scope 1 and Scope 2 greenhouse gas emissions, with large accelerated filers also reporting Scope 3 emissions if material or if the company has set emissions reduction targets that include downstream activities. The emissions data would need third-party attestation, similar to financial audit requirements, creating a new compliance infrastructure that industry analysts estimate could cost Fortune 500 companies between $420,000 and $530,000 annually in the first year of implementation alone.."
+                          }
+                        ]
+                      },
+                      {
+                        "nodeType": "inline-media-group",
+                        "attributes": {
+                          "class": "detailMedia",
+                          "data-target": "show",
+                          "emxed-trx-picturedesk": "true",
+                          "emxed-trx-section-container": "true",
+                          "emxed-trx-show-images-button": "true",
+                          "emxed-trx-softctop-enabled-list": "Available crops: Wide / Square / Portrait / Ultrawide",
+                          "enabledcropslist": "Wide,Square,Portrait,Ultrawide",
+                          "group": "detailMedia",
+                          "id": "U32321184564thD",
+                          "picturedesklite": "true"
+                        },
+                        "elements": [
+                          {
+                            "nodeType": "image",
+                            "attributes": {
+                              "emxed-trx-picturedesk-image": "true",
+                              "src": "/resources/029d-1e9eae767d4a-050afbd61547-1000/:1200x675:dHJhbnNsYXRlKC0xMDY1LjAxMTU4IC04MjguMzUyMjYpIHNjYWxlKDEuMTc4MjUgMS4xNzgxNjgp/free_stock_photo_of_bremenpexelsmeetup_confident_editorial_originalwidthxoriginalheigth.jpeg?s=gCdc6hJn4KdoPjyzIg7waedOdRvHwOOgkBo_JjbdcIE",
+                              "id": "U35640465614OMW",
+                              "softCrop": "Wide",
+                              "softcropenabled": "enabled",
+                              "tmx": "2880 1920 1200 675",
+                              "xtransform": "translate(-1065.01158 -828.35226) scale(1.17825 1.178168)"
+                            },
+                            "elements": []
+                          },
+                          {
+                            "nodeType": "image",
+                            "attributes": {
+                              "emxed-trx-picturedesk-image": "true",
+                              "src": "/resources/029d-1e9eae767d4a-050afbd61547-1000/:490x490:dHJhbnNsYXRlKC00MzQuODc5MjYgLTIzMS4wNDk5NCkgc2NhbGUoMC40ODExMTcgMC40ODEwNzcp/free_stock_photo_of_bremenpexelsmeetup_confident_editorial_originalwidthxoriginalheigth.jpeg?s=DGIT_gZWbvih2sSkGfxjQ-SOA8VCqTzVuMq3kIAavHs",
+                              "id": "U42537766113Kzq",
+                              "softCrop": "Square",
+                              "softcropenabled": "enabled",
+                              "tmx": "2880 1920 490 490",
+                              "xtransform": "translate(-434.87926 -231.04994) scale(0.481117 0.481077)"
+                            },
+                            "elements": []
+                          },
+                          {
+                            "nodeType": "image",
+                            "attributes": {
+                              "emxed-trx-picturedesk-image": "true",
+                              "src": "/resources/029d-1e9eae767d4a-050afbd61547-1000/:556x988:dHJhbnNsYXRlKC00OTMuNDU0NzggLTQ2LjIxNTk0KSBzY2FsZSgwLjU0NTkyMiAwLjU0NTkyMik=/free_stock_photo_of_bremenpexelsmeetup_confident_editorial_originalwidthxoriginalheigth.jpeg?s=Cs8sOp_178PYDWWxGHdSJsL5CTEa30B9hcBa3VDye8o",
+                              "id": "U00284125650NKG",
+                              "softCrop": "Portrait",
+                              "softcropenabled": "enabled",
+                              "tmx": "2880 1920 556 988",
+                              "xtransform": "translate(-493.45478 -46.21594) scale(0.545922 0.545922)"
+                            },
+                            "elements": []
+                          },
+                          {
+                            "nodeType": "image",
+                            "attributes": {
+                              "emxed-trx-picturedesk-image": "true",
+                              "src": "/resources/029d-1e9eae767d4a-050afbd61547-1000/:2048x800:c2NhbGUoMC43MTExMSAwLjcxMTExKQ==/free_stock_photo_of_bremenpexelsmeetup_confident_editorial_originalwidthxoriginalheigth.jpeg?s=zRD1919EBOVM5_at4opOJjCBKD_NS_UYOUBK9kZvOFM",
+                              "id": "U06356716074Uda",
+                              "softCrop": "Ultrawide",
+                              "softcropenabled": "enabled-preferred",
+                              "tmx": "2880 1920 2048 800",
+                              "xtransform": "scale(0.71111 0.71111)"
+                            },
+                            "elements": []
+                          },
+                          {
+                            "nodeType": "image-caption",
+                            "attributes": {},
+                            "elements": [
+                              {
+                                "nodeType": "caption",
+                                "attributes": {
+                                  "emxed-trx-captiongroup": "image-caption",
+                                  "emxed-trx-captionsequence": "0",
+                                  "emxed-trx-captiontitle": "Caption",
+                                  "emxed-trx-captiontype": "caption",
+                                  "emxed-trx-iscaption": "true"
+                                },
+                                "elements": [
+                                  {
+                                    "nodeType": "p",
+                                    "attributes": {},
+                                    "elements": [
+                                      {
+                                        "nodeType": "plainText",
+                                        "value": "Free stock photo of bremenpexelsmeetup, confident, editorial OriginalWidthxOriginalHeigth"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              },
+                              {
+                                "nodeType": "credit",
+                                "attributes": {
+                                  "emxed-trx-captiongroup": "image-caption",
+                                  "emxed-trx-captionsequence": "0",
+                                  "emxed-trx-captiontitle": "Credit",
+                                  "emxed-trx-captiontype": "credit",
+                                  "emxed-trx-iscaption": "true"
+                                },
+                                "elements": [
+                                  {
+                                    "nodeType": "p",
+                                    "attributes": {},
+                                    "elements": [
+                                      {
+                                        "nodeType": "plainText",
+                                        "value": "Pexels® Image"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "nodeType": "p",
+                        "attributes": {},
+                        "elements": [
+                          {
+                            "nodeType": "plainText",
+                            "value": "The rules would establish a phased compliance timeline, with large accelerated filers required to begin reporting climate-related disclosures for fiscal year 2024, followed by accelerated and non-accelerated filers in subsequent years. Companies would need to describe their governance structures for climate risk oversight, including board expertise and management’s role in assessing and managing climate-related risks, effectively making climate competency a boardroom imperative."
+                          }
+                        ]
+                      },
+                      {
+                        "nodeType": "p",
+                        "attributes": {},
+                        "elements": [
+                          {
+                            "nodeType": "plainText",
+                            "value": "Physical and transition risks would require quantitative disclosure when they exceed one percent of any financial statement line item, a threshold that corporate attorneys argue could capture virtually every major business decision. Companies must detail how climate risks affect their strategy, business model, and outlook, including scenario analysis if used, and disclose any internal carbon pricing mechanisms or climate-related targets and goals."
+                          }
+                        ]
+                      },
+                      {
+                        "nodeType": "p",
+                        "attributes": {},
+                        "elements": [
+                          {
+                            "nodeType": "plainText",
+                            "value": "The proposed regulations extend beyond environmental metrics to encompass financial statement impacts, requiring companies to separately identify climate-related costs, expenditures, charges, and losses in audited financial statements. This granular approach would create new challenges for corporate accounting departments, potentially requiring system overhauls to track climate-related financial impacts across operations, from supply chain disruptions to stranded assets."
+                          }
+                        ]
+                      },
+                      {
+                        "nodeType": "p",
+                        "attributes": {},
+                        "elements": [
+                          {
+                            "nodeType": "plainText",
+                            "value": "Industry response has been sharply divided, with investor groups representing $130 trillion in assets under management supporting standardized disclosure while business coalitions warn of excessive compliance burdens. The U.S. Chamber of Commerce projects that mid-sized companies could face first-year implementation costs exceeding $200,000, with ongoing annual compliance costs of $75,000 to $150,000, potentially disadvantaging American companies relative to international competitors not subject to similar requirements."
+                          }
+                        ]
+                      },
+                      {
+                        "nodeType": "p",
+                        "attributes": {},
+                        "elements": [
+                          {
+                            "nodeType": "plainText",
+                            "value": "Legal challenges appear inevitable, with several industry groups already signaling constitutional objections based on the major questions doctrine and arguments that climate disclosure exceeds the SEC’s statutory authority. The West Virginia Attorney General has assembled a coalition of 24 states preparing to challenge the rules, arguing they represent backdoor environmental regulation disguised as investor protection, setting up a likely Supreme Court showdown over the scope of securities regulation."
+                          }
+                        ]
+                      },
+                      {
+                        "nodeType": "p",
+                        "attributes": {},
+                        "elements": [
+                          {
+                            "nodeType": "plainText",
+                            "value": "The 60-day public comment period has already generated over 14,000 submissions, reflecting intense stakeholder engagement that could result in significant modifications to the final rules. Key areas of contention include the Scope 3 emissions requirement, the one percent materiality threshold for financial statement impacts, and the attestation requirements timeline, with the SEC likely to face pressure to provide additional implementation time and safe harbors for good-faith compliance efforts as companies navigate this unprecedented expansion of disclosure obligations."
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "nodeType": "teaser",
+                "attributes": {},
+                "elements": [
+                  {
+                    "nodeType": "web-image-group",
+                    "attributes": {
+                      "id": "U8nHgboVaAbmmQ"
+                    },
+                    "elements": [
+                      {
+                        "nodeType": "image",
+                        "attributes": {
+                          "align": "top",
+                          "id": "Uz30Nj4d6lxluz",
+                          "softCrop": "Wide",
+                          "units": "pixels"
+                        },
+                        "elements": []
+                      },
+                      {
+                        "nodeType": "image",
+                        "attributes": {
+                          "align": "top",
+                          "id": "U7dFa90P0286x0",
+                          "softCrop": "Square",
+                          "units": "pixels"
+                        },
+                        "elements": []
+                      },
+                      {
+                        "nodeType": "image",
+                        "attributes": {
+                          "align": "top",
+                          "id": "UFxonYSVEp9jmj",
+                          "softCrop": "Portrait",
+                          "units": "pixels"
+                        },
+                        "elements": []
+                      },
+                      {
+                        "nodeType": "image",
+                        "attributes": {
+                          "align": "top",
+                          "id": "UVMyeWyt7S7e1T",
+                          "softCrop": "Ultrawide",
+                          "units": "pixels"
+                        },
+                        "elements": []
+                      }
+                    ]
+                  },
+                  {
+                    "nodeType": "grouphead",
+                    "attributes": {},
+                    "elements": [
+                      {
+                        "nodeType": "headline",
+                        "attributes": {
+                          "id": "UHgmv10B3jp68r"
+                        },
+                        "elements": [
+                          {
+                            "nodeType": "p",
+                            "attributes": {},
+                            "elements": []
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "nodeType": "summary",
+                    "attributes": {
+                      "id": "U9h3e17eGLxyRz"
+                    },
+                    "elements": [
+                      {
+                        "nodeType": "p",
+                        "attributes": {},
+                        "elements": []
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "nodeType": "style",
+                "attributes": {
+                  "id": "U52445875685gam",
+                  "type": "text/css"
+                },
+                "elements": [
+                  {
+                    "nodeType": "plainText",
+                    "value": "{}\n#U52445875685gam {\ndisplay: none;\n}\n"
+                  }
+                ]
+              }
+            ],
+            "attributes": {},
+            "nodeType": "doc"
+          },
+          "jsonFileEmbeddedNoImage": true
+        }
+      },
+      "links": {
+        "hyperlink": {
+          "image": [
+            {
+              "targetId": "029d-1e9eae767d4a-050afbd61547-1000",
+              "metadata": {
+                "metadataType": "generic",
+                "softCrops": {
+                  "Wide": {
+                    "id": "U35640465614OMW",
+                    "tmx": "2880 1920 1200 675",
+                    "xtransform": "translate(-1065.01158 -828.35226) scale(1.17825 1.178168)"
+                  },
+                  "Square": {
+                    "id": "U42537766113Kzq",
+                    "tmx": "2880 1920 490 490",
+                    "xtransform": "translate(-434.87926 -231.04994) scale(0.481117 0.481077)"
+                  },
+                  "Ultrawide": {
+                    "id": "U06356716074Uda",
+                    "tmx": "2880 1920 2048 800",
+                    "xtransform": "scale(0.71111 0.71111)"
+                  },
+                  "Portrait": {
+                    "id": "U00284125650NKG",
+                    "tmx": "2880 1920 556 988",
+                    "xtransform": "translate(-493.45478 -46.21594) scale(0.545922 0.545922)"
+                  }
+                },
+                "groupId": "U32321184564thD"
+              },
+              "dynamicCropsResourceUrls": {
+                "Square_thumb": "/resources/029d-1e9eae767d4a-050afbd61547-1000/format/thumb:490x490:dHJhbnNsYXRlKC00MzQuODc5MjYgLTIzMS4wNDk5NCkgc2NhbGUoMC40ODExMTcgMC40ODEwNzcp/free_stock_photo_of_bremenpexelsmeetup_confident_editorial_originalwidthxoriginalheigth.webp?s=3jhdSHuaXDasF5VjcmQOkMnCZVCklNUSynqsOQZ5-W4",
+                "Wide_large": "/resources/029d-1e9eae767d4a-050afbd61547-1000/format/large:1200x675:dHJhbnNsYXRlKC0xMDY1LjAxMTU4IC04MjguMzUyMjYpIHNjYWxlKDEuMTc4MjUgMS4xNzgxNjgp/free_stock_photo_of_bremenpexelsmeetup_confident_editorial_originalwidthxoriginalheigth.webp?s=1azWp_wn5teCJ4KCE9HDBLGN21J-bKyH78pcrO2iUKM",
+                "Ultrawide_large": "/resources/029d-1e9eae767d4a-050afbd61547-1000/format/large:2048x800:c2NhbGUoMC43MTExMSAwLjcxMTExKQ==/free_stock_photo_of_bremenpexelsmeetup_confident_editorial_originalwidthxoriginalheigth.webp?s=FqZY8Tdf_CavwIQUjPylEdyCRtONpERzu4H9GwrnumY",
+                "Portrait_small": "/resources/029d-1e9eae767d4a-050afbd61547-1000/format/small:556x988:dHJhbnNsYXRlKC00OTMuNDU0NzggLTQ2LjIxNTk0KSBzY2FsZSgwLjU0NTkyMiAwLjU0NTkyMik=/free_stock_photo_of_bremenpexelsmeetup_confident_editorial_originalwidthxoriginalheigth.webp?s=SSOQyvpP5sow9pfiJXzjk5yE8wfCLV_ZyH1CU90uesE",
+                "Ultrawide_small": "/resources/029d-1e9eae767d4a-050afbd61547-1000/format/small:2048x800:c2NhbGUoMC43MTExMSAwLjcxMTExKQ==/free_stock_photo_of_bremenpexelsmeetup_confident_editorial_originalwidthxoriginalheigth.webp?s=JRX9GXW43bCyHbjTEygy4v9TjlSKHnPVntpKKsr0uQM",
+                "Square_large": "/resources/029d-1e9eae767d4a-050afbd61547-1000/format/large:490x490:dHJhbnNsYXRlKC00MzQuODc5MjYgLTIzMS4wNDk5NCkgc2NhbGUoMC40ODExMTcgMC40ODEwNzcp/free_stock_photo_of_bremenpexelsmeetup_confident_editorial_originalwidthxoriginalheigth.webp?s=v6c_Z1Xg2xYCUcuuuv7UmYf9tfl3E7FCCEvK2CsrnFY",
+                "Wide_thumb": "/resources/029d-1e9eae767d4a-050afbd61547-1000/format/thumb:1200x675:dHJhbnNsYXRlKC0xMDY1LjAxMTU4IC04MjguMzUyMjYpIHNjYWxlKDEuMTc4MjUgMS4xNzgxNjgp/free_stock_photo_of_bremenpexelsmeetup_confident_editorial_originalwidthxoriginalheigth.webp?s=Zy4vSmZyDrmShkhSIomyYRKi5UYFbFDe0SgkfP9gJQ0",
+                "Ultrawide_thumb": "/resources/029d-1e9eae767d4a-050afbd61547-1000/format/thumb:2048x800:c2NhbGUoMC43MTExMSAwLjcxMTExKQ==/free_stock_photo_of_bremenpexelsmeetup_confident_editorial_originalwidthxoriginalheigth.webp?s=40jbryBkfRwaViUz9xTssremi3iOAWN_rYhej6iQAk4",
+                "Square_small": "/resources/029d-1e9eae767d4a-050afbd61547-1000/format/small:490x490:dHJhbnNsYXRlKC00MzQuODc5MjYgLTIzMS4wNDk5NCkgc2NhbGUoMC40ODExMTcgMC40ODEwNzcp/free_stock_photo_of_bremenpexelsmeetup_confident_editorial_originalwidthxoriginalheigth.webp?s=pgt_wqwXSpHiwskeegIfrO9eWFAVBUjNwIuvbvZzLyY",
+                "Wide_small": "/resources/029d-1e9eae767d4a-050afbd61547-1000/format/small:1200x675:dHJhbnNsYXRlKC0xMDY1LjAxMTU4IC04MjguMzUyMjYpIHNjYWxlKDEuMTc4MjUgMS4xNzgxNjgp/free_stock_photo_of_bremenpexelsmeetup_confident_editorial_originalwidthxoriginalheigth.webp?s=dX7beU5EJJRhh_OIqz-JhHXOqNpzzPTl5W8--Q6Sqlo",
+                "Portrait_thumb": "/resources/029d-1e9eae767d4a-050afbd61547-1000/format/thumb:556x988:dHJhbnNsYXRlKC00OTMuNDU0NzggLTQ2LjIxNTk0KSBzY2FsZSgwLjU0NTkyMiAwLjU0NTkyMik=/free_stock_photo_of_bremenpexelsmeetup_confident_editorial_originalwidthxoriginalheigth.webp?s=xZI5V6MUYsAz1KAd3c9lrjWdoXMGmBcdpviWTQwvxV0",
+                "Portrait_large": "/resources/029d-1e9eae767d4a-050afbd61547-1000/format/large:556x988:dHJhbnNsYXRlKC00OTMuNDU0NzggLTQ2LjIxNTk0KSBzY2FsZSgwLjU0NTkyMiAwLjU0NTkyMik=/free_stock_photo_of_bremenpexelsmeetup_confident_editorial_originalwidthxoriginalheigth.webp?s=F0LOMLolqJyX4v_KVyvHX326senHz7in2_PT5sa2g7o"
+              }
+            },
+            {
+              "targetId": "029d-1ea4bf8036a5-95fa445598ff-1000",
+              "metadata": {
+                "metadataType": "generic",
+                "softCrops": {
+                  "Square": {
+                    "id": "UVJXMSeEyzuKDR",
+                    "tmx": "3827 5947 490 490",
+                    "xtransform": "scale(0.128038 0.128038)"
+                  },
+                  "Portrait": {
+                    "id": "U41JFWgiPQVGkC",
+                    "tmx": "3827 5947 556 988",
+                    "xtransform": "scale(0.166134 0.166134)"
+                  },
+                  "Ultrawide": {
+                    "id": "UODm0tgzZzSLfZ",
+                    "tmx": "3827 5947 2048 800",
+                    "xtransform": "scale(0.535145 0.535145)"
+                  },
+                  "Wide": {
+                    "id": "UiRQGDQlmA1jpn",
+                    "tmx": "3827 5947 1200 675",
+                    "xtransform": "scale(0.313562 0.313562)"
+                  }
+                },
+                "groupId": "Uy8L2mnnKGIb2n"
+              },
+              "dynamicCropsResourceUrls": {
+                "Square_thumb": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/thumb:490x490:c2NhbGUoMC4xMjgwMzggMC4xMjgwMzgp/summer_corner_originalwidthxoriginalheigth.webp?s=aLwUwJ4tQroW1huJFo1pP7eYlHVBmo0Cqb7VoJMo_54",
+                "Ultrawide_large": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/large:2048x800:c2NhbGUoMC41MzUxNDUgMC41MzUxNDUp/summer_corner_originalwidthxoriginalheigth.webp?s=Pj0H1gYCZrgXElkpjb4YzPJv27FvobwJB1CVDeL_oQo",
+                "Wide_large": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/large:1200x675:c2NhbGUoMC4zMTM1NjIgMC4zMTM1NjIp/summer_corner_originalwidthxoriginalheigth.webp?s=XbhMUZLKqgs5A4I_a0GE7hxbsTKkzBkWp2FnEVAg8KE",
+                "Portrait_small": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/small:556x988:c2NhbGUoMC4xNjYxMzQgMC4xNjYxMzQp/summer_corner_originalwidthxoriginalheigth.webp?s=4fr7iZ_XFiD1UP3aI28Xlmue7eRt_qmZRyXAG3aoCew",
+                "Ultrawide_small": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/small:2048x800:c2NhbGUoMC41MzUxNDUgMC41MzUxNDUp/summer_corner_originalwidthxoriginalheigth.webp?s=0YdlfyvXAiI4gaARTONrgXPU-K78-1smH1mJmVe0SVM",
+                "Square_large": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/large:490x490:c2NhbGUoMC4xMjgwMzggMC4xMjgwMzgp/summer_corner_originalwidthxoriginalheigth.webp?s=9VYGmOlI6zsc6z2L8Ax9We-HbBpaBL3sHj5PSZZZcOY",
+                "Ultrawide_thumb": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/thumb:2048x800:c2NhbGUoMC41MzUxNDUgMC41MzUxNDUp/summer_corner_originalwidthxoriginalheigth.webp?s=hdOmYc7OjIjU8X87F_KZQAmuqj1YClb-HwnbjMgkgRc",
+                "Wide_thumb": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/thumb:1200x675:c2NhbGUoMC4zMTM1NjIgMC4zMTM1NjIp/summer_corner_originalwidthxoriginalheigth.webp?s=Srs_aWz9Pn-j1JqzscLs0Ft-wVnzJE8Faoe0VVQ6Z5c",
+                "Square_small": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/small:490x490:c2NhbGUoMC4xMjgwMzggMC4xMjgwMzgp/summer_corner_originalwidthxoriginalheigth.webp?s=I4AwqDJgrO1m2b9HKGYaQPtKsdgLVkO-yfLHx3WeSUA",
+                "Portrait_thumb": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/thumb:556x988:c2NhbGUoMC4xNjYxMzQgMC4xNjYxMzQp/summer_corner_originalwidthxoriginalheigth.webp?s=9c4f3JtyA3jEH4BdWi_3cpWVynpbxq9PUNgNG0bAHP0",
+                "Wide_small": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/small:1200x675:c2NhbGUoMC4zMTM1NjIgMC4zMTM1NjIp/summer_corner_originalwidthxoriginalheigth.webp?s=GaIMQNCMvsQE8D_SqFXrdZ86eue0GDfQBC82zmINWwc",
+                "Portrait_large": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/large:556x988:c2NhbGUoMC4xNjYxMzQgMC4xNjYxMzQp/summer_corner_originalwidthxoriginalheigth.webp?s=tIiDZT3K9Qz6lHjFm0792AeRRWWXh7k1za_SDOyH320"
+              }
+            }
+          ]
+        },
+        "system": {
+          "mainPicture": [
+            {
+              "targetId": "029d-1ea4bf8036a5-95fa445598ff-1000",
+              "metadata": {
+                "metadataType": "generic",
+                "softCrops": {
+                  "Square": {
+                    "id": "UVJXMSeEyzuKDR",
+                    "tmx": "3827 5947 490 490",
+                    "xtransform": "scale(0.128038 0.128038)"
+                  },
+                  "Portrait": {
+                    "id": "U41JFWgiPQVGkC",
+                    "tmx": "3827 5947 556 988",
+                    "xtransform": "scale(0.166134 0.166134)"
+                  },
+                  "Ultrawide": {
+                    "id": "UODm0tgzZzSLfZ",
+                    "tmx": "3827 5947 2048 800",
+                    "xtransform": "scale(0.535145 0.535145)"
+                  },
+                  "Wide": {
+                    "id": "UiRQGDQlmA1jpn",
+                    "tmx": "3827 5947 1200 675",
+                    "xtransform": "scale(0.313562 0.313562)"
+                  }
+                },
+                "groupId": "Uy8L2mnnKGIb2n"
+              },
+              "dynamicCropsResourceUrls": {
+                "Square_thumb": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/thumb:490x490:c2NhbGUoMC4xMjgwMzggMC4xMjgwMzgp/summer_corner_originalwidthxoriginalheigth.webp?s=aLwUwJ4tQroW1huJFo1pP7eYlHVBmo0Cqb7VoJMo_54",
+                "Ultrawide_large": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/large:2048x800:c2NhbGUoMC41MzUxNDUgMC41MzUxNDUp/summer_corner_originalwidthxoriginalheigth.webp?s=Pj0H1gYCZrgXElkpjb4YzPJv27FvobwJB1CVDeL_oQo",
+                "Wide_large": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/large:1200x675:c2NhbGUoMC4zMTM1NjIgMC4zMTM1NjIp/summer_corner_originalwidthxoriginalheigth.webp?s=XbhMUZLKqgs5A4I_a0GE7hxbsTKkzBkWp2FnEVAg8KE",
+                "Portrait_small": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/small:556x988:c2NhbGUoMC4xNjYxMzQgMC4xNjYxMzQp/summer_corner_originalwidthxoriginalheigth.webp?s=4fr7iZ_XFiD1UP3aI28Xlmue7eRt_qmZRyXAG3aoCew",
+                "Ultrawide_small": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/small:2048x800:c2NhbGUoMC41MzUxNDUgMC41MzUxNDUp/summer_corner_originalwidthxoriginalheigth.webp?s=0YdlfyvXAiI4gaARTONrgXPU-K78-1smH1mJmVe0SVM",
+                "Square_large": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/large:490x490:c2NhbGUoMC4xMjgwMzggMC4xMjgwMzgp/summer_corner_originalwidthxoriginalheigth.webp?s=9VYGmOlI6zsc6z2L8Ax9We-HbBpaBL3sHj5PSZZZcOY",
+                "Ultrawide_thumb": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/thumb:2048x800:c2NhbGUoMC41MzUxNDUgMC41MzUxNDUp/summer_corner_originalwidthxoriginalheigth.webp?s=hdOmYc7OjIjU8X87F_KZQAmuqj1YClb-HwnbjMgkgRc",
+                "Wide_thumb": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/thumb:1200x675:c2NhbGUoMC4zMTM1NjIgMC4zMTM1NjIp/summer_corner_originalwidthxoriginalheigth.webp?s=Srs_aWz9Pn-j1JqzscLs0Ft-wVnzJE8Faoe0VVQ6Z5c",
+                "Square_small": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/small:490x490:c2NhbGUoMC4xMjgwMzggMC4xMjgwMzgp/summer_corner_originalwidthxoriginalheigth.webp?s=I4AwqDJgrO1m2b9HKGYaQPtKsdgLVkO-yfLHx3WeSUA",
+                "Portrait_thumb": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/thumb:556x988:c2NhbGUoMC4xNjYxMzQgMC4xNjYxMzQp/summer_corner_originalwidthxoriginalheigth.webp?s=9c4f3JtyA3jEH4BdWi_3cpWVynpbxq9PUNgNG0bAHP0",
+                "Wide_small": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/small:1200x675:c2NhbGUoMC4zMTM1NjIgMC4zMTM1NjIp/summer_corner_originalwidthxoriginalheigth.webp?s=GaIMQNCMvsQE8D_SqFXrdZ86eue0GDfQBC82zmINWwc",
+                "Portrait_large": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/format/large:556x988:c2NhbGUoMC4xNjYxMzQgMC4xNjYxMzQp/summer_corner_originalwidthxoriginalheigth.webp?s=tIiDZT3K9Qz6lHjFm0792AeRRWWXh7k1za_SDOyH320"
+              }
+            }
+          ]
+        }
+      },
+      "url": "/news/029c-1e9888864149-e1a672d6992e-1000/index.html",
+      "resourceUrl": "/resources/029c-1e9888864149-e1a672d6992e-1000/sec_s_bold_climate_disclosure_proposal_a_game_changer_for_corporate_reporting.json",
+      "picture": "029d-1ea4bf8036a5-95fa445598ff-1000",
+      "etag": "029c-1e9888864149-e1a672d6992e-1000-336929384666",
+      "dataType": "node"
+    },
+    "dataType": "node",
+    "nodes": {
+      "029d-1ea4bf8036a5-95fa445598ff-1000": {
+        "id": "029d-1ea4bf8036a5-95fa445598ff-1000",
+        "pubInfo": {
+          "publicationTime": "2025-09-04T15:29:44.666Z",
+          "visible": true
+        },
+        "attributes": {
+          "tags": []
+        },
+        "files": {
+          "content": {
+            "mimeType": "image/jpeg",
+            "data": null,
+            "jsonFileEmbeddedNoImage": false
+          }
+        },
+        "resourceUrl": "/resources/029d-1ea4bf8036a5-95fa445598ff-1000/summer_corner_originalwidthxoriginalheigth.jpeg",
+        "dataType": "node"
+      },
+      "029d-1e9eae767d4a-050afbd61547-1000": {
+        "id": "029d-1e9eae767d4a-050afbd61547-1000",
+        "pubInfo": {
+          "publicationTime": "2025-09-01T15:07:57.414Z",
+          "visible": true
+        },
+        "attributes": {
+          "tags": []
+        },
+        "files": {
+          "content": {
+            "mimeType": "image/jpeg",
+            "data": null,
+            "jsonFileEmbeddedNoImage": false
+          }
+        },
+        "resourceUrl": "/resources/029d-1e9eae767d4a-050afbd61547-1000/free_stock_photo_of_bremenpexelsmeetup_confident_editorial_originalwidthxoriginalheigth.jpeg",
+        "dataType": "node"
+      }
+    },
+    "defaultContent": false,
+    "lastModified": 1756999784666,
+    "etag": "029d-1e9eae767d4a-050afbd61547-1000-336668877414/1756999784666/1909068879",
+    "contentLength": 0,
+    "children": [],
+    "errors": [],
+    "totalPages": 0,
+    "builder": "cfg:AF132279DE87B14239F491580E5EB920:2025-09-04T06:14:39.710Z",
+    "buildDate": "2025-09-04T15:30:33.392Z",
+    "modelSourceClass": "com.eidosmedia.portal.impl.content.aggregation.ConfigBasedModelBuilder",
+    "invalidationPriority": 4,
+    "builtByConfigModelBuilder": true,
+    "page": 1,
+    "aggregators": []
+  },
+  "writebackMetadataMaxSize": 4096
+}

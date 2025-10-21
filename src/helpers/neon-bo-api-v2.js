@@ -114,6 +114,13 @@ class NeonClient {
     /**
      * Node Operations
      */
+    async getNode(familyRef) {
+        return await this.makeRequest({
+            method: 'get',
+            url: `/contents/nodes/${familyRef}`
+        }, `Node ${familyRef} retrieved successfully`, true);
+    }
+
     async deleteNode(familyRef, force = false) {
         return await this.makeRequest({
             method: 'delete',
@@ -442,10 +449,11 @@ module.exports = {
     NeonClient,
     NeonSessionManager,
     sessionManager,
-    
+
     // Backwards compatibility - delegate to default client
     login: () => defaultClient.login(),
     logout: (all) => defaultClient.logout(all),
+    getNode: (familyRef) => defaultClient.getNode(familyRef),
     deleteNode: (familyRef, force) => defaultClient.deleteNode(familyRef, force),
     lockNode: (familyRef) => defaultClient.lockNode(familyRef),
     unlockNode: (familyRef, unlockMode) => defaultClient.unlockNode(familyRef, unlockMode),

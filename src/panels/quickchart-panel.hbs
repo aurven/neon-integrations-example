@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -32,19 +33,24 @@
             scrollbar-width: thin;
             scrollbar-color: #cbd5e0 transparent;
         }
+
         .scrollbar-thin::-webkit-scrollbar {
             width: 6px;
         }
+
         .scrollbar-thin::-webkit-scrollbar-track {
             background: transparent;
         }
+
         .scrollbar-thin::-webkit-scrollbar-thumb {
             background: #cbd5e0;
             border-radius: 3px;
         }
+
         .scrollbar-thin::-webkit-scrollbar-thumb:hover {
             background: #a0aec0;
         }
+
         .chart-card {
             transition: box-shadow 0.2s ease;
         }
@@ -80,8 +86,13 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
         @keyframes slideIn {
@@ -89,6 +100,7 @@
                 transform: translateY(-50px);
                 opacity: 0;
             }
+
             to {
                 transform: translateY(0);
                 opacity: 1;
@@ -118,6 +130,7 @@
         }
     </style>
 </head>
+
 <body class="bg-gray-50 min-h-screen font-sans" style="min-height: 95vh;">
     <div id="app" class="container mx-auto p-4 max-w-6xl">
         <!-- Header -->
@@ -127,9 +140,12 @@
                     <h1 class="text-2xl font-bold text-gray-800">QuickChart Gallery</h1>
                     <p class="text-gray-600 mt-1">Select a chart to preview or import into Neon</p>
                 </div>
-                <a href="https://quickchart.io" target="_blank" class="inline-flex items-center px-4 py-2 text-sm font-medium text-primary-600 hover:text-primary-800 hover:bg-primary-50 rounded-md transition-colors">
+                <a href="https://quickchart.io" target="_blank"
+                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-primary-600 hover:text-primary-800 hover:bg-primary-50 rounded-md transition-colors">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                        </path>
                     </svg>
                     QuickChart.io
                 </a>
@@ -151,14 +167,20 @@
                 <img id="modal-image" src="" alt="Chart Preview" class="max-w-full h-auto mb-4 rounded-lg shadow-lg">
                 <p id="modal-description" class="text-gray-600 mb-6"></p>
                 <div class="flex justify-center space-x-4">
-                    <button id="modal-download" class="inline-flex items-center px-6 py-3 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                    <button id="modal-download"
+                        class="inline-flex items-center px-4 py-2 bg-emerald-50 text-emerald-700 rounded-full hover:bg-emerald-100 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-1 transition-colors text-sm font-medium">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
+                            </path>
                         </svg>
                         <span class="button-text">Import to Neon</span>
-                        <svg class="w-5 h-5 loading-spinner hidden animate-spin ml-2" fill="none" viewBox="0 0 24 24">
-                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"></circle>
-                            <path fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" class="opacity-75"></path>
+                        <svg class="w-4 h-4 loading-spinner hidden animate-spin ml-2" fill="none" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25">
+                            </circle>
+                            <path fill="currentColor"
+                                d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                class="opacity-75"></path>
                         </svg>
                     </button>
                 </div>
@@ -174,6 +196,402 @@
             charts: [],
             neonContext: null
         };
+
+        // QuickChart configurations for Bessemer Trust article charts
+        // Base URL: https://quickchart.io/chart?c=
+
+        // Exhibit 1: Share of Global Trade Finance by Currency
+        const exhibit1 = {
+            type: 'bar',
+            data: {
+                labels: ['USD', 'EUR', 'GBP', 'JPY', 'CNY', 'Others'],
+                datasets: [{
+                    label: 'Share of Global Trade Finance (%)',
+                    data: [80, 6, 5, 3, 2, 4],
+                    backgroundColor: [
+                        'rgba(31, 78, 121, 0.8)',
+                        'rgba(70, 130, 180, 0.8)',
+                        'rgba(100, 149, 237, 0.8)',
+                        'rgba(135, 206, 250, 0.8)',
+                        'rgba(176, 196, 222, 0.8)',
+                        'rgba(211, 211, 211, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(31, 78, 121, 1)',
+                        'rgba(70, 130, 180, 1)',
+                        'rgba(100, 149, 237, 1)',
+                        'rgba(135, 206, 250, 1)',
+                        'rgba(176, 196, 222, 1)',
+                        'rgba(211, 211, 211, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: 'Exhibit 1: Share of Global Trade Finance by Currency',
+                    fontSize: 16,
+                    fontStyle: 'bold'
+                },
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            max: 100,
+                            callback: (value) => value + '%'
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Percentage of Global Trade Finance'
+                        }
+                    }]
+                },
+                legend: {
+                    display: false
+                }
+            }
+        };
+
+        // Exhibit 2: Currency Composition of Official Foreign Exchange Reserves (%)
+        // Time series from 1999 to 2025
+        const exhibit2 = {
+            type: 'line',
+            data: {
+                labels: ['1999', '2002', '2005', '2008', '2011', '2014', '2017', '2020', '2023', '2025'],
+                datasets: [
+                    {
+                        label: 'USD',
+                        data: [71, 68, 66, 64, 62, 63, 62, 59, 58, 58],
+                        borderColor: 'rgba(31, 78, 121, 1)',
+                        backgroundColor: 'rgba(31, 78, 121, 0.1)',
+                        fill: true,
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'EUR',
+                        data: [18, 24, 25, 26, 25, 22, 20, 21, 20, 20],
+                        borderColor: 'rgba(70, 130, 180, 1)',
+                        backgroundColor: 'rgba(70, 130, 180, 0.1)',
+                        fill: true,
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'JPY',
+                        data: [6, 4, 4, 3, 4, 4, 5, 6, 5, 5],
+                        borderColor: 'rgba(100, 149, 237, 1)',
+                        backgroundColor: 'rgba(100, 149, 237, 0.1)',
+                        fill: true,
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'GBP',
+                        data: [3, 3, 3, 4, 4, 4, 5, 5, 5, 5],
+                        borderColor: 'rgba(135, 206, 250, 1)',
+                        backgroundColor: 'rgba(135, 206, 250, 0.1)',
+                        fill: true,
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'CNY',
+                        data: [0, 0, 0, 0, 0, 1, 2, 2, 3, 3],
+                        borderColor: 'rgba(176, 196, 222, 1)',
+                        backgroundColor: 'rgba(176, 196, 222, 0.1)',
+                        fill: true,
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Others',
+                        data: [2, 1, 2, 3, 5, 6, 6, 7, 9, 9],
+                        borderColor: 'rgba(211, 211, 211, 1)',
+                        backgroundColor: 'rgba(211, 211, 211, 0.1)',
+                        fill: true,
+                        borderWidth: 2
+                    }
+                ]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: 'Exhibit 2: Currency Composition of Official Foreign Exchange Reserves (%)',
+                    fontSize: 16,
+                    fontStyle: 'bold'
+                },
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            max: 80,
+                            callback: (value) => value + '%'
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Share of Global Reserves (%)'
+                        }
+                    }],
+                    xAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Year'
+                        }
+                    }]
+                },
+                legend: {
+                    display: true,
+                    position: 'right'
+                }
+            }
+        };
+
+        // Exhibit 3: U.S. vs. Europe Real GDP Growth
+        const exhibit3 = {
+            type: 'line',
+            data: {
+                labels: ['2010', '2012', '2014', '2016', '2018', '2020', '2022', '2024'],
+                datasets: [
+                    {
+                        label: 'United States',
+                        data: [100, 106, 113, 119, 127, 120, 130, 136],
+                        borderColor: 'rgba(31, 78, 121, 1)',
+                        backgroundColor: 'rgba(31, 78, 121, 0.1)',
+                        fill: false,
+                        borderWidth: 3,
+                        pointRadius: 4
+                    },
+                    {
+                        label: 'Europe',
+                        data: [100, 99, 103, 106, 110, 101, 107, 110],
+                        borderColor: 'rgba(70, 130, 180, 1)',
+                        backgroundColor: 'rgba(70, 130, 180, 0.1)',
+                        fill: false,
+                        borderWidth: 3,
+                        pointRadius: 4
+                    }
+                ]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: 'Exhibit 3: U.S. vs. Europe Real GDP Growth (Index: 2010=100)',
+                    fontSize: 16,
+                    fontStyle: 'bold'
+                },
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: false,
+                            min: 95,
+                            max: 140
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Real GDP (Index)'
+                        }
+                    }],
+                    xAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Year'
+                        }
+                    }]
+                },
+                legend: {
+                    display: true,
+                    position: 'top'
+                }
+            }
+        };
+
+        // Exhibit 4: Weight in MSCI All Country World Index
+        const exhibit4 = {
+            type: 'horizontalBar',
+            data: {
+                labels: [
+                    'Magnificent 7',
+                    'Japan',
+                    'Canada',
+                    'China',
+                    'U.K.',
+                    'France'
+                ],
+                datasets: [{
+                    label: 'Weight in MSCI ACWI (%)',
+                    data: [32, 5.5, 3.5, 2.8, 3.2, 2.5],
+                    backgroundColor: [
+                        'rgba(31, 78, 121, 0.8)',
+                        'rgba(70, 130, 180, 0.8)',
+                        'rgba(100, 149, 237, 0.8)',
+                        'rgba(135, 206, 250, 0.8)',
+                        'rgba(176, 196, 222, 0.8)',
+                        'rgba(211, 211, 211, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(31, 78, 121, 1)',
+                        'rgba(70, 130, 180, 1)',
+                        'rgba(100, 149, 237, 1)',
+                        'rgba(135, 206, 250, 1)',
+                        'rgba(176, 196, 222, 1)',
+                        'rgba(211, 211, 211, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: 'Exhibit 4: Weight in MSCI All Country World Index',
+                    fontSize: 16,
+                    fontStyle: 'bold'
+                },
+                scales: {
+                    xAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            max: 35,
+                            callback: (value) => value + '%'
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Weight (%)'
+                        }
+                    }]
+                },
+                legend: {
+                    display: false
+                }
+            }
+        };
+
+        // Exhibit 5: Comparison of Sector-Level Return on Equity
+        const exhibit5 = {
+            type: 'horizontalBar',
+            data: {
+                labels: [
+                    'Technology',
+                    'Healthcare',
+                    'Financials',
+                    'Consumer Discretionary',
+                    'Communication Services',
+                    'Industrials',
+                    'Consumer Staples',
+                    'Energy',
+                    'Materials',
+                    'Utilities',
+                    'Real Estate'
+                ],
+                datasets: [
+                    {
+                        label: 'S&P 500',
+                        data: [35, 24, 15, 22, 28, 18, 20, 16, 14, 9, 8],
+                        backgroundColor: 'rgba(31, 78, 121, 0.8)',
+                        borderColor: 'rgba(31, 78, 121, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'International Developed Markets',
+                        data: [20, 16, 10, 14, 18, 12, 14, 10, 9, 6, 5],
+                        backgroundColor: 'rgba(70, 130, 180, 0.8)',
+                        borderColor: 'rgba(70, 130, 180, 1)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: 'Exhibit 5: Sector-Level Return on Equity (%)',
+                    fontSize: 16,
+                    fontStyle: 'bold'
+                },
+                scales: {
+                    xAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            max: 40,
+                            callback: (value) => value + '%'
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Return on Equity (%)'
+                        }
+                    }]
+                },
+                legend: {
+                    display: true,
+                    position: 'top'
+                }
+            }
+        };
+
+        // Exhibit 6: Total Private Equity Deal Volume
+        const exhibit6 = {
+            type: 'bar',
+            data: {
+                labels: ['2020 Q1', '2020 Q3', '2021 Q1', '2021 Q3', '2022 Q1', '2022 Q3', '2023 Q1', '2023 Q3', '2024 Q1', '2024 Q3', '2025 Q1'],
+                datasets: [
+                    {
+                        label: 'United States',
+                        data: [180, 210, 260, 290, 280, 240, 200, 190, 180, 195, 210],
+                        backgroundColor: 'rgba(31, 78, 121, 0.8)',
+                        borderColor: 'rgba(31, 78, 121, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Europe & Asia Combined',
+                        data: [120, 140, 180, 200, 190, 160, 130, 120, 110, 115, 125],
+                        backgroundColor: 'rgba(70, 130, 180, 0.8)',
+                        borderColor: 'rgba(70, 130, 180, 1)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: 'Exhibit 6: Total Private Equity Deal Volume ($ Billions)',
+                    fontSize: 16,
+                    fontStyle: 'bold'
+                },
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            max: 320,
+                            callback: (value) => '$' + value + 'B'
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Deal Volume ($ Billions)'
+                        }
+                    }],
+                    xAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Quarter'
+                        }
+                    }]
+                },
+                legend: {
+                    display: true,
+                    position: 'top'
+                }
+            }
+        };
+
+        // Helper function to generate QuickChart URLs
+        function generateQuickChartURL(config) {
+            const encodedConfig = encodeURIComponent(JSON.stringify(config));
+            return `https://quickchart.io/chart?c=${encodedConfig}`;
+        }
+
+        const bessemerCharts = [
+            { id: 'exhibit-1', name: 'Exhibit 1', type: exhibit1.type, description: 'Share of Global Trade Finance by Currency', url: generateQuickChartURL(exhibit1) },
+            { id: 'exhibit-2', name: 'Exhibit 2', type: exhibit2.type, description: 'Currency Composition of Official Foreign Exchange Reserves (%)', url: generateQuickChartURL(exhibit2) },
+            { id: 'exhibit-3', name: 'Exhibit 3', type: exhibit3.type, description: 'U.S. vs. Europe Real GDP Growth', url: generateQuickChartURL(exhibit3) },
+            { id: 'exhibit-4', name: 'Exhibit 4', type: exhibit4.type, description: 'Weight in MSCI All Country World Index', url: generateQuickChartURL(exhibit4) },
+            { id: 'exhibit-5', name: 'Exhibit 5', type: exhibit5.type, description: 'Comparison of Sector-Level Return on Equity', url: generateQuickChartURL(exhibit5) },
+            { id: 'exhibit-6', name: 'Exhibit 6', type: exhibit6.type, description: 'Total Private Equity Deal Volume', url: generateQuickChartURL(exhibit6) }
+        ];
 
         // QuickChart examples configuration
         const chartExamples = [
@@ -297,7 +715,7 @@
             const grid = document.getElementById('charts-grid');
             grid.innerHTML = '';
 
-            chartExamples.forEach(chart => {
+            bessemerCharts.forEach(chart => {
                 const card = document.createElement('div');
                 card.className = 'chart-card bg-white rounded-lg shadow-md overflow-hidden';
 
@@ -316,24 +734,24 @@
                         <div class="flex items-center justify-end space-x-2">
                             <button
                                 onclick="importChart('${chart.id}')"
-                                class="import-btn inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors"
+                                class="import-btn inline-flex items-center px-2.5 py-1 text-xs font-medium text-emerald-700 bg-emerald-50 rounded-full hover:bg-emerald-100 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-1 transition-colors"
                                 title="Import to Neon"
                             >
-                                <svg class="w-4 h-4 mr-1 upload-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-3.5 h-3.5 mr-1 upload-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
                                 </svg>
                                 <span class="button-text">Import</span>
-                                <svg class="w-4 h-4 ml-1 loading-icon hidden animate-spin" fill="none" viewBox="0 0 24 24">
+                                <svg class="w-3.5 h-3.5 ml-1 loading-icon hidden animate-spin" fill="none" viewBox="0 0 24 24">
                                     <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"></circle>
                                     <path fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" class="opacity-75"></path>
                                 </svg>
                             </button>
                             <button
                                 onclick="openModalById('${chart.id}')"
-                                class="inline-flex items-center px-3 py-2 text-sm font-medium text-primary-600 bg-primary-50 rounded-md hover:bg-primary-100 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors"
+                                class="inline-flex items-center px-2.5 py-1 text-xs font-medium text-slate-600 bg-slate-50 rounded-full hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-1 transition-colors"
                                 title="Preview"
                             >
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                                 </svg>
@@ -373,7 +791,7 @@
 
         // Open modal by chart ID
         function openModalById(chartId) {
-            const chart = chartExamples.find(c => c.id === chartId);
+            const chart = bessemerCharts.find(c => c.id === chartId);
             if (chart) {
                 openModal(chart);
             }
@@ -381,7 +799,7 @@
 
         // Import chart directly from card button
         async function importChart(chartId) {
-            const chart = chartExamples.find(c => c.id === chartId);
+            const chart = bessemerCharts.find(c => c.id === chartId);
             if (!chart) return;
 
             // Find the button that was clicked by finding the card with this chart ID
@@ -439,8 +857,8 @@
                     loadingIcon.classList.add('hidden');
                     uploadIcon.classList.remove('hidden');
                     uploadIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>';
-                    targetButton.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-green-600', 'hover:bg-green-700');
-                    targetButton.classList.add('bg-green-700');
+                    targetButton.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-emerald-50', 'hover:bg-emerald-100', 'text-emerald-700');
+                    targetButton.classList.add('bg-emerald-100', 'text-emerald-800');
 
                     // Send success message to parent window
                     if (window.parent !== window) {
@@ -461,8 +879,8 @@
                         buttonText.textContent = 'Import';
                         uploadIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>';
                         targetButton.disabled = false;
-                        targetButton.classList.remove('bg-green-700');
-                        targetButton.classList.add('bg-green-600', 'hover:bg-green-700');
+                        targetButton.classList.remove('bg-emerald-100', 'text-emerald-800');
+                        targetButton.classList.add('bg-emerald-50', 'hover:bg-emerald-100', 'text-emerald-700');
                     }, 3000);
 
                 } else {
@@ -478,8 +896,8 @@
                 uploadIcon.classList.remove('hidden');
                 uploadIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>';
                 targetButton.disabled = false;
-                targetButton.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-green-600', 'hover:bg-green-700');
-                targetButton.classList.add('bg-red-600', 'hover:bg-red-700');
+                targetButton.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-emerald-50', 'hover:bg-emerald-100', 'text-emerald-700');
+                targetButton.classList.add('bg-red-50', 'hover:bg-red-100', 'text-red-700');
 
                 // Send error message to parent window
                 if (window.parent !== window) {
@@ -496,14 +914,14 @@
                 setTimeout(() => {
                     buttonText.textContent = 'Import';
                     uploadIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>';
-                    targetButton.classList.remove('bg-red-600', 'hover:bg-red-700');
-                    targetButton.classList.add('bg-green-600', 'hover:bg-green-700');
+                    targetButton.classList.remove('bg-red-50', 'hover:bg-red-100', 'text-red-700');
+                    targetButton.classList.add('bg-emerald-50', 'hover:bg-emerald-100', 'text-emerald-700');
                 }, 5000);
             }
         }
 
         // Close modal when clicking outside
-        window.onclick = function(event) {
+        window.onclick = function (event) {
             const modal = document.getElementById('preview-modal');
             if (event.target === modal) {
                 closeModal();
@@ -551,8 +969,8 @@
                     buttonText.textContent = 'Uploaded!';
                     loadingSpinner.classList.add('hidden');
                     downloadBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-                    downloadBtn.classList.remove('bg-primary-600', 'hover:bg-primary-700');
-                    downloadBtn.classList.add('bg-green-600');
+                    downloadBtn.classList.remove('bg-emerald-50', 'hover:bg-emerald-100', 'text-emerald-700');
+                    downloadBtn.classList.add('bg-emerald-100', 'text-emerald-800');
 
                     // Send success message to parent window
                     if (window.parent !== window) {
@@ -574,8 +992,8 @@
                         // Reset button state
                         buttonText.textContent = 'Import to Neon';
                         downloadBtn.disabled = false;
-                        downloadBtn.classList.remove('bg-green-600');
-                        downloadBtn.classList.add('bg-primary-600', 'hover:bg-primary-700');
+                        downloadBtn.classList.remove('bg-emerald-100', 'text-emerald-800');
+                        downloadBtn.classList.add('bg-emerald-50', 'hover:bg-emerald-100', 'text-emerald-700');
                     }, 1500);
 
                 } else {
@@ -590,8 +1008,8 @@
                 loadingSpinner.classList.add('hidden');
                 downloadBtn.disabled = false;
                 downloadBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-                downloadBtn.classList.remove('bg-primary-600', 'hover:bg-primary-700');
-                downloadBtn.classList.add('bg-red-600', 'hover:bg-red-700');
+                downloadBtn.classList.remove('bg-emerald-50', 'hover:bg-emerald-100', 'text-emerald-700');
+                downloadBtn.classList.add('bg-red-50', 'hover:bg-red-100', 'text-red-700');
 
                 // Send error message to parent window
                 if (window.parent !== window) {
@@ -607,8 +1025,8 @@
                 // Reset after 3 seconds
                 setTimeout(() => {
                     buttonText.textContent = 'Import to Neon';
-                    downloadBtn.classList.remove('bg-red-600', 'hover:bg-red-700');
-                    downloadBtn.classList.add('bg-primary-600', 'hover:bg-primary-700');
+                    downloadBtn.classList.remove('bg-red-50', 'hover:bg-red-100', 'text-red-700');
+                    downloadBtn.classList.add('bg-emerald-50', 'hover:bg-emerald-100', 'text-emerald-700');
                 }, 3000);
             }
         }
@@ -624,4 +1042,5 @@
         });
     </script>
 </body>
+
 </html>

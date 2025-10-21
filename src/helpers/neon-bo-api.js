@@ -76,6 +76,31 @@ async function logout(all = false) {
         });
 }
 
+async function getNode(familyRef) {
+    const config = {
+        method: 'get',
+        maxBodyLength: Infinity,
+        url: `${NEON_BASEURL}/contents/nodes/${familyRef}`,
+        headers: {
+            'Content-Type': 'application/json',
+            'neon-bo-access-key': NEON_BO_APIKEY
+        }
+    };
+
+    return await client.request(config)
+        .then((response) => {
+            console.log(`Node ${familyRef} retrieved successfully`);
+            return response.data;
+        })
+        .catch((error) => {
+            console.error(`❌ ERROR during getNode: ${error.code}`);
+            if (error.response?.data) {
+                console.error(JSON.stringify(error.response.data));
+            }
+            throw error;
+        });
+}
+
 async function deleteNode(familyRef, force = false) {
     const config = {
         method: 'delete',
@@ -695,6 +720,7 @@ async function discoveryServices() {
 module.exports = {
     login,
     logout,
+    getNode,
     deleteNode,
     lockNode,
     unlockNode,

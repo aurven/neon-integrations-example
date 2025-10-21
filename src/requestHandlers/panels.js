@@ -1,10 +1,13 @@
 const seo = require("../seo.json");
 const axios = require("axios");
 const neon = require("../helpers/neon-bo-api.js");
+const neonV2 = require("../helpers/neon-bo-api-v2.js");
 const imagesImporter = require("../images-importer.js");
 const { MethodeClient } = require("../helpers/methode-bo-api.js");
 const { createStoryPreviewWithSetup } = require("../helpers/edapi-utils.js");
 const { authenticate } = require("../helpers/auth.js");
+const { parseNeonArticleContent } = require("../helpers/neon-content-parser.js");
+const { generateArticlePDF } = require("../helpers/pdf-generator.js");
 
 function trelloPanelHandler(request, reply) {
   const auth = authenticate(request, reply);
@@ -360,6 +363,132 @@ async function methodeApiProxyHandler(request, reply) {
   }
 }
 
+function articlePdfPanelHandler(request, reply) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) {
+    return reply.status(401).send({ error: "Unauthorized" });
+  }
+
+  const objectId = request.query.objectId;
+
+  // params is an object we'll pass to our handlebars template
+  let params = {
+    seo: seo,
+    apiKey: auth.apikey,
+    neonAppUrl: process.env.NEON_APP_URL,
+    objectId: objectId || null
+  };
+
+  // The Handlebars code will be able to access the parameter values and build them into the page
+  return reply.view("/src/panels/article-pdf-panel.hbs", params);
+}
+
+async function generateArticlePdfHandler(request, reply) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) {
+    return reply.status(401).send({ error: "Unauthorized" });
+  }
+
+  const objectId = request.query.objectId;
+  const demoMode = request.query.demo === 'true';
+
+  if (!objectId && !demoMode) {
+    return reply.status(400).send({ error: "objectId query parameter is required (or use demo=true)" });
+  }
+
+  try {
+    let articleObject;
+
+    if (demoMode) {
+      // Demo mode: load from local example file
+      console.log('Demo mode enabled - loading from local example file');
+      const fs = require('fs');
+      const path = require('path');
+      const exampleFilePath = path.join(__dirname, '../../examples/out-methode.json');
+
+      try {
+        const fileContent = fs.readFileSync(exampleFilePath, 'utf8');
+        articleObject = JSON.parse(fileContent);
+        console.log('Demo article loaded from:', exampleFilePath);
+      } catch (fileError) {
+        console.error('Error loading demo file:', fileError.message);
+        return reply.status(500).send({
+          error: 'Failed to load demo file',
+          details: fileError.message
+        });
+      }
+    } else {
+      // Normal mode: fetch from Neon API using v2
+      console.log(`Generating PDF for object: ${objectId}`);
+
+      // Login to Neon (v2)
+      await neonV2.login();
+
+      // Fetch article data from Neon
+      console.log(`Fetching article data for: ${objectId}`);
+      articleObject = await neonV2.getNode(objectId);
+
+      if (!articleObject) {
+        await neonV2.logout();
+        return reply.status(404).send({ error: "Article not found" });
+      }
+
+      // Logout from Neon
+      await neonV2.logout();
+    }
+
+    // Parse article content
+    console.log('Parsing article content...');
+    const parsedArticle = parseNeonArticleContent(articleObject);
+
+    console.log('Parsed article:', {
+      title: parsedArticle.title,
+      author: parsedArticle.author,
+      siteName: parsedArticle.siteName,
+      hasCoverImage: !!parsedArticle.coverImage,
+      paragraphCount: parsedArticle.bodyParagraphs.length
+    });
+
+    // Generate PDF
+    console.log('Generating PDF document...');
+    const pdfDoc = await generateArticlePDF(parsedArticle);
+
+    // Set response headers
+    reply.type('application/pdf');
+    const filename = demoMode ? 'demo-article-report.pdf' : `article-${objectId}-report.pdf`;
+    reply.header('Content-Disposition', `inline; filename="${filename}"`);
+    reply.header('Cache-Control', 'no-cache');
+
+    // Stream PDF to response
+    console.log('Streaming PDF to client...');
+
+    // Pipe the PDF document to the response
+    pdfDoc.pipe(reply.raw);
+
+    // Finalize the PDF document (this triggers the 'end' event on the stream)
+    pdfDoc.end();
+
+    return reply;
+
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+
+    // Ensure logout even on error (only if not in demo mode)
+    if (!demoMode) {
+      try {
+        await neonV2.logout();
+      } catch (logoutError) {
+        console.error('Error during cleanup logout:', logoutError.message);
+      }
+    }
+
+    return reply.status(500).send({
+      error: 'PDF generation failed',
+      details: error.message
+    });
+  }
+}
+
 module.exports = {
   trelloPanelHandler,
   trelloApiProxyHandler,
@@ -368,5 +497,7 @@ module.exports = {
   uploadAssetHandler,
   methodePanelHandler,
   methodeApiProxyHandler,
-  quickchartPanelHandler
+  quickchartPanelHandler,
+  articlePdfPanelHandler,
+  generateArticlePdfHandler
 };

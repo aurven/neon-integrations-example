@@ -1,0 +1,184 @@
+{
+    "queryStatement": {
+        "aggregations": [
+            {
+                "type": "terms",
+                "name": "edition",
+                "fieldPath": "metadataGroups.eom.sys_attributes.props.productInfo.edition",
+                "size": 100
+            },
+            {
+                "type": "terms",
+                "name": "workfolder",
+                "fieldPath": "workspaceLinkInfo.workspaceFolderPath",
+                "size": 100
+            },
+            {
+                "type": "terms",
+                "name": "workflow",
+                "fieldPath": "versionInfo.workflowInfo.workflow",
+                "size": 100
+            },
+            {
+                "type": "terms",
+                "name": "priority",
+                "fieldPath": "versionInfo.workflowInfo.assigmentInfo.priority",
+                "size": 100
+            },
+            {
+                "type": "terms",
+                "name": "assignedTo",
+                "fieldPath": "versionInfo.updateVersionUserRef.alias",
+                "size": 100
+            },
+            {
+                "type": "terms",
+                "name": "createdBy",
+                "fieldPath": "versionInfo.createFamilyUserRef.alias",
+                "size": 100
+            },
+            {
+                "type": "countCondition",
+                "name": "lockedByMe",
+                "fieldPath": "lockInfos.USER.userUpdateRef.userId",
+                "condition": {
+                    "type": "bool",
+                    "and": [
+                        {
+                            "type": "match",
+                            "match": "62038d84-f161-3579-a5f1-7aba053f999a",
+                            "path": "lockInfos.USER.userUpdateRef.userId"
+                        }
+                    ]
+                }
+            },
+            {
+                "type": "countCondition",
+                "name": "lockedByOthers",
+                "fieldPath": "lockInfos.USER.userUpdateRef.userId",
+                "condition": {
+                    "type": "bool",
+                    "andnot": [
+                        {
+                            "type": "match",
+                            "match": "62038d84-f161-3579-a5f1-7aba053f999a",
+                            "path": "lockInfos.USER.userUpdateRef.userId"
+                        }
+                    ],
+                    "and": [
+                        {
+                            "type": "exists",
+                            "path": "lockInfos.USER.userUpdateRef.userId"
+                        }
+                    ]
+                }
+            },
+            {
+                "type": "countCondition",
+                "name": "unlocked",
+                "fieldPath": "lockInfos.USER.userUpdateRef.userId",
+                "condition": {
+                    "type": "bool",
+                    "andnot": [
+                        {
+                            "type": "exists",
+                            "path": "lockInfos.USER.userUpdateRef.userId"
+                        }
+                    ]
+                }
+            }
+        ],
+        "bool": {
+            "and": [
+                {
+                    "type": "match",
+                    "path": "typeName",
+                    "match": "${type}*"
+                },
+                {
+                    "type": "match",
+                    "path": "externalSource",
+                    "match": "${externalSource}*"
+                },
+                {
+                    "type": "stringBetween",
+                    "path": "updateTs",
+                    "low": "${dateLow}",
+                    "high": "${dateHigh}"
+                },
+                {
+                    "type": "match",
+                    "path": "metadataGroups.eom.sys_attributes.props.productInfo.edition",
+                    "match": "${edition}"
+                },
+                {
+                    "type": "match",
+                    "path": "workspaceLinkInfo.workspaceFolderPath",
+                    "match": "${workfolder}"
+                },
+                {
+                    "type": "match",
+                    "path": "versionInfo.workflowInfo.workflow",
+                    "match": "${workflow}"
+                },
+                {
+                    "type": "match",
+                    "path": "versionInfo.workflowInfo.assigmentInfo.priority",
+                    "match": "${priority}"
+                },
+                {
+                    "type": "match",
+                    "path": "versionInfo.updateVersionUserRef.alias",
+                    "match": "${assignedTo}"
+                },
+                {
+                    "type": "match",
+                    "path": "versionInfo.createFamilyUserRef.alias",
+                    "match": "${createdBy}"
+                },
+                {
+                    "type": "match",
+                    "path": "lockInfos",
+                    "match": "${Lock}"
+                },
+                {
+                    "type": "contain",
+                    "path": "allText",
+                    "term": "*${searchTerm}*"
+                }
+            ],
+            "or": []
+        },
+        "sort": {
+            "type": "fields",
+            "sorts": [
+                {
+                    "path": "versionInfo.createFamilyTime",
+                    "order": "DESC"
+                }
+            ]
+        }
+    },
+    "variables": {
+        "domain": [
+            "editorial"
+        ],
+        "searchTerm": [
+            ""
+        ],
+        "type": [
+            "article"
+        ],
+        "externalSource": [
+            "Trello"
+        ]
+    },
+    "options": {
+        "showPath": true,
+        "showXml": true,
+        "showSystemAttributes": true,
+        "showAttributes": true,
+        "showLinkedContents": true,
+        "showLoadPublishInfo": true
+    }
+}

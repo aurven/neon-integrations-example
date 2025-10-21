@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Article PDF Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .scrollbar-thin {
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e0 transparent;
+        }
+
+        .scrollbar-thin::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .scrollbar-thin::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 3px;
+        }
+
+        .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+            background: #a0aec0;
+        }
+
+        /* PDF iframe styling */
+        #pdf-iframe {
+            width: 100%;
+            height: calc(100vh - 2rem);
+            border: none;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 min-h-screen font-sans" style="min-height: 95vh;">
+    <div id="app" class="container mx-auto p-4 max-w-6xl">
+        <!-- Loading State -->
+        <div id="loading" class="flex flex-col items-center justify-center min-h-screen">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+            <p class="mt-4 text-gray-600 text-lg">Generating PDF report...</p>
+            <p class="mt-2 text-gray-500 text-sm">This may take a few moments</p>
+        </div>
+
+        <!-- No Object State -->
+        <div id="no-object" class="hidden flex flex-col items-center justify-center min-h-screen text-center">
+            <div class="bg-white rounded-lg shadow-md p-8 max-w-md w-full">
+                <div class="text-gray-400 mb-4">
+                    <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                        </path>
+                    </svg>
+                </div>
+                <h2 class="text-xl font-semibold text-gray-800 mb-2">No Article Selected</h2>
+                <p class="text-gray-600 mb-4">Please open an article to generate a PDF report.</p>
+                <p class="text-sm text-gray-500 mb-6">Or try the demo mode to see a sample PDF</p>
+                <button onclick="enableDemoMode()"
+                    class="inline-flex items-center px-4 py-2 bg-amber-50 text-amber-700 rounded-md hover:bg-amber-100 transition-colors text-sm font-medium">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                    Try Demo Mode
+                </button>
+            </div>
+        </div>
+
+        <!-- Error State -->
+        <div id="error-state" class="hidden flex flex-col items-center justify-center min-h-screen text-center">
+            <div class="bg-white rounded-lg shadow-md p-8 max-w-md w-full">
+                <div class="text-red-400 mb-4">
+                    <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <h2 class="text-xl font-semibold text-gray-800 mb-2">Error Generating PDF</h2>
+                <p id="error-message" class="text-gray-600 mb-6">An error occurred while generating the PDF report.</p>
+                <button onclick="retryGeneration()"
+                    class="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                        </path>
+                    </svg>
+                    Retry
+                </button>
+            </div>
+        </div>
+
+        <!-- PDF Display -->
+        <div id="pdf-display" class="hidden">
+            <div class="bg-white rounded-lg shadow-md p-4 mb-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="flex-shrink-0">
+                            <svg class="w-8 h-8 text-primary-600" fill="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" />
+                                <polyline points="14,2 14,8 20,8" />
+                                <line x1="16" y1="13" x2="8" y2="13" />
+                                <line x1="16" y1="17" x2="8" y2="17" />
+                                <polyline points="10,9 9,9 8,9" />
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="flex items-center space-x-2">
+                                <p class="text-sm text-gray-500">Article PDF Report</p>
+                                <span id="demo-badge" class="hidden inline-flex items-center px-2 py-0.5 text-xs font-medium text-amber-700 bg-amber-50 rounded-full">
+                                    Demo Mode
+                                </span>
+                            </div>
+                            <p id="pdf-title" class="font-semibold text-gray-800"></p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button id="demo-toggle-btn" onclick="toggleDemoMode()"
+                            class="inline-flex items-center px-2.5 py-1 text-xs font-medium text-slate-600 bg-slate-50 rounded-full hover:bg-slate-100 transition-colors">
+                            <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                            <span id="demo-toggle-text">Demo</span>
+                        </button>
+                        <a id="download-link" href="#" download="article-report.pdf"
+                            class="inline-flex items-center px-2.5 py-1 text-xs font-medium text-primary-700 bg-primary-50 rounded-full hover:bg-primary-100 transition-colors">
+                            <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                            </svg>
+                            Download
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PDF Viewer -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <iframe id="pdf-iframe" title="Article PDF Report"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let state = {
+            apiKey: '{{{apiKey}}}',
+            neonAppUrl: '{{{neonAppUrl}}}',
+            objectId: null,
+            neonContext: null,
+            demoMode: false
+        };
+
+        // PostMessage API for Neon CMS communication
+        function setupPostMessageApi() {
+            console.log('Setting up PostMessage API');
+
+            window.addEventListener('message', (event) => {
+                if (event.origin !== state.neonAppUrl) {
+                    console.warn('Received message from unwanted origin:', event.origin);
+                    return;
+                }
+                console.log('Received message:', event.data);
+
+                if (event.data) {
+                    switch (event.data.key) {
+                        case 'getInfo':
+                            state.neonContext = event.data.info;
+                            console.log('Neon context updated:', state.neonContext);
+
+                            // Extract objectId from context
+                            const originalNode = state.neonContext?.originalNode;
+                            if (originalNode && originalNode.familyRef) {
+                                state.objectId = originalNode.familyRef;
+                                console.log('Object ID from context:', state.objectId);
+                                loadPDF();
+                            } else {
+                                console.warn('No object ID found in context');
+                                showNoObject();
+                            }
+                            break;
+                        default:
+                            console.warn('Unknown message key:', event.data.key);
+                    }
+                }
+            });
+
+            // Send ready message to parent
+            console.log('Sending ready message to parent');
+            window.parent.postMessage({ type: 'panel-ready', info: { op: 'getInfo' } }, state.neonAppUrl);
+            console.log('Ready message sent');
+        }
+
+        // Get objectId from query parameter (fallback)
+        function getObjectIdFromQuery() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('objectId');
+        }
+
+        // Load PDF
+        function loadPDF() {
+            // Check if we should use demo mode or if we have objectId
+            if (!state.objectId && !state.demoMode) {
+                showNoObject();
+                return;
+            }
+
+            console.log('Loading PDF - Demo mode:', state.demoMode, 'ObjectId:', state.objectId);
+
+            // Build PDF URL
+            let pdfUrl;
+            if (state.demoMode) {
+                pdfUrl = `/panels/article-pdf/generate?demo=true`;
+            } else {
+                pdfUrl = `/panels/article-pdf/generate?objectId=${encodeURIComponent(state.objectId)}`;
+            }
+
+            // Show loading state
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('no-object').classList.add('hidden');
+            document.getElementById('error-state').classList.add('hidden');
+            document.getElementById('pdf-display').classList.add('hidden');
+
+            // Load PDF in iframe
+            const iframe = document.getElementById('pdf-iframe');
+            iframe.src = pdfUrl;
+
+            // Set up iframe load handlers
+            iframe.onload = function () {
+                console.log('PDF loaded successfully');
+                showPDF();
+            };
+
+            iframe.onerror = function (error) {
+                console.error('Error loading PDF:', error);
+                showError('Failed to load PDF report');
+            };
+
+            // Set download link
+            const downloadLink = document.getElementById('download-link');
+            downloadLink.href = pdfUrl;
+            if (state.demoMode) {
+                downloadLink.download = 'demo-article-report.pdf';
+            } else {
+                downloadLink.download = `article-${state.objectId}-report.pdf`;
+            }
+
+            // Update demo badge visibility
+            updateDemoBadge();
+        }
+
+        // Toggle demo mode
+        function toggleDemoMode() {
+            state.demoMode = !state.demoMode;
+            console.log('Demo mode toggled:', state.demoMode);
+
+            // Update UI
+            updateDemoBadge();
+
+            // Reload PDF
+            loadPDF();
+        }
+
+        // Enable demo mode (from no-object state)
+        function enableDemoMode() {
+            state.demoMode = true;
+            console.log('Demo mode enabled');
+            loadPDF();
+        }
+
+        // Update demo badge visibility
+        function updateDemoBadge() {
+            const demoBadge = document.getElementById('demo-badge');
+            const demoToggleText = document.getElementById('demo-toggle-text');
+
+            if (state.demoMode) {
+                demoBadge.classList.remove('hidden');
+                demoToggleText.textContent = 'Live';
+            } else {
+                demoBadge.classList.add('hidden');
+                demoToggleText.textContent = 'Demo';
+            }
+        }
+
+        // Show PDF display
+        function showPDF() {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('no-object').classList.add('hidden');
+            document.getElementById('error-state').classList.add('hidden');
+            document.getElementById('pdf-display').classList.remove('hidden');
+
+            // Update title if available
+            if (state.neonContext?.originalNode?.title) {
+                document.getElementById('pdf-title').textContent = state.neonContext.originalNode.title;
+            } else {
+                document.getElementById('pdf-title').textContent = 'Article Report';
+            }
+        }
+
+        // Show no object state
+        function showNoObject() {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('no-object').classList.remove('hidden');
+            document.getElementById('error-state').classList.add('hidden');
+            document.getElementById('pdf-display').classList.add('hidden');
+        }
+
+        // Show error state
+        function showError(message) {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('no-object').classList.add('hidden');
+            document.getElementById('error-state').classList.remove('hidden');
+            document.getElementById('pdf-display').classList.add('hidden');
+            document.getElementById('error-message').textContent = message;
+        }
+
+        // Retry generation
+        function retryGeneration() {
+            if (state.objectId) {
+                loadPDF();
+            } else {
+                showNoObject();
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Document loaded, initializing...');
+
+            // Check for demo mode in query parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const demoParam = urlParams.get('demo');
+            if (demoParam === 'true') {
+                state.demoMode = true;
+                console.log('Demo mode enabled from query parameter');
+                loadPDF();
+                return;
+            }
+
+            // Check for query parameter first (fallback)
+            const queryObjectId = getObjectIdFromQuery();
+            if (queryObjectId) {
+                state.objectId = queryObjectId;
+                console.log('Object ID from query:', state.objectId);
+                loadPDF();
+            } else {
+                // Set up PostMessage API to receive from parent
+                setupPostMessageApi();
+            }
+        });
+    </script>
+</body>
+
+</html>

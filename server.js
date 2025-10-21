@@ -202,6 +202,8 @@ fastify.get("/panels/trello", panelHandlers.trelloPanelHandler);
 fastify.get("/panels/external-sources", panelHandlers.externalSourcesPanelHandler);
 fastify.get("/panels/methode", panelHandlers.methodePanelHandler);
 fastify.get("/panels/quickchart", panelHandlers.quickchartPanelHandler);
+fastify.get("/panels/article-pdf", panelHandlers.articlePdfPanelHandler);
+fastify.get("/panels/article-pdf/generate", panelHandlers.generateArticlePdfHandler);
 fastify.post("/panels/upload-asset", panelHandlers.uploadAssetHandler);
 fastify.register(async function (fastify) {
   fastify.route({
