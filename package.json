@@ -5,7 +5,9 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon --env-file=.env server.js",
+    "build:css": "npx tailwindcss -i ./src/styles/tailwind-source.css -o ./public/css/tailwind-panels.css --minify",
+    "watch:css": "npx tailwindcss -i ./src/styles/tailwind-source.css -o ./public/css/tailwind-panels.css --watch",
+    "dev": "concurrently \"npm run watch:css\" \"nodemon --env-file=.env server.js\"",
     "dev:legacy": "node --env-file=.env server.js"
   },
   "dependencies": {
@@ -43,6 +45,8 @@
     "node"
   ],
   "devDependencies": {
-    "nodemon": "^3.1.10"
+    "concurrently": "^9.2.1",
+    "nodemon": "^3.1.10",
+    "tailwindcss": "^3.4.18"
   }
 }

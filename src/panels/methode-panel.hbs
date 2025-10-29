@@ -4,60 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Méthode Panel</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: {
-                            50: '#eff6ff',
-                            100: '#dbeafe',
-                            200: '#bfdbfe',
-                            300: '#93c5fd',
-                            400: '#60a5fa',
-                            500: '#3b82f6',
-                            600: '#2563eb',
-                            700: '#1d4ed8',
-                            800: '#1e40af',
-                            900: '#1e3a8a'
-                        },
-                        methode: {
-                            50: '#fdf4ff',
-                            100: '#fae8ff',
-                            200: '#f5d0fe',
-                            300: '#f0abfc',
-                            400: '#e879f9',
-                            500: '#d946ef',
-                            600: '#c026d3',
-                            700: '#a21caf',
-                            800: '#86198f',
-                            900: '#701a75'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    <!-- Panel Bootstrap (inline to avoid path resolution chicken-and-egg problem when embedded) -->
+    <script>(function(w){'use strict';function e(){try{return w.self!==w.top}catch(e){return true}}const m=e(),p=m?'/neon/api/demo-integration':'';w.__PANEL_EMBED_PREFIX__=p;w.__PANEL_IS_EMBEDDED__=m;w.__fixScriptSrc__=function(s){if(!s||!m||s.startsWith('http')||s.startsWith('//')||!s.startsWith('/')||s.startsWith(p))return s;return p+s}})(window);</script>
+    <script src="/js/panel-api-helper.js"></script>
+    <link rel="stylesheet" href="/css/tailwind-panels.css">
     <style>
-        .scrollbar-thin {
-            scrollbar-width: thin;
-            scrollbar-color: #cbd5e0 transparent;
-        }
-        .scrollbar-thin::-webkit-scrollbar {
-            width: 6px;
-        }
-        .scrollbar-thin::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .scrollbar-thin::-webkit-scrollbar-thumb {
-            background: #cbd5e0;
-            border-radius: 3px;
-        }
-        .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-            background: #a0aec0;
-        }
-        
         /* Smooth transitions for updates */
         .update-transition {
             transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
@@ -244,20 +195,21 @@
 
         // Utility functions
         function apiCall(endpoint, method = 'GET', body = null) {
-            const url = `/panels/methode/api/${endpoint}`;
+            const path = `/panels/methode/api/${endpoint}`;
             const options = {
                 method,
                 headers: {
                     'Content-Type': 'application/json',
                     'apikey': state.apiKey
-                },
+                }
             };
-            
+
             if (body) {
                 options.body = JSON.stringify(body);
             }
-            
-            return fetch(url, options).then(res => res.json());
+
+            // Use PanelAPI helper to handle embedded iframe routing
+            return PanelAPI.apiCallJson(path, options);
         }
 
         function formatDate(dateString) {

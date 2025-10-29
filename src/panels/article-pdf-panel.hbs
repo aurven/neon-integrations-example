@@ -5,52 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Article PDF Panel</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: {
-                            50: '#eff6ff',
-                            100: '#dbeafe',
-                            200: '#bfdbfe',
-                            300: '#93c5fd',
-                            400: '#60a5fa',
-                            500: '#3b82f6',
-                            600: '#2563eb',
-                            700: '#1d4ed8',
-                            800: '#1e40af',
-                            900: '#1e3a8a'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    <!-- Panel Bootstrap (inline to avoid path resolution chicken-and-egg problem when embedded) -->
+    <script>(function(w){'use strict';function e(){try{return w.self!==w.top}catch(e){return true}}const m=e(),p=m?'/neon/api/demo-integration':'';w.__PANEL_EMBED_PREFIX__=p;w.__PANEL_IS_EMBEDDED__=m;w.__fixScriptSrc__=function(s){if(!s||!m||s.startsWith('http')||s.startsWith('//')||!s.startsWith('/')||s.startsWith(p))return s;return p+s}})(window);</script>
+    <script src="/js/panel-api-helper.js"></script>
+    <link rel="stylesheet" href="/css/tailwind-panels.css">
     <style>
-        .scrollbar-thin {
-            scrollbar-width: thin;
-            scrollbar-color: #cbd5e0 transparent;
-        }
-
-        .scrollbar-thin::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .scrollbar-thin::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .scrollbar-thin::-webkit-scrollbar-thumb {
-            background: #cbd5e0;
-            border-radius: 3px;
-        }
-
-        .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-            background: #a0aec0;
-        }
-
         /* PDF iframe styling */
         #pdf-iframe {
             width: 100%;
@@ -235,12 +194,12 @@
 
             console.log('Loading PDF - Demo mode:', state.demoMode, 'ObjectId:', state.objectId);
 
-            // Build PDF URL
+            // Build PDF URL (with embedded iframe support)
             let pdfUrl;
             if (state.demoMode) {
-                pdfUrl = `/panels/article-pdf/generate?demo=true`;
+                pdfUrl = PanelAPI.buildResourceUrl('/panels/article-pdf/generate', { demo: 'true' });
             } else {
-                pdfUrl = `/panels/article-pdf/generate?objectId=${encodeURIComponent(state.objectId)}`;
+                pdfUrl = PanelAPI.buildResourceUrl('/panels/article-pdf/generate', { objectId: state.objectId });
             }
 
             // Show loading state
