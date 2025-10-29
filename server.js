@@ -204,6 +204,7 @@ fastify.get("/panels/methode", panelHandlers.methodePanelHandler);
 fastify.get("/panels/quickchart", panelHandlers.quickchartPanelHandler);
 fastify.get("/panels/article-pdf", panelHandlers.articlePdfPanelHandler);
 fastify.get("/panels/article-pdf/generate", panelHandlers.generateArticlePdfHandler);
+fastify.get("/panels/ga4-analytics", panelHandlers.ga4AnalyticsPanelHandler);
 fastify.post("/panels/upload-asset", panelHandlers.uploadAssetHandler);
 fastify.register(async function (fastify) {
   fastify.route({
