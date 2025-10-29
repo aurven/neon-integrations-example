@@ -505,6 +505,22 @@ function ga4AnalyticsPanelHandler(request, reply) {
   return reply.view("/src/panels/ga4-analytics-panel.hbs", params);
 }
 
+function smartOctoPanelHandler(request, reply) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) {
+    return reply.status(401).send({ error: "Unauthorized" });
+  }
+
+  // params is an object we'll pass to our handlebars template
+  let params = {
+    seo: seo,
+    apiKey: auth.apikey
+  };
+
+  // The Handlebars code will be able to access the parameter values and build them into the page
+  return reply.view("/src/panels/smartocto-panel.hbs", params);
+}
+
 module.exports = {
   trelloPanelHandler,
   trelloApiProxyHandler,
@@ -516,5 +532,6 @@ module.exports = {
   quickchartPanelHandler,
   articlePdfPanelHandler,
   generateArticlePdfHandler,
-  ga4AnalyticsPanelHandler
+  ga4AnalyticsPanelHandler,
+  smartOctoPanelHandler
 };
