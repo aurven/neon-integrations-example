@@ -5,10 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Article PDF Panel</title>
-    <!-- Panel Bootstrap (inline to avoid path resolution chicken-and-egg problem when embedded) -->
-    <script>(function(w){'use strict';function e(){try{return w.self!==w.top}catch(e){return true}}const m=e(),p=m?'/neon/api/demo-integration':'';w.__PANEL_EMBED_PREFIX__=p;w.__PANEL_IS_EMBEDDED__=m;w.__fixScriptSrc__=function(s){if(!s||!m||s.startsWith('http')||s.startsWith('//')||!s.startsWith('/')||s.startsWith(p))return s;return p+s}})(window);</script>
-    <script src="/js/panel-api-helper.js"></script>
-    <link rel="stylesheet" href="/css/tailwind-panels.css">
+    <!-- Panel Bootstrap (inline with dynamic resource loading to avoid path issues when embedded) -->
+    <script>(function(w){'use strict';function e(){try{return w.self!==w.top}catch(e){return true}}const m=e(),p=m?'/neon/api/demo-integration':'';w.__PANEL_EMBED_PREFIX__=p;w.__PANEL_IS_EMBEDDED__=m;const l=document.createElement('link');l.rel='stylesheet';l.href=p+'/css/tailwind-panels.css';document.head.appendChild(l);const s=document.createElement('script');s.src=p+'/js/panel-api-helper.js';document.head.appendChild(s)})(window);</script>
     <style>
         /* PDF iframe styling */
         #pdf-iframe {
