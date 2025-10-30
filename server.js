@@ -22,7 +22,7 @@ if (fs.existsSync(sslCertPath) && fs.existsSync(sslKeyPath)) {
 
 const fastify = require("fastify")({
   // Set this to true for detailed logging:
-  logger: false,
+  logger: true,
   ...httpsOptions
 });
 
