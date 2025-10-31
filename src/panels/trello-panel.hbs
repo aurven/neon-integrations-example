@@ -246,7 +246,7 @@
 
             window.addEventListener('message', (event) => {
                 // Security check - you might want to restrict origin
-                if (event.origin !== state.neonAppUrl) {
+                if (event.origin !== state.neonAppUrl && event.origin !== window.parent.origin) {
                     console.warn('Received message from unwanted origin:', event.origin);
                     return;
                 }
@@ -291,7 +291,7 @@
 
             // Send ready message to parent
             console.log('Sending ready message to parent');
-            window.parent.postMessage({ type: 'panel-ready', info: { op: 'getInfo' } }, state.neonAppUrl);
+            window.parent.postMessage({ type: 'panel-ready', info: { op: 'getInfo' } }, window.parent.origin);
             console.log('Ready message sent');
         }
 
@@ -382,7 +382,7 @@
 
                     if (typeof state.neonContext === 'undefined' || typeof state.neonContext === 'null' || !state.neonContext) {
                         console.warn('Neon context is not available, asking for parent panel.');
-                        window.parent.postMessage({ type: 'request-context', info: { op: 'getInfo' } }, state.neonAppUrl);
+                        window.parent.postMessage({ type: 'request-context', info: { op: 'getInfo' } }, window.parent.origin);
                     }
                 }
                 
@@ -977,7 +977,7 @@
                                 familyRef: result.result.node.familyRef,
                                 message: 'Asset uploaded successfully to Neon'
                             }
-                        }, state.neonAppUrl);
+                        }, window.parent.origin);
                     }
                 } else {
                     throw new Error(result.details || 'Upload failed');
@@ -1014,7 +1014,7 @@
                         url: url,
                         error: error.message,
                         message: 'Asset upload failed'
-                    }, state.neonAppUrl);
+                    }, window.parent.origin);
                 }
             }
         }

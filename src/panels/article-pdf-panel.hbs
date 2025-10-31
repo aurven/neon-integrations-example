@@ -143,7 +143,7 @@
             console.log('Setting up PostMessage API');
 
             window.addEventListener('message', (event) => {
-                if (event.origin !== state.neonAppUrl) {
+                if (event.origin !== state.neonAppUrl && event.origin !== window.parent.origin) {
                     console.warn('Received message from unwanted origin:', event.origin);
                     return;
                 }
@@ -174,7 +174,7 @@
 
             // Send ready message to parent
             console.log('Sending ready message to parent');
-            window.parent.postMessage({ type: 'panel-ready', info: { op: 'getInfo' } }, state.neonAppUrl);
+            window.parent.postMessage({ type: 'panel-ready', info: { op: 'getInfo' } }, window.parent.origin);
             console.log('Ready message sent');
         }
 
