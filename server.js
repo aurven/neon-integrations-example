@@ -142,6 +142,16 @@ fastify.get("/services", function (request, reply) {
       { name: "Save Article", endpoint: "POST /mobileclient/save", description: "Save article content and generate XML for Neon CMS integration" },
       { name: "Articles API - List", endpoint: "GET /mobileclient/api/articles", description: "RESTful API to retrieve list of articles with metadata" },
       { name: "Articles API - Single", endpoint: "GET /mobileclient/api/articles/:id", description: "RESTful API to retrieve specific article by UUID for editing" }
+    ],
+    taxonomies: [
+      { name: "List Taxonomies", endpoint: "GET /iab/taxonomies", description: "List all IAB taxonomies with versions and stats" },
+      { name: "Get Taxonomy", endpoint: "GET /iab/:type", description: "Get full taxonomy data (content, audience, adproduct)" },
+      { name: "Lookup Labels", endpoint: "POST /iab/lookup", description: "Lookup labels for taxonomy IDs (batch supported)" },
+      { name: "Search Taxonomy", endpoint: "GET /iab/search", description: "Search categories by name or path" },
+      { name: "Validate IDs", endpoint: "POST /iab/validate", description: "Validate if taxonomy IDs exist" },
+      { name: "Get Children", endpoint: "GET /iab/:type/children", description: "Get child categories for a parent ID" },
+      { name: "Get Statistics", endpoint: "GET /iab/:type/stats", description: "Get taxonomy statistics" },
+      { name: "Refresh Cache", endpoint: "POST /iab/refresh", description: "Force refresh taxonomies from GitHub" }
     ]
   };
 
@@ -295,6 +305,42 @@ fastify.get("/mobileclient/editor", mobileClientHandlers.getMobileClientEditorHa
 fastify.post("/mobileclient/save", mobileClientHandlers.postMobileClientSaveHandler);
 fastify.get("/mobileclient/api/articles", mobileClientHandlers.getMobileClientApiArticlesHandler);
 fastify.get("/mobileclient/api/articles/:id", mobileClientHandlers.getMobileClientApiArticleHandler);
+
+/**
+ *
+ * IAB Taxonomies API
+ *
+ */
+const iabTaxonomiesHandlers = require("./src/requestHandlers/iab-taxonomies.js");
+fastify.register(async function (fastify) {
+  await iabTaxonomiesHandlers.registerRoutes(fastify, {
+    apikey: process.env.NEON_EXT_APIKEY
+  });
+});
+
+// Initialize IAB taxonomies cache on startup (non-blocking)
+const { initializeAll } = require("./src/connectors/iab-taxonomies-connector");
+setImmediate(async () => {
+  try {
+    console.log('[IAB Taxonomies] Initializing cache...');
+    const results = await initializeAll();
+
+    if (results.initialized.length > 0) {
+      console.log(`[IAB Taxonomies] ✓ Downloaded and cached: ${results.initialized.join(', ')}`);
+    }
+    if (results.cached.length > 0) {
+      console.log(`[IAB Taxonomies] ✓ Already cached: ${results.cached.join(', ')}`);
+    }
+    if (results.errors.length > 0) {
+      console.error(`[IAB Taxonomies] ✗ Errors: ${results.errors.length}`);
+      results.errors.forEach(err => {
+        console.error(`  - ${err.type}: ${err.error}`);
+      });
+    }
+  } catch (error) {
+    console.error('[IAB Taxonomies] Failed to initialize:', error.message);
+  }
+});
 
 /**
  *
