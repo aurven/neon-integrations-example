@@ -36,6 +36,8 @@ async function login({ username, password }) {
         data: authPayload
     };
 
+    console.log(`Logging in to Méthode at ${EDAPIURL} as user ${username}...`);
+
     try {
         await client.request(config)
             .then((response) => {

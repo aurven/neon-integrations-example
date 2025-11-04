@@ -1,0 +1,877 @@
+{
+    "userRef": {
+        "userId": "1652ec49-afeb-38ba-8146-bb131fc692e4",
+        "alias": "Aureliano"
+    },
+    "publicationTimestamp": "2025-10-30T09:51:18.386Z",
+    "eventType": "updated",
+    "rootData": {
+        "id": "029e-1f1384230ca2-97db16d9aa96-1000",
+        "version": "029e-1f1384230ca2-97db16d9aa96-1000-341747478386",
+        "timestamp": "2025-10-30T09:51:18.386Z",
+        "foreignId": "trello:68a71b39030e98bd21e44678",
+        "foreignSource": "Trello",
+        "title": "SEC Proposes New Climate Disclosure Rules for Public Companies",
+        "summary": "Breaking analysis of proposed regulations requiring companies to disclose climate-related risks and greenhouse gas emissions in annual reports. Cover impact on Fortune 500 compliance costs and timeline (due to end of September).",
+        "authors": [
+            "Aureliano"
+        ],
+        "sys": {
+            "kind": "content",
+            "baseType": "article",
+            "type": "article",
+            "creationTime": "2025-10-29T17:00:17.291Z",
+            "createdBy": {
+                "userId": "1652ec49-afeb-38ba-8146-bb131fc692e4",
+                "userName": "Aureliano"
+            },
+            "updateTime": "2025-10-30T09:51:18.386Z",
+            "updatedBy": {
+                "userId": "1652ec49-afeb-38ba-8146-bb131fc692e4",
+                "userName": "Aureliano"
+            }
+        },
+        "pubInfo": {
+            "siteName": "TheGlobe",
+            "status": "LIVE",
+            "publicationTime": "2025-10-30T09:51:18.386Z",
+            "publishedBy": {
+                "userId": "1652ec49-afeb-38ba-8146-bb131fc692e4",
+                "userName": "Aureliano"
+            },
+            "sectionPath": "/economy/",
+            "priority": 4,
+            "paywallLevel": "FREE",
+            "visible": true
+        },
+        "attributes": {
+            "tags": [],
+            "teaser": {},
+            "contentIds": {
+                "teaserTitle": "UQGY2uREUs6M4S",
+                "teaserSummary": "UYobmDwvlR3ASu",
+                "title": "UXJegPrMD6Vq5r",
+                "summary": "UZlSHFCZ2ebEoW"
+            },
+            "title": "SEC Proposes New Climate Disclosure Rules for Public Companies",
+            "comment": "",
+            "modifiable": true
+        },
+        "files": {
+            "content": {
+                "fileName": "SECProposesNewClimateDisclosureRulesforPublicCompanies.xml",
+                "mimeType": "application/json",
+                "updatedBy": {
+                    "userId": "1652ec49-afeb-38ba-8146-bb131fc692e4",
+                    "userName": "Aureliano"
+                },
+                "updateTime": "2025-10-29T17:00:30.592Z",
+                "size": 2726,
+                "data": {
+                    "elements": [
+                        {
+                            "nodeType": "story",
+                            "attributes": {},
+                            "elements": [
+                                {
+                                    "nodeType": "web-image-group",
+                                    "attributes": {
+                                        "id": "UFp4azvVqaSiun"
+                                    },
+                                    "elements": [
+                                        {
+                                            "nodeType": "image",
+                                            "attributes": {
+                                                "src": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.jpeg",
+                                                "id": "Uyt9hCDsqzY14U",
+                                                "softCrop": "Wide"
+                                            },
+                                            "elements": []
+                                        },
+                                        {
+                                            "nodeType": "image",
+                                            "attributes": {
+                                                "src": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.jpeg",
+                                                "id": "UDCf3AwbRcVw84",
+                                                "softCrop": "Square"
+                                            },
+                                            "elements": []
+                                        },
+                                        {
+                                            "nodeType": "image",
+                                            "attributes": {
+                                                "src": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.jpeg",
+                                                "id": "UsSQOhV5F0YgMl",
+                                                "softCrop": "Portrait"
+                                            },
+                                            "elements": []
+                                        },
+                                        {
+                                            "nodeType": "image",
+                                            "attributes": {
+                                                "src": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.jpeg",
+                                                "id": "UCWQkP1vlJWqTS",
+                                                "softCrop": "Ultrawide"
+                                            },
+                                            "elements": []
+                                        },
+                                        {
+                                            "nodeType": "web-image-caption",
+                                            "attributes": {},
+                                            "elements": [
+                                                {
+                                                    "nodeType": "caption",
+                                                    "attributes": {
+                                                        "id": "UBEpnNmIj5pKDo"
+                                                    },
+                                                    "elements": [
+                                                        {
+                                                            "nodeType": "p",
+                                                            "attributes": {},
+                                                            "elements": []
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "nodeType": "credit",
+                                                    "attributes": {
+                                                        "id": "Uk8HI7SxuPWmc5"
+                                                    },
+                                                    "elements": [
+                                                        {
+                                                            "nodeType": "p",
+                                                            "attributes": {},
+                                                            "elements": []
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "nodeType": "grouphead",
+                                    "attributes": {},
+                                    "elements": [
+                                        {
+                                            "nodeType": "overhead",
+                                            "attributes": {
+                                                "id": "UHa4j6D1k9GFSG"
+                                            },
+                                            "elements": [
+                                                {
+                                                    "nodeType": "p",
+                                                    "attributes": {},
+                                                    "elements": []
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "nodeType": "headline",
+                                            "attributes": {
+                                                "id": "UXJegPrMD6Vq5r"
+                                            },
+                                            "elements": [
+                                                {
+                                                    "nodeType": "p",
+                                                    "attributes": {},
+                                                    "elements": [
+                                                        {
+                                                            "nodeType": "plainText",
+                                                            "value": "SEC Proposes New Climate Disclosure Rules for Public Companies"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "nodeType": "summary",
+                                    "attributes": {
+                                        "id": "UZlSHFCZ2ebEoW"
+                                    },
+                                    "elements": [
+                                        {
+                                            "nodeType": "p",
+                                            "attributes": {},
+                                            "elements": [
+                                                {
+                                                    "nodeType": "plainText",
+                                                    "value": "Breaking analysis of proposed regulations requiring companies to disclose climate-related risks and greenhouse gas emissions in annual reports. Cover impact on Fortune 500 compliance costs and timeline (due to end of September)."
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "nodeType": "byline",
+                                    "attributes": {
+                                        "id": "Uday5NdP7K5JkK"
+                                    },
+                                    "elements": [
+                                        {
+                                            "nodeType": "p",
+                                            "attributes": {},
+                                            "elements": []
+                                        }
+                                    ]
+                                },
+                                {
+                                    "nodeType": "text",
+                                    "attributes": {
+                                        "id": "UCowXptrm0iVL0"
+                                    },
+                                    "elements": [
+                                        {
+                                            "nodeType": "p",
+                                            "attributes": {},
+                                            "elements": [
+                                                {
+                                                    "nodeType": "plainText",
+                                                    "value": "This story has been automatically generated from Trello!"
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "nodeType": "teaser",
+                            "attributes": {},
+                            "elements": [
+                                {
+                                    "nodeType": "web-image-group",
+                                    "attributes": {
+                                        "id": "UndTLtjD723pn5"
+                                    },
+                                    "elements": [
+                                        {
+                                            "nodeType": "image",
+                                            "attributes": {
+                                                "id": "UwmAun55b1LTgS",
+                                                "softCrop": "Wide"
+                                            },
+                                            "elements": []
+                                        },
+                                        {
+                                            "nodeType": "image",
+                                            "attributes": {
+                                                "id": "UoxWKp47bwfxIe",
+                                                "softCrop": "Square"
+                                            },
+                                            "elements": []
+                                        },
+                                        {
+                                            "nodeType": "image",
+                                            "attributes": {
+                                                "id": "UXmbsrq5g03UzM",
+                                                "softCrop": "Portrait"
+                                            },
+                                            "elements": []
+                                        },
+                                        {
+                                            "nodeType": "image",
+                                            "attributes": {
+                                                "id": "UvAGOKP68lEr62",
+                                                "softCrop": "Ultrawide"
+                                            },
+                                            "elements": []
+                                        }
+                                    ]
+                                },
+                                {
+                                    "nodeType": "grouphead",
+                                    "attributes": {},
+                                    "elements": [
+                                        {
+                                            "nodeType": "headline",
+                                            "attributes": {
+                                                "id": "UQGY2uREUs6M4S"
+                                            },
+                                            "elements": [
+                                                {
+                                                    "nodeType": "p",
+                                                    "attributes": {},
+                                                    "elements": []
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "nodeType": "summary",
+                                    "attributes": {
+                                        "id": "UYobmDwvlR3ASu"
+                                    },
+                                    "elements": [
+                                        {
+                                            "nodeType": "p",
+                                            "attributes": {},
+                                            "elements": []
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "attributes": {},
+                    "nodeType": "doc"
+                },
+                "jsonFileEmbeddedNoImage": true
+            }
+        },
+        "links": {
+            "hyperlink": {
+                "image": [
+                    {
+                        "targetId": "029e-1f1384335c9f-7e3087c23ab2-1000",
+                        "metadata": {
+                            "baseType": "image",
+                            "type": "image",
+                            "metadataType": "generic",
+                            "softCrops": {
+                                "Square": {
+                                    "id": "UDCf3AwbRcVw84"
+                                },
+                                "Portrait": {
+                                    "id": "UsSQOhV5F0YgMl"
+                                },
+                                "Ultrawide": {
+                                    "id": "UCWQkP1vlJWqTS"
+                                },
+                                "Wide": {
+                                    "id": "Uyt9hCDsqzY14U"
+                                }
+                            },
+                            "groupId": "UFp4azvVqaSiun"
+                        },
+                        "key": 1537228672809129000,
+                        "dynamicCropsResourceUrls": {
+                            "Square_thumb": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/thumb/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp",
+                            "Ultrawide_large": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/large/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp",
+                            "Wide_large": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/large/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp",
+                            "Portrait_small": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/small/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp",
+                            "Ultrawide_small": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/small/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp",
+                            "Square_large": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/large/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp",
+                            "Ultrawide_thumb": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/thumb/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp",
+                            "Wide_thumb": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/thumb/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp",
+                            "Square_small": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/small/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp",
+                            "Portrait_thumb": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/thumb/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp",
+                            "Wide_small": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/small/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp",
+                            "Portrait_large": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/large/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp"
+                        }
+                    }
+                ]
+            },
+            "system": {
+                "mainPicture": [
+                    {
+                        "targetId": "029e-1f1384335c9f-7e3087c23ab2-1000",
+                        "metadata": {
+                            "baseType": "image",
+                            "type": "image",
+                            "metadataType": "generic",
+                            "softCrops": {
+                                "Square": {
+                                    "id": "UDCf3AwbRcVw84"
+                                },
+                                "Portrait": {
+                                    "id": "UsSQOhV5F0YgMl"
+                                },
+                                "Ultrawide": {
+                                    "id": "UCWQkP1vlJWqTS"
+                                },
+                                "Wide": {
+                                    "id": "Uyt9hCDsqzY14U"
+                                }
+                            },
+                            "groupId": "UFp4azvVqaSiun"
+                        },
+                        "key": 1537228672809129000,
+                        "dynamicCropsResourceUrls": {
+                            "Square_thumb": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/thumb/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp",
+                            "Ultrawide_large": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/large/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp",
+                            "Wide_large": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/large/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp",
+                            "Portrait_small": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/small/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp",
+                            "Ultrawide_small": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/small/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp",
+                            "Square_large": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/large/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp",
+                            "Ultrawide_thumb": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/thumb/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp",
+                            "Wide_thumb": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/thumb/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp",
+                            "Square_small": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/small/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp",
+                            "Portrait_thumb": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/thumb/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp",
+                            "Wide_small": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/small/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp",
+                            "Portrait_large": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/large/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp"
+                        }
+                    }
+                ]
+            }
+        },
+        "pubInfoEx": {
+            "TheGlobe": {
+                "siteName": "TheGlobe",
+                "status": "LIVE",
+                "publicationTime": "2025-10-30T09:51:18.386Z",
+                "publishedBy": {
+                    "userId": "1652ec49-afeb-38ba-8146-bb131fc692e4",
+                    "userName": "Aureliano"
+                },
+                "liveInfo": {
+                    "version": "029e-1f1384230ca2-97db16d9aa96-1000-341747478386",
+                    "sourceVersion": "029e-1f1384230ca2-97db16d9aa96-1000-n341747355490",
+                    "publicationTime": "2025-10-30T09:51:18.386Z",
+                    "publishedBy": {
+                        "userId": "1652ec49-afeb-38ba-8146-bb131fc692e4",
+                        "userName": "Aureliano"
+                    }
+                },
+                "stageInfo": {
+                    "version": "029e-1f1384230ca2-97db16d9aa96-1000-n341747355490",
+                    "publicationTime": "2025-10-30T09:49:15.490Z",
+                    "publishedBy": {
+                        "userId": "1652ec49-afeb-38ba-8146-bb131fc692e4",
+                        "userName": "Aureliano"
+                    }
+                },
+                "previewInfo": {
+                    "version": "029e-1f1384230ca2-97db16d9aa96-1000-n341747355490",
+                    "publicationTime": "2025-10-30T09:49:15.490Z",
+                    "publishedBy": {
+                        "userId": "1652ec49-afeb-38ba-8146-bb131fc692e4",
+                        "userName": "Aureliano"
+                    }
+                },
+                "sectionPath": "/economy/",
+                "priority": 4,
+                "paywallLevel": "FREE",
+                "visible": true
+            }
+        },
+        "url": "/economy/029e-1f1384230ca2-97db16d9aa96-1000/index.html",
+        "resourceUrl": "/resources/029e-1f1384230ca2-97db16d9aa96-1000/sec_proposes_new_climate_disclosure_rules_for_public_companies.json",
+        "picture": "029e-1f1384335c9f-7e3087c23ab2-1000",
+        "lastModified": 1761817878386,
+        "dataType": "node",
+        "etag": "029e-1f1384230ca2-97db16d9aa96-1000-341747478386"
+    },
+    "contentData": {
+        "id": "model://029e-1f1384230ca2-97db16d9aa96-1000/1/null/NE",
+        "data": {
+            "id": "029e-1f1384230ca2-97db16d9aa96-1000",
+            "version": "029e-1f1384230ca2-97db16d9aa96-1000-341747478386",
+            "foreignId": "trello:68a71b39030e98bd21e44678",
+            "title": "SEC Proposes New Climate Disclosure Rules for Public Companies",
+            "summary": "Breaking analysis of proposed regulations requiring companies to disclose climate-related risks and greenhouse gas emissions in annual reports. Cover impact on Fortune 500 compliance costs and timeline (due to end of September).",
+            "authors": [
+                "Aureliano"
+            ],
+            "sys": {
+                "baseType": "article",
+                "type": "article"
+            },
+            "pubInfo": {
+                "publicationTime": "2025-10-30T09:51:18.386Z",
+                "publishedBy": {
+                    "userName": "Aureliano"
+                },
+                "priority": 4,
+                "paywallLevel": "FREE",
+                "visible": true
+            },
+            "attributes": {
+                "tags": [],
+                "teaser": {},
+                "contentIds": {
+                    "teaserTitle": "UQGY2uREUs6M4S",
+                    "teaserSummary": "UYobmDwvlR3ASu",
+                    "title": "UXJegPrMD6Vq5r",
+                    "summary": "UZlSHFCZ2ebEoW"
+                },
+                "title": "SEC Proposes New Climate Disclosure Rules for Public Companies",
+                "comment": "",
+                "modifiable": true
+            },
+            "files": {
+                "content": {
+                    "mimeType": "application/json",
+                    "data": {
+                        "elements": [
+                            {
+                                "nodeType": "story",
+                                "attributes": {},
+                                "elements": [
+                                    {
+                                        "nodeType": "web-image-group",
+                                        "attributes": {
+                                            "id": "UFp4azvVqaSiun"
+                                        },
+                                        "elements": [
+                                            {
+                                                "nodeType": "image",
+                                                "attributes": {
+                                                    "src": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.jpeg",
+                                                    "id": "Uyt9hCDsqzY14U",
+                                                    "softCrop": "Wide"
+                                                },
+                                                "elements": []
+                                            },
+                                            {
+                                                "nodeType": "image",
+                                                "attributes": {
+                                                    "src": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.jpeg",
+                                                    "id": "UDCf3AwbRcVw84",
+                                                    "softCrop": "Square"
+                                                },
+                                                "elements": []
+                                            },
+                                            {
+                                                "nodeType": "image",
+                                                "attributes": {
+                                                    "src": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.jpeg",
+                                                    "id": "UsSQOhV5F0YgMl",
+                                                    "softCrop": "Portrait"
+                                                },
+                                                "elements": []
+                                            },
+                                            {
+                                                "nodeType": "image",
+                                                "attributes": {
+                                                    "src": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.jpeg",
+                                                    "id": "UCWQkP1vlJWqTS",
+                                                    "softCrop": "Ultrawide"
+                                                },
+                                                "elements": []
+                                            },
+                                            {
+                                                "nodeType": "web-image-caption",
+                                                "attributes": {},
+                                                "elements": [
+                                                    {
+                                                        "nodeType": "caption",
+                                                        "attributes": {
+                                                            "id": "UBEpnNmIj5pKDo"
+                                                        },
+                                                        "elements": [
+                                                            {
+                                                                "nodeType": "p",
+                                                                "attributes": {},
+                                                                "elements": []
+                                                            }
+                                                        ]
+                                                    },
+                                                    {
+                                                        "nodeType": "credit",
+                                                        "attributes": {
+                                                            "id": "Uk8HI7SxuPWmc5"
+                                                        },
+                                                        "elements": [
+                                                            {
+                                                                "nodeType": "p",
+                                                                "attributes": {},
+                                                                "elements": []
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "nodeType": "grouphead",
+                                        "attributes": {},
+                                        "elements": [
+                                            {
+                                                "nodeType": "overhead",
+                                                "attributes": {
+                                                    "id": "UHa4j6D1k9GFSG"
+                                                },
+                                                "elements": [
+                                                    {
+                                                        "nodeType": "p",
+                                                        "attributes": {},
+                                                        "elements": []
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "nodeType": "headline",
+                                                "attributes": {
+                                                    "id": "UXJegPrMD6Vq5r"
+                                                },
+                                                "elements": [
+                                                    {
+                                                        "nodeType": "p",
+                                                        "attributes": {},
+                                                        "elements": [
+                                                            {
+                                                                "nodeType": "plainText",
+                                                                "value": "SEC Proposes New Climate Disclosure Rules for Public Companies"
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "nodeType": "summary",
+                                        "attributes": {
+                                            "id": "UZlSHFCZ2ebEoW"
+                                        },
+                                        "elements": [
+                                            {
+                                                "nodeType": "p",
+                                                "attributes": {},
+                                                "elements": [
+                                                    {
+                                                        "nodeType": "plainText",
+                                                        "value": "Breaking analysis of proposed regulations requiring companies to disclose climate-related risks and greenhouse gas emissions in annual reports. Cover impact on Fortune 500 compliance costs and timeline (due to end of September)."
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "nodeType": "byline",
+                                        "attributes": {
+                                            "id": "Uday5NdP7K5JkK"
+                                        },
+                                        "elements": [
+                                            {
+                                                "nodeType": "p",
+                                                "attributes": {},
+                                                "elements": []
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "nodeType": "text",
+                                        "attributes": {
+                                            "id": "UCowXptrm0iVL0"
+                                        },
+                                        "elements": [
+                                            {
+                                                "nodeType": "p",
+                                                "attributes": {},
+                                                "elements": [
+                                                    {
+                                                        "nodeType": "plainText",
+                                                        "value": "This story has been automatically generated from Trello!"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "nodeType": "teaser",
+                                "attributes": {},
+                                "elements": [
+                                    {
+                                        "nodeType": "web-image-group",
+                                        "attributes": {
+                                            "id": "UndTLtjD723pn5"
+                                        },
+                                        "elements": [
+                                            {
+                                                "nodeType": "image",
+                                                "attributes": {
+                                                    "id": "UwmAun55b1LTgS",
+                                                    "softCrop": "Wide"
+                                                },
+                                                "elements": []
+                                            },
+                                            {
+                                                "nodeType": "image",
+                                                "attributes": {
+                                                    "id": "UoxWKp47bwfxIe",
+                                                    "softCrop": "Square"
+                                                },
+                                                "elements": []
+                                            },
+                                            {
+                                                "nodeType": "image",
+                                                "attributes": {
+                                                    "id": "UXmbsrq5g03UzM",
+                                                    "softCrop": "Portrait"
+                                                },
+                                                "elements": []
+                                            },
+                                            {
+                                                "nodeType": "image",
+                                                "attributes": {
+                                                    "id": "UvAGOKP68lEr62",
+                                                    "softCrop": "Ultrawide"
+                                                },
+                                                "elements": []
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "nodeType": "grouphead",
+                                        "attributes": {},
+                                        "elements": [
+                                            {
+                                                "nodeType": "headline",
+                                                "attributes": {
+                                                    "id": "UQGY2uREUs6M4S"
+                                                },
+                                                "elements": [
+                                                    {
+                                                        "nodeType": "p",
+                                                        "attributes": {},
+                                                        "elements": []
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "nodeType": "summary",
+                                        "attributes": {
+                                            "id": "UYobmDwvlR3ASu"
+                                        },
+                                        "elements": [
+                                            {
+                                                "nodeType": "p",
+                                                "attributes": {},
+                                                "elements": []
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "attributes": {},
+                        "nodeType": "doc"
+                    },
+                    "jsonFileEmbeddedNoImage": true
+                }
+            },
+            "links": {
+                "hyperlink": {
+                    "image": [
+                        {
+                            "targetId": "029e-1f1384335c9f-7e3087c23ab2-1000",
+                            "metadata": {
+                                "metadataType": "generic",
+                                "softCrops": {
+                                    "Square": {
+                                        "id": "UDCf3AwbRcVw84"
+                                    },
+                                    "Portrait": {
+                                        "id": "UsSQOhV5F0YgMl"
+                                    },
+                                    "Ultrawide": {
+                                        "id": "UCWQkP1vlJWqTS"
+                                    },
+                                    "Wide": {
+                                        "id": "Uyt9hCDsqzY14U"
+                                    }
+                                },
+                                "groupId": "UFp4azvVqaSiun"
+                            },
+                            "dynamicCropsResourceUrls": {
+                                "Square_thumb": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/thumb/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp",
+                                "Ultrawide_large": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/large/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp",
+                                "Wide_large": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/large/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp",
+                                "Portrait_small": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/small/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp",
+                                "Ultrawide_small": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/small/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp",
+                                "Square_large": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/large/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp",
+                                "Ultrawide_thumb": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/thumb/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp",
+                                "Wide_thumb": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/thumb/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp",
+                                "Square_small": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/small/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp",
+                                "Portrait_thumb": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/thumb/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp",
+                                "Wide_small": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/small/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp",
+                                "Portrait_large": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/large/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp"
+                            }
+                        }
+                    ]
+                },
+                "system": {
+                    "mainPicture": [
+                        {
+                            "targetId": "029e-1f1384335c9f-7e3087c23ab2-1000",
+                            "metadata": {
+                                "metadataType": "generic",
+                                "softCrops": {
+                                    "Square": {
+                                        "id": "UDCf3AwbRcVw84"
+                                    },
+                                    "Portrait": {
+                                        "id": "UsSQOhV5F0YgMl"
+                                    },
+                                    "Ultrawide": {
+                                        "id": "UCWQkP1vlJWqTS"
+                                    },
+                                    "Wide": {
+                                        "id": "Uyt9hCDsqzY14U"
+                                    }
+                                },
+                                "groupId": "UFp4azvVqaSiun"
+                            },
+                            "dynamicCropsResourceUrls": {
+                                "Square_thumb": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/thumb/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp",
+                                "Ultrawide_large": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/large/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp",
+                                "Wide_large": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/large/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp",
+                                "Portrait_small": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/small/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp",
+                                "Ultrawide_small": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/small/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp",
+                                "Square_large": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/large/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp",
+                                "Ultrawide_thumb": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/thumb/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp",
+                                "Wide_thumb": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/thumb/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp",
+                                "Square_small": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/small/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp",
+                                "Portrait_thumb": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/thumb/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp",
+                                "Wide_small": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/small/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp",
+                                "Portrait_large": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/format/large/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.webp"
+                            }
+                        }
+                    ]
+                }
+            },
+            "url": "/economy/029e-1f1384230ca2-97db16d9aa96-1000/index.html",
+            "resourceUrl": "/resources/029e-1f1384230ca2-97db16d9aa96-1000/sec_proposes_new_climate_disclosure_rules_for_public_companies.json",
+            "picture": "029e-1f1384335c9f-7e3087c23ab2-1000",
+            "dataType": "node",
+            "etag": "029e-1f1384230ca2-97db16d9aa96-1000-341747478386"
+        },
+        "dataType": "node",
+        "nodes": {
+            "029e-1f1384335c9f-7e3087c23ab2-1000": {
+                "id": "029e-1f1384335c9f-7e3087c23ab2-1000",
+                "pubInfo": {
+                    "publicationTime": "2025-10-30T09:51:18.386Z",
+                    "visible": true
+                },
+                "attributes": {
+                    "tags": []
+                },
+                "files": {
+                    "content": {
+                        "mimeType": "image/jpeg",
+                        "data": null,
+                        "jsonFileEmbeddedNoImage": false
+                    }
+                },
+                "resourceUrl": "/resources/029e-1f1384335c9f-7e3087c23ab2-1000/sec-building-istock-155235616-scaled-1-e1690412051179_20251029170027.jpeg",
+                "dataType": "node"
+            }
+        },
+        "defaultContent": false,
+        "lastModified": 1761817878386,
+        "etag": "029e-1f1384335c9f-7e3087c23ab2-1000-341747478386/1761817878386/541055599",
+        "contentLength": 0,
+        "children": [],
+        "errors": [],
+        "totalPages": 0,
+        "builder": "cfg:DCB5D99ABE908D8FED1F4589DB502111:2025-10-30T09:41:55.320Z",
+        "buildDate": "2025-10-30T09:51:20.988Z",
+        "modelSourceClass": "com.eidosmedia.portal.impl.content.aggregation.ConfigBasedModelBuilder",
+        "invalidationPriority": 4,
+        "builtByConfigModelBuilder": true,
+        "page": 1,
+        "aggregators": []
+    },
+    "writebackMetadataMaxSize": 4096
+}
