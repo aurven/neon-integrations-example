@@ -191,6 +191,7 @@ fastify.post("/widgets/drop/upload", widgetHandlers.asyncDropUploadWidgetHandler
 fastify.get("/widgets/wires", widgetHandlers.wiresWidgetHandler);
 fastify.get("/widgets/breakingnews", widgetHandlers.breakingNewsWidgetHandler);
 fastify.post("/widgets/breakingnews/publish", widgetHandlers.breakingNewsPublishHandler);
+fastify.get("/widgets/smartocto-dashboard", widgetHandlers.smartOctoDashboardHandler);
 
 /**
  *
