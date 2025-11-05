@@ -271,8 +271,8 @@
                     const loid = `${dbid}$${eomid}`;
                     console.log('Extracted loid from hrefPdf:', loid);
 
-                    // Generate the proxied image URL
-                    const imageUrl = `/panels/methode/api/content/lowres/${loid}?maxSize=4`;
+                    // Generate the proxied image URL with proper prefix handling for embedded mode
+                    const imageUrl = PanelAPI.buildApiPath(`/panels/methode/api/content/lowres/${loid}?maxSize=4`);
                     console.log('Generated image URL:', imageUrl);
 
                     return imageUrl;
