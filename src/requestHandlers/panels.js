@@ -44,6 +44,9 @@ function externalSourcesPanelHandler(request, reply) {
     seo: seo,
     apiKey: auth.apikey,
     pexelsApiKey: process.env.PEXELS_APIKEY,
+    youtubeApiKey: process.env.YOUTUBE_APIKEY,
+    dailymotionApiKey: process.env.DAILYMOTION_APIKEY,
+    dailymotionApiSecret: process.env.DAILYMOTION_APISECRET,
     integrationsApiKey: auth.apikey
   };
 
@@ -108,14 +111,14 @@ async function pexelsApiProxyHandler(request, reply) {
   const fullPath = request.url.split('?')[0]; // Remove query string
   const endpoint = fullPath.replace('/panels/external-sources/api/', '');
   const method = request.method.toLowerCase();
-  
+
   try {
-    const baseUrl = endpoint.includes('videos') ? 
-      'https://api.pexels.com/videos' : 
+    const baseUrl = endpoint.includes('videos') ?
+      'https://api.pexels.com/videos' :
       'https://api.pexels.com/v1';
-    
+
     const url = `${baseUrl}/${endpoint}`;
-    
+
     const config = {
       headers: {
         'Authorization': process.env.PEXELS_APIKEY,
@@ -140,6 +143,147 @@ async function pexelsApiProxyHandler(request, reply) {
     console.error('Pexels API proxy error:', error.response?.data || error.message);
     return reply.status(error.response?.status || 500).send({
       error: 'Pexels API error',
+      details: error.response?.data || error.message
+    });
+  }
+}
+
+async function youtubeApiProxyHandler(request, reply) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) {
+    return reply.status(401).send({ error: "Unauthorized" });
+  }
+
+  // Extract endpoint from the full URL path
+  const fullPath = request.url.split('?')[0]; // Remove query string
+  const endpoint = fullPath.replace('/panels/external-sources/api/youtube/', '');
+  const method = request.method.toLowerCase();
+
+  try {
+    const baseUrl = 'https://www.googleapis.com/youtube/v3';
+    const url = `${baseUrl}/${endpoint}`;
+
+    const config = {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      params: {
+        ...request.query,
+        key: process.env.YOUTUBE_APIKEY
+      }
+    };
+
+    let response;
+    if (method === 'get') {
+      response = await axios.get(url, config);
+    } else if (method === 'post') {
+      response = await axios.post(url, request.body, config);
+    } else if (method === 'put') {
+      response = await axios.put(url, request.body, config);
+    } else if (method === 'delete') {
+      response = await axios.delete(url, config);
+    }
+
+    return reply.send(response.data);
+  } catch (error) {
+    console.error('YouTube API proxy error:', error.response?.data || error.message);
+    return reply.status(error.response?.status || 500).send({
+      error: 'YouTube API error',
+      details: error.response?.data || error.message
+    });
+  }
+}
+
+// OAuth token cache for DailyMotion
+let dailymotionTokenCache = {
+  token: null,
+  expiresAt: null
+};
+
+/**
+ * Get OAuth 2.0 access token for DailyMotion API
+ */
+async function getDailymotionAccessToken() {
+  // If no credentials, return null
+  if (!process.env.DAILYMOTION_APIKEY || !process.env.DAILYMOTION_APISECRET) {
+    return null;
+  }
+
+  // Check if we have a valid cached token
+  if (dailymotionTokenCache.token && dailymotionTokenCache.expiresAt && Date.now() < dailymotionTokenCache.expiresAt) {
+    return dailymotionTokenCache.token;
+  }
+
+  // Get new token
+  try {
+    const response = await axios.post('https://api.dailymotion.com/oauth/token', null, {
+      params: {
+        grant_type: 'client_credentials',
+        client_id: process.env.DAILYMOTION_APIKEY,
+        client_secret: process.env.DAILYMOTION_APISECRET
+      }
+    });
+
+    const { access_token, expires_in } = response.data;
+
+    // Cache the token (subtract 60 seconds for safety margin)
+    dailymotionTokenCache.token = access_token;
+    dailymotionTokenCache.expiresAt = Date.now() + (expires_in - 60) * 1000;
+
+    console.log('DailyMotion access token obtained for proxy');
+    return access_token;
+  } catch (error) {
+    console.error('Failed to get DailyMotion access token:', error.message);
+    return null;
+  }
+}
+
+async function dailymotionApiProxyHandler(request, reply) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) {
+    return reply.status(401).send({ error: "Unauthorized" });
+  }
+
+  // Extract endpoint from the full URL path
+  const fullPath = request.url.split('?')[0]; // Remove query string
+  const endpoint = fullPath.replace('/panels/external-sources/api/dailymotion/', '');
+  const method = request.method.toLowerCase();
+
+  try {
+    // Get OAuth access token
+    const accessToken = await getDailymotionAccessToken();
+
+    const baseUrl = 'https://api.dailymotion.com';
+    const url = `${baseUrl}/${endpoint}`;
+
+    const config = {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      params: request.query
+    };
+
+    // Add access token if available
+    if (accessToken) {
+      config.params.access_token = accessToken;
+    }
+
+    let response;
+    if (method === 'get') {
+      response = await axios.get(url, config);
+    } else if (method === 'post') {
+      response = await axios.post(url, request.body, config);
+    } else if (method === 'put') {
+      response = await axios.put(url, request.body, config);
+    } else if (method === 'delete') {
+      response = await axios.delete(url, config);
+    }
+
+    return reply.send(response.data);
+  } catch (error) {
+    console.error('DailyMotion API proxy error:', error.response?.data || error.message);
+    return reply.status(error.response?.status || 500).send({
+      error: 'DailyMotion API error',
       details: error.response?.data || error.message
     });
   }
@@ -596,6 +740,8 @@ module.exports = {
   trelloApiProxyHandler,
   externalSourcesPanelHandler,
   pexelsApiProxyHandler,
+  youtubeApiProxyHandler,
+  dailymotionApiProxyHandler,
   uploadAssetHandler,
   methodePanelHandler,
   methodeApiProxyHandler,
