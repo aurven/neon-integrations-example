@@ -521,6 +521,76 @@ function smartOctoPanelHandler(request, reply) {
   return reply.view("/src/panels/smartocto-panel.hbs", params);
 }
 
+/**
+ * Social Media Panel Handler
+ * Displays social media publishing interface
+ */
+function socialMediaPanelHandler(request, reply) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) {
+    return reply.status(401).send({ error: "Unauthorized" });
+  }
+
+  let params = {
+    seo: seo,
+    apiKey: auth.apikey,
+    neonAppUrl: process.env.NEON_APP_URL || 'http://localhost:3000'
+  };
+
+  return reply.view("/src/panels/social-media-panel.hbs", params);
+}
+
+/**
+ * Social Media API Proxy Handler
+ * Handles API calls for AI generation and metrics
+ */
+async function socialMediaApiProxyHandler(request, reply) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) {
+    return reply.status(401).send({ error: "Unauthorized" });
+  }
+
+  try {
+    const endpoint = request.url.replace('/panels/social-media/api/', '');
+
+    // Generate post with AI
+    if (endpoint === 'generate-post' && request.method === 'POST') {
+      const { generatePostContent, buildArticleUrl, extractArticleData } = require('../helpers/social-media-helper');
+      const { platform, neonContext } = request.body;
+
+      if (!platform || !neonContext) {
+        return reply.status(400).send({ error: 'Missing platform or neonContext' });
+      }
+
+      const articleData = extractArticleData(neonContext);
+      const articleUrl = buildArticleUrl(neonContext) || 'https://example.com/article';
+
+      const result = await generatePostContent(platform, articleData, articleUrl);
+
+      return reply.send(result);
+    }
+
+    // Get Bluesky metrics
+    if (endpoint.startsWith('bluesky/metrics/') && request.method === 'GET') {
+      const { getPostMetrics } = require('../connectors/bluesky-connector');
+      const postId = decodeURIComponent(endpoint.replace('bluesky/metrics/', ''));
+
+      const result = await getPostMetrics(postId);
+
+      return reply.send(result);
+    }
+
+    return reply.status(404).send({ error: 'Endpoint not found' });
+
+  } catch (error) {
+    console.error('[Social Media API] Error:', error);
+    return reply.status(500).send({
+      error: 'API request failed',
+      details: error.message
+    });
+  }
+}
+
 module.exports = {
   trelloPanelHandler,
   trelloApiProxyHandler,
@@ -533,5 +603,7 @@ module.exports = {
   articlePdfPanelHandler,
   generateArticlePdfHandler,
   ga4AnalyticsPanelHandler,
-  smartOctoPanelHandler
+  smartOctoPanelHandler,
+  socialMediaPanelHandler,
+  socialMediaApiProxyHandler
 };
