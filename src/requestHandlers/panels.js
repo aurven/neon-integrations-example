@@ -133,8 +133,6 @@ async function pexelsApiProxyHandler(request, reply) {
       params: request.query // Pass through query parameters
     };
 
-    console.log(`  Configuration: ${JSON.stringify(config)}`);
-
     let response;
     if (method === 'get') {
       response = await axios.get(url, config);
