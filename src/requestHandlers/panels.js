@@ -109,8 +109,14 @@ async function pexelsApiProxyHandler(request, reply) {
 
   // Extract endpoint from the full URL path
   const fullPath = request.url.split('?')[0]; // Remove query string
-  const endpoint = fullPath.replace('/panels/external-sources/api/', '');
+  const endpoint = fullPath.replace('/panels/external-sources/api/pexels/', '');
   const method = request.method.toLowerCase();
+
+  console.log('Pexels API Proxy Handler << IN');
+  console.log(`  Request URL: ${request.url}`);
+  console.log(`  Extracted endpoint: ${endpoint}`);
+  console.log(`  Method: ${method}`);
+  console.log(`  Query params: ${JSON.stringify(request.query)}`);
 
   try {
     const baseUrl = endpoint.includes('videos') ?
@@ -138,6 +144,10 @@ async function pexelsApiProxyHandler(request, reply) {
       response = await axios.delete(url, config);
     }
 
+    console.log('Pexels API Proxy Handler << OUT');
+    console.log(`  Final API URL: ${url}`);
+    console.log(`  Status: ${response.status}`);
+
     return reply.send(response.data);
   } catch (error) {
     console.error('Pexels API proxy error:', error.response?.data || error.message);
@@ -158,6 +168,12 @@ async function youtubeApiProxyHandler(request, reply) {
   const fullPath = request.url.split('?')[0]; // Remove query string
   const endpoint = fullPath.replace('/panels/external-sources/api/youtube/', '');
   const method = request.method.toLowerCase();
+
+  console.log('YouTube API Proxy Handler << IN');
+  console.log(`  Request URL: ${request.url}`);
+  console.log(`  Extracted endpoint: ${endpoint}`);
+  console.log(`  Method: ${method}`);
+  console.log(`  Query params: ${JSON.stringify(request.query)}`);
 
   try {
     const baseUrl = 'https://www.googleapis.com/youtube/v3';
@@ -183,6 +199,10 @@ async function youtubeApiProxyHandler(request, reply) {
     } else if (method === 'delete') {
       response = await axios.delete(url, config);
     }
+
+    console.log('YouTube API Proxy Handler << OUT');
+    console.log(`  Final API URL: ${url}`);
+    console.log(`  Status: ${response.status}`);
 
     return reply.send(response.data);
   } catch (error) {
@@ -253,6 +273,13 @@ async function dailymotionApiProxyHandler(request, reply) {
     // Get OAuth access token
     const accessToken = await getDailymotionAccessToken();
 
+    console.log('DailyMotion API Proxy Handler << IN');
+    console.log(`  Request URL: ${request.url}`);
+    console.log(`  Extracted endpoint: ${endpoint}`);
+    console.log(`  Method: ${method}`);
+    console.log(`  Query params: ${JSON.stringify(request.query)}`);
+    console.log(`  OAuth token: ${accessToken ? 'present' : 'not available'}`);
+
     const baseUrl = 'https://api.dailymotion.com';
     const url = `${baseUrl}/${endpoint}`;
 
@@ -278,6 +305,10 @@ async function dailymotionApiProxyHandler(request, reply) {
     } else if (method === 'delete') {
       response = await axios.delete(url, config);
     }
+
+    console.log('DailyMotion API Proxy Handler << OUT');
+    console.log(`  Final API URL: ${url}`);
+    console.log(`  Status: ${response.status}`);
 
     return reply.send(response.data);
   } catch (error) {

@@ -337,8 +337,8 @@
                 : (query ? 'search' : 'popular');
 
             const url = query
-                ? `${endpoint}?query=${encodeURIComponent(query)}&per_page=20`
-                : `${endpoint}?per_page=20`;
+                ? `pexels/${endpoint}?query=${encodeURIComponent(query)}&per_page=20`
+                : `pexels/${endpoint}?per_page=20`;
 
             try {
                 const data = await apiCall(url);

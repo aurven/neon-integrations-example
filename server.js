@@ -232,7 +232,7 @@ fastify.register(async function (fastify) {
 fastify.register(async function (fastify) {
   fastify.route({
     method: ['GET', 'POST', 'PUT', 'DELETE'],
-    url: '/panels/external-sources/api/*',
+    url: '/panels/external-sources/api/pexels/*',
     handler: panelHandlers.pexelsApiProxyHandler
   });
 });
