@@ -15,7 +15,7 @@
     <div id="app" class="container mx-auto p-4 max-w-6xl">
         <!-- Header -->
         <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-            <h1 class="text-2xl font-bold text-gray-800 mb-4">External Sources</h1>
+            <h1 class="text-2xl font-bold text-gray-800 mb-4" hidden>External Sources</h1>
             
             <!-- Source Tabs -->
             <div class="source-tabs mb-4">
@@ -330,13 +330,17 @@
 
         // Search Pexels
         async function searchPexels(query) {
-            const endpoint = state.currentType === 'photos'
-                ? (query ? 'search' : 'curated')
-                : (query ? 'search' : 'popular');
+            // Build the full API path including v1 or videos
+            let apiPath;
+            if (state.currentType === 'photos') {
+                apiPath = query ? 'v1/search' : 'v1/curated';
+            } else {
+                apiPath = query ? 'videos/search' : 'videos/popular';
+            }
 
             const url = query
-                ? `pexels/${endpoint}?query=${encodeURIComponent(query)}&per_page=20`
-                : `pexels/${endpoint}?per_page=20`;
+                ? `pexels/${apiPath}?query=${encodeURIComponent(query)}&per_page=20`
+                : `pexels/${apiPath}?per_page=20`;
 
             try {
                 const data = await apiCall(url);
@@ -524,6 +528,23 @@
             return n.toString();
         }
 
+        // Get highest quality video link from Pexels video asset
+        function getHighestQualityVideo(asset) {
+            if (!asset.video_files || asset.video_files.length === 0) {
+                return null;
+            }
+
+            // Sort video files by resolution (width * height) in descending order
+            const sortedVideos = [...asset.video_files].sort((a, b) => {
+                const resolutionA = (a.width || 0) * (a.height || 0);
+                const resolutionB = (b.width || 0) * (b.height || 0);
+                return resolutionB - resolutionA;
+            });
+
+            // Return the link of the highest resolution video
+            return sortedVideos[0].link;
+        }
+
         // Asset actions
         function insertAsset(button) {
             const card = button.closest('.asset-card');
@@ -531,17 +552,28 @@
 
             let url;
             if (state.currentSource === 'pexels') {
-                url = getImageUrl(asset, 'original');
+                // Check if it's a photo or video based on current type
+                if (state.currentType === 'photos') {
+                    url = getImageUrl(asset, 'original');
+                } else {
+                    // For videos, get the highest quality video link
+                    url = getHighestQualityVideo(asset);
+                }
             } else if (state.currentSource === 'youtube' || state.currentSource === 'dailymotion') {
                 // For YouTube and DailyMotion, use the video URL or embed URL
                 url = asset.videoUrl || asset.embedUrl;
             }
 
+            if (!url) {
+                console.error('Failed to get asset URL:', asset);
+                return;
+            }
+
             console.log('Inserting asset:', url);
 
-            window.parent.postMessage({ 
+            window.parent.postMessage({
                 type: 'insert-object',
-                info: { 
+                info: {
                     op: 'uploadAndInsertAsset',
                     url,
                     targetWorkfolder: state.neonContext?.workfolderId || null

@@ -107,7 +107,7 @@ async function pexelsApiProxyHandler(request, reply) {
     return reply.status(401).send({ error: "Unauthorized" });
   }
 
-  // Extract endpoint from the full URL path
+  // Extract endpoint from the full URL path (includes v1/ or videos/)
   const fullPath = request.url.split('?')[0]; // Remove query string
   const endpoint = fullPath.replace('/panels/external-sources/api/pexels/', '');
   const method = request.method.toLowerCase();
@@ -119,10 +119,8 @@ async function pexelsApiProxyHandler(request, reply) {
   console.log(`  Query params: ${JSON.stringify(request.query)}`);
 
   try {
-    const baseUrl = endpoint.includes('videos') ?
-      'https://api.pexels.com/videos' :
-      'https://api.pexels.com/v1';
-
+    // Simple passthrough - endpoint already includes v1/ or videos/
+    const baseUrl = 'https://api.pexels.com';
     const url = `${baseUrl}/${endpoint}`;
 
     const config = {
