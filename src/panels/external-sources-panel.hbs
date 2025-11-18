@@ -120,6 +120,7 @@
         // Global state
         let state = {
             apiKey: '{{{apiKey}}}',
+            neonAppUrl: '{{{neonAppUrl}}}',
             pexelsApiKey: '{{{pexelsApiKey}}}',
             youtubeApiKey: '{{{youtubeApiKey}}}',
             dailymotionApiKey: '{{{dailymotionApiKey}}}',
@@ -179,22 +180,30 @@
             console.log('Setting up PostMessage API for External Sources');
 
             window.addEventListener('message', (event) => {
-                console.log('Received message:', event.data);
-                
-                if (event.data && event.data.type === 'neonContext') {
-                    state.neonContext = event.data;
-                    console.log('Neon context received:', state.neonContext);
+                // Validate origin for security
+                if (event.origin !== state.neonAppUrl && event.origin !== window.parent.origin) {
+                    console.warn('Received message from unwanted origin:', event.origin);
+                    return;
+                }
+                console.log('Received message:', event, event.data);
+
+                if (event.data) {
+                    switch (event.data.key) {
+                        case 'getInfo':
+                            state.neonContext = event.data.info;
+                            console.log('Neon context updated:', state.neonContext);
+                            break;
+
+                        default:
+                            console.warn('Unknown neonContext key:', event.data.key);
+                    }
                 }
             });
 
             // Send ready message to parent
             console.log('Sending ready message to parent');
-            if (window.parent !== window) {
-                window.parent.postMessage({ 
-                    type: 'panel-ready',
-                    panel: 'external-sources'
-                }, '*');
-            }
+            window.parent.postMessage({ type: 'panel-ready', info: { op: 'getInfo' } }, window.parent.origin);
+            console.log('Ready message sent');
         }
 
         // Request Neon context data
@@ -542,7 +551,7 @@
             console.log('Inserting asset:', url);
 
             // Request asset insertion via PostMessage API
-            requestNeonContext('insertAsset', {
+            requestNeonContext('insertObject', {
                 url: url,
                 type: state.currentType.slice(0, -1), // Remove 's' from 'photos'/'videos'
                 source: state.currentSource,
