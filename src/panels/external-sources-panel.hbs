@@ -206,17 +206,6 @@
             console.log('Ready message sent');
         }
 
-        // Request Neon context data
-        function requestNeonContext(operation, data = {}) {
-            if (window.parent !== window) {
-                window.parent.postMessage({
-                    type: 'neon-request',
-                    operation: operation,
-                    data: data
-                }, '*');
-            }
-        }
-
         // Setup event listeners
         function setupEventListeners() {
             // Source tabs
@@ -550,13 +539,14 @@
 
             console.log('Inserting asset:', url);
 
-            // Request asset insertion via PostMessage API
-            requestNeonContext('insertObject', {
-                url: url,
-                type: state.currentType.slice(0, -1), // Remove 's' from 'photos'/'videos'
-                source: state.currentSource,
-                asset: asset
-            });
+            window.parent.postMessage({ 
+                type: 'insert-object',
+                info: { 
+                    op: 'uploadAndInsertAsset',
+                    url,
+                    targetWorkfolder: state.neonContext?.workfolderId || null
+                }
+            }, window.parent.origin);
         }
 
         function showModal(button) {
