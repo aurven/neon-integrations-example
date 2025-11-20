@@ -193,8 +193,8 @@
 </head>
 <body class="bg-gray-50 min-h-screen font-sans">
     <div id="app" class="container mx-auto p-6 max-w-7xl">
-        <!-- Header -->
-        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <!-- Full Header (standalone mode) -->
+        <div id="full-header" class="bg-white rounded-lg shadow-md p-6 mb-6">
             <div class="flex items-center justify-between">
                 <div>
                     <h1 class="text-2xl font-bold text-gray-800 flex items-center">
@@ -219,6 +219,21 @@
                         Save Posts
                     </button>
                 </div>
+            </div>
+        </div>
+
+        <!-- Compact Header (embedded mode) -->
+        <div id="compact-header" class="hidden bg-white rounded-lg shadow-sm p-3 mb-4 sticky top-0 z-10">
+            <div class="flex items-center justify-end gap-2">
+                <button id="generate-all-btn-compact" class="ai-button px-4 py-2 text-white text-sm font-medium rounded-lg flex items-center space-x-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                    </svg>
+                    <span>Generate All</span>
+                </button>
+                <button id="save-all-btn-compact" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors">
+                    Save Posts
+                </button>
             </div>
         </div>
 
@@ -292,6 +307,7 @@
             writebacks: {},
             pollingIntervals: {},
             demoMode: false,
+            isEmbedded: false,  // Track if panel is embedded in iframe
             availableImages: {
                 main: null,      // mainPicture.ref
                 teaser: null     // First hyperlink image (could be teaserImage)
@@ -312,8 +328,36 @@
             return PanelAPI.apiCallJson(path, options);
         }
 
+        // Detect if panel is embedded in iframe
+        function detectEmbedded() {
+            try {
+                // Check if we're in an iframe
+                state.isEmbedded = window.self !== window.top;
+            } catch (e) {
+                // If we can't access window.top due to CORS, we're definitely embedded
+                state.isEmbedded = true;
+            }
+
+            console.log('[Social Media Panel] Embedded mode:', state.isEmbedded);
+
+            // Toggle header visibility based on embedded state
+            if (state.isEmbedded) {
+                document.getElementById('full-header').classList.add('hidden');
+                document.getElementById('compact-header').classList.remove('hidden');
+                // Reduce padding for embedded mode
+                document.getElementById('app').classList.remove('p-6');
+                document.getElementById('app').classList.add('p-3');
+            } else {
+                document.getElementById('full-header').classList.remove('hidden');
+                document.getElementById('compact-header').classList.add('hidden');
+            }
+        }
+
         // Initialize panel
         function init() {
+            // Detect if embedded
+            detectEmbedded();
+
             // Check for demo mode in query parameter
             const urlParams = new URLSearchParams(window.location.search);
             const demoParam = urlParams.get('demo');
@@ -847,67 +891,91 @@
         }
 
         // Generate all posts with AI
+        async function handleGenerateAll(button, originalHTML) {
+            button.disabled = true;
+            const isCompact = button.id.includes('compact');
+            const spinnerSize = isCompact ? 'h-4 w-4' : 'h-5 w-5';
+
+            button.innerHTML = `<div class="animate-spin rounded-full ${spinnerSize} border-b-2 border-white"></div><span>Generating...</span>`;
+
+            const platforms = Object.keys(PLATFORMS).filter(p => state.drafts[p]?.enabled);
+            let completed = 0;
+
+            for (const platform of platforms) {
+                try {
+                    await generateWithAI(platform);
+                    completed++;
+                    button.innerHTML = `<span>${completed}/${platforms.length}...</span>`;
+                } catch (error) {
+                    console.error(`Failed to generate for ${platform}:`, error);
+                }
+            }
+
+            const iconSize = isCompact ? 'w-4 h-4' : 'w-5 h-5';
+            button.innerHTML = `<svg class="${iconSize}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span>${isCompact ? 'Done!' : 'All Generated!'}</span>`;
+
+            setTimeout(() => {
+                button.innerHTML = originalHTML;
+                button.disabled = false;
+            }, 2000);
+        }
+
         async function setupGenerateAllButton() {
             const generateBtn = document.getElementById('generate-all-btn');
-            if (!generateBtn) return;
+            const generateBtnCompact = document.getElementById('generate-all-btn-compact');
 
-            generateBtn.addEventListener('click', async () => {
+            if (generateBtn) {
                 const originalHTML = generateBtn.innerHTML;
-                generateBtn.disabled = true;
-                generateBtn.innerHTML = '<div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div><span>Generating...</span>';
+                generateBtn.addEventListener('click', () => handleGenerateAll(generateBtn, originalHTML));
+            }
 
-                const platforms = Object.keys(PLATFORMS).filter(p => state.drafts[p]?.enabled);
-                let completed = 0;
-
-                for (const platform of platforms) {
-                    try {
-                        await generateWithAI(platform);
-                        completed++;
-                        generateBtn.innerHTML = `<span>Generated ${completed}/${platforms.length}...</span>`;
-                    } catch (error) {
-                        console.error(`Failed to generate for ${platform}:`, error);
-                    }
-                }
-
-                generateBtn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span>All Generated!</span>';
-                setTimeout(() => {
-                    generateBtn.innerHTML = originalHTML;
-                    generateBtn.disabled = false;
-                }, 2000);
-            });
+            if (generateBtnCompact) {
+                const originalHTML = generateBtnCompact.innerHTML;
+                generateBtnCompact.addEventListener('click', () => handleGenerateAll(generateBtnCompact, originalHTML));
+            }
         }
 
         // Save all drafts
+        function handleSaveAll(button, originalText) {
+            // Collect all draft data
+            for (const platform of Object.keys(PLATFORMS)) {
+                const textarea = document.getElementById(`text-${platform}`);
+                const hashtagsInput = document.getElementById(`hashtags-${platform}`);
+
+                if (textarea && state.drafts[platform]?.enabled) {
+                    state.drafts[platform].text = textarea.value;
+                    const hashtagsValue = hashtagsInput.value.trim();
+                    state.drafts[platform].hashtags = hashtagsValue ? hashtagsValue.split(',').map(h => h.trim()) : [];
+                }
+            }
+
+            // Send to parent via PostMessage
+            window.parent.postMessage({
+                type: 'metadata-update',
+                info: {
+                    socialMediaDraft: state.drafts
+                }
+            }, window.parent.origin);
+
+            button.textContent = '✓ Saved!';
+            button.classList.add('bg-green-600');
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.classList.remove('bg-green-600');
+            }, 2000);
+        }
+
         function setupSaveButton() {
             const saveBtn = document.getElementById('save-all-btn');
-            saveBtn.addEventListener('click', async () => {
-                // Collect all draft data
-                for (const platform of Object.keys(PLATFORMS)) {
-                    const textarea = document.getElementById(`text-${platform}`);
-                    const hashtagsInput = document.getElementById(`hashtags-${platform}`);
+            const saveBtnCompact = document.getElementById('save-all-btn-compact');
 
-                    if (textarea && state.drafts[platform]?.enabled) {
-                        state.drafts[platform].text = textarea.value;
-                        const hashtagsValue = hashtagsInput.value.trim();
-                        state.drafts[platform].hashtags = hashtagsValue ? hashtagsValue.split(',').map(h => h.trim()) : [];
-                    }
-                }
+            if (saveBtn) {
+                saveBtn.addEventListener('click', () => handleSaveAll(saveBtn, 'Save Posts'));
+            }
 
-                // Send to parent via PostMessage
-                window.parent.postMessage({
-                    type: 'metadata-update',
-                    info: {
-                        socialMediaDraft: state.drafts
-                    }
-                }, window.parent.origin);
-
-                saveBtn.textContent = '✓ Saved!';
-                saveBtn.classList.add('bg-green-600');
-                setTimeout(() => {
-                    saveBtn.textContent = 'Save All Drafts';
-                    saveBtn.classList.remove('bg-green-600');
-                }, 2000);
-            });
+            if (saveBtnCompact) {
+                saveBtnCompact.addEventListener('click', () => handleSaveAll(saveBtnCompact, 'Save Posts'));
+            }
         }
 
         // Start metrics polling for published posts
