@@ -208,6 +208,19 @@ function smartOctoDashboardHandler(request, reply) {
   return reply.view("/src/widgets/smartocto-dashboard.hbs", params);
 }
 
+function neonAnalyticsDashboardHandler(request, reply) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) {
+    return reply.status(401).send({ error: "Unauthorized" });
+  }
+
+  // params is an object we'll pass to our handlebars template
+  let params = { seo: seo };
+
+  // The Handlebars code will be able to access the parameter values and build them into the page
+  return reply.view("/src/widgets/neon-analytics-dashboard.hbs", params);
+}
+
 async function breakingNewsPublishHandler(request, reply) {
   console.log("breakingNewsPublishHandler << IN:");
   const safeRequest = safeLogRequest(request?.headers || {}, request?.body || {});
@@ -287,5 +300,6 @@ module.exports = {
   wiresWidgetHandler,
   breakingNewsWidgetHandler,
   breakingNewsPublishHandler,
-  smartOctoDashboardHandler
+  smartOctoDashboardHandler,
+  neonAnalyticsDashboardHandler
 };

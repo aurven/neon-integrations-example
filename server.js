@@ -120,7 +120,9 @@ fastify.get("/services", function (request, reply) {
       { name: "Document Upload", endpoint: "POST /widgets/drop/upload", description: "Process uploaded documents" },
       { name: "Wires Widget", endpoint: "GET /widgets/wires", description: "Wire management interface" },
       { name: "Breaking News", endpoint: "GET /widgets/breakingnews", description: "Breaking news publisher interface" },
-      { name: "Breaking News Publish", endpoint: "POST /widgets/breakingnews/publish", description: "Publish breaking news to Neon" }
+      { name: "Breaking News Publish", endpoint: "POST /widgets/breakingnews/publish", description: "Publish breaking news to Neon" },
+      { name: "SmartOcto Dashboard", endpoint: "GET /widgets/smartocto-dashboard", description: "SmartOcto analytics dashboard (demo)" },
+      { name: "Neon Analytics", endpoint: "GET /widgets/neon-analytics", description: "Production metrics dashboard with interactive charts - supports demo mode (?demo=true)" }
     ],
     panels: [
       { name: "Trello Panel", endpoint: "GET /panels/trello", description: "Trello card management panel for Neon CMS iframe embedding with PostMessage API" },
@@ -206,6 +208,7 @@ fastify.get("/widgets/wires", widgetHandlers.wiresWidgetHandler);
 fastify.get("/widgets/breakingnews", widgetHandlers.breakingNewsWidgetHandler);
 fastify.post("/widgets/breakingnews/publish", widgetHandlers.breakingNewsPublishHandler);
 fastify.get("/widgets/smartocto-dashboard", widgetHandlers.smartOctoDashboardHandler);
+fastify.get("/widgets/neon-analytics", widgetHandlers.neonAnalyticsDashboardHandler);
 
 /**
  *
