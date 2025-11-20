@@ -1,9 +1,12 @@
 const OpenAI = require('openai');
+const Anthropic = require('@anthropic-ai/sdk');
 const { parseRichText } = require('../connectors/bluesky-connector');
 
 /**
  * Social Media Helper
  * Handles AI content generation and platform-specific formatting
+ *
+ * Uses Claude (Anthropic) as primary AI provider with OpenAI as fallback
  */
 
 // Platform configurations
@@ -46,49 +49,52 @@ const PLATFORM_CONFIGS = {
 };
 
 /**
+ * Initialize Anthropic (Claude) client
+ * @returns {Anthropic|null} Anthropic client instance or null if not configured
+ */
+function getAnthropicClient() {
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+
+  if (!apiKey) {
+    console.log('[Social Media Helper] Anthropic API key not configured. Will use OpenAI fallback.');
+    return null;
+  }
+
+  return new Anthropic({ apiKey });
+}
+
+/**
  * Initialize OpenAI client
- * @returns {OpenAI} OpenAI client instance
+ * @returns {OpenAI|null} OpenAI client instance or null if not configured
  */
 function getOpenAIClient() {
   const apiKey = process.env.OPENAI_APIKEY;
 
   if (!apiKey) {
-    throw new Error('OpenAI API key not configured. Set OPENAI_APIKEY in .env');
+    console.log('[Social Media Helper] OpenAI API key not configured.');
+    return null;
   }
 
   return new OpenAI({ apiKey });
 }
 
 /**
- * Generate social media post content using AI
- * @param {string} platform - Target platform (facebook, twitter, instagram, threads, bluesky)
- * @param {Object} articleData - Article data from Neon context
- * @param {string} articleUrl - URL to include in the post
- * @param {Object} options - Additional generation options
- * @returns {Promise<Object>} Generated content with text and hashtags
+ * Build the AI prompt for social media content generation
+ * @param {string} platform - Target platform
+ * @param {Object} articleData - Article data
+ * @param {string} articleUrl - Article URL
+ * @returns {string} Formatted prompt
  */
-async function generatePostContent(platform, articleData, articleUrl, options = {}) {
-  try {
-    const config = PLATFORM_CONFIGS[platform];
+function buildPrompt(platform, articleData, articleUrl) {
+  const config = PLATFORM_CONFIGS[platform];
+  const title = articleData.title || articleData.name || 'Untitled Article';
+  const abstract = articleData.abstract || articleData.description || '';
+  const body = articleData.body || articleData.content || '';
 
-    if (!config) {
-      throw new Error(`Unsupported platform: ${platform}`);
-    }
+  // Truncate body for context (first 1000 chars)
+  const bodyPreview = body.length > 1000 ? body.substring(0, 1000) + '...' : body;
 
-    console.log(`[Social Media Helper] Generating content for ${platform}`);
-
-    const openai = getOpenAIClient();
-
-    // Extract article information
-    const title = articleData.title || articleData.name || 'Untitled Article';
-    const abstract = articleData.abstract || articleData.description || '';
-    const body = articleData.body || articleData.content || '';
-
-    // Truncate body for context (first 1000 chars)
-    const bodyPreview = body.length > 1000 ? body.substring(0, 1000) + '...' : body;
-
-    // Build AI prompt
-    const prompt = `You are a professional social media manager creating a post for ${platform}.
+  return `You are a professional social media manager creating a post for ${platform}.
 
 Article Information:
 - Title: ${title}
@@ -122,24 +128,126 @@ Please respond with a JSON object in this exact format:
 }
 
 Important: Make sure the total character count (text + hashtags) is under ${config.maxLength} characters.`;
+}
 
-    const response = await openai.chat.completions.create({
-      model: options.model || 'gpt-4o-mini',
-      messages: [
-        {
-          role: 'system',
-          content: 'You are an expert social media content creator. Always respond with valid JSON only, no additional text or markdown formatting.'
-        },
-        {
-          role: 'user',
-          content: prompt
-        }
-      ],
-      temperature: options.temperature || 0.7,
-      max_tokens: options.maxTokens || 500
-    });
+/**
+ * Generate content using Claude (Anthropic)
+ * @param {string} platform - Target platform
+ * @param {Object} articleData - Article data
+ * @param {string} articleUrl - Article URL
+ * @param {Object} options - Generation options
+ * @returns {Promise<string>} Generated JSON content
+ */
+async function generateWithClaude(platform, articleData, articleUrl, options = {}) {
+  const anthropic = getAnthropicClient();
 
-    const generatedContent = response.choices[0].message.content.trim();
+  if (!anthropic) {
+    throw new Error('Anthropic client not available');
+  }
+
+  const prompt = buildPrompt(platform, articleData, articleUrl);
+
+  console.log(`[Social Media Helper] Using Claude (Anthropic) for ${platform}`);
+
+  const response = await anthropic.messages.create({
+    model: options.claudeModel || 'claude-3-5-sonnet-20241022',
+    max_tokens: options.maxTokens || 1024,
+    temperature: options.temperature || 0.7,
+    system: 'You are an expert social media content creator. Always respond with valid JSON only, no additional text or markdown formatting.',
+    messages: [
+      {
+        role: 'user',
+        content: prompt
+      }
+    ]
+  });
+
+  // Extract text from Claude response
+  const textContent = response.content.find(block => block.type === 'text');
+  if (!textContent) {
+    throw new Error('No text content in Claude response');
+  }
+
+  return textContent.text.trim();
+}
+
+/**
+ * Generate content using OpenAI
+ * @param {string} platform - Target platform
+ * @param {Object} articleData - Article data
+ * @param {string} articleUrl - Article URL
+ * @param {Object} options - Generation options
+ * @returns {Promise<string>} Generated JSON content
+ */
+async function generateWithOpenAI(platform, articleData, articleUrl, options = {}) {
+  const openai = getOpenAIClient();
+
+  if (!openai) {
+    throw new Error('OpenAI client not available');
+  }
+
+  const prompt = buildPrompt(platform, articleData, articleUrl);
+
+  console.log(`[Social Media Helper] Using OpenAI for ${platform}`);
+
+  const response = await openai.chat.completions.create({
+    model: options.openaiModel || 'gpt-4o-mini',
+    messages: [
+      {
+        role: 'system',
+        content: 'You are an expert social media content creator. Always respond with valid JSON only, no additional text or markdown formatting.'
+      },
+      {
+        role: 'user',
+        content: prompt
+      }
+    ],
+    temperature: options.temperature || 0.7,
+    max_tokens: options.maxTokens || 500
+  });
+
+  return response.choices[0].message.content.trim();
+}
+
+/**
+ * Generate social media post content using AI (Claude with OpenAI fallback)
+ * @param {string} platform - Target platform (facebook, twitter, instagram, threads, bluesky)
+ * @param {Object} articleData - Article data from Neon context
+ * @param {string} articleUrl - URL to include in the post
+ * @param {Object} options - Additional generation options
+ * @returns {Promise<Object>} Generated content with text and hashtags
+ */
+async function generatePostContent(platform, articleData, articleUrl, options = {}) {
+  try {
+    const config = PLATFORM_CONFIGS[platform];
+
+    if (!config) {
+      throw new Error(`Unsupported platform: ${platform}`);
+    }
+
+    console.log(`[Social Media Helper] Generating content for ${platform}`);
+
+    let generatedContent;
+    let usedProvider = 'none';
+
+    // Try Claude first, then fall back to OpenAI
+    try {
+      generatedContent = await generateWithClaude(platform, articleData, articleUrl, options);
+      usedProvider = 'claude';
+    } catch (claudeError) {
+      console.warn(`[Social Media Helper] Claude generation failed: ${claudeError.message}`);
+      console.log('[Social Media Helper] Falling back to OpenAI...');
+
+      try {
+        generatedContent = await generateWithOpenAI(platform, articleData, articleUrl, options);
+        usedProvider = 'openai';
+      } catch (openaiError) {
+        console.error(`[Social Media Helper] OpenAI generation also failed: ${openaiError.message}`);
+        throw new Error(`Both AI providers failed. Claude: ${claudeError.message}, OpenAI: ${openaiError.message}`);
+      }
+    }
+
+    console.log(`[Social Media Helper] Successfully generated content using ${usedProvider}`);
 
     // Parse JSON response
     let parsedContent;
@@ -160,7 +268,8 @@ Important: Make sure the total character count (text + hashtags) is under ${conf
       hashtags: Array.isArray(parsedContent.hashtags) ? parsedContent.hashtags : [],
       characterCount: parsedContent.characterCount || parsedContent.text.length,
       platform: platform,
-      generatedAt: new Date().toISOString()
+      generatedAt: new Date().toISOString(),
+      aiProvider: usedProvider // Track which AI was used
     };
 
     // For Bluesky, parse rich text facets
@@ -171,7 +280,8 @@ Important: Make sure the total character count (text + hashtags) is under ${conf
 
     console.log(`[Social Media Helper] Generated content for ${platform}:`, {
       textLength: result.text.length,
-      hashtagCount: result.hashtags.length
+      hashtagCount: result.hashtags.length,
+      provider: usedProvider
     });
 
     return result;

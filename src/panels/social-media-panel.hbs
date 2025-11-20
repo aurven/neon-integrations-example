@@ -10,22 +10,96 @@
     <link rel="stylesheet" href="/neon/api/demo-integration/css/tailwind-panels.css">
     <style>
         .social-cards-container {
-            display: flex;
+            display: grid;
+            grid-template-columns: 1fr;
             gap: 1.5rem;
-            overflow-x: auto;
             padding: 1rem 0;
-            scroll-snap-type: x mandatory;
+            max-width: 900px;
+            margin: 0 auto;
         }
 
         .social-card {
-            flex: 0 0 350px;
-            scroll-snap-align: start;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border-left: 4px solid transparent;
         }
 
         .social-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            transform: translateX(4px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .social-card.platform-bluesky { border-left-color: #1185FE; }
+        .social-card.platform-facebook { border-left-color: #1877F2; }
+        .social-card.platform-twitter { border-left-color: #000000; }
+        .social-card.platform-instagram { border-left-color: #E4405F; }
+        .social-card.platform-threads { border-left-color: #000000; }
+
+        .image-preview {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            background: #f3f4f6;
+        }
+
+        .image-selector {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .image-option {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        .image-option:hover {
+            border-color: #3b82f6;
+            transform: scale(1.05);
+        }
+
+        .image-option.selected {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+
+        .image-option img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-option.no-image {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f9fafb;
+            color: #9ca3af;
+        }
+
+        .image-option .checkmark {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 20px;
+            height: 20px;
+            background: #3b82f6;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+        }
+
+        .image-option.selected .checkmark {
+            display: flex;
         }
 
         .platform-icon {
@@ -134,9 +208,17 @@
                     </h1>
                     <p class="text-gray-600 mt-1">Publish your content across multiple social platforms</p>
                 </div>
-                <button id="save-all-btn" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
-                    Save All Drafts
-                </button>
+                <div class="flex gap-3">
+                    <button id="generate-all-btn" class="ai-button px-6 py-2 text-white font-medium rounded-lg flex items-center space-x-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                        </svg>
+                        <span>Generate All Posts</span>
+                    </button>
+                    <button id="save-all-btn" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
+                        Save Posts
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -155,38 +237,50 @@
     </div>
 
     <script>
-        // Platform configurations
+        // Platform configurations (Bluesky first!)
         const PLATFORMS = {
-            facebook: {
-                name: 'Facebook',
-                icon: '<svg viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>',
-                color: '#1877F2',
-                maxLength: 63206
+            bluesky: {
+                name: 'Bluesky',
+                icon: '<svg viewBox="0 0 24 24" fill="#1185FE"><path d="M12 10.8c-1.087-2.114-4.046-6.053-6.798-7.995C2.566.944 1.561 1.266.902 1.565.139 1.908 0 3.08 0 3.768c0 .69.378 5.65.624 6.479.815 2.736 3.713 3.66 6.383 3.364.136-.02.275-.039.415-.056-.138.022-.276.04-.415.056-3.912.58-7.387 2.005-2.83 7.078 5.013 5.19 6.87-1.113 7.823-4.308.953 3.195 2.05 9.271 7.733 4.308 4.267-4.308 1.172-6.498-2.74-7.078a8.741 8.741 0 0 1-.415-.056c.14.017.279.036.415.056 2.67.297 5.568-.628 6.383-3.364.246-.828.624-5.79.624-6.478 0-.69-.139-1.861-.902-2.206-.659-.298-1.664-.62-4.3 1.24C16.046 4.748 13.087 8.687 12 10.8z"/></svg>',
+                color: '#1185FE',
+                maxLength: 300,
+                imageRatio: '1:1' // Square or landscape
             },
             twitter: {
                 name: 'X (Twitter)',
                 icon: '<svg viewBox="0 0 24 24" fill="#000000"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>',
                 color: '#000000',
-                maxLength: 280
+                maxLength: 280,
+                imageRatio: '16:9' // Landscape
+            },
+            facebook: {
+                name: 'Facebook',
+                icon: '<svg viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>',
+                color: '#1877F2',
+                maxLength: 63206,
+                imageRatio: '16:9' // Landscape
             },
             instagram: {
                 name: 'Instagram',
                 icon: '<svg viewBox="0 0 24 24" fill="url(#instagram-gradient)"><defs><linearGradient id="instagram-gradient" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#833AB4"/><stop offset="50%" style="stop-color:#FD1D1D"/><stop offset="100%" style="stop-color:#FCAF45"/></linearGradient></defs><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>',
                 color: '#E4405F',
-                maxLength: 2200
+                maxLength: 2200,
+                imageRatio: '1:1' // Square
             },
             threads: {
                 name: 'Threads',
                 icon: '<svg aria-label="Threads" viewBox="0 0 192 192" xmlns="http://www.w3.org/2000/svg"><path class="x19hqcy" d="M141.537 88.9883C140.71 88.5919 139.87 88.2104 139.019 87.8451C137.537 60.5382 122.616 44.905 97.5619 44.745C97.4484 44.7443 97.3355 44.7443 97.222 44.7443C82.2364 44.7443 69.7731 51.1409 62.102 62.7807L75.881 72.2328C81.6116 63.5383 90.6052 61.6848 97.2286 61.6848C97.3051 61.6848 97.3819 61.6848 97.4576 61.6855C105.707 61.7381 111.932 64.1366 115.961 68.814C118.893 72.2193 120.854 76.925 121.825 82.8638C114.511 81.6207 106.601 81.2385 98.145 81.7233C74.3247 83.0954 59.0111 96.9879 60.0396 116.292C60.5615 126.084 65.4397 134.508 73.775 140.011C80.8224 144.663 89.899 146.938 99.3323 146.423C111.79 145.74 121.563 140.987 128.381 132.296C133.559 125.696 136.834 117.143 138.28 106.366C144.217 109.949 148.617 114.664 151.047 120.332C155.179 129.967 155.42 145.8 142.501 158.708C131.182 170.016 117.576 174.908 97.0135 175.059C74.2042 174.89 56.9538 167.575 45.7381 153.317C35.2355 139.966 29.8077 120.682 29.6052 96C29.8077 71.3178 35.2355 52.0336 45.7381 38.6827C56.9538 24.4249 74.2039 17.11 97.0132 16.9405C119.988 17.1113 137.539 24.4614 149.184 38.788C154.894 45.8136 159.199 54.6488 162.037 64.9503L178.184 60.6422C174.744 47.9622 169.331 37.0357 161.965 27.974C147.036 9.60668 125.202 0.195148 97.0695 0H96.9569C68.8816 0.19447 47.2921 9.6418 32.7883 28.0793C19.8819 44.4864 13.2244 67.3157 13.0007 95.9325L13 96L13.0007 96.0675C13.2244 124.684 19.8819 147.514 32.7883 163.921C47.2921 182.358 68.8816 191.806 96.9569 192H97.0695C122.03 191.827 139.624 185.292 154.118 170.811C173.081 151.866 172.51 128.119 166.26 113.541C161.776 103.087 153.227 94.5962 141.537 88.9883ZM98.4405 129.507C88.0005 130.095 77.1544 125.409 76.6196 115.372C76.2232 107.93 81.9158 99.626 99.0812 98.6368C101.047 98.5234 102.976 98.468 104.871 98.468C111.106 98.468 116.939 99.0737 122.242 100.233C120.264 124.935 108.662 128.946 98.4405 129.507Z"></path></svg>',
                 color: '#000000',
-                maxLength: 500
-            },
-            bluesky: {
-                name: 'Bluesky',
-                icon: '<svg viewBox="0 0 24 24" fill="#1185FE"><path d="M12 10.8c-1.087-2.114-4.046-6.053-6.798-7.995C2.566.944 1.561 1.266.902 1.565.139 1.908 0 3.08 0 3.768c0 .69.378 5.65.624 6.479.815 2.736 3.713 3.66 6.383 3.364.136-.02.275-.039.415-.056-.138.022-.276.04-.415.056-3.912.58-7.387 2.005-2.83 7.078 5.013 5.19 6.87-1.113 7.823-4.308.953 3.195 2.05 9.271 7.733 4.308 4.267-4.308 1.172-6.498-2.74-7.078a8.741 8.741 0 0 1-.415-.056c.14.017.279.036.415.056 2.67.297 5.568-.628 6.383-3.364.246-.828.624-5.79.624-6.478 0-.69-.139-1.861-.902-2.206-.659-.298-1.664-.62-4.3 1.24C16.046 4.748 13.087 8.687 12 10.8z"/></svg>',
-                color: '#1185FE',
-                maxLength: 300
+                maxLength: 500,
+                imageRatio: '1:1' // Square
             }
+        };
+
+        // Demo placeholder images
+        const DEMO_IMAGES = {
+            main: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=800&h=600&fit=crop',
+            teaser: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800&h=600&fit=crop',
+            placeholder: 'https://via.placeholder.com/800x600/e5e7eb/9ca3af?text=No+Image'
         };
 
         // Global state
@@ -197,7 +291,11 @@
             drafts: {},
             writebacks: {},
             pollingIntervals: {},
-            demoMode: false
+            demoMode: false,
+            availableImages: {
+                main: null,      // mainPicture.ref
+                teaser: null     // First hyperlink image (could be teaserImage)
+            }
         };
 
         // API Helper
@@ -231,37 +329,49 @@
                 setupPostMessageApi();
             }
 
+            setupGenerateAllButton();
             setupSaveButton();
         }
 
         // Load demo data for demonstration
         function loadDemoData() {
-            // Demo drafts
+            // Load demo images
+            state.availableImages = {
+                main: DEMO_IMAGES.main,
+                teaser: DEMO_IMAGES.teaser
+            };
+
+            // Demo drafts - ALL ENABLED BY DEFAULT
             state.drafts = {
-                facebook: {
+                bluesky: {
                     enabled: true,
-                    text: "🚀 Exciting news! Check out our latest article on innovation and technology. We explore how AI is transforming the media industry. Read more at https://example.com/article-123",
-                    hashtags: ['innovation', 'technology', 'AI', 'media']
+                    text: "🚀 New article: AI is transforming journalism! Exploring the intersection of technology and storytelling.\n\nhttps://example.com/article-123",
+                    hashtags: ['AI', 'journalism', 'tech'],
+                    selectedImage: 'main'
                 },
                 twitter: {
                     enabled: true,
                     text: "Breaking: AI transforms journalism 🤖📰 New insights on the future of media\n\nhttps://example.com/article-123",
-                    hashtags: ['AI', 'journalism', 'tech']
+                    hashtags: ['AI', 'journalism', 'tech'],
+                    selectedImage: 'main'
+                },
+                facebook: {
+                    enabled: true,
+                    text: "🚀 Exciting news! Check out our latest article on innovation and technology. We explore how AI is transforming the media industry. Read more at https://example.com/article-123",
+                    hashtags: ['innovation', 'technology', 'AI', 'media'],
+                    selectedImage: 'main'
                 },
                 instagram: {
-                    enabled: false,
-                    text: '',
-                    hashtags: []
+                    enabled: true,
+                    text: "The media revolution is happening right now! 📱✨\n\nSwipe to learn how AI is changing journalism forever. Link in bio!\n\n📸 Behind the scenes of modern newsrooms",
+                    hashtags: ['journalism', 'AI', 'innovation', 'media', 'tech'],
+                    selectedImage: 'main'
                 },
                 threads: {
                     enabled: true,
                     text: "Just published a deep dive into AI and journalism. The future is fascinating! 🌟\n\nWhat are your thoughts on AI-generated content?\n\nhttps://example.com/article-123",
-                    hashtags: ['journalism', 'AI', 'future']
-                },
-                bluesky: {
-                    enabled: false,
-                    text: '',
-                    hashtags: []
+                    hashtags: ['journalism', 'AI', 'future'],
+                    selectedImage: 'teaser'
                 }
             };
 
@@ -310,14 +420,51 @@
             }, window.parent.origin);
         }
 
+        // Extract images from Neon context
+        function extractImagesFromContext() {
+            const node = state.neonContext?.originalNode;
+            if (!node || !node.linkedNodeRefs) return;
+
+            // Extract mainPicture
+            const mainPicture = node.linkedNodeRefs.system?.mainPicture?.[0];
+            if (mainPicture) {
+                state.availableImages.main = mainPicture.ref;
+                console.log('[Social Media Panel] Found mainPicture:', mainPicture.ref);
+            }
+
+            // Extract first hyperlink image as teaser (could include teaserImage)
+            const hyperlinkImages = node.linkedNodeRefs.hyperlink?.image;
+            if (hyperlinkImages && hyperlinkImages.length > 0) {
+                state.availableImages.teaser = hyperlinkImages[0].ref;
+                console.log('[Social Media Panel] Found teaser image:', hyperlinkImages[0].ref);
+            }
+
+            console.log('[Social Media Panel] Available images:', state.availableImages);
+        }
+
         // Load drafts and writebacks from Neon context
         function loadDraftsFromContext() {
             const node = state.neonContext?.originalNode;
             if (!node) return;
 
-            // Load drafts from metadata
+            // Extract images first
+            extractImagesFromContext();
+
+            // Load drafts from metadata (or set default enabled state)
             if (node.metadata?.socialMediaDraft) {
                 state.drafts = node.metadata.socialMediaDraft;
+            } else {
+                // Initialize all platforms as enabled by default
+                state.drafts = {};
+                for (const platform of Object.keys(PLATFORMS)) {
+                    state.drafts[platform] = {
+                        enabled: true,
+                        text: '',
+                        hashtags: [],
+                        selectedImage: state.availableImages.main ? 'main' : 'none'
+                    };
+                }
+                console.log('[Social Media Panel] Initialized default drafts (all enabled)');
             }
 
             // Load writebacks from publishInfos
@@ -346,11 +493,11 @@
 
         // Create individual social card
         function createSocialCard(platform, config) {
-            const draft = state.drafts[platform] || { enabled: false, text: '', hashtags: [] };
+            const draft = state.drafts[platform] || { enabled: true, text: '', hashtags: [], selectedImage: 'main' };
             const writeback = state.writebacks[platform];
 
             const card = document.createElement('div');
-            card.className = 'social-card bg-white rounded-lg shadow-md p-6';
+            card.className = `social-card platform-${platform} bg-white rounded-lg shadow-md p-6`;
             card.id = `card-${platform}`;
 
             if (writeback) {
@@ -364,13 +511,67 @@
             return card;
         }
 
+        // Get image URL for display (handle both Neon refs and direct URLs)
+        function getImageUrl(imageType) {
+            if (!imageType || imageType === 'none') return null;
+
+            const ref = state.availableImages[imageType];
+            if (!ref) return null;
+
+            // If it's already a URL (demo mode), return it
+            if (ref.startsWith('http')) return ref;
+
+            // Otherwise it's a Neon ref - would need BO URL to construct full path
+            // For now, return placeholder in non-demo mode
+            return state.demoMode ? ref : DEMO_IMAGES.placeholder;
+        }
+
         // Render draft mode card
         function renderDraftCard(platform, config, draft) {
+            const selectedImage = draft.selectedImage || 'none';
+            const selectedImageUrl = getImageUrl(selectedImage);
+
+            // Build image selector options
+            let imageOptions = '';
+
+            if (state.availableImages.main) {
+                const mainUrl = getImageUrl('main');
+                imageOptions += `
+                    <div class="image-option ${selectedImage === 'main' ? 'selected' : ''}" data-image="main">
+                        <img src="${mainUrl}" alt="Main image" />
+                        <div class="checkmark">✓</div>
+                    </div>
+                `;
+            }
+
+            if (state.availableImages.teaser) {
+                const teaserUrl = getImageUrl('teaser');
+                imageOptions += `
+                    <div class="image-option ${selectedImage === 'teaser' ? 'selected' : ''}" data-image="teaser">
+                        <img src="${teaserUrl}" alt="Teaser image" />
+                        <div class="checkmark">✓</div>
+                    </div>
+                `;
+            }
+
+            // Always include "no image" option
+            imageOptions += `
+                <div class="image-option no-image ${selectedImage === 'none' ? 'selected' : ''}" data-image="none">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                    <div class="checkmark">✓</div>
+                </div>
+            `;
+
             return `
                 <div class="flex items-center justify-between mb-4">
                     <div class="flex items-center space-x-3">
                         <div class="platform-icon">${config.icon}</div>
-                        <h3 class="text-lg font-semibold text-gray-800">${config.name}</h3>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-800">${config.name}</h3>
+                            <span class="text-xs text-gray-500">${config.imageRatio} • Max ${config.maxLength} chars</span>
+                        </div>
                     </div>
                     <label class="switch">
                         <input type="checkbox" id="toggle-${platform}" ${draft.enabled ? 'checked' : ''}>
@@ -379,12 +580,27 @@
                 </div>
 
                 <div id="content-${platform}" class="${draft.enabled ? '' : 'hidden'}">
+                    <!-- Image Preview -->
+                    ${selectedImageUrl ? `
+                        <div class="mb-4">
+                            <img src="${selectedImageUrl}" class="image-preview" alt="Selected image" id="preview-${platform}" />
+                        </div>
+                    ` : ''}
+
+                    <!-- Image Selector -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Attached Image</label>
+                        <div class="image-selector" id="image-selector-${platform}">
+                            ${imageOptions}
+                        </div>
+                    </div>
+
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700 mb-2">Post Content</label>
                         <textarea
                             id="text-${platform}"
                             class="w-full p-3 border border-gray-300 rounded-lg resize-none"
-                            rows="4"
+                            rows="5"
                             maxlength="${config.maxLength}"
                             placeholder="Write your ${config.name} post..."
                         >${draft.text || ''}</textarea>
@@ -418,6 +634,9 @@
                 </div>
 
                 <div id="disabled-${platform}" class="${draft.enabled ? 'hidden' : ''} text-center py-8 text-gray-400">
+                    <svg class="w-12 h-12 mx-auto mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
+                    </svg>
                     <p>Enable to publish to ${config.name}</p>
                 </div>
             `;
@@ -486,6 +705,7 @@
                 const textarea = document.getElementById(`text-${platform}`);
                 const aiBtn = document.getElementById(`ai-${platform}`);
                 const counter = document.getElementById(`count-${platform}`);
+                const imageSelector = document.getElementById(`image-selector-${platform}`);
 
                 // Check if elements exist (safety check)
                 if (!toggle || !textarea || !aiBtn) {
@@ -513,6 +733,39 @@
                 });
 
                 aiBtn.addEventListener('click', () => generateWithAI(platform));
+
+                // Image selector events
+                if (imageSelector) {
+                    const imageOptions = imageSelector.querySelectorAll('.image-option');
+                    imageOptions.forEach(option => {
+                        option.addEventListener('click', () => {
+                            const selectedImage = option.getAttribute('data-image');
+
+                            // Update UI
+                            imageOptions.forEach(opt => opt.classList.remove('selected'));
+                            option.classList.add('selected');
+
+                            // Update state
+                            if (!state.drafts[platform]) {
+                                state.drafts[platform] = { enabled: true };
+                            }
+                            state.drafts[platform].selectedImage = selectedImage;
+
+                            // Update preview
+                            const preview = document.getElementById(`preview-${platform}`);
+                            const imageUrl = getImageUrl(selectedImage);
+
+                            if (imageUrl && preview) {
+                                preview.src = imageUrl;
+                                preview.parentElement.classList.remove('hidden');
+                            } else if (preview) {
+                                preview.parentElement.classList.add('hidden');
+                            }
+
+                            console.log(`[Social Media Panel] ${platform} image changed to:`, selectedImage);
+                        });
+                    });
+                }
             }, 0);
         }
 
@@ -591,6 +844,37 @@
                 text: `Check out our latest article! ${PLATFORMS[platform].name} post about innovation. https://example.com/article`,
                 hashtags: ['news', 'update']
             };
+        }
+
+        // Generate all posts with AI
+        async function setupGenerateAllButton() {
+            const generateBtn = document.getElementById('generate-all-btn');
+            if (!generateBtn) return;
+
+            generateBtn.addEventListener('click', async () => {
+                const originalHTML = generateBtn.innerHTML;
+                generateBtn.disabled = true;
+                generateBtn.innerHTML = '<div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div><span>Generating...</span>';
+
+                const platforms = Object.keys(PLATFORMS).filter(p => state.drafts[p]?.enabled);
+                let completed = 0;
+
+                for (const platform of platforms) {
+                    try {
+                        await generateWithAI(platform);
+                        completed++;
+                        generateBtn.innerHTML = `<span>Generated ${completed}/${platforms.length}...</span>`;
+                    } catch (error) {
+                        console.error(`Failed to generate for ${platform}:`, error);
+                    }
+                }
+
+                generateBtn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span>All Generated!</span>';
+                setTimeout(() => {
+                    generateBtn.innerHTML = originalHTML;
+                    generateBtn.disabled = false;
+                }, 2000);
+            });
         }
 
         // Save all drafts
