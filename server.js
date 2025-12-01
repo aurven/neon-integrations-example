@@ -122,7 +122,8 @@ fastify.get("/services", function (request, reply) {
       { name: "Breaking News", endpoint: "GET /widgets/breakingnews", description: "Breaking news publisher interface" },
       { name: "Breaking News Publish", endpoint: "POST /widgets/breakingnews/publish", description: "Publish breaking news to Neon" },
       { name: "SmartOcto Dashboard", endpoint: "GET /widgets/smartocto-dashboard", description: "SmartOcto analytics dashboard (demo)" },
-      { name: "Neon Analytics", endpoint: "GET /widgets/neon-analytics", description: "Production metrics dashboard with interactive charts - supports demo mode (?demo=true)" }
+      { name: "Neon Analytics", endpoint: "GET /widgets/neon-analytics", description: "Production metrics dashboard with interactive charts - supports demo mode (?demo=true)" },
+      { name: "Welcome Widget", endpoint: "GET /widgets/welcome", description: "Onboarding widget for new users with quick tour and action cards" }
     ],
     panels: [
       { name: "Trello Panel", endpoint: "GET /panels/trello", description: "Trello card management panel for Neon CMS iframe embedding with PostMessage API" },
@@ -209,6 +210,7 @@ fastify.get("/widgets/breakingnews", widgetHandlers.breakingNewsWidgetHandler);
 fastify.post("/widgets/breakingnews/publish", widgetHandlers.breakingNewsPublishHandler);
 fastify.get("/widgets/smartocto-dashboard", widgetHandlers.smartOctoDashboardHandler);
 fastify.get("/widgets/neon-analytics", widgetHandlers.neonAnalyticsDashboardHandler);
+fastify.get("/widgets/welcome", widgetHandlers.welcomeWidgetHandler);
 
 /**
  *

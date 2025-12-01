@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{seo.title}}</title>
+    <link href="/css/tailwind-panels.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+        }
+
+        /* Action Card Styles */
+        .action-card {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.25rem;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .action-card:hover {
+            border-color: #2847E2;
+            box-shadow: 0 4px 12px rgba(40, 71, 226, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .action-card:active {
+            transform: translateY(0);
+        }
+
+        .icon-circle {
+            width: 48px;
+            height: 48px;
+            min-width: 48px;
+            border-radius: 0.75rem;
+            background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #2847E2;
+        }
+
+        .action-card h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1F2937;
+            margin-bottom: 0.25rem;
+        }
+
+        .action-card p {
+            font-size: 0.875rem;
+            color: #6B7280;
+            line-height: 1.4;
+            margin: 0;
+        }
+
+        .arrow-icon {
+            width: 20px;
+            height: 20px;
+            color: #9CA3AF;
+            transition: all 0.2s ease;
+        }
+
+        .action-card:hover .arrow-icon {
+            color: #2847E2;
+            transform: translateX(4px);
+        }
+
+        /* Carousel Styles */
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            border-radius: 0.75rem;
+            background: white;
+        }
+
+        .carousel-slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            border-radius: 0.75rem;
+        }
+
+        .carousel-slide.active {
+            opacity: 1;
+        }
+
+        .carousel-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.25rem;
+            color: #2847E2;
+            transition: all 0.2s ease;
+            z-index: 10;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .carousel-arrow:hover {
+            background: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .carousel-arrow.left {
+            left: 1rem;
+        }
+
+        .carousel-arrow.right {
+            right: 1rem;
+        }
+
+        .indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #D1D5DB;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .indicator:hover {
+            background: #9CA3AF;
+        }
+
+        .indicator.active {
+            width: 24px;
+            border-radius: 4px;
+            background: #2847E2;
+        }
+
+        /* Logo Animation */
+        .logo-container {
+            background: linear-gradient(135deg, #2847E2 0%, #1e3a8a 100%);
+            animation: pulse-logo 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-logo {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="max-w-7xl mx-auto p-6">
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div class="grid grid-cols-1 min-[500px]:grid-cols-2 gap-0">
+
+                <!-- Left Section: Welcome & Actions -->
+                <div class="p-8">
+                    <!-- Neon Logo Icon -->
+                    <div class="flex items-center gap-4 mb-2">
+                        <div class="w-16 h-16">
+                            <img src="/assets/Neon.png" alt="Neon Logo" class="w-full h-full rounded-lg object-contain">
+                        </div>
+                        <h1 class="text-3xl font-bold text-gray-900">Welcome to Neon!</h1>
+                    </div>
+
+                    <!-- Welcome Text -->
+                    <p class="text-gray-600 mb-8 leading-relaxed mb-2">
+                        We're excited to have you here!<br>
+                        Get started by exploring some of these actions below.
+                    </p>
+
+                    <!-- Action Cards -->
+                    <div class="space-y-4">
+                        <button onclick="triggerCreateStory()" class="action-card">
+                            <div class="icon-circle">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <h3>Start Writing</h3>
+                                <p>Create your first story and get ready to publish it in Neon's Story Editor.</p>
+                            </div>
+                            <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+
+                        <button onclick="triggerEditDashboard()" class="action-card">
+                            <div class="icon-circle">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 4.5V19.5M19.5 12H4.5M4.5 6H19.5V18H4.5V6Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <h3>Add Dashboard Widgets</h3>
+                                <p>Customize your workspace by adding widgets from Neon's dashboard templates.</p>
+                            </div>
+                            <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+
+                        <button onclick="triggerOpenUserGuide()" class="action-card">
+                            <div class="icon-circle">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 6.5C10.067 6.5 8.5 8.067 8.5 10C8.5 11.933 10.067 13.5 12 13.5C13.933 13.5 15.5 11.933 15.5 10C15.5 8.067 13.933 6.5 12 6.5ZM12 6.5V4M18.364 5.636L16.95 7.05M19.5 12H22M5.636 5.636L7.05 7.05M4.5 12H2M7.05 16.95L5.636 18.364M16.95 16.95L18.364 18.364" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <h3>Explore the User Guide</h3>
+                                <p>Explore step-by-step guides and tips to work more efficiently in Neon.</p>
+                            </div>
+                            <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right Section: Carousel (hidden on small screens) -->
+                <div class="hidden min-[500px]:block bg-gradient-to-br from-blue-50 to-blue-100 p-8">
+                    <div class="h-full flex flex-col">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 2L3.5 8V16L12 22L20.5 16V8L12 2Z" stroke="#2847E2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M12 8V14M9 10L12 8L15 10" stroke="#2847E2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Take a Quick Tour
+                        </h2>
+                        <p class="text-gray-600 text-sm mb-6">
+                            Learn how to navigate Neon and discover its key features in just a few minutes
+                        </p>
+
+                        <!-- Carousel Container -->
+                        <div class="flex-1 relative">
+                            <div class="carousel-container">
+                                <img src="https://placehold.co/600x400/E0E7FF/2847E2?text=Dashboard+Overview" alt="Dashboard Overview" class="carousel-slide active">
+                                <img src="https://placehold.co/600x400/E0E7FF/2847E2?text=Story+Editor" alt="Story Editor" class="carousel-slide">
+                                <img src="https://placehold.co/600x400/E0E7FF/2847E2?text=Features+Overview" alt="Features Overview" class="carousel-slide">
+                            </div>
+
+                            <!-- Navigation Arrows -->
+                            <button onclick="prevSlide()" class="carousel-arrow left" aria-label="Previous slide">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
+                            <button onclick="nextSlide()" class="carousel-arrow right" aria-label="Next slide">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- Carousel Indicators -->
+                        <div class="flex gap-2 justify-center mt-4">
+                            <span class="indicator active" data-slide="0" onclick="goToSlide(0)"></span>
+                            <span class="indicator" data-slide="1" onclick="goToSlide(1)"></span>
+                            <span class="indicator" data-slide="2" onclick="goToSlide(2)"></span>
+                        </div>
+
+                        <p class="text-center text-sm text-gray-500 mt-6">
+                            Begin your journey by creating your first piece of content
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Parent window interaction functions
+        function triggerParentAction(selector) {
+            try {
+                if (window.parent && window.parent !== window) {
+                    const element = window.parent.document.querySelector(selector);
+                    if (element) {
+                        element.click();
+                        console.log('Triggered action:', selector);
+                    } else {
+                        console.warn('Element not found in parent:', selector);
+                    }
+                }
+            } catch (e) {
+                console.error('Cannot access parent window:', e);
+            }
+        }
+
+        function triggerCreateStory() {
+            triggerParentAction('[role="menuitem"][value="story"]');
+        }
+
+        function triggerEditDashboard() {
+            triggerParentAction('button[aria-label="Edit dashboard"]');
+        }
+
+        function triggerOpenUserGuide() {
+            triggerParentAction('a[href="/neon/docs/userguide/index.html"]');
+        }
+
+        // Carousel functionality
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.carousel-slide');
+        const indicators = document.querySelectorAll('.indicator');
+
+        function showSlide(index) {
+            // Remove active class from all slides and indicators
+            slides.forEach(s => s.classList.remove('active'));
+            indicators.forEach(i => i.classList.remove('active'));
+
+            // Add active class to current slide and indicator
+            slides[index].classList.add('active');
+            indicators[index].classList.add('active');
+            currentSlide = index;
+        }
+
+        function nextSlide() {
+            const next = (currentSlide + 1) % slides.length;
+            showSlide(next);
+        }
+
+        function prevSlide() {
+            const prev = (currentSlide - 1 + slides.length) % slides.length;
+            showSlide(prev);
+        }
+
+        function goToSlide(index) {
+            showSlide(index);
+        }
+
+        // Auto-advance carousel every 5 seconds
+        if (slides.length > 0) {
+            setInterval(nextSlide, 5000);
+        }
+
+        // Log initialization
+        console.log('Welcome Widget initialized');
+        console.log('Carousel slides:', slides.length);
+        console.log('Embedded mode:', window.parent !== window);
+    </script>
+</body>
+</html>

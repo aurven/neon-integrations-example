@@ -293,6 +293,21 @@ async function breakingNewsPublishHandler(request, reply) {
   }
 }
 
+function welcomeWidgetHandler(request, reply) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) {
+    return reply.status(401).send({ error: "Unauthorized" });
+  }
+
+  let params = {
+    seo: {
+      title: "Welcome to Neon - Get Started",
+      description: "Quick tour and onboarding for new Neon users"
+    }
+  };
+  return reply.view("/src/widgets/welcome-widget.hbs", params);
+}
+
 module.exports = {
   testWidgetHandler,
   dropWidgetHandler,
@@ -301,5 +316,6 @@ module.exports = {
   breakingNewsWidgetHandler,
   breakingNewsPublishHandler,
   smartOctoDashboardHandler,
-  neonAnalyticsDashboardHandler
+  neonAnalyticsDashboardHandler,
+  welcomeWidgetHandler
 };
