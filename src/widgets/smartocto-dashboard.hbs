@@ -115,7 +115,7 @@
     <div class="min-h-screen p-6">
         <div class="max-w-7xl mx-auto">
             <!-- Header with SmartOcto Logo -->
-            <div class="bg-white rounded-lg shadow-sm p-4 mb-4 border border-gray-200">
+            <div id="header" class="bg-white rounded-lg shadow-sm p-4 mb-4 border border-gray-200">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-3">
                         <!-- SmartOcto Logo (Stylized) -->
@@ -151,7 +151,7 @@
             </div>
 
             <!-- Weekly Overview - Core Metrics Grid -->
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-4">
+            <div id="weekly-overview" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-4">
                 <!-- Total Articles -->
                 <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
                     <div class="mb-2">
@@ -214,7 +214,7 @@
             </div>
 
             <!-- Weekly Performance Trend Chart -->
-            <div class="bg-white rounded-lg shadow-sm p-6 mb-4 border border-gray-200">
+            <div id="weekly-performance-trend" class="bg-white rounded-lg shadow-sm p-6 mb-4 border border-gray-200">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-base font-semibold text-gray-900">📈 Weekly Performance Trend</h3>
                     <div class="text-xs text-gray-500">Articles published per day</div>
@@ -227,7 +227,7 @@
             <!-- Two column layout for Traffic and Devices -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
                 <!-- Traffic Sources Distribution -->
-                <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+                <div id="traffic-sources" class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
                     <h3 class="text-base font-semibold text-gray-900 mb-4">🌐 Traffic Sources (Week Total)</h3>
                     <div class="chart-container-small">
                         <canvas id="traffic-chart"></canvas>
@@ -235,7 +235,7 @@
                 </div>
 
                 <!-- Device Breakdown -->
-                <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+                <div id="device-distribution" class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
                     <h3 class="text-base font-semibold text-gray-900 mb-4">📱 Device Distribution</h3>
                     <div class="chart-container-small">
                         <canvas id="device-chart"></canvas>
@@ -244,7 +244,7 @@
             </div>
 
             <!-- Hourly Engagement Pattern -->
-            <div class="bg-white rounded-lg shadow-sm p-6 mb-4 border border-gray-200">
+            <div id="hourly-engagement" class="bg-white rounded-lg shadow-sm p-6 mb-4 border border-gray-200">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-base font-semibold text-gray-900">🕐 Hourly Engagement Pattern</h3>
                     <div class="text-xs text-gray-500">Average engagement by hour of day</div>
@@ -255,7 +255,7 @@
             </div>
 
             <!-- Top Performing Articles -->
-            <div class="bg-white rounded-lg shadow-sm p-6 mb-4 border border-gray-200">
+            <div id="top-articles" class="bg-white rounded-lg shadow-sm p-6 mb-4 border border-gray-200">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-base font-semibold text-gray-900">🏆 Top 10 Performing Articles</h3>
                     <div class="text-xs text-gray-500">Ranked by Attention Score</div>
@@ -266,7 +266,7 @@
             </div>
 
             <!-- Content Portfolio Grid -->
-            <div class="bg-white rounded-lg shadow-sm p-6 mb-4 border border-gray-200">
+            <div id="content-portfolio" class="bg-white rounded-lg shadow-sm p-6 mb-4 border border-gray-200">
                 <h3 class="text-base font-semibold text-gray-900 mb-4">📊 Content Portfolio Details</h3>
                 <div class="overflow-x-auto">
                     <table class="articles-table w-full">
@@ -289,7 +289,7 @@
             </div>
 
             <!-- Weekly AI Insights Panel -->
-            <div class="bg-gradient-to-br from-purple-50 via-white to-teal-50 rounded-lg shadow-sm p-6 mb-4 border-2 border-purple-200">
+            <div id="ai-insights" class="bg-gradient-to-br from-purple-50 via-white to-teal-50 rounded-lg shadow-sm p-6 mb-4 border-2 border-purple-200">
                 <div class="flex items-center space-x-2 mb-4">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
@@ -786,6 +786,63 @@
 
             console.log('SmartOcto Dashboard loaded with data:', dashboardData);
         });
+
+        // ============================================================
+        // QUERY PARAMETERS HANDLING
+        // ============================================================
+        (function initQueryParameters() {
+            const urlParams = new URLSearchParams(window.location.search);
+
+            // All available widget IDs for SmartOcto Dashboard
+            const allWidgetIds = [
+                'header',
+                'weekly-overview',
+                'weekly-performance-trend',
+                'traffic-sources',
+                'device-distribution',
+                'hourly-engagement',
+                'top-articles',
+                'content-portfolio',
+                'ai-insights'
+            ];
+
+            // Handle active-widgets parameter
+            const activeWidgets = urlParams.get('active-widgets');
+            if (activeWidgets) {
+                const widgetIds = activeWidgets.split(',').map(id => id.trim());
+
+                allWidgetIds.forEach(id => {
+                    const element = document.getElementById(id);
+                    if (element) {
+                        if (widgetIds.includes(id)) {
+                            element.style.display = ''; // Show
+                        } else {
+                            element.style.display = 'none'; // Hide
+                        }
+                    }
+                });
+
+                console.log('Active widgets filter applied:', widgetIds);
+            }
+
+            // Handle watermark parameter
+            const watermark = urlParams.get('watermark');
+            if (watermark === 'true') {
+                const prefix = window.__PANEL_EMBED_PREFIX__ || '';
+                const logoPath = prefix + '/assets/logos/smartocto.svg';
+
+                const watermarkDiv = document.createElement('div');
+                watermarkDiv.id = 'watermark';
+                watermarkDiv.innerHTML = `
+                    <span style="font-size: 12px; color: #6B7280; font-weight: 500;">powered by</span>
+                    <img src="${logoPath}" alt="SmartOcto Logo" style="height: 20px; object-fit: contain;">
+                `;
+                watermarkDiv.style.cssText = 'position: fixed; bottom: 16px; right: 16px; background: white; padding: 8px 12px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 8px; z-index: 9999; border: 1px solid #E5E7EB;';
+
+                document.body.appendChild(watermarkDiv);
+                console.log('Watermark added');
+            }
+        })();
     </script>
 </body>
 

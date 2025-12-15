@@ -181,7 +181,7 @@
     <div class="min-h-screen p-6">
         <div class="max-w-7xl mx-auto">
             <!-- Header with Neon Analytics Logo -->
-            <div class="bg-white rounded-lg shadow-sm p-4 mb-4 border border-gray-200">
+            <div id="header" class="bg-white rounded-lg shadow-sm p-4 mb-4 border border-gray-200">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-3">
                         <!-- Neon Analytics Logo -->
@@ -230,7 +230,7 @@
             <!-- Content Container (hidden until data loads) -->
             <div id="analytics-content" class="hidden">
                 <!-- Key Metrics Cards Grid -->
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-4">
+                <div id="key-metrics" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-4">
                     <!-- Total Items -->
                     <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-200 metric-card">
                         <div class="mb-2">
@@ -287,7 +287,7 @@
                 </div>
 
                 <!-- Timeline Activity Chart -->
-                <div class="bg-white rounded-lg shadow-sm p-6 mb-4 border border-gray-200">
+                <div id="timeline-activity" class="bg-white rounded-lg shadow-sm p-6 mb-4 border border-gray-200">
                     <div class="flex items-center justify-between mb-4">
                         <div class="flex items-center gap-2">
                             <h3 class="text-base font-semibold text-gray-900">Timeline Activity</h3>
@@ -310,7 +310,7 @@
                 <!-- Two column layout for Types and Users -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
                     <!-- Content Type Distribution -->
-                    <div id="types-container" class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+                    <div id="content-type-distribution" class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
                         <div class="flex items-center gap-2 mb-4">
                             <h3 class="text-base font-semibold text-gray-900">Content Type Distribution</h3>
                             <div class="info-icon-container relative inline-block">
@@ -328,7 +328,7 @@
                     </div>
 
                     <!-- User Productivity -->
-                    <div id="users-container" class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+                    <div id="user-productivity" class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
                         <div class="flex items-center gap-2 mb-4">
                             <h3 class="text-base font-semibold text-gray-900">User Productivity</h3>
                             <div class="info-icon-container relative inline-block">
@@ -349,7 +349,7 @@
                 <!-- Three column layout: Calendar, Workfolders, Endpoints -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                     <!-- Calendar Heatmap -->
-                    <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+                    <div id="activity-calendar" class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
                         <div class="flex items-center gap-2 mb-4">
                             <h3 class="text-base font-semibold text-gray-900">Activity Calendar</h3>
                             <div class="info-icon-container relative inline-block">
@@ -367,7 +367,7 @@
                     </div>
 
                     <!-- Workfolder Activity -->
-                    <div id="workfolders-container" class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+                    <div id="top-workfolders" class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
                         <div class="flex items-center gap-2 mb-4">
                             <h3 class="text-base font-semibold text-gray-900">Top Workfolders</h3>
                             <div class="info-icon-container relative inline-block">
@@ -385,7 +385,7 @@
                     </div>
 
                     <!-- Endpoint Distribution -->
-                    <div id="endpoints-container" class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+                    <div id="endpoint-usage" class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
                         <div class="flex items-center gap-2 mb-4">
                             <h3 class="text-base font-semibold text-gray-900">Endpoint Usage</h3>
                             <div class="info-icon-container relative inline-block">
@@ -404,7 +404,7 @@
                 </div>
 
                 <!-- Hourly Activity - Full width -->
-                <div id="hourly-container" class="bg-white rounded-lg shadow-sm p-6 mb-4 border border-gray-200">
+                <div id="hourly-activity" class="bg-white rounded-lg shadow-sm p-6 mb-4 border border-gray-200">
                     <div class="flex items-center justify-between mb-4">
                         <div class="flex items-center gap-2">
                             <h3 class="text-base font-semibold text-gray-900">Hourly Activity</h3>
@@ -540,16 +540,21 @@
             const hasWorkfolders = data.workfolders && data.workfolders.length > 0;
             const hasEndpoints = data.endpoints && data.endpoints.length > 0;
 
-            // Show/hide containers
-            const typesContainer = document.getElementById('types-container');
-            const usersContainer = document.getElementById('users-container');
-            const workfoldersContainer = document.getElementById('workfolders-container');
-            const endpointsContainer = document.getElementById('endpoints-container');
+            // Show/hide containers (only if active-widgets filter is not applied)
+            const urlParams = new URLSearchParams(window.location.search);
+            const hasActiveWidgetsFilter = urlParams.get('active-widgets') !== null;
 
-            if (typesContainer) typesContainer.style.display = hasTypes ? 'block' : 'none';
-            if (usersContainer) usersContainer.style.display = hasUsers ? 'block' : 'none';
-            if (workfoldersContainer) workfoldersContainer.style.display = hasWorkfolders ? 'block' : 'none';
-            if (endpointsContainer) endpointsContainer.style.display = hasEndpoints ? 'block' : 'none';
+            if (!hasActiveWidgetsFilter) {
+                const typesContainer = document.getElementById('content-type-distribution');
+                const usersContainer = document.getElementById('user-productivity');
+                const workfoldersContainer = document.getElementById('top-workfolders');
+                const endpointsContainer = document.getElementById('endpoint-usage');
+
+                if (typesContainer) typesContainer.style.display = hasTypes ? 'block' : 'none';
+                if (usersContainer) usersContainer.style.display = hasUsers ? 'block' : 'none';
+                if (workfoldersContainer) workfoldersContainer.style.display = hasWorkfolders ? 'block' : 'none';
+                if (endpointsContainer) endpointsContainer.style.display = hasEndpoints ? 'block' : 'none';
+            }
 
             // Initialize charts (check if functions exist)
             if (typeof initTimelineChart === 'function') {
@@ -585,6 +590,63 @@
         }
 
         console.log('Neon Analytics Dashboard script loaded');
+
+        // ============================================================
+        // QUERY PARAMETERS HANDLING
+        // ============================================================
+        (function initQueryParameters() {
+            const urlParams = new URLSearchParams(window.location.search);
+
+            // All available widget IDs for Neon Analytics Dashboard
+            const allWidgetIds = [
+                'header',
+                'key-metrics',
+                'timeline-activity',
+                'content-type-distribution',
+                'user-productivity',
+                'activity-calendar',
+                'top-workfolders',
+                'endpoint-usage',
+                'hourly-activity'
+            ];
+
+            // Handle active-widgets parameter
+            const activeWidgets = urlParams.get('active-widgets');
+            if (activeWidgets) {
+                const widgetIds = activeWidgets.split(',').map(id => id.trim());
+
+                allWidgetIds.forEach(id => {
+                    const element = document.getElementById(id);
+                    if (element) {
+                        if (widgetIds.includes(id)) {
+                            element.style.display = ''; // Show
+                        } else {
+                            element.style.display = 'none'; // Hide
+                        }
+                    }
+                });
+
+                console.log('Active widgets filter applied:', widgetIds);
+            }
+
+            // Handle watermark parameter
+            const watermark = urlParams.get('watermark');
+            if (watermark === 'true') {
+                const prefix = window.__PANEL_EMBED_PREFIX__ || '';
+                const logoPath = prefix + '/assets/Neon_Blue_Logo.png';
+
+                const watermarkDiv = document.createElement('div');
+                watermarkDiv.id = 'watermark';
+                watermarkDiv.innerHTML = `
+                    <span style="font-size: 12px; color: #6B7280; font-weight: 500;">powered by</span>
+                    <img src="${logoPath}" alt="Neon Logo" style="height: 20px; object-fit: contain;">
+                `;
+                watermarkDiv.style.cssText = 'position: fixed; bottom: 16px; right: 16px; background: white; padding: 8px 12px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 8px; z-index: 9999; border: 1px solid #E5E7EB;';
+
+                document.body.appendChild(watermarkDiv);
+                console.log('Watermark added');
+            }
+        })();
     </script>
 </body>
 
