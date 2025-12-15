@@ -172,6 +172,14 @@ class NeonClient {
         return !!result;
     }
 
+    async searchContents(queryPayload, numberOfNodes = 0, numberOfIds = 10) {
+        return await this.makeRequest({
+            method: 'post',
+            url: `/contents/search?numberOfNodes=${numberOfNodes}&numberOfIds=${numberOfIds}`,
+            data: queryPayload
+        }, `Content search completed (${numberOfIds} ids requested)`, true);
+    }
+
     /**
      * Content Creation
      */
@@ -476,5 +484,6 @@ module.exports = {
     putNode: (params) => defaultClient.putNode(params),
     promoteNode: (familyRef, params) => defaultClient.promoteNode(familyRef, params),
     promoteNodeEverywhere: (familyRef, params) => defaultClient.promoteNodeEverywhere(familyRef, params),
-    discoveryServices: () => defaultClient.discoveryServices()
+    discoveryServices: () => defaultClient.discoveryServices(),
+    searchContents: (queryPayload, numberOfNodes, numberOfIds) => defaultClient.searchContents(queryPayload, numberOfNodes, numberOfIds)
 };

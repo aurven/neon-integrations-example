@@ -19,50 +19,55 @@
 
         <!-- Article List -->
         <main class="main-content">
+            {{#if articles.length}}
             <div class="articles-container" id="articlesContainer">
                 {{#each articles}}
-                <div class="article-card" data-uuid="{{uuid}}">
+                <div class="article-card" data-uuid="{{familyRef}}">
                     <div class="article-header">
                         <h3 class="article-title">{{title}}</h3>
-                        <span class="article-status status-{{status}}">{{status}}</span>
+                        {{#if workflowInfo}}
+                        <span class="article-status-chip">
+                            <span class="status-dot" style="background-color: {{workflowInfo.color}};"></span>
+                            {{workflowInfo.workflow}}
+                        </span>
+                        {{else}}
+                        <span class="article-status-chip">
+                            <span class="status-dot" style="background-color: rgb(150, 150, 150);"></span>
+                            Unknown
+                        </span>
+                        {{/if}}
                     </div>
-                    
-                    <p class="article-summary">{{summary}}</p>
-                    
+
+                    <p class="article-summary">{{#if nodeMeta.teaser.title}}{{nodeMeta.teaser.title}}{{else}}{{title}}{{/if}}</p>
+
                     <div class="article-meta">
                         <span class="article-date">
                             <i class="fas fa-clock"></i>
-                            {{formatDate lastModified}}
+                            {{formatDate updateTs}}
                         </span>
                         <span class="article-uuid">
                             <i class="fas fa-fingerprint"></i>
-                            {{uuid}}
+                            {{familyRef}}
                         </span>
                     </div>
-                    
+
                     <div class="article-actions">
-                        <button class="btn btn-secondary" onclick="editArticle('{{uuid}}')">
+                        <button class="btn btn-secondary" onclick="editArticle('{{familyRef}}')">
                             <i class="fas fa-edit"></i> Edit
                         </button>
-                        <button class="btn btn-info" onclick="viewArticle('{{uuid}}')">
+                        <button class="btn btn-info" onclick="viewArticle('{{familyRef}}')">
                             <i class="fas fa-eye"></i> View
                         </button>
-                        <button class="btn btn-danger" onclick="deleteArticle('{{uuid}}')">
+                        <button class="btn btn-danger" onclick="deleteArticle('{{familyRef}}')">
                             <i class="fas fa-trash"></i> Delete
                         </button>
                     </div>
                 </div>
                 {{/each}}
             </div>
-
-            <!-- Loading state -->
-            <div class="loading-state" id="loadingState" style="display: none;">
-                <i class="fas fa-spinner fa-spin"></i>
-                <p>Loading articles...</p>
-            </div>
-
+            {{else}}
             <!-- Empty state -->
-            <div class="empty-state" id="emptyState" style="display: none;">
+            <div class="empty-state" id="emptyState">
                 <i class="fas fa-file-alt"></i>
                 <h3>No Articles Found</h3>
                 <p>Create your first article to get started.</p>
@@ -70,11 +75,18 @@
                     <i class="fas fa-plus"></i> Create First Article
                 </button>
             </div>
+            {{/if}}
+
+            <!-- Loading state -->
+            <div class="loading-state" id="loadingState" style="display: none;">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Loading articles...</p>
+            </div>
         </main>
 
         <!-- Footer -->
         <footer class="footer">
-            <p>&copy; 2024 Neon Mobile Client POC</p>
+            <p>&copy; 2025 Neon Mobile Client POC</p>
         </footer>
     </div>
 
