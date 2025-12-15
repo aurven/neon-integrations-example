@@ -489,19 +489,15 @@
         }
 
         async function loadMetricsData(metric) {
-            if (isDemoMode) {
-                // Load from static JSON files
-                const response = await fetch(`/data/neon-analytics/api-metrics-example-${metric}.json`);
-                if (!response.ok) throw new Error('Failed to load demo data');
+            const isEmbedded = window.self !== window.top;
+            const prefix = isEmbedded ? '/neon/api/demo-integration' : '';
+            const endpoint = isDemoMode
+                ? `${prefix}/data/neon-analytics/api-metrics-example-${metric}.json`
+                : `${prefix}/neon/api/core/metrics/${metric}`;
+
+                const response = await fetch(endpoint);
+                if (!response.ok) throw new Error(isDemoMode ? 'Failed to load demo data' : 'Failed to load metrics');
                 return await response.json();
-            } else {
-                // Load from real API
-                const isEmbedded = window.self !== window.top;
-                const prefix = isEmbedded ? '/neon/api/demo-integration' : '';
-                const response = await fetch(`${prefix}/neon/api/core/metrics/${metric}`);
-                if (!response.ok) throw new Error('Failed to load metrics');
-                return await response.json();
-            }
         }
 
         function showLoading(show) {
