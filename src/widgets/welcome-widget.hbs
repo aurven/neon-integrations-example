@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{seo.title}}</title>
-    <script>(function(w){'use strict';function e(){try{return w.self!==w.top}catch(e){return true}}const m=e(),p=m?'/neon/api/demo-integration':'';w.__PANEL_EMBED_PREFIX__=p;w.__PANEL_IS_EMBEDDED__=m;const l=document.createElement('link');l.rel='stylesheet';l.href=p+'/css/tailwind-panels.css';document.head.appendChild(l);const s=document.createElement('script');s.src=p+'/js/panel-api-helper.js';document.head.appendChild(s)})(window);</script>
+    <script src="/js/panel-api-helper.js"></script>
+    <script src="/neon/api/demo-integration/js/panel-api-helper.js"></script>
+    <link rel="stylesheet" href="/css/tailwind-panels.css">
+    <link rel="stylesheet" href="/neon/api/demo-integration/css/tailwind-panels.css">
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
@@ -247,10 +250,8 @@
 
                         <!-- Carousel Container -->
                         <div class="flex-1 relative">
-                            <div class="carousel-container" style="min-height: 300px;">
-                                <img src="https://placehold.co/600x400/E0E7FF/2847E2?text=Dashboard+Overview" alt="Dashboard Overview" class="carousel-slide active">
-                                <img src="https://placehold.co/600x400/E0E7FF/2847E2?text=Story+Editor" alt="Story Editor" class="carousel-slide">
-                                <img src="https://placehold.co/600x400/E0E7FF/2847E2?text=Features+Overview" alt="Features Overview" class="carousel-slide">
+                            <div class="carousel-container" style="min-height: 300px;" id="carousel-slides">
+                                <!-- Slides will be populated by JavaScript -->
                             </div>
 
                             <!-- Navigation Arrows -->
@@ -267,14 +268,13 @@
                         </div>
 
                         <!-- Carousel Indicators -->
-                        <div class="flex gap-2 justify-center mt-4">
-                            <span class="indicator active" data-slide="0" onclick="goToSlide(0)"></span>
-                            <span class="indicator" data-slide="1" onclick="goToSlide(1)"></span>
-                            <span class="indicator" data-slide="2" onclick="goToSlide(2)"></span>
+                        <div class="flex gap-2 justify-center mt-4" id="carousel-indicators">
+                            <!-- Indicators will be populated by JavaScript -->
                         </div>
 
-                        <p class="text-center text-sm text-gray-500 mt-6">
-                            Begin your journey by creating your first piece of content
+                        <!-- Dynamic Description Text -->
+                        <p class="text-center text-sm text-gray-500 mt-6 transition-opacity duration-300" id="carousel-description">
+                            <!-- Description will be updated by JavaScript -->
                         </p>
                     </div>
                 </div>
@@ -284,6 +284,78 @@
     </div>
 
     <script>
+        // Centralized carousel configuration - single source of truth
+        const CAROUSEL_SLIDES = [
+            {
+                gif: '1-custom-dashboard.gif',
+                alt: 'Custom Dashboard',
+                description: 'Customize your dashboard with widgets tailored to your workflow'
+            },
+            {
+                gif: '2-create-new-story.gif',
+                alt: 'Create New Story',
+                description: 'Create engaging stories with our intuitive editor'
+            },
+            {
+                gif: '3-publishing-story.gif',
+                alt: 'Publishing Story',
+                description: 'Publish your content across multiple platforms seamlessly'
+            },
+            {
+                gif: '4-faceted-search.gif',
+                alt: 'Faceted Search',
+                description: 'Find exactly what you need with powerful faceted search'
+            },
+            {
+                gif: '5-live-blog.gif',
+                alt: 'Live Blog',
+                description: 'Keep your audience engaged with real-time live blog updates'
+            },
+            {
+                gif: '6-ai-companion.gif',
+                alt: 'AI Companion',
+                description: 'Leverage AI assistance to enhance your content creation'
+            }
+        ];
+
+        // Initialize carousel with slides and indicators
+        function initializeCarousel() {
+            const slidesContainer = document.getElementById('carousel-slides');
+            const indicatorsContainer = document.getElementById('carousel-indicators');
+            const descriptionElement = document.getElementById('carousel-description');
+
+            // Create slides (with dual path support for embedded mode)
+            CAROUSEL_SLIDES.forEach((slide, index) => {
+                // Create slide image
+                const img = document.createElement('img');
+                img.className = `carousel-slide${index === 0 ? ' active' : ''}`;
+                img.alt = slide.alt;
+
+                // Dual path support (try both paths)
+                img.src = `/assets/welcome-gifs/${slide.gif}`;
+                img.onerror = function() {
+                    this.src = `/neon/api/demo-integration/assets/welcome-gifs/${slide.gif}`;
+                };
+
+                slidesContainer.appendChild(img);
+
+                // Create indicator
+                const indicator = document.createElement('span');
+                indicator.className = `indicator${index === 0 ? ' active' : ''}`;
+                indicator.setAttribute('data-slide', index);
+                indicator.onclick = () => goToSlide(index);
+                indicatorsContainer.appendChild(indicator);
+            });
+
+            // Set initial description
+            if (descriptionElement) {
+                descriptionElement.textContent = CAROUSEL_SLIDES[0].description;
+            }
+        }
+
+        // Initialize on load
+        initializeCarousel();
+
         // Parent window interaction functions
         function triggerParentAction(selector) {
             try {
@@ -315,10 +387,34 @@
 
         // Carousel functionality
         let currentSlide = 0;
-        const slides = document.querySelectorAll('.carousel-slide');
-        const indicators = document.querySelectorAll('.indicator');
+        let slides, indicators, descriptionElement;
+
+        // Get DOM elements after initialization
+        function initCarouselControls() {
+            slides = document.querySelectorAll('.carousel-slide');
+            indicators = document.querySelectorAll('.indicator');
+            descriptionElement = document.getElementById('carousel-description');
+        }
+
+        // Call after DOM is ready
+        setTimeout(initCarouselControls, 0);
+
+        function updateDescription(index) {
+            if (descriptionElement && CAROUSEL_SLIDES[index]) {
+                // Fade out
+                descriptionElement.style.opacity = '0';
+
+                // Change text and fade in
+                setTimeout(() => {
+                    descriptionElement.textContent = CAROUSEL_SLIDES[index].description;
+                    descriptionElement.style.opacity = '1';
+                }, 150);
+            }
+        }
 
         function showSlide(index) {
+            if (!slides || !indicators) return;
+
             // Remove active class from all slides and indicators
             slides.forEach(s => s.classList.remove('active'));
             indicators.forEach(i => i.classList.remove('active'));
@@ -327,6 +423,9 @@
             slides[index].classList.add('active');
             indicators[index].classList.add('active');
             currentSlide = index;
+
+            // Update description text
+            updateDescription(index);
         }
 
         function nextSlide() {
@@ -344,13 +443,17 @@
         }
 
         // Auto-advance carousel every 5 seconds
-        if (slides.length > 0) {
-            setInterval(nextSlide, 5000);
-        }
+        /*
+        setTimeout(() => {
+            if (slides && slides.length > 0) {
+                setInterval(nextSlide, 5000);
+            }
+        }, 100);
+        */
 
         // Log initialization
         console.log('Welcome Widget initialized');
-        console.log('Carousel slides:', slides.length);
+        console.log('Carousel configuration:', CAROUSEL_SLIDES.length, 'slides');
         console.log('Embedded mode:', window.parent !== window);
     </script>
 </body>
