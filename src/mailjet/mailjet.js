@@ -55,7 +55,7 @@ async function sendNewsletter(neonModel) {
   const contentData = neonModel.contentData || {};
   const model = neonModel.model || neonModel;
   const newsletterTitle = contentData.data.title || model.data?.title || "Latest News Updates";
-  const baseUrl = neonModel.siteNode?.hostname || "https://theglobe-demo.neon.eks-dev.dev.eidosmedia.io";
+  const baseUrl = neonModel.siteNode?.hostname || process.env.NEON_THEGLOBE_LIVE_URL || 'https://theglobe-demorc.sites.neap.eidosmedia.io';
   
   // Extract linked articles from the model
   const articleIds = contentData.data?.links?.pagelink?.main || model.data?.links?.pagelink?.main || [];
