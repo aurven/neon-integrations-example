@@ -926,9 +926,9 @@
 
                 const targetWorkspace = state.neonContext?.workfolder || null;
                 console.log('Target workspace:', targetWorkspace);
-                
+
                 // Call our API proxy to upload to Neon
-                const response = await fetch('/panels/upload-asset', {
+                const result = await PanelAPI.apiCallJson('/panels/upload-asset', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -940,8 +940,6 @@
                         workspace: targetWorkspace,
                     })
                 });
-                
-                const result = await response.json();
                 
                 if (result.success) {
                     console.log('Asset uploaded successfully:', result.result);
