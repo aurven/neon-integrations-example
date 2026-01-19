@@ -149,6 +149,7 @@ async function uploadImageFromStory(story) {
 
 async function prepareNeonImage({ siteName, targetId, environment }) {
     try {
+        console.log('prepareNeonImage - process.env.NEON_FO_APIKEY: ' + process.env.NEON_FO_APIKEY); 
         const { node, data } = await siteshelpers.getResourceById({ siteName, targetId, environment });
         // const base64 = Buffer.from(data, 'binary').toString('base64');
         const { fileName, mimeType } = node.files.editorial;
