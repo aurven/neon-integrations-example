@@ -115,27 +115,27 @@ fastify.get("/services", function (request, reply) {
       { name: "Neon Discovery", endpoint: "GET /utilities/services", description: "Discover Neon services" }
     ],
     widgets: [
-      { name: "Test Widget", endpoint: "GET /widgets/test", description: "Test widget interface" },
-      { name: "Document Drop", endpoint: "GET /widgets/drop", description: "Drop and upload documents" },
+      { name: "Test Widget", endpoint: "GET /widgets/test", demoUrl: "/widgets/test", description: "Test widget interface" },
+      { name: "Document Drop", endpoint: "GET /widgets/drop", demoUrl: "/widgets/drop", description: "Drop and upload documents" },
       { name: "Document Upload", endpoint: "POST /widgets/drop/upload", description: "Process uploaded documents" },
-      { name: "Wires Widget", endpoint: "GET /widgets/wires", description: "Wire management interface" },
-      { name: "Breaking News", endpoint: "GET /widgets/breakingnews", description: "Breaking news publisher interface" },
+      { name: "Wires Widget", endpoint: "GET /widgets/wires", demoUrl: "/widgets/wires", description: "Wire management interface" },
+      { name: "Breaking News", endpoint: "GET /widgets/breakingnews", demoUrl: "/widgets/breakingnews", description: "Breaking news publisher interface" },
       { name: "Breaking News Publish", endpoint: "POST /widgets/breakingnews/publish", description: "Publish breaking news to Neon" },
-      { name: "SmartOcto Dashboard", endpoint: "GET /widgets/smartocto-dashboard", description: "SmartOcto analytics dashboard (demo)" },
-      { name: "Neon Analytics", endpoint: "GET /widgets/neon-analytics", description: "Production metrics dashboard with interactive charts - supports demo mode (?demo=true)" },
-      { name: "Welcome Widget", endpoint: "GET /widgets/welcome", description: "Onboarding widget for new users with quick tour and action cards" }
+      { name: "SmartOcto Dashboard", endpoint: "GET /widgets/smartocto-dashboard", demoUrl: "/widgets/smartocto-dashboard", description: "SmartOcto analytics dashboard (demo)" },
+      { name: "Neon Analytics", endpoint: "GET /widgets/neon-analytics", demoUrl: "/widgets/neon-analytics?demo=true", description: "Production metrics dashboard with interactive charts - supports demo mode (?demo=true)" },
+      { name: "Welcome Widget", endpoint: "GET /widgets/welcome", demoUrl: "/widgets/welcome", description: "Onboarding widget for new users with quick tour and action cards" }
     ],
     panels: [
-      { name: "Trello Panel", endpoint: "GET /panels/trello", description: "Trello card management panel for Neon CMS iframe embedding with PostMessage API" },
+      { name: "Trello Panel", endpoint: "GET /panels/trello", demoUrl: "/panels/trello", description: "Trello card management panel for Neon CMS iframe embedding with PostMessage API" },
       { name: "Trello API Proxy", endpoint: "ALL /panels/trello/api/*", description: "Proxy for Trello API calls with authentication" },
-      { name: "External Sources Panel", endpoint: "GET /panels/external-sources", description: "External assets panel for searching and inserting Pexels, YouTube, and DailyMotion videos into Neon CMS" },
+      { name: "External Sources Panel", endpoint: "GET /panels/external-sources", demoUrl: "/panels/external-sources", description: "External assets panel for searching and inserting Pexels, YouTube, and DailyMotion videos into Neon CMS" },
       { name: "Pexels API Proxy", endpoint: "ALL /panels/external-sources/api/*", description: "Proxy for Pexels API calls with authentication" },
       { name: "YouTube API Proxy", endpoint: "ALL /panels/external-sources/api/youtube/*", description: "Proxy for YouTube Data API calls with authentication" },
       { name: "DailyMotion API Proxy", endpoint: "ALL /panels/external-sources/api/dailymotion/*", description: "Proxy for DailyMotion API calls with authentication" },
-      { name: "Méthode Panel", endpoint: "GET /panels/methode", description: "Méthode object management panel with PDF preview, workflow status, and Swing integration" },
+      { name: "Méthode Panel", endpoint: "GET /panels/methode", demoUrl: "/panels/methode", description: "Méthode object management panel with PDF preview, workflow status, and Swing integration" },
       { name: "Méthode API Proxy", endpoint: "ALL /panels/methode/api/*", description: "Proxy for Méthode Editorial API calls with authentication and object retrieval" },
-      { name: "QuickChart Panel", endpoint: "GET /panels/quickchart", description: "QuickChart.io gallery panel for browsing and importing chart examples as PNG assets into Neon CMS" },
-      { name: "Social Media Panel", endpoint: "GET /panels/social-media", description: "Social media publishing panel with AI-powered content generation for Facebook, X, Instagram, Threads, and Bluesky" },
+      { name: "QuickChart Panel", endpoint: "GET /panels/quickchart", demoUrl: "/panels/quickchart", description: "QuickChart.io gallery panel for browsing and importing chart examples as PNG assets into Neon CMS" },
+      { name: "Social Media Panel", endpoint: "GET /panels/social-media", demoUrl: "/panels/social-media", description: "Social media publishing panel with AI-powered content generation for Facebook, X, Instagram, Threads, and Bluesky" },
       { name: "Social Media API Proxy", endpoint: "ALL /panels/social-media/api/*", description: "Proxy for social media API calls (AI generation, Bluesky metrics) with authentication" }
     ],
     webhooks: [

@@ -97,49 +97,135 @@
                 </div>
             </div>
 
-            <!-- PDF Viewer Section -->
-            <div id="pdf-section" class="bg-white rounded-lg shadow-md p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-lg font-semibold text-gray-800 flex items-center">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
-                        </svg>
-                        Preview
-                    </h2>
-                    <button id="open-preview-btn" class="hidden inline-flex items-center px-3 py-1 text-sm font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md transition-colors" title="Open preview in new tab">
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-                        </svg>
-                        Open
-                    </button>
-                </div>
-                <div id="preview-container" class="relative">
-                    <!-- Loading overlay for initial load -->
-                    <div id="preview-loading" class="hidden flex items-center justify-center h-96 bg-gray-100 rounded">
-                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-methode-500"></div>
-                        <span class="ml-3 text-gray-600">Loading preview...</span>
-                    </div>
-
-                    <!-- Error state -->
-                    <div id="preview-error" class="hidden flex items-center justify-center h-96 bg-gray-100 rounded">
-                        <div class="text-center">
-                            <svg class="w-12 h-12 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            <!-- Tabs Section -->
+            <div class="bg-white rounded-lg shadow-md">
+                <!-- Tab Navigation -->
+                <div class="border-b border-gray-200">
+                    <nav class="flex -mb-px">
+                        <button id="tab-metadata" class="tab-button active flex-1 py-3 px-4 text-center border-b-2 border-methode-500 text-methode-600 font-medium text-sm transition-colors" data-tab="metadata">
+                            <svg class="w-4 h-4 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
                             </svg>
-                            <p class="text-gray-600">Preview not available</p>
-                        </div>
-                    </div>
+                            PRINT
+                        </button>
+                        <button id="tab-preview" class="tab-button flex-1 py-3 px-4 text-center border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-sm transition-colors" data-tab="preview">
+                            <svg class="w-4 h-4 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                            </svg>
+                            Preview
+                        </button>
+                    </nav>
+                </div>
 
-                    <!-- Preview image container -->
-                    <div id="preview-image-container" class="hidden relative">
-                        <!-- Subtle loading chip for refresh -->
-                        <div id="preview-refresh-chip" class="hidden absolute top-2 right-2 z-10 bg-white shadow-md rounded-full px-3 py-1 text-xs text-gray-600 border border-gray-200 transition-opacity duration-300">
+                <!-- Tab Content -->
+                <div class="p-6">
+                    <!-- Metadata Tab Content -->
+                    <div id="content-metadata" class="tab-content">
+                        <div class="space-y-4">
+                            <!-- Position -->
                             <div class="flex items-center">
-                                <div class="animate-spin rounded-full h-3 w-3 border border-methode-500 border-t-transparent mr-2"></div>
-                                Updating...
+                                <label for="meta-position" class="w-32 text-sm font-medium text-gray-700">Position</label>
+                                <select id="meta-position" class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-methode-500 focus:border-methode-500 text-sm">
+                                    <option value="AboveFold">AboveFold</option>
+                                    <option value="BelowFold">BelowFold</option>
+                                    <option value="Inside">Inside</option>
+                                </select>
+                            </div>
+
+                            <!-- Priority -->
+                            <div class="flex items-center">
+                                <label for="meta-priority" class="w-32 text-sm font-medium text-gray-700">Priority</label>
+                                <select id="meta-priority" class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-methode-500 focus:border-methode-500 text-sm">
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3" selected>3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                </select>
+                            </div>
+
+                            <!-- Issue Date -->
+                            <div class="flex items-center">
+                                <label for="meta-issue-date" class="w-32 text-sm font-medium text-gray-700">Issue Date</label>
+                                <input type="text" id="meta-issue-date" placeholder="Tomorrow" class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-methode-500 focus:border-methode-500 text-sm">
+                            </div>
+
+                            <!-- Include Image -->
+                            <div class="flex items-center">
+                                <label for="meta-include-image" class="w-32 text-sm font-medium text-gray-700">Include Image</label>
+                                <select id="meta-include-image" class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-methode-500 focus:border-methode-500 text-sm">
+                                    <option value="Yes">Yes</option>
+                                    <option value="No">No</option>
+                                </select>
+                            </div>
+
+                            <!-- Image Size -->
+                            <div class="flex items-center">
+                                <label for="meta-image-size" class="w-32 text-sm font-medium text-gray-700">Image Size</label>
+                                <select id="meta-image-size" class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-methode-500 focus:border-methode-500 text-sm">
+                                    <option value="Small">Small</option>
+                                    <option value="Medium" selected>Medium</option>
+                                    <option value="Large">Large</option>
+                                </select>
+                            </div>
+
+                            <!-- Adjacent Ads -->
+                            <div class="flex items-center">
+                                <label for="meta-adjacent-ads" class="w-32 text-sm font-medium text-gray-700">Adjacent Ads</label>
+                                <select id="meta-adjacent-ads" class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-methode-500 focus:border-methode-500 text-sm">
+                                    <option value="Yes">Yes</option>
+                                    <option value="No">No</option>
+                                </select>
                             </div>
                         </div>
-                        <img id="preview-image" class="w-full h-96 object-contain border border-gray-200 rounded" alt="Story Preview" />
+                    </div>
+
+                    <!-- Preview Tab Content -->
+                    <div id="content-preview" class="tab-content hidden">
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="text-lg font-semibold text-gray-800 flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                                </svg>
+                                Preview
+                            </h2>
+                            <button id="open-preview-btn" class="hidden inline-flex items-center px-3 py-1 text-sm font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md transition-colors" title="Open preview in new tab">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                </svg>
+                                Open
+                            </button>
+                        </div>
+                        <div id="preview-container" class="relative">
+                            <!-- Loading overlay for initial load -->
+                            <div id="preview-loading" class="hidden flex items-center justify-center h-96 bg-gray-100 rounded">
+                                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-methode-500"></div>
+                                <span class="ml-3 text-gray-600">Loading preview...</span>
+                            </div>
+
+                            <!-- Error state -->
+                            <div id="preview-error" class="hidden flex items-center justify-center h-96 bg-gray-100 rounded">
+                                <div class="text-center">
+                                    <svg class="w-12 h-12 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    <p class="text-gray-600">Preview not available</p>
+                                </div>
+                            </div>
+
+                            <!-- Preview image container -->
+                            <div id="preview-image-container" class="hidden relative">
+                                <!-- Subtle loading chip for refresh -->
+                                <div id="preview-refresh-chip" class="hidden absolute top-2 right-2 z-10 bg-white shadow-md rounded-full px-3 py-1 text-xs text-gray-600 border border-gray-200 transition-opacity duration-300">
+                                    <div class="flex items-center">
+                                        <div class="animate-spin rounded-full h-3 w-3 border border-methode-500 border-t-transparent mr-2"></div>
+                                        Updating...
+                                    </div>
+                                </div>
+                                <img id="preview-image" class="w-full h-96 object-contain border border-gray-200 rounded" alt="Story Preview" />
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -688,10 +774,84 @@
             document.getElementById('no-object').classList.remove('hidden');
         }
 
+        // Tab switching functionality
+        function setupTabs() {
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabName = button.dataset.tab;
+
+                    // Update button states
+                    tabButtons.forEach(btn => {
+                        if (btn.dataset.tab === tabName) {
+                            btn.classList.add('border-methode-500', 'text-methode-600');
+                            btn.classList.remove('border-transparent', 'text-gray-500');
+                        } else {
+                            btn.classList.remove('border-methode-500', 'text-methode-600');
+                            btn.classList.add('border-transparent', 'text-gray-500');
+                        }
+                    });
+
+                    // Update content visibility
+                    tabContents.forEach(content => {
+                        if (content.id === `content-${tabName}`) {
+                            content.classList.remove('hidden');
+                        } else {
+                            content.classList.add('hidden');
+                        }
+                    });
+
+                    // If switching to preview tab for the first time and no preview loaded yet
+                    if (tabName === 'preview' && !state.currentPreviewUrl && state.currentObject) {
+                        generatePreviewAsync();
+                    }
+                });
+            });
+        }
+
+        // Get metadata values from form
+        function getMetadataValues() {
+            return {
+                position: document.getElementById('meta-position')?.value || 'AboveFold',
+                priority: document.getElementById('meta-priority')?.value || '3',
+                issueDate: document.getElementById('meta-issue-date')?.value || '',
+                includeImage: document.getElementById('meta-include-image')?.value || 'Yes',
+                imageSize: document.getElementById('meta-image-size')?.value || 'Medium',
+                adjacentAds: document.getElementById('meta-adjacent-ads')?.value || 'Yes'
+            };
+        }
+
+        // Set metadata values in form
+        function setMetadataValues(metadata) {
+            if (!metadata) return;
+
+            if (metadata.position) {
+                document.getElementById('meta-position').value = metadata.position;
+            }
+            if (metadata.priority) {
+                document.getElementById('meta-priority').value = metadata.priority;
+            }
+            if (metadata.issueDate) {
+                document.getElementById('meta-issue-date').value = metadata.issueDate;
+            }
+            if (metadata.includeImage) {
+                document.getElementById('meta-include-image').value = metadata.includeImage;
+            }
+            if (metadata.imageSize) {
+                document.getElementById('meta-image-size').value = metadata.imageSize;
+            }
+            if (metadata.adjacentAds) {
+                document.getElementById('meta-adjacent-ads').value = metadata.adjacentAds;
+            }
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             console.log('Document loaded, initializing Méthode panel...');
             setupPostMessageApi();
+            setupTabs();
             
             // Check if we have a direct methodeId (from URL parameter)
             if (state.methodeId && state.methodeId !== 'null' && state.methodeId !== '') {
