@@ -1,13 +1,12 @@
-const frontoffice = require('../frontoffice.json');
 const https = require('https');
 const axios = require('axios');
 
 const NEON_FO_APIKEY = process.env.NEON_FO_APIKEY;
 
-function getFrontOfficeUrl(siteName, environment = 'live' ) {
-  const url = frontoffice[siteName]?.urls?.[environment];
-
-  return url;
+function getFrontOfficeUrl(siteName, environment = 'live') {
+  // Build env var name: NEON_FO_THEGLOBE_LIVE_URL, NEON_FO_THEGLOBE_PREVIEW_URL, etc.
+  const envVarName = `NEON_FO_${siteName.toUpperCase()}_${environment.toUpperCase()}_URL`;
+  return process.env[envVarName];
 }
 
 async function getNodeById({ siteName, targetId, environment }) {
