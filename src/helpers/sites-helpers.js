@@ -13,7 +13,7 @@ function getFrontOfficeUrl(siteName, environment = 'live') {
 }
 
 async function getNodeById({ siteName, targetId, environment }) {
-  console.log(`[getNodeById] siteName: ${siteName}, targetId: ${targetId}, environment: ${environment}`);
+  console.log(`[getNodeById] siteName: ${siteName}, targetId: ${targetId}, environment: ${environment}, NEON_FO_APIKEY: ${NEON_FO_APIKEY}`);
   const frontOfficeUrl = getFrontOfficeUrl(siteName, environment);
 
   const config = {
@@ -45,7 +45,7 @@ async function getNodeById({ siteName, targetId, environment }) {
 }
 
 async function getResource({ siteName, url, environment }) {
-  console.log(`[getResource] siteName: ${siteName}, url: ${url}, environment: ${environment}`);
+  console.log(`[getResource] siteName: ${siteName}, url: ${url}, environment: ${environment}, NEON_FO_APIKEY: ${NEON_FO_APIKEY}`);
   const frontOfficeUrl = getFrontOfficeUrl(siteName, environment);
 
   const config = {
