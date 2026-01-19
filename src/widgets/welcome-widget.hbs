@@ -364,13 +364,14 @@
                     if (element) {
                         element.click();
                         console.log('Triggered action:', selector);
-                    } else {
-                        console.warn('Element not found in parent:', selector);
+                        return true;
                     }
+                    console.warn('Element not found in parent:', selector);
                 }
             } catch (e) {
                 console.error('Cannot access parent window:', e);
             }
+            return false;
         }
 
         function triggerCreateStory() {
@@ -382,7 +383,10 @@
         }
 
         function triggerOpenUserGuide() {
-            triggerParentAction('a[href="/neon/docs/userguide/index.html"]');
+            const opened = triggerParentAction('a[href="/neon/docs/userguide/index.html"]');
+            if (!opened) {
+                window.open('https://neon-userguide.onrender.com', '_blank');
+            }
         }
 
         // Carousel functionality
