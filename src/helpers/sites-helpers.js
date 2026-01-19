@@ -4,12 +4,16 @@ const axios = require('axios');
 const NEON_FO_APIKEY = process.env.NEON_FO_APIKEY;
 
 function getFrontOfficeUrl(siteName, environment = 'live') {
+  console.log(`[getFrontOfficeUrl] siteName: ${siteName}, environment: ${environment}`);
   // Build env var name: NEON_FO_THEGLOBE_LIVE_URL, NEON_FO_THEGLOBE_PREVIEW_URL, etc.
   const envVarName = `NEON_FO_${siteName.toUpperCase()}_${environment.toUpperCase()}_URL`;
-  return process.env[envVarName];
+  const url = process.env[envVarName];
+  console.log(`[getFrontOfficeUrl] returning: ${url}`);
+  return url;
 }
 
 async function getNodeById({ siteName, targetId, environment }) {
+  console.log(`[getNodeById] siteName: ${siteName}, targetId: ${targetId}, environment: ${environment}`);
   const frontOfficeUrl = getFrontOfficeUrl(siteName, environment);
 
   const config = {
@@ -41,6 +45,7 @@ async function getNodeById({ siteName, targetId, environment }) {
 }
 
 async function getResource({ siteName, url, environment }) {
+  console.log(`[getResource] siteName: ${siteName}, url: ${url}, environment: ${environment}`);
   const frontOfficeUrl = getFrontOfficeUrl(siteName, environment);
 
   const config = {
