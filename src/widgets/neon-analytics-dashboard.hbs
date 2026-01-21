@@ -497,9 +497,12 @@
             const selector = document.getElementById('metric-selector');
             selector.innerHTML = '<option value="">-- Select --</option>';
 
+            // Filter out reports without valid IDs
+            const validReports = reports.filter(report => report.id);
+
             // Group reports by category if available
             const grouped = {};
-            reports.forEach(report => {
+            validReports.forEach(report => {
                 const category = report.category || 'other';
                 if (!grouped[category]) {
                     grouped[category] = [];
@@ -562,7 +565,7 @@
             const selectedOption = selector.options[selector.selectedIndex];
             const metric = selector.value;
 
-            if (!metric || metric === 'undefined' || metric === 'null') {
+            if (!metric) {
                 document.getElementById('analytics-content').classList.add('hidden');
                 document.getElementById('data-info').textContent = 'Select a report to view analytics';
                 document.getElementById('report-description').classList.add('hidden');
