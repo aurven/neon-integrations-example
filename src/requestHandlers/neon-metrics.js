@@ -36,8 +36,19 @@ async function getMetricsReportsHandler(request, reply) {
         console.log("Response Data:", result);
 
         // Ensure consistent response format - frontend expects { reports: [...] }
-        const response = result?.reports ? result : { reports: Array.isArray(result) ? result : [] };
-        return reply.status(200).send(response);
+        let reports = result?.reports ? result.reports : (Array.isArray(result) ? result : []);
+
+        // Normalize report data - API returns 'path' but frontend expects 'id'
+        reports = reports.map(report => {
+            if (!report.id && report.path) {
+                // Extract ID from path (e.g., "/core/metrics/metrics/month_worked" -> "month_worked")
+                const pathParts = report.path.split('/');
+                report.id = pathParts[pathParts.length - 1];
+            }
+            return report;
+        });
+
+        return reply.status(200).send({ reports });
     } catch (error) {
         console.error("getMetricsReportsHandler << ERROR:", error.message);
         return reply.status(error.response?.status || 500).send({
