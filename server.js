@@ -112,7 +112,9 @@ fastify.get("/services", function (request, reply) {
       { name: "Content Cleanup", endpoint: "POST /utilities/cleanup", description: "Clean up content references" },
       { name: "OpenAI Processing", endpoint: "POST /ai/openai", description: "Process content with OpenAI" },
       { name: "Pexels Photos", endpoint: "GET /sources/pexels", description: "Source photos from Pexels API" },
-      { name: "Neon Discovery", endpoint: "GET /utilities/services", description: "Discover Neon services" }
+      { name: "Neon Discovery", endpoint: "GET /utilities/services", description: "Discover Neon services" },
+      { name: "Metrics Reports", endpoint: "GET /neon/api/core/metrics", description: "List available Neon BO analytics reports" },
+      { name: "Metrics Data", endpoint: "GET /neon/api/core/metrics/:reportId", description: "Get specific metrics data from Neon BO" }
     ],
     widgets: [
       { name: "Test Widget", endpoint: "GET /widgets/test", demoUrl: "/widgets/test", description: "Test widget interface" },
@@ -195,6 +197,11 @@ fastify.post("/utilities/cleanup", utilitiesHandlers.cleanupHandler);
 fastify.post("/ai/openai", utilitiesHandlers.openAiHandler);
 fastify.get("/sources/pexels", utilitiesHandlers.pexelsPhotosHandler);
 fastify.get("/utilities/services", utilitiesHandlers.neonDiscoveryHandler);
+
+// Neon Metrics API
+const neonMetricsHandlers = require("./src/requestHandlers/neon-metrics.js");
+fastify.get("/neon/api/core/metrics", neonMetricsHandlers.getMetricsReportsHandler);
+fastify.get("/neon/api/core/metrics/:reportId", neonMetricsHandlers.getMetricsDataHandler);
 
 /**
  *

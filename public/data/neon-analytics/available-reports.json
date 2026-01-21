@@ -1,0 +1,68 @@
+{
+    "reports": [
+        {
+            "id": "month_worked",
+            "name": "Month Worked Content",
+            "description": "Content worked on in the last 30 days across all workspaces",
+            "category": "content",
+            "period": "month",
+            "widgets": ["header", "key-metrics", "timeline-activity", "content-type-distribution", "user-productivity", "activity-calendar", "top-workfolders", "endpoint-usage", "hourly-activity"]
+        },
+        {
+            "id": "month_creations",
+            "name": "Month Creations",
+            "description": "New content created in the last 30 days",
+            "category": "content",
+            "period": "month",
+            "widgets": ["header", "key-metrics", "timeline-activity", "content-type-distribution", "user-productivity", "activity-calendar", "top-workfolders", "hourly-activity"]
+        },
+        {
+            "id": "month_active_users",
+            "name": "Month Active Users",
+            "description": "User activity metrics for the last 30 days",
+            "category": "users",
+            "period": "month",
+            "widgets": ["header", "key-metrics", "timeline-activity", "user-productivity", "activity-calendar", "hourly-activity"]
+        },
+        {
+            "id": "week_worked",
+            "name": "Week Worked Content",
+            "description": "Content worked on in the last 7 days across all workspaces",
+            "category": "content",
+            "period": "week",
+            "widgets": ["header", "key-metrics", "timeline-activity", "content-type-distribution", "user-productivity", "activity-calendar", "top-workfolders", "endpoint-usage", "hourly-activity"]
+        },
+        {
+            "id": "week_creations",
+            "name": "Week Creations",
+            "description": "New content created in the last 7 days",
+            "category": "content",
+            "period": "week",
+            "widgets": ["header", "key-metrics", "timeline-activity", "content-type-distribution", "user-productivity", "activity-calendar", "top-workfolders", "hourly-activity"]
+        },
+        {
+            "id": "week_active_users",
+            "name": "Week Active Users",
+            "description": "User activity metrics for the last 7 days",
+            "category": "users",
+            "period": "week",
+            "widgets": ["header", "key-metrics", "timeline-activity", "user-productivity", "activity-calendar", "hourly-activity"]
+        }
+    ],
+    "categories": [
+        {
+            "id": "content",
+            "name": "Content Analytics",
+            "description": "Track content creation and modification across workspaces"
+        },
+        {
+            "id": "users",
+            "name": "User Analytics",
+            "description": "Monitor user activity and productivity"
+        }
+    ],
+    "metadata": {
+        "version": "1.0",
+        "generatedAt": "2025-01-21T00:00:00.000Z"
+    }
+}

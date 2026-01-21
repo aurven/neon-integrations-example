@@ -198,20 +198,18 @@
                         </div>
                     </div>
                 </div>
-                <!-- Metric Selector -->
+                <!-- Report Selector -->
                 <div class="flex items-center space-x-3 mt-4">
-                    <span class="text-xs text-gray-500">Select Metric:</span>
+                    <span class="text-xs text-gray-500">Select Report:</span>
                     <select id="metric-selector" class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs font-semibold focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        <option value="">-- Select --</option>
-                        <option value="month_worked">Month Worked Content</option>
-                        <option value="month_creations">Month Creations</option>
-                        <option value="month_active_users">Month Active Users</option>
-                        <option value="week_worked">Week Worked Content</option>
-                        <option value="week_creations">Week Creations</option>
-                        <option value="week_active_users">Week Active Users</option>
+                        <option value="">-- Loading Reports --</option>
                     </select>
                     <div id="loading-spinner" class="spinner hidden"></div>
-                    <span class="text-xs text-gray-400" id="data-info">Select a metric to view analytics</span>
+                    <span class="text-xs text-gray-400" id="data-info">Loading available reports...</span>
+                </div>
+                <!-- Report Description -->
+                <div id="report-description" class="mt-2 text-xs text-gray-500 hidden">
+                    <span id="report-desc-text"></span>
                 </div>
             </div>
 
@@ -418,12 +416,27 @@
     <script>
         // Global state
         let currentMetric = null;
+        let currentReport = null;
         let metricsData = null;
+        let availableReports = [];
         let charts = {};
         const isDemoMode = new URLSearchParams(window.location.search).get('demo') === 'true';
 
+        // All available widget IDs for visibility control
+        const allWidgetIds = [
+            'header',
+            'key-metrics',
+            'timeline-activity',
+            'content-type-distribution',
+            'user-productivity',
+            'activity-calendar',
+            'top-workfolders',
+            'endpoint-usage',
+            'hourly-activity'
+        ];
+
         // Initialize on load
-        window.addEventListener('load', function() {
+        window.addEventListener('load', async function() {
             console.log('Neon Analytics Dashboard initializing...');
 
             // Show demo badge if in demo mode
@@ -431,28 +444,157 @@
                 document.getElementById('demo-badge').classList.remove('hidden');
             }
 
+            // Load available reports
+            await loadAvailableReports();
+
             // Set up metric selector
             const selector = document.getElementById('metric-selector');
             selector.addEventListener('change', handleMetricChange);
 
-            // Pre-select first metric if in demo mode
-            if (isDemoMode) {
-                selector.value = 'month_worked';
+            // Pre-select first report if in demo mode
+            if (isDemoMode && availableReports.length > 0) {
+                selector.value = availableReports[0].id;
                 handleMetricChange();
             }
         });
 
+        async function loadAvailableReports() {
+            const isEmbedded = window.self !== window.top;
+            const prefix = isEmbedded ? '/neon/api/demo-integration' : '';
+            const demoParam = isDemoMode ? '?demo=true' : '';
+            const endpoint = `${prefix}/neon/api/core/metrics${demoParam}`;
+
+            try {
+                const response = await fetch(endpoint);
+                if (!response.ok) throw new Error('Failed to load available reports');
+
+                const data = await response.json();
+                availableReports = data.reports || [];
+
+                populateReportSelector(availableReports);
+                document.getElementById('data-info').textContent = 'Select a report to view analytics';
+
+                console.log('Available reports loaded:', availableReports.length);
+            } catch (error) {
+                console.error('Error loading available reports:', error);
+                document.getElementById('data-info').textContent = 'Error loading reports';
+
+                // Fallback to hardcoded options if API fails
+                const fallbackReports = [
+                    { id: 'month_worked', name: 'Month Worked Content', description: 'Content worked on in the last 30 days' },
+                    { id: 'month_creations', name: 'Month Creations', description: 'New content created in the last 30 days' },
+                    { id: 'month_active_users', name: 'Month Active Users', description: 'User activity for the last 30 days' },
+                    { id: 'week_worked', name: 'Week Worked Content', description: 'Content worked on in the last 7 days' },
+                    { id: 'week_creations', name: 'Week Creations', description: 'New content created in the last 7 days' },
+                    { id: 'week_active_users', name: 'Week Active Users', description: 'User activity for the last 7 days' }
+                ];
+                availableReports = fallbackReports;
+                populateReportSelector(fallbackReports);
+            }
+        }
+
+        function populateReportSelector(reports) {
+            const selector = document.getElementById('metric-selector');
+            selector.innerHTML = '<option value="">-- Select --</option>';
+
+            // Group reports by category if available
+            const grouped = {};
+            reports.forEach(report => {
+                const category = report.category || 'other';
+                if (!grouped[category]) {
+                    grouped[category] = [];
+                }
+                grouped[category].push(report);
+            });
+
+            // Add options, grouped by category
+            Object.keys(grouped).forEach(category => {
+                if (Object.keys(grouped).length > 1) {
+                    const optgroup = document.createElement('optgroup');
+                    optgroup.label = category.charAt(0).toUpperCase() + category.slice(1) + ' Reports';
+
+                    grouped[category].forEach(report => {
+                        const option = document.createElement('option');
+                        option.value = report.id;
+                        option.textContent = report.name;
+                        option.dataset.description = report.description || '';
+                        option.dataset.widgets = JSON.stringify(report.widgets || allWidgetIds);
+                        optgroup.appendChild(option);
+                    });
+
+                    selector.appendChild(optgroup);
+                } else {
+                    grouped[category].forEach(report => {
+                        const option = document.createElement('option');
+                        option.value = report.id;
+                        option.textContent = report.name;
+                        option.dataset.description = report.description || '';
+                        option.dataset.widgets = JSON.stringify(report.widgets || allWidgetIds);
+                        selector.appendChild(option);
+                    });
+                }
+            });
+        }
+
+        function updateWidgetVisibility(reportWidgets) {
+            // Check if URL has active-widgets filter - if so, use that instead
+            const urlParams = new URLSearchParams(window.location.search);
+            const activeWidgetsParam = urlParams.get('active-widgets');
+
+            if (activeWidgetsParam) {
+                // URL filter takes precedence
+                return;
+            }
+
+            // Hide all widgets first
+            allWidgetIds.forEach(widgetId => {
+                const element = document.getElementById(widgetId);
+                if (element) {
+                    element.style.display = reportWidgets.includes(widgetId) ? '' : 'none';
+                }
+            });
+
+            console.log('Widget visibility updated for report. Active widgets:', reportWidgets);
+        }
+
         async function handleMetricChange() {
             const selector = document.getElementById('metric-selector');
+            const selectedOption = selector.options[selector.selectedIndex];
             const metric = selector.value;
 
             if (!metric) {
                 document.getElementById('analytics-content').classList.add('hidden');
-                document.getElementById('data-info').textContent = 'Select a metric to view analytics';
+                document.getElementById('data-info').textContent = 'Select a report to view analytics';
+                document.getElementById('report-description').classList.add('hidden');
                 return;
             }
 
             currentMetric = metric;
+
+            // Get report metadata from selected option
+            const reportDescription = selectedOption.dataset.description || '';
+            let reportWidgets = allWidgetIds;
+            try {
+                reportWidgets = JSON.parse(selectedOption.dataset.widgets || '[]');
+                if (reportWidgets.length === 0) reportWidgets = allWidgetIds;
+            } catch (e) {
+                reportWidgets = allWidgetIds;
+            }
+
+            // Find current report from available reports
+            currentReport = availableReports.find(r => r.id === metric) || null;
+
+            // Show report description
+            if (reportDescription) {
+                document.getElementById('report-desc-text').textContent = reportDescription;
+                document.getElementById('report-description').classList.remove('hidden');
+            } else {
+                document.getElementById('report-description').classList.add('hidden');
+            }
+
+            // Update widget visibility based on report context
+            updateWidgetVisibility(reportWidgets);
+
             showLoading(true);
 
             try {
@@ -461,11 +603,11 @@
                 metricsData = parseNeonMetrics(data);
 
                 // Update UI
-                updateDashboard(metricsData);
+                updateDashboard(metricsData, reportWidgets);
 
                 // Show content
                 document.getElementById('analytics-content').classList.remove('hidden');
-                document.getElementById('data-info').textContent = `Loaded: ${metric}`;
+                document.getElementById('data-info').textContent = `Loaded: ${currentReport?.name || metric}`;
 
             } catch (error) {
                 console.error('Error loading metrics:', error);
@@ -479,13 +621,14 @@
         async function loadMetricsData(metric) {
             const isEmbedded = window.self !== window.top;
             const prefix = isEmbedded ? '/neon/api/demo-integration' : '';
-            const endpoint = isDemoMode
-                ? `${prefix}/data/neon-analytics/api-metrics-example-${metric}.json`
-                : `${prefix}/neon/api/core/metrics/${metric}`;
+            const demoParam = isDemoMode ? '?demo=true' : '';
 
-                const response = await fetch(endpoint);
-                if (!response.ok) throw new Error(isDemoMode ? 'Failed to load demo data' : 'Failed to load metrics');
-                return await response.json();
+            // Use the consolidated API endpoint which handles both demo and real data
+            const endpoint = `${prefix}/neon/api/core/metrics/${metric}${demoParam}`;
+
+            const response = await fetch(endpoint);
+            if (!response.ok) throw new Error('Failed to load metrics data');
+            return await response.json();
         }
 
         function showLoading(show) {
@@ -497,8 +640,9 @@
             }
         }
 
-        function updateDashboard(data) {
+        function updateDashboard(data, reportWidgets = allWidgetIds) {
             console.log('Updating dashboard with data:', data);
+            console.log('Report widgets:', reportWidgets);
 
             // Update metrics cards
             document.getElementById('metric-total').textContent = data.totalItems.toLocaleString();
@@ -517,56 +661,65 @@
             });
             charts = {};
 
-            // Determine which charts to show based on metric type
-            const isActiveUsers = currentMetric.includes('active_users');
+            // Determine which charts to show based on both metric type and data availability
             const hasTypes = data.types && data.types.length > 0;
             const hasUsers = data.users && data.users.length > 0;
             const hasWorkfolders = data.workfolders && data.workfolders.length > 0;
             const hasEndpoints = data.endpoints && data.endpoints.length > 0;
 
-            // Show/hide containers (only if active-widgets filter is not applied)
+            // Check if URL has active-widgets filter - if so, skip dynamic visibility
             const urlParams = new URLSearchParams(window.location.search);
             const hasActiveWidgetsFilter = urlParams.get('active-widgets') !== null;
 
             if (!hasActiveWidgetsFilter) {
+                // Apply report context-based widget visibility with data availability check
                 const typesContainer = document.getElementById('content-type-distribution');
                 const usersContainer = document.getElementById('user-productivity');
                 const workfoldersContainer = document.getElementById('top-workfolders');
                 const endpointsContainer = document.getElementById('endpoint-usage');
 
-                if (typesContainer) typesContainer.style.display = hasTypes ? 'block' : 'none';
-                if (usersContainer) usersContainer.style.display = hasUsers ? 'block' : 'none';
-                if (workfoldersContainer) workfoldersContainer.style.display = hasWorkfolders ? 'block' : 'none';
-                if (endpointsContainer) endpointsContainer.style.display = hasEndpoints ? 'block' : 'none';
+                // Widget is visible if: in report widget list AND has data
+                if (typesContainer) {
+                    typesContainer.style.display = (reportWidgets.includes('content-type-distribution') && hasTypes) ? 'block' : 'none';
+                }
+                if (usersContainer) {
+                    usersContainer.style.display = (reportWidgets.includes('user-productivity') && hasUsers) ? 'block' : 'none';
+                }
+                if (workfoldersContainer) {
+                    workfoldersContainer.style.display = (reportWidgets.includes('top-workfolders') && hasWorkfolders) ? 'block' : 'none';
+                }
+                if (endpointsContainer) {
+                    endpointsContainer.style.display = (reportWidgets.includes('endpoint-usage') && hasEndpoints) ? 'block' : 'none';
+                }
             }
 
-            // Initialize charts (check if functions exist)
-            if (typeof initTimelineChart === 'function') {
+            // Initialize charts (check if functions exist and widget is in context)
+            if (typeof initTimelineChart === 'function' && reportWidgets.includes('timeline-activity')) {
                 charts.timeline = initTimelineChart(data);
             }
 
-            if (hasTypes && typeof initTypesChart === 'function') {
+            if (hasTypes && typeof initTypesChart === 'function' && reportWidgets.includes('content-type-distribution')) {
                 charts.types = initTypesChart(data);
             }
 
-            if (hasUsers && typeof initUsersChart === 'function') {
+            if (hasUsers && typeof initUsersChart === 'function' && reportWidgets.includes('user-productivity')) {
                 charts.users = initUsersChart(data);
             }
 
-            if (typeof initHourlyChart === 'function') {
+            if (typeof initHourlyChart === 'function' && reportWidgets.includes('hourly-activity')) {
                 charts.hourly = initHourlyChart(data);
             }
 
-            if (hasWorkfolders && typeof initWorkfoldersChart === 'function') {
+            if (hasWorkfolders && typeof initWorkfoldersChart === 'function' && reportWidgets.includes('top-workfolders')) {
                 charts.workfolders = initWorkfoldersChart(data);
             }
 
-            if (hasEndpoints && typeof initEndpointsChart === 'function') {
+            if (hasEndpoints && typeof initEndpointsChart === 'function' && reportWidgets.includes('endpoint-usage')) {
                 charts.endpoints = initEndpointsChart(data);
             }
 
             // Render heatmap
-            if (typeof renderCalendarHeatmap === 'function') {
+            if (typeof renderCalendarHeatmap === 'function' && reportWidgets.includes('activity-calendar')) {
                 renderCalendarHeatmap(data);
             }
 
@@ -576,25 +729,12 @@
         console.log('Neon Analytics Dashboard script loaded');
 
         // ============================================================
-        // QUERY PARAMETERS HANDLING
+        // QUERY PARAMETERS HANDLING (runs immediately on page load)
         // ============================================================
         (function initQueryParameters() {
             const urlParams = new URLSearchParams(window.location.search);
 
-            // All available widget IDs for Neon Analytics Dashboard
-            const allWidgetIds = [
-                'header',
-                'key-metrics',
-                'timeline-activity',
-                'content-type-distribution',
-                'user-productivity',
-                'activity-calendar',
-                'top-workfolders',
-                'endpoint-usage',
-                'hourly-activity'
-            ];
-
-            // Handle active-widgets parameter
+            // Handle active-widgets parameter (uses global allWidgetIds)
             const activeWidgets = urlParams.get('active-widgets');
             if (activeWidgets) {
                 const widgetIds = activeWidgets.split(',').map(id => id.trim());
@@ -610,7 +750,7 @@
                     }
                 });
 
-                console.log('Active widgets filter applied:', widgetIds);
+                console.log('Active widgets filter applied from URL:', widgetIds);
             }
 
             // Handle watermark parameter

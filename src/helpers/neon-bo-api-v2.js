@@ -373,6 +373,26 @@ class NeonClient {
     }
 
     /**
+     * Metrics & Analytics
+     */
+    async getMetricsReports() {
+        return await this.makeRequest({
+            method: 'get',
+            url: '/core/metrics'
+        }, 'Available metrics reports retrieved', true);
+    }
+
+    async getMetricsData(reportId) {
+        if (!reportId) {
+            throw new Error('Report ID is required');
+        }
+        return await this.makeRequest({
+            method: 'get',
+            url: `/core/metrics/${reportId}`
+        }, `Metrics data for ${reportId} retrieved`, true);
+    }
+
+    /**
      * Session utilities
      */
     getSessionId() {
@@ -485,5 +505,7 @@ module.exports = {
     promoteNode: (familyRef, params) => defaultClient.promoteNode(familyRef, params),
     promoteNodeEverywhere: (familyRef, params) => defaultClient.promoteNodeEverywhere(familyRef, params),
     discoveryServices: () => defaultClient.discoveryServices(),
-    searchContents: (queryPayload, numberOfNodes, numberOfIds) => defaultClient.searchContents(queryPayload, numberOfNodes, numberOfIds)
+    searchContents: (queryPayload, numberOfNodes, numberOfIds) => defaultClient.searchContents(queryPayload, numberOfNodes, numberOfIds),
+    getMetricsReports: () => defaultClient.getMetricsReports(),
+    getMetricsData: (reportId) => defaultClient.getMetricsData(reportId)
 };
