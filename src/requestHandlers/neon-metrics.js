@@ -39,11 +39,17 @@ async function getMetricsReportsHandler(request, reply) {
         let reports = result?.reports ? result.reports : (Array.isArray(result) ? result : []);
 
         // Normalize report data - API returns 'path' but frontend expects 'id'
+        // The path contains the full API path (e.g., "/core/metrics/modelBuild/modelcreation")
+        // We use the path after "/core/metrics/" as the ID to preserve the full route
         reports = reports.map(report => {
             if (!report.id && report.path) {
-                // Extract ID from path (e.g., "/core/metrics/metrics/month_worked" -> "month_worked")
-                const pathParts = report.path.split('/');
-                report.id = pathParts[pathParts.length - 1];
+                // Extract ID from path (e.g., "/core/metrics/modelBuild/modelcreation" -> "modelBuild/modelcreation")
+                const prefix = '/core/metrics/';
+                if (report.path.startsWith(prefix)) {
+                    report.id = report.path.substring(prefix.length);
+                } else {
+                    report.id = report.path;
+                }
             }
             return report;
         });
