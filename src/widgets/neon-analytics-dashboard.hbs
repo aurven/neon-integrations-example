@@ -452,7 +452,7 @@
             selector.addEventListener('change', handleMetricChange);
 
             // Pre-select first report if in demo mode
-            if (isDemoMode && availableReports.length > 0) {
+            if (isDemoMode && availableReports.length > 0 && availableReports[0].id) {
                 selector.value = availableReports[0].id;
                 handleMetricChange();
             }
@@ -562,7 +562,7 @@
             const selectedOption = selector.options[selector.selectedIndex];
             const metric = selector.value;
 
-            if (!metric) {
+            if (!metric || metric === 'undefined' || metric === 'null') {
                 document.getElementById('analytics-content').classList.add('hidden');
                 document.getElementById('data-info').textContent = 'Select a report to view analytics';
                 document.getElementById('report-description').classList.add('hidden');
@@ -619,6 +619,11 @@
         }
 
         async function loadMetricsData(metric) {
+            // Validate metric parameter to prevent undefined/null in URL
+            if (!metric || metric === 'undefined' || metric === 'null') {
+                throw new Error('Invalid metric ID');
+            }
+
             const isEmbedded = window.self !== window.top;
             const prefix = isEmbedded ? '/neon/api/demo-integration' : '';
             const demoParam = isDemoMode ? '?demo=true' : '';
