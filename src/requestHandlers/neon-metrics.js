@@ -34,7 +34,10 @@ async function getMetricsReportsHandler(request, reply) {
         });
         console.log("getMetricsReportsHandler << OUT:");
         console.log("Response Data:", result);
-        return reply.status(200).send(result);
+
+        // Ensure consistent response format - frontend expects { reports: [...] }
+        const response = result?.reports ? result : { reports: Array.isArray(result) ? result : [] };
+        return reply.status(200).send(response);
     } catch (error) {
         console.error("getMetricsReportsHandler << ERROR:", error.message);
         return reply.status(error.response?.status || 500).send({
