@@ -5,8 +5,8 @@ const fs = require('fs');
 
 // HTTPS configuration
 let httpsOptions = {};
-const sslCertPath = path.join(__dirname, 'ssl', 'integrations.neon.test+3.pem');
-const sslKeyPath = path.join(__dirname, 'ssl', 'integrations.neon.test+3-key.pem');
+const sslCertPath = path.join(__dirname, 'ssl', 'integrations.neon-examples.test+3.pem');
+const sslKeyPath = path.join(__dirname, 'ssl', 'integrations.neon-examples.test+3-key.pem');
 
 if (fs.existsSync(sslCertPath) && fs.existsSync(sslKeyPath)) {
   httpsOptions = {
@@ -201,7 +201,7 @@ fastify.get("/utilities/services", utilitiesHandlers.neonDiscoveryHandler);
 // Neon Metrics API
 const neonMetricsHandlers = require("./src/requestHandlers/neon-metrics.js");
 fastify.get("/neon/api/core/metrics", neonMetricsHandlers.getMetricsReportsHandler);
-fastify.get("/neon/api/core/metrics/:reportId", neonMetricsHandlers.getMetricsDataHandler);
+fastify.get("/neon/api/core/metrics/metrics/:reportId", neonMetricsHandlers.getMetricsDataHandler);
 
 /**
  *
