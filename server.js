@@ -5,8 +5,8 @@ const fs = require('fs');
 
 // HTTPS configuration
 let httpsOptions = {};
-const sslCertPath = path.join(__dirname, 'ssl', 'integrations.neon.com+3.pem');
-const sslKeyPath = path.join(__dirname, 'ssl', 'integrations.neon.com+3-key.pem');
+const sslCertPath = path.join(__dirname, 'ssl', 'integrations.neon.test+3.pem');
+const sslKeyPath = path.join(__dirname, 'ssl', 'integrations.neon.test+3-key.pem');
 
 if (fs.existsSync(sslCertPath) && fs.existsSync(sslKeyPath)) {
   httpsOptions = {
@@ -412,7 +412,7 @@ fastify.listen(
       console.log(`📲 Mobile client: ${projectDomain}/mobileclient`);
       
       if (httpsOptions.https) {
-        console.log(`🔒 Custom domain: ${protocol}://integrations.neon.com${portDisplay}`);
+        console.log(`🔒 Custom domain: ${protocol}://integrations.neon-examples.test${portDisplay}`);
       }
     } else {
       console.log(`🏠 Available at: ${protocol}://${host}${portDisplay}`);
