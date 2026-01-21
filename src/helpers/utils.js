@@ -351,24 +351,24 @@ function safeLogRequest(headers, body) {
       body: body
     };
   }
-  
+
   const sensitiveKeys = [
-    'apikey', 'authorization', 'auth', 'token', 'password', 'secret', 
+    'apikey', 'authorization', 'auth', 'token', 'password', 'secret',
     'key', 'x-api-key', 'x-auth-token', 'cookie', 'set-cookie',
     'x-forwarded-for', 'x-real-ip'
   ];
-  
+
   const safeHeaders = { ...headers };
-  
+
   // Remove or redact sensitive headers
   Object.keys(safeHeaders).forEach(key => {
     if (sensitiveKeys.some(sensitive => key.toLowerCase().includes(sensitive.toLowerCase()))) {
       safeHeaders[key] = '[REDACTED]';
     }
   });
-  
+
   const safeBody = { ...body };
-  
+
   // Remove or redact sensitive body fields
   if (safeBody && typeof safeBody === 'object') {
     Object.keys(safeBody).forEach(key => {
@@ -377,13 +377,38 @@ function safeLogRequest(headers, body) {
       }
     });
   }
-  
+
   return {
     headers: safeHeaders,
     body: safeBody
   };
 }
 
+/**
+ * Wrapper for one-shot Neon operations that handles login/logout automatically.
+ * Creates a new NeonClient session, logs in, executes the operation, and logs out.
+ *
+ * @param {Function} operation - Async function that receives a NeonClient instance
+ * @param {Object} options - Optional configuration for the NeonClient
+ * @returns {Promise<*>} - Result of the operation
+ *
+ * @example
+ * const result = await withNeonSession(async (neon) => {
+ *   return await neon.getMetricsReports();
+ * });
+ */
+async function withNeonSession(operation, options = {}) {
+  const { NeonClient } = require('./neon-bo-api-v2.js');
+  const client = new NeonClient(options);
+
+  try {
+    await client.login();
+    const result = await operation(client);
+    return result;
+  } finally {
+    await client.logout();
+  }
+}
 
 module.exports = {
   polyfills,
@@ -397,5 +422,6 @@ module.exports = {
   bodyGenerator,
   metadataGenerator,
   getLargestSrcFromPicture,
-  safeLogRequest
+  safeLogRequest,
+  withNeonSession
 };

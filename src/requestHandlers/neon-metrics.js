@@ -1,5 +1,5 @@
 const neonApi = require('../helpers/neon-bo-api-v2.js');
-const { safeLogRequest } = require("../helpers/utils.js");
+const { safeLogRequest, withNeonSession } = require("../helpers/utils.js");
 const { authenticate } = require("../helpers/auth.js");
 const fs = require('fs');
 const path = require('path');
@@ -29,7 +29,9 @@ async function getMetricsReportsHandler(request, reply) {
     }
 
     try {
-        const result = await neonApi.getMetricsReports();
+        const result = await withNeonSession(async (neon) => {
+            return await neon.getMetricsReports();
+        });
         console.log("getMetricsReportsHandler << OUT:");
         console.log("Response Data:", result);
         return reply.status(200).send(result);
@@ -74,7 +76,9 @@ async function getMetricsDataHandler(request, reply) {
     }
 
     try {
-        const result = await neonApi.getMetricsData(reportId);
+        const result = await withNeonSession(async (neon) => {
+            return await neon.getMetricsData(reportId);
+        });
         console.log("getMetricsDataHandler << OUT:");
         console.log("Response Data:", result);
         return reply.status(200).send(result);
