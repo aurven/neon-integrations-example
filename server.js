@@ -114,7 +114,7 @@ fastify.get("/services", function (request, reply) {
       { name: "Pexels Photos", endpoint: "GET /sources/pexels", description: "Source photos from Pexels API" },
       { name: "Neon Discovery", endpoint: "GET /utilities/services", description: "Discover Neon services" },
       { name: "Metrics Reports", endpoint: "GET /neon/api/core/metrics", description: "List available Neon BO analytics reports" },
-      { name: "Metrics Data", endpoint: "GET /neon/api/core/metrics/:reportId", description: "Get specific metrics data from Neon BO" }
+      { name: "Metrics Data", endpoint: "GET /neon/api/core/metrics/*", description: "Get specific metrics data from Neon BO (supports path-style reportId)" }
     ],
     widgets: [
       { name: "Test Widget", endpoint: "GET /widgets/test", demoUrl: "/widgets/test", description: "Test widget interface" },
@@ -201,7 +201,7 @@ fastify.get("/utilities/services", utilitiesHandlers.neonDiscoveryHandler);
 // Neon Metrics API
 const neonMetricsHandlers = require("./src/requestHandlers/neon-metrics.js");
 fastify.get("/neon/api/core/metrics", neonMetricsHandlers.getMetricsReportsHandler);
-fastify.get("/neon/api/core/metrics/metrics/:reportId", neonMetricsHandlers.getMetricsDataHandler);
+fastify.get("/neon/api/core/metrics/*", neonMetricsHandlers.getMetricsDataHandler);
 
 /**
  *

@@ -5,8 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Neon Analytics - Production Metrics Dashboard</title>
-    <!-- Panel Bootstrap (inline with dynamic resource loading to avoid path issues when embedded) -->
-    <script>(function(w){'use strict';function e(){try{return w.self!==w.top}catch(e){return true}}const m=e(),p=m?'/neon/api/demo-integration':'';w.__PANEL_EMBED_PREFIX__=p;w.__PANEL_IS_EMBEDDED__=m;const l=document.createElement('link');l.rel='stylesheet';l.href=p+'/css/tailwind-panels.css';document.head.appendChild(l);const s=document.createElement('script');s.src=p+'/js/panel-api-helper.js';document.head.appendChild(s)})(window);</script>
+    <link rel="stylesheet" href="/css/tailwind-panels.css">
+    <link rel="stylesheet" href="/neon/api/demo-integration/css/tailwind-panels.css">
+    <script src="/js/panel-api-helper.js"></script>
+    <script src="/neon/api/demo-integration/js/panel-api-helper.js"></script>
     <script src="/js/chart.js"></script>
     <script src="/neon/api/demo-integration/js/chart.js"></script>
     <script src="/js/neon-analytics-data.js"></script>
@@ -451,24 +453,33 @@
             const selector = document.getElementById('metric-selector');
             selector.addEventListener('change', handleMetricChange);
 
-            // Pre-select first report if in demo mode
-            if (isDemoMode && availableReports.length > 0 && availableReports[0].id) {
+            // Check for report query parameter to preload a specific report
+            const urlParams = new URLSearchParams(window.location.search);
+            const reportParam = urlParams.get('report');
+
+            if (reportParam) {
+                // Find the report by ID in available reports
+                const reportExists = availableReports.some(r => r.id === reportParam);
+                if (reportExists) {
+                    selector.value = reportParam;
+                    handleMetricChange();
+                } else {
+                    console.warn(`Report '${reportParam}' not found in available reports`);
+                    document.getElementById('data-info').textContent = `Report '${reportParam}' not found`;
+                }
+            } else if (isDemoMode && availableReports.length > 0 && availableReports[0].id) {
+                // Pre-select first report if in demo mode (and no specific report requested)
                 selector.value = availableReports[0].id;
                 handleMetricChange();
             }
         });
 
         async function loadAvailableReports() {
-            const isEmbedded = window.self !== window.top;
-            const prefix = isEmbedded ? '/neon/api/demo-integration' : '';
             const demoParam = isDemoMode ? '?demo=true' : '';
-            const endpoint = `${prefix}/neon/api/core/metrics${demoParam}`;
+            const endpoint = `/neon/api/core/metrics${demoParam}`;
 
             try {
-                const response = await fetch(endpoint);
-                if (!response.ok) throw new Error('Failed to load available reports');
-
-                const data = await response.json();
+                const data = await PanelAPI.apiCallJson(endpoint);
                 availableReports = data.reports || [];
 
                 populateReportSelector(availableReports);
@@ -627,16 +638,13 @@
                 throw new Error('Invalid metric ID');
             }
 
-            const isEmbedded = window.self !== window.top;
-            const prefix = isEmbedded ? '/neon/api/demo-integration' : '';
             const demoParam = isDemoMode ? '?demo=true' : '';
 
             // Use the consolidated API endpoint which handles both demo and real data
-            const endpoint = `${prefix}/neon/api/core/metrics/${metric}${demoParam}`;
+            // PanelAPI.apiCallJson automatically handles prefix for embedded mode
+            const endpoint = `/neon/api/core/metrics/${metric}${demoParam}`;
 
-            const response = await fetch(endpoint);
-            if (!response.ok) throw new Error('Failed to load metrics data');
-            return await response.json();
+            return await PanelAPI.apiCallJson(endpoint);
         }
 
         function showLoading(show) {

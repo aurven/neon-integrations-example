@@ -66,10 +66,10 @@ async function getMetricsReportsHandler(request, reply) {
 
 /**
  * Get specific metrics data from Neon BO
- * GET /neon/api/core/metrics/:reportId
+ * GET /neon/api/core/metrics/* (supports reportId with slashes like "outgoingCalls/test")
  */
 async function getMetricsDataHandler(request, reply) {
-    const { reportId } = request.params;
+    const reportId = request.params['*'];
 
     console.log("getMetricsDataHandler << IN:");
     const safeRequest = safeLogRequest(request?.headers || {}, {});
