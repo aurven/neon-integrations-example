@@ -5,7 +5,7 @@ const neonV2 = require("../helpers/neon-bo-api-v2.js");
 const imagesImporter = require("../images-importer.js");
 const { MethodeClient } = require("../helpers/methode-bo-api.js");
 const { createStoryPreviewWithSetup } = require("../helpers/edapi-utils.js");
-const { authenticate } = require("../helpers/auth.js");
+const { authenticate, shouldShowMaintenance } = require("../helpers/auth.js");
 const { parseNeonArticleContent } = require("../helpers/neon-content-parser.js");
 const { generateArticlePDF } = require("../helpers/pdf-generator.js");
 
@@ -13,6 +13,15 @@ function trelloPanelHandler(request, reply) {
   const auth = authenticate(request, reply);
   if (!auth.authenticated) {
     return reply.status(401).send({ error: "Unauthorized" });
+  }
+
+  // Check if maintenance page should be shown
+  if (shouldShowMaintenance(request, auth, 'trello')) {
+    return reply.view("/src/panels/maintenance-panel.hbs", {
+      seo: seo,
+      panelName: "Trello",
+      isDemoMode: request.query.demo === 'maintenance'
+    });
   }
 
   const externalRef = request.query.externalRef;
@@ -378,6 +387,16 @@ function methodePanelHandler(request, reply) {
     return reply.status(401).send({ error: "Unauthorized" });
   }
 
+
+  // Check if maintenance page should be shown
+  if (shouldShowMaintenance(request, auth, 'methode')) {
+    return reply.view("/src/panels/maintenance-panel.hbs", {
+      seo: seo,
+      panelName: "Méthode",
+      isDemoMode: request.query.demo === 'maintenance'
+    });
+  }
+
   const methodeId = request.query.methodeId;
 
   // params is an object we'll pass to our handlebars template
@@ -684,6 +703,15 @@ function smartOctoPanelHandler(request, reply) {
     return reply.status(401).send({ error: "Unauthorized" });
   }
 
+  // Check if maintenance page should be shown
+  if (shouldShowMaintenance(request, auth, 'smartocto')) {
+    return reply.view("/src/panels/maintenance-panel.hbs", {
+      seo: seo,
+      panelName: "SmartOcto",
+      isDemoMode: request.query.demo === 'maintenance'
+    });
+  }
+
   // params is an object we'll pass to our handlebars template
   let params = {
     seo: seo,
@@ -702,6 +730,15 @@ function socialMediaPanelHandler(request, reply) {
   const auth = authenticate(request, reply);
   if (!auth.authenticated) {
     return reply.status(401).send({ error: "Unauthorized" });
+  }
+
+  // Check if maintenance page should be shown
+  if (shouldShowMaintenance(request, auth, 'social-media')) {
+    return reply.view("/src/panels/maintenance-panel.hbs", {
+      seo: seo,
+      panelName: "Social Media",
+      isDemoMode: request.query.demo === 'maintenance'
+    });
   }
 
   let params = {

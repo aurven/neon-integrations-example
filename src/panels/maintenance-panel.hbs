@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Maintenance</title>
+    <!-- Panel Bootstrap (inline with dynamic resource loading to avoid path issues when embedded) -->
+    <script src="/js/panel-api-helper.js"></script>
+    <script src="/neon/api/demo-integration/js/panel-api-helper.js"></script>
+    <link rel="stylesheet" href="/css/tailwind-panels.css">
+    <link rel="stylesheet" href="/neon/api/demo-integration/css/tailwind-panels.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+    <div class="flex flex-col items-center justify-center min-h-screen p-6">
+        <div class="bg-white rounded-lg shadow-md p-8 max-w-md w-full text-center">
+            <!-- Warning Icon -->
+            <div class="text-yellow-500 mb-6">
+                <svg class="w-20 h-20 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                    </path>
+                </svg>
+            </div>
+
+            <!-- Title -->
+            <h1 class="text-2xl font-bold text-gray-800 mb-3">
+                Panel Under Maintenance
+            </h1>
+
+            <!-- Panel Name -->
+            <p class="text-lg text-gray-600 mb-4">
+                <span class="font-semibold text-gray-700">{{panelName}}</span>
+            </p>
+
+            <!-- Message -->
+            <p class="text-gray-500 mb-6">
+                This panel is currently unavailable. Please contact your administrator
+                if you need access to this feature.
+            </p>
+
+            <!-- Demo Mode Badge -->
+            {{#if isDemoMode}}
+            <div class="inline-flex items-center px-3 py-1 bg-yellow-100 text-yellow-800 text-sm font-medium rounded-full">
+                Demo Mode - Testing Maintenance View
+            </div>
+            {{/if}}
+        </div>
+    </div>
+</body>
+
+</html>
