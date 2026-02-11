@@ -1,0 +1,35 @@
+{
+  "customers": [
+    {
+      "id": "cust-acme-corp",
+      "name": "Acme Corp",
+      "contact": "editor@acme.com",
+      "packageIds": [
+        "pkg-premium-sport"
+      ],
+      "createdAt": "2026-02-10T00:00:00.000Z"
+    },
+    {
+      "id": "cust-globalnews",
+      "name": "GlobalNews Ltd",
+      "contact": "syndication@globalnews.com",
+      "packageIds": [
+        "pkg-full-europe",
+        "pkg-breaking-news"
+      ],
+      "createdAt": "2026-02-10T00:00:00.000Z"
+    },
+    {
+      "id": "cust-eidosmedia",
+      "name": "Eidosmedia",
+      "contact": "procurement@eidosmedia.com",
+      "packageIds": [
+        "pkg-premium-sport",
+        "pkg-breaking-news",
+        "pkg-full-europe"
+      ],
+      "createdAt": "2026-02-11T09:23:29.514Z"
+    }
+  ],
+  "lastUpdated": "2026-02-11T09:23:29.514Z"
+}

@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{seo.title}}</title>
+    <script src="/js/panel-api-helper.js"></script>
+    <script src="/neon/api/demo-integration/js/panel-api-helper.js"></script>
+    <link rel="stylesheet" href="/css/tailwind-panels.css">
+    <link rel="stylesheet" href="/neon/api/demo-integration/css/tailwind-panels.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+        .tag-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            transition: all 0.15s ease;
+        }
+        .tag-pill-remove {
+            cursor: pointer;
+            opacity: 0.5;
+            font-size: 1rem;
+            line-height: 1;
+        }
+        .tag-pill-remove:hover {
+            opacity: 1;
+        }
+        .card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            transition: box-shadow 0.2s ease;
+        }
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        }
+        .tab-btn {
+            padding: 0.5rem 1.25rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+            color: #6b7280;
+            background: transparent;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .tab-btn:hover {
+            color: #374151;
+            background: #f3f4f6;
+        }
+        .tab-btn.active {
+            color: #2847E2;
+            background: #eef2fe;
+            border-color: #b9cbfb;
+        }
+        .btn-primary {
+            background: #2847E2;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+            border: none;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+        .btn-primary:hover {
+            background: #1e3bc4;
+        }
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+            padding: 0.375rem 0.75rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            font-size: 0.8125rem;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+            border: 1px solid #d1d5db;
+            cursor: pointer;
+        }
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+        .input-field {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            outline: none;
+            transition: border-color 0.15s ease;
+        }
+        .input-field:focus {
+            border-color: #2847E2;
+            box-shadow: 0 0 0 2px rgba(40, 71, 226, 0.15);
+        }
+        .family-sidebar-item {
+            padding: 0.625rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: background 0.1s ease;
+        }
+        .family-sidebar-item:hover {
+            background: #f3f4f6;
+        }
+        .family-sidebar-item.active {
+            background: #eef2fe;
+            color: #2847E2;
+            font-weight: 600;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.375rem 0;
+            font-size: 0.875rem;
+        }
+        .checkbox-item input[type="checkbox"] {
+            width: 1rem;
+            height: 1rem;
+            accent-color: #2847E2;
+        }
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            max-width: 32rem;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        }
+        .toast {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            z-index: 100;
+            animation: slideIn 0.3s ease;
+        }
+        .toast-success { background: #10b981; color: white; }
+        .toast-error { background: #ef4444; color: white; }
+        @keyframes slideIn {
+            from { transform: translateY(1rem); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .section-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #9ca3af;
+            margin-bottom: 0.5rem;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: #9ca3af;
+            font-size: 0.875rem;
+        }
+        /* Family color palette for tag pills */
+        .family-color-0 { background: #dbeafe; color: #1e40af; }
+        .family-color-1 { background: #fce7f3; color: #9d174d; }
+        .family-color-2 { background: #d1fae5; color: #065f46; }
+        .family-color-3 { background: #fef3c7; color: #92400e; }
+        .family-color-4 { background: #ede9fe; color: #5b21b6; }
+        .family-color-5 { background: #ffe4e6; color: #be123c; }
+        .family-color-6 { background: #ccfbf1; color: #115e59; }
+        .family-color-7 { background: #fef9c3; color: #854d0e; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+    <div class="max-w-6xl mx-auto p-4 sm:p-6">
+        <!-- Header -->
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-gray-800">Tag Manager</h1>
+            <p class="text-gray-500 text-sm mt-1">Manage distribution tags, packages, and customer subscriptions</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="flex space-x-2 mb-6">
+            <button class="tab-btn active" data-tab="tags" onclick="switchTab('tags')">Tags</button>
+            <button class="tab-btn" data-tab="packages" onclick="switchTab('packages')">Packages</button>
+            <button class="tab-btn" data-tab="customers" onclick="switchTab('customers')">Customers</button>
+        </div>
+
+        <!-- ==================== TAGS TAB ==================== -->
+        <div id="panel-tags" class="tab-panel">
+            <div class="flex flex-col md:flex-row gap-4">
+                <!-- Family sidebar -->
+                <div class="w-full md:w-64 flex-shrink-0">
+                    <div class="card">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="font-semibold text-gray-700 text-sm">Tag Families</h3>
+                            <button class="btn-primary text-xs" style="padding: 0.25rem 0.625rem;" onclick="showCreateFamilyModal()">+ New</button>
+                        </div>
+                        <div id="familyList" class="space-y-1">
+                            <!-- populated by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tag cloud area -->
+                <div class="flex-1">
+                    <div class="card">
+                        <div id="familyDetail">
+                            <div class="empty-state">Select a tag family to view and manage its tags</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== PACKAGES TAB ==================== -->
+        <div id="panel-packages" class="tab-panel" hidden>
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-semibold text-gray-700">Distribution Packages</h3>
+                <button class="btn-primary" onclick="showCreatePackageModal()">+ New Package</button>
+            </div>
+            <div id="packageList" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <!-- populated by JS -->
+            </div>
+        </div>
+
+        <!-- ==================== CUSTOMERS TAB ==================== -->
+        <div id="panel-customers" class="tab-panel" hidden>
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-semibold text-gray-700">Customers</h3>
+                <button class="btn-primary" onclick="showCreateCustomerModal()">+ New Customer</button>
+            </div>
+            <div id="customerList" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <!-- populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal container -->
+    <div id="modalContainer"></div>
+
+    <script>
+        // =============================================
+        // STATE
+        // =============================================
+        let families = [];
+        let packages = [];
+        let customers = [];
+        let selectedFamilyId = null;
+        const familyColors = {};
+
+        // =============================================
+        // API HELPERS
+        // =============================================
+        async function api(path, options = {}) {
+            try {
+                return await PanelAPI.apiCallJson(path, options);
+            } catch (err) {
+                showToast(err.message || 'API error', 'error');
+                throw err;
+            }
+        }
+
+        async function apiPost(path, body) {
+            return api(path, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+        }
+
+        async function apiPut(path, body) {
+            return api(path, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+        }
+
+        async function apiDelete(path) {
+            return api(path, { method: 'DELETE' });
+        }
+
+        // =============================================
+        // TOAST
+        // =============================================
+        function showToast(message, type = 'success') {
+            const existing = document.querySelector('.toast');
+            if (existing) existing.remove();
+
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // =============================================
+        // MODAL
+        // =============================================
+        function showModal(html) {
+            document.getElementById('modalContainer').innerHTML = `
+                <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+                    <div class="modal-content">${html}</div>
+                </div>`;
+        }
+
+        function closeModal() {
+            document.getElementById('modalContainer').innerHTML = '';
+        }
+
+        // =============================================
+        // TAB SWITCHING
+        // =============================================
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(b => {
+                b.classList.toggle('active', b.dataset.tab === tab);
+            });
+            document.querySelectorAll('.tab-panel').forEach(p => {
+                p.hidden = p.id !== 'panel-' + tab;
+            });
+
+            if (tab === 'tags') loadFamilies();
+            if (tab === 'packages') loadPackages();
+            if (tab === 'customers') loadCustomers();
+        }
+
+        // =============================================
+        // TAG FAMILIES
+        // =============================================
+        function getFamilyColor(index) {
+            return 'family-color-' + (index % 8);
+        }
+
+        function buildFamilyColorMap() {
+            families.forEach((f, i) => {
+                familyColors[f.id] = getFamilyColor(i);
+            });
+        }
+
+        async function loadFamilies() {
+            const data = await api('/tags/families');
+            families = data.families || [];
+            buildFamilyColorMap();
+            renderFamilySidebar();
+            if (selectedFamilyId) {
+                const family = families.find(f => f.id === selectedFamilyId);
+                if (family) renderFamilyDetail(family);
+                else { selectedFamilyId = null; renderFamilyDetail(null); }
+            } else if (families.length > 0) {
+                selectedFamilyId = families[0].id;
+                renderFamilySidebar();
+                renderFamilyDetail(families[0]);
+            } else {
+                renderFamilyDetail(null);
+            }
+        }
+
+        function renderFamilySidebar() {
+            const el = document.getElementById('familyList');
+            if (families.length === 0) {
+                el.innerHTML = '<div class="empty-state">No families yet</div>';
+                return;
+            }
+            el.innerHTML = families.map(f => `
+                <div class="family-sidebar-item ${f.id === selectedFamilyId ? 'active' : ''}"
+                     onclick="selectFamily('${f.id}')">
+                    <div class="font-medium">${esc(f.name)}</div>
+                    <div class="text-xs text-gray-400">${f.tags.length} tag${f.tags.length !== 1 ? 's' : ''}</div>
+                </div>
+            `).join('');
+        }
+
+        function selectFamily(familyId) {
+            selectedFamilyId = familyId;
+            renderFamilySidebar();
+            const family = families.find(f => f.id === familyId);
+            renderFamilyDetail(family);
+        }
+
+        function renderFamilyDetail(family) {
+            const el = document.getElementById('familyDetail');
+            if (!family) {
+                el.innerHTML = '<div class="empty-state">Select a tag family to view and manage its tags</div>';
+                return;
+            }
+            const colorClass = familyColors[family.id] || 'family-color-0';
+            el.innerHTML = `
+                <div class="flex items-start justify-between mb-4">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-800">${esc(family.name)}</h3>
+                        <p class="text-sm text-gray-500">${esc(family.description || '')}</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button class="btn-secondary text-xs" onclick="showEditFamilyModal('${family.id}')">Edit</button>
+                        <button class="btn-danger text-xs" onclick="confirmDeleteFamily('${family.id}')">Delete</button>
+                    </div>
+                </div>
+
+                <div class="section-title">Tags</div>
+                <div class="flex flex-wrap gap-2 mb-4" id="tagCloud">
+                    ${family.tags.length === 0 ? '<span class="text-sm text-gray-400">No tags yet. Add one below.</span>' : ''}
+                    ${family.tags.map(t => `
+                        <span class="tag-pill ${colorClass}">
+                            ${esc(t.label)}
+                            <span class="tag-pill-remove" onclick="removeTag('${family.id}','${t.id}')" title="Remove tag">&times;</span>
+                        </span>
+                    `).join('')}
+                </div>
+
+                <div class="flex gap-2">
+                    <input type="text" id="newTagInput" class="input-field" style="max-width:16rem;"
+                           placeholder="New tag name..." onkeydown="if(event.key==='Enter')addTagFromInput('${family.id}')">
+                    <button class="btn-primary" onclick="addTagFromInput('${family.id}')">Add Tag</button>
+                </div>
+            `;
+        }
+
+        async function addTagFromInput(familyId) {
+            const input = document.getElementById('newTagInput');
+            const label = input.value.trim();
+            if (!label) return;
+            const data = await apiPost(`/tags/families/${familyId}/tags`, { label });
+            if (data.success) {
+                showToast(`Tag "${label}" added`);
+                input.value = '';
+                await loadFamilies();
+            }
+        }
+
+        async function removeTag(familyId, tagId) {
+            if (!confirm('Remove this tag? It will also be removed from any packages using it.')) return;
+            const data = await apiDelete(`/tags/families/${familyId}/tags/${tagId}`);
+            if (data.success) {
+                showToast('Tag removed');
+                await loadFamilies();
+            }
+        }
+
+        function showCreateFamilyModal() {
+            showModal(`
+                <h3 class="text-lg font-semibold mb-4">Create Tag Family</h3>
+                <div class="space-y-3">
+                    <div>
+                        <label class="text-sm font-medium text-gray-700">Name</label>
+                        <input type="text" id="modalFamilyName" class="input-field mt-1" placeholder="e.g. Geography, Topics...">
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium text-gray-700">Description</label>
+                        <input type="text" id="modalFamilyDesc" class="input-field mt-1" placeholder="Optional description">
+                    </div>
+                    <div class="flex gap-2 justify-end pt-2">
+                        <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+                        <button class="btn-primary" onclick="createFamily()">Create</button>
+                    </div>
+                </div>
+            `);
+            setTimeout(() => document.getElementById('modalFamilyName').focus(), 100);
+        }
+
+        async function createFamily() {
+            const name = document.getElementById('modalFamilyName').value.trim();
+            const description = document.getElementById('modalFamilyDesc').value.trim();
+            if (!name) return;
+            const data = await apiPost('/tags/families', { name, description });
+            if (data.success) {
+                showToast(`Family "${name}" created`);
+                closeModal();
+                selectedFamilyId = data.family.id;
+                await loadFamilies();
+            }
+        }
+
+        function showEditFamilyModal(familyId) {
+            const family = families.find(f => f.id === familyId);
+            if (!family) return;
+            showModal(`
+                <h3 class="text-lg font-semibold mb-4">Edit Tag Family</h3>
+                <div class="space-y-3">
+                    <div>
+                        <label class="text-sm font-medium text-gray-700">Name</label>
+                        <input type="text" id="modalFamilyName" class="input-field mt-1" value="${esc(family.name)}">
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium text-gray-700">Description</label>
+                        <input type="text" id="modalFamilyDesc" class="input-field mt-1" value="${esc(family.description || '')}">
+                    </div>
+                    <div class="flex gap-2 justify-end pt-2">
+                        <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+                        <button class="btn-primary" onclick="updateFamilyFromModal('${familyId}')">Save</button>
+                    </div>
+                </div>
+            `);
+        }
+
+        async function updateFamilyFromModal(familyId) {
+            const name = document.getElementById('modalFamilyName').value.trim();
+            const description = document.getElementById('modalFamilyDesc').value.trim();
+            if (!name) return;
+            const data = await apiPut(`/tags/families/${familyId}`, { name, description });
+            if (data.success) {
+                showToast('Family updated');
+                closeModal();
+                await loadFamilies();
+            }
+        }
+
+        async function confirmDeleteFamily(familyId) {
+            const family = families.find(f => f.id === familyId);
+            if (!confirm(`Delete family "${family.name}" and all its tags? Tags will be removed from any packages using them.`)) return;
+            const data = await apiDelete(`/tags/families/${familyId}`);
+            if (data.success) {
+                showToast('Family deleted');
+                selectedFamilyId = null;
+                await loadFamilies();
+            }
+        }
+
+        // =============================================
+        // PACKAGES
+        // =============================================
+        async function loadPackages() {
+            const [pkgData, famData] = await Promise.all([
+                api('/tags/packages'),
+                api('/tags/families')
+            ]);
+            packages = pkgData.packages || [];
+            families = famData.families || [];
+            buildFamilyColorMap();
+            renderPackageList();
+        }
+
+        function resolveTagLabel(tagId) {
+            for (const fam of families) {
+                const tag = fam.tags.find(t => t.id === tagId);
+                if (tag) return { label: tag.label, familyId: fam.id };
+            }
+            return { label: tagId, familyId: null };
+        }
+
+        function renderPackageList() {
+            const el = document.getElementById('packageList');
+            if (packages.length === 0) {
+                el.innerHTML = '<div class="empty-state col-span-full">No packages yet. Create one to bundle tags together.</div>';
+                return;
+            }
+            el.innerHTML = packages.map(pkg => {
+                const tagPills = pkg.tagIds.map(tid => {
+                    const resolved = resolveTagLabel(tid);
+                    const colorClass = familyColors[resolved.familyId] || 'family-color-0';
+                    return `<span class="tag-pill ${colorClass}" style="font-size:0.75rem;padding:0.125rem 0.5rem;">${esc(resolved.label)}</span>`;
+                }).join('');
+
+                const subPkgs = pkg.packageIds.map(pid => {
+                    const sub = packages.find(p => p.id === pid);
+                    return sub ? `<span class="tag-pill" style="background:#f3f4f6;color:#374151;font-size:0.75rem;padding:0.125rem 0.5rem;">&#128230; ${esc(sub.name)}</span>` : '';
+                }).join('');
+
+                return `
+                <div class="card">
+                    <div class="flex items-start justify-between mb-2">
+                        <h4 class="font-semibold text-gray-800">${esc(pkg.name)}</h4>
+                        <div class="flex gap-1">
+                            <button class="btn-secondary text-xs" style="padding:0.2rem 0.5rem;" onclick="showEditPackageModal('${pkg.id}')">Edit</button>
+                            <button class="btn-danger text-xs" style="padding:0.2rem 0.5rem;" onclick="confirmDeletePackage('${pkg.id}')">Del</button>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-500 mb-3">${esc(pkg.description || '')}</p>
+                    <div class="section-title">Tags</div>
+                    <div class="flex flex-wrap gap-1 mb-2">${tagPills || '<span class="text-xs text-gray-400">None</span>'}</div>
+                    ${pkg.packageIds.length > 0 ? `
+                        <div class="section-title mt-2">Included Packages</div>
+                        <div class="flex flex-wrap gap-1">${subPkgs}</div>
+                    ` : ''}
+                </div>`;
+            }).join('');
+        }
+
+        function showCreatePackageModal() {
+            showPackageModal(null);
+        }
+
+        function showEditPackageModal(packageId) {
+            const pkg = packages.find(p => p.id === packageId);
+            showPackageModal(pkg);
+        }
+
+        function showPackageModal(pkg) {
+            const isEdit = !!pkg;
+            const title = isEdit ? 'Edit Package' : 'Create Package';
+            const btnLabel = isEdit ? 'Save' : 'Create';
+            const action = isEdit ? `savePackage('${pkg.id}')` : `savePackage(null)`;
+
+            const allTags = [];
+            families.forEach(fam => {
+                fam.tags.forEach(t => allTags.push({ ...t, familyName: fam.name, familyId: fam.id }));
+            });
+
+            const tagCheckboxes = families.map(fam => {
+                if (fam.tags.length === 0) return '';
+                const checks = fam.tags.map(t => {
+                    const checked = pkg && pkg.tagIds.includes(t.id) ? 'checked' : '';
+                    return `<div class="checkbox-item"><input type="checkbox" name="pkgTag" value="${t.id}" ${checked}><span>${esc(t.label)}</span></div>`;
+                }).join('');
+                return `<div class="mb-2"><div class="text-xs font-semibold text-gray-500 mb-1">${esc(fam.name)}</div>${checks}</div>`;
+            }).join('');
+
+            const otherPackages = packages.filter(p => !pkg || p.id !== pkg.id);
+            const pkgCheckboxes = otherPackages.map(p => {
+                const checked = pkg && pkg.packageIds.includes(p.id) ? 'checked' : '';
+                return `<div class="checkbox-item"><input type="checkbox" name="pkgPkg" value="${p.id}" ${checked}><span>${esc(p.name)}</span></div>`;
+            }).join('');
+
+            showModal(`
+                <h3 class="text-lg font-semibold mb-4">${title}</h3>
+                <div class="space-y-3">
+                    <div>
+                        <label class="text-sm font-medium text-gray-700">Name</label>
+                        <input type="text" id="modalPkgName" class="input-field mt-1" value="${isEdit ? esc(pkg.name) : ''}" ${isEdit ? 'readonly style="background:#f9fafb;"' : ''}>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium text-gray-700">Description</label>
+                        <input type="text" id="modalPkgDesc" class="input-field mt-1" value="${isEdit ? esc(pkg.description || '') : ''}">
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium text-gray-700">Tags</label>
+                        <div class="mt-1 max-h-40 overflow-y-auto border rounded-lg p-2">${tagCheckboxes || '<span class="text-sm text-gray-400">No tags available</span>'}</div>
+                    </div>
+                    ${otherPackages.length > 0 ? `
+                    <div>
+                        <label class="text-sm font-medium text-gray-700">Include Packages</label>
+                        <div class="mt-1 max-h-32 overflow-y-auto border rounded-lg p-2">${pkgCheckboxes}</div>
+                    </div>` : ''}
+                    <div class="flex gap-2 justify-end pt-2">
+                        <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+                        <button class="btn-primary" onclick="${action}">${btnLabel}</button>
+                    </div>
+                </div>
+            `);
+        }
+
+        async function savePackage(packageId) {
+            const name = document.getElementById('modalPkgName').value.trim();
+            const description = document.getElementById('modalPkgDesc').value.trim();
+            if (!name) return;
+
+            const tagIds = Array.from(document.querySelectorAll('input[name="pkgTag"]:checked')).map(cb => cb.value);
+            const packageIds = Array.from(document.querySelectorAll('input[name="pkgPkg"]:checked')).map(cb => cb.value);
+
+            if (packageId) {
+                const data = await apiPut(`/tags/packages/${packageId}`, { description, tagIds, packageIds });
+                if (data.success) { showToast('Package updated'); closeModal(); await loadPackages(); }
+            } else {
+                const data = await apiPost('/tags/packages', { name, description, tagIds, packageIds });
+                if (data.success) { showToast(`Package "${name}" created`); closeModal(); await loadPackages(); }
+            }
+        }
+
+        async function confirmDeletePackage(packageId) {
+            const pkg = packages.find(p => p.id === packageId);
+            if (!confirm(`Delete package "${pkg.name}"? It will be removed from any customers and other packages.`)) return;
+            const data = await apiDelete(`/tags/packages/${packageId}`);
+            if (data.success) {
+                showToast('Package deleted');
+                await loadPackages();
+            }
+        }
+
+        // =============================================
+        // CUSTOMERS
+        // =============================================
+        async function loadCustomers() {
+            const [custData, pkgData] = await Promise.all([
+                api('/tags/customers'),
+                api('/tags/packages')
+            ]);
+            customers = custData.customers || [];
+            packages = pkgData.packages || [];
+            renderCustomerList();
+        }
+
+        function renderCustomerList() {
+            const el = document.getElementById('customerList');
+            if (customers.length === 0) {
+                el.innerHTML = '<div class="empty-state col-span-full">No customers yet. Create one and assign packages.</div>';
+                return;
+            }
+            el.innerHTML = customers.map(cust => {
+                const pkgPills = cust.packageIds.map(pid => {
+                    const pkg = packages.find(p => p.id === pid);
+                    return `<span class="tag-pill" style="background:#eef2fe;color:#2847E2;font-size:0.75rem;padding:0.125rem 0.5rem;">${esc(pkg ? pkg.name : pid)}</span>`;
+                }).join('');
+
+                return `
+                <div class="card">
+                    <div class="flex items-start justify-between mb-2">
+                        <h4 class="font-semibold text-gray-800">${esc(cust.name)}</h4>
+                        <div class="flex gap-1">
+                            <button class="btn-secondary text-xs" style="padding:0.2rem 0.5rem;" onclick="showEditCustomerModal('${cust.id}')">Edit</button>
+                            <button class="btn-danger text-xs" style="padding:0.2rem 0.5rem;" onclick="confirmDeleteCustomer('${cust.id}')">Del</button>
+                        </div>
+                    </div>
+                    ${cust.contact ? `<p class="text-sm text-gray-500 mb-3">${esc(cust.contact)}</p>` : ''}
+                    <div class="section-title">Subscribed Packages</div>
+                    <div class="flex flex-wrap gap-1">${pkgPills || '<span class="text-xs text-gray-400">None</span>'}</div>
+                </div>`;
+            }).join('');
+        }
+
+        function showCreateCustomerModal() {
+            showCustomerModal(null);
+        }
+
+        function showEditCustomerModal(customerId) {
+            const cust = customers.find(c => c.id === customerId);
+            showCustomerModal(cust);
+        }
+
+        function showCustomerModal(cust) {
+            const isEdit = !!cust;
+            const title = isEdit ? 'Edit Customer' : 'Create Customer';
+            const btnLabel = isEdit ? 'Save' : 'Create';
+            const action = isEdit ? `saveCustomer('${cust.id}')` : `saveCustomer(null)`;
+
+            const pkgCheckboxes = packages.map(p => {
+                const checked = cust && cust.packageIds.includes(p.id) ? 'checked' : '';
+                return `<div class="checkbox-item"><input type="checkbox" name="custPkg" value="${p.id}" ${checked}><span>${esc(p.name)}</span></div>`;
+            }).join('');
+
+            showModal(`
+                <h3 class="text-lg font-semibold mb-4">${title}</h3>
+                <div class="space-y-3">
+                    <div>
+                        <label class="text-sm font-medium text-gray-700">Name</label>
+                        <input type="text" id="modalCustName" class="input-field mt-1" value="${isEdit ? esc(cust.name) : ''}" ${isEdit ? 'readonly style="background:#f9fafb;"' : ''}>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium text-gray-700">Contact</label>
+                        <input type="text" id="modalCustContact" class="input-field mt-1" value="${isEdit ? esc(cust.contact || '') : ''}" placeholder="Email or contact info">
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium text-gray-700">Packages</label>
+                        <div class="mt-1 max-h-40 overflow-y-auto border rounded-lg p-2">${pkgCheckboxes || '<span class="text-sm text-gray-400">No packages available. Create packages first.</span>'}</div>
+                    </div>
+                    <div class="flex gap-2 justify-end pt-2">
+                        <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+                        <button class="btn-primary" onclick="${action}">${btnLabel}</button>
+                    </div>
+                </div>
+            `);
+        }
+
+        async function saveCustomer(customerId) {
+            const name = document.getElementById('modalCustName').value.trim();
+            const contact = document.getElementById('modalCustContact').value.trim();
+            if (!name) return;
+
+            const packageIds = Array.from(document.querySelectorAll('input[name="custPkg"]:checked')).map(cb => cb.value);
+
+            if (customerId) {
+                const data = await apiPut(`/tags/customers/${customerId}`, { contact, packageIds });
+                if (data.success) { showToast('Customer updated'); closeModal(); await loadCustomers(); }
+            } else {
+                const data = await apiPost('/tags/customers', { name, contact, packageIds });
+                if (data.success) { showToast(`Customer "${name}" created`); closeModal(); await loadCustomers(); }
+            }
+        }
+
+        async function confirmDeleteCustomer(customerId) {
+            const cust = customers.find(c => c.id === customerId);
+            if (!confirm(`Delete customer "${cust.name}"?`)) return;
+            const data = await apiDelete(`/tags/customers/${customerId}`);
+            if (data.success) {
+                showToast('Customer deleted');
+                await loadCustomers();
+            }
+        }
+
+        // =============================================
+        // UTILITIES
+        // =============================================
+        function esc(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // =============================================
+        // INIT
+        // =============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            loadFamilies();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+{
+  "families": [
+    {
+      "id": "geo",
+      "name": "Geography",
+      "description": "Geographic distribution tags",
+      "tags": [
+        {
+          "id": "geo-europe",
+          "label": "Europe"
+        },
+        {
+          "id": "geo-north-america",
+          "label": "North America"
+        },
+        {
+          "id": "geo-italy",
+          "label": "Italy"
+        },
+        {
+          "id": "geo-uk",
+          "label": "United Kingdom"
+        }
+      ]
+    },
+    {
+      "id": "topic",
+      "name": "Topics",
+      "description": "Content topic tags",
+      "tags": [
+        {
+          "id": "topic-sport",
+          "label": "Sport"
+        },
+        {
+          "id": "topic-politics",
+          "label": "Politics"
+        },
+        {
+          "id": "topic-technology",
+          "label": "Technology"
+        },
+        {
+          "id": "topic-finance",
+          "label": "Finance"
+        }
+      ]
+    },
+    {
+      "id": "format",
+      "name": "Content Format",
+      "description": "Content format and type tags",
+      "tags": [
+        {
+          "id": "format-longform",
+          "label": "Longform"
+        },
+        {
+          "id": "format-breaking",
+          "label": "Breaking News"
+        },
+        {
+          "id": "format-opinion",
+          "label": "Opinion"
+        }
+      ]
+    },
+    {
+      "id": "events",
+      "name": "Events",
+      "description": "Special Events we are covering",
+      "tags": [
+        {
+          "id": "events-sanremo-2026",
+          "label": "Sanremo 2026"
+        }
+      ]
+    }
+  ],
+  "lastUpdated": "2026-02-10T16:01:25.359Z"
+}

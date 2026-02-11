@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{seo.title}}</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="/js/panel-api-helper.js"></script>
+    <script src="/neon/api/demo-integration/js/panel-api-helper.js"></script>
+    <link rel="stylesheet" href="/css/tailwind-panels.css">
+    <link rel="stylesheet" href="/neon/api/demo-integration/css/tailwind-panels.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        /* ========================================
+           NeonTagsInput Component Styles
+           Copy these styles into your Object Panel
+           ======================================== */
+        .nti-container {
+            position: relative;
+            margin-bottom: 0.75rem;
+        }
+        .nti-label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #6b7280;
+            margin-bottom: 0.375rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        .nti-input-area {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.375rem 0.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            background: #fff;
+            min-height: 2.25rem;
+            cursor: text;
+            transition: border-color 0.15s ease;
+        }
+        .nti-input-area:focus-within {
+            border-color: #2847E2;
+            box-shadow: 0 0 0 2px rgba(40, 71, 226, 0.12);
+        }
+        .nti-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.125rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            background: #dbeafe;
+            color: #1e40af;
+            white-space: nowrap;
+            line-height: 1.5;
+        }
+        .nti-pill-remove {
+            cursor: pointer;
+            opacity: 0.5;
+            font-size: 0.875rem;
+            line-height: 1;
+            margin-left: 0.125rem;
+        }
+        .nti-pill-remove:hover {
+            opacity: 1;
+        }
+        .nti-text-input {
+            border: none;
+            outline: none;
+            font-size: 0.8125rem;
+            flex: 1;
+            min-width: 6rem;
+            padding: 0.125rem 0;
+            background: transparent;
+        }
+        .nti-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            background: #fff;
+            border: 1px solid #d1d5db;
+            border-top: none;
+            border-radius: 0 0 0.375rem 0.375rem;
+            max-height: 12rem;
+            overflow-y: auto;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        .nti-dropdown-item {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.8125rem;
+            cursor: pointer;
+            transition: background 0.1s;
+        }
+        .nti-dropdown-item:hover,
+        .nti-dropdown-item.nti-highlighted {
+            background: #eef2fe;
+            color: #2847E2;
+        }
+        .nti-dropdown-empty {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.8125rem;
+            color: #9ca3af;
+            font-style: italic;
+        }
+        /* ======================================== */
+
+        /* Mockup page styles */
+        .mockup-section {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+        }
+        .mockup-section h3 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.75rem;
+        }
+        .xml-textarea {
+            width: 100%;
+            font-family: 'SF Mono', 'Monaco', 'Menlo', 'Consolas', monospace;
+            font-size: 0.75rem;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            background: #f9fafb;
+            resize: vertical;
+            line-height: 1.5;
+        }
+        .xml-textarea:focus {
+            outline: none;
+            border-color: #2847E2;
+        }
+        .btn-action {
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .btn-blue { background: #2847E2; color: white; }
+        .btn-blue:hover { background: #1e3bc4; }
+        .btn-green { background: #10b981; color: white; }
+        .btn-green:hover { background: #059669; }
+        .btn-gray { background: #f3f4f6; color: #374151; border: 1px solid #d1d5db; }
+        .btn-gray:hover { background: #e5e7eb; }
+        .output-box {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.375rem;
+            padding: 0.75rem;
+            font-family: 'SF Mono', 'Monaco', 'Menlo', 'Consolas', monospace;
+            font-size: 0.75rem;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 12rem;
+            overflow-y: auto;
+        }
+        .code-snippet {
+            background: #1e293b;
+            color: #e2e8f0;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            font-family: 'SF Mono', 'Monaco', 'Menlo', 'Consolas', monospace;
+            font-size: 0.75rem;
+            overflow-x: auto;
+            white-space: pre;
+            line-height: 1.6;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.6875rem;
+            background: rgba(255,255,255,0.15);
+            color: #e2e8f0;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 0.25rem;
+            cursor: pointer;
+        }
+        .copy-btn:hover { background: rgba(255,255,255,0.25); }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+    <div class="max-w-4xl mx-auto p-4 sm:p-6">
+        <!-- Header -->
+        <div class="mb-6">
+            <h1 class="text-xl font-bold text-gray-800">NeonTagsInput Component</h1>
+            <p class="text-gray-500 text-sm mt-1">Mockup page — test the component and copy the code into your Neon Object Panel</p>
+        </div>
+
+        <!-- Simulated Metadata XML -->
+        <div class="mockup-section">
+            <h3>Simulated $metadataXml</h3>
+            <p class="text-xs text-gray-500 mb-2">Edit the XML below, then click "Reload from XML" to re-initialize the components.</p>
+            <textarea id="xmlSource" class="xml-textarea" rows="12"><ObjectMetadata>
+    <CustomTags>
+        <Topics>
+            <Topic>Sport</Topic>
+            <Topic>Technology</Topic>
+        </Topics>
+        <Geography>
+            <Place>Europe</Place>
+        </Geography>
+    </CustomTags>
+    <General>
+        <ContentType>article</ContentType>
+    </General>
+</ObjectMetadata></textarea>
+            <div class="flex gap-2 mt-3">
+                <button class="btn-action btn-blue" onclick="reloadFromXml()">Reload from XML</button>
+            </div>
+        </div>
+
+        <!-- Live Components -->
+        <div class="mockup-section">
+            <h3>Live Components</h3>
+            <p class="text-xs text-gray-500 mb-4">These are two independent NeonTagsInput instances, each bound to a different tag family and XML path.</p>
+
+            <div id="topics-input-container" class="mb-4"></div>
+            <div id="geo-input-container" class="mb-4"></div>
+            <div id="events-input-container"></div>
+        </div>
+
+        <!-- Read / Write Controls -->
+        <div class="mockup-section">
+            <h3>Read / Write</h3>
+            <div class="flex gap-2 mb-3">
+                <button class="btn-action btn-green" onclick="readAllValues()">Read Values</button>
+                <button class="btn-action btn-blue" onclick="writeAllToXml()">Write to XML</button>
+            </div>
+            <div id="outputArea" class="output-box" style="display:none;"></div>
+        </div>
+
+        <!-- Code Snippet -->
+        <div class="mockup-section">
+            <h3>Code Snippet for Neon Object Panel</h3>
+            <p class="text-xs text-gray-500 mb-3">Copy the component class and instantiation code below into your Object Panel HTML.</p>
+            <div style="position:relative;">
+                <button class="copy-btn" onclick="copySnippet()">Copy</button>
+                <pre class="code-snippet" id="codeSnippet"></pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // =====================================================================
+    // NeonTagsInput Component
+    // Self-contained vanilla JS class — copy this into your Object Panel
+    // =====================================================================
+    class NeonTagsInput {
+        /**
+         * @param {Object} options
+         * @param {HTMLElement} options.container   - DOM element to render into
+         * @param {string}     options.familyId     - Tag family ID for autocomplete
+         * @param {string}     options.xmlParent    - XML parent element under <CustomTags> (e.g. "Topics")
+         * @param {string}     options.xmlChild     - XML child element name (e.g. "Topic")
+         * @param {string}     options.apiBase      - API base path (e.g. "/neon/api/demo-integration/tags")
+         * @param {jQuery}     options.$metadataXml - jQuery object wrapping the metadata XML
+         * @param {string}     [options.label]      - Optional label text
+         * @param {string}     [options.placeholder]- Input placeholder
+         */
+        constructor(options) {
+            this.familyId = options.familyId;
+            this.xmlParent = options.xmlParent;
+            this.xmlChild = options.xmlChild;
+            this.apiBase = options.apiBase || '/neon/api/demo-integration/tags';
+            this.$metadataXml = options.$metadataXml;
+            this.label = options.label || options.xmlParent;
+            this.placeholder = options.placeholder || 'Type to search tags...';
+
+            this.values = [];
+            this.highlightIndex = -1;
+            this.suggestions = [];
+            this._debounceTimer = null;
+
+            this._render(options.container);
+            this._readFromMetadata();
+            this._renderPills();
+        }
+
+        // --- Public API ---
+
+        /** Returns array of tag label strings */
+        getValues() {
+            return [...this.values];
+        }
+
+        /** Returns XML fragment string for this family */
+        getXml() {
+            if (this.values.length === 0) {
+                return '<' + this.xmlParent + '/>';
+            }
+            const children = this.values
+                .map(v => '    <' + this.xmlChild + '>' + this._escXml(v) + '</' + this.xmlChild + '>')
+                .join('\n');
+            return '<' + this.xmlParent + '>\n' + children + '\n</' + this.xmlParent + '>';
+        }
+
+        /** Updates the $metadataXml jQuery object in place */
+        writeToMetadata() {
+            if (!this.$metadataXml) return;
+
+            // Get the underlying XML document — must use its createElement
+            // to preserve Pascal case and avoid XHTML namespace pollution
+            const xmlDoc = this.$metadataXml[0].ownerDocument || this.$metadataXml[0];
+
+            let $customTags = this.$metadataXml.find('CustomTags');
+            if ($customTags.length === 0) {
+                const ctEl = xmlDoc.createElement('CustomTags');
+                this.$metadataXml.find('ObjectMetadata')[0].appendChild(ctEl);
+                $customTags = this.$metadataXml.find('CustomTags');
+            }
+
+            // Remove existing parent element
+            $customTags.find(this.xmlParent).remove();
+
+            // Rebuild using XML DOM methods to preserve tag name casing
+            if (this.values.length > 0) {
+                const parentEl = xmlDoc.createElement(this.xmlParent);
+                this.values.forEach(v => {
+                    const childEl = xmlDoc.createElement(this.xmlChild);
+                    childEl.textContent = v;
+                    parentEl.appendChild(childEl);
+                });
+                $customTags[0].appendChild(parentEl);
+            }
+        }
+
+        /** Destroys the component */
+        destroy() {
+            if (this._container) {
+                this._container.innerHTML = '';
+            }
+        }
+
+        // --- Private: Render ---
+
+        _render(container) {
+            this._container = container;
+            container.innerHTML = '';
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'nti-container';
+
+            // Label
+            const lbl = document.createElement('span');
+            lbl.className = 'nti-label';
+            lbl.textContent = this.label;
+            wrapper.appendChild(lbl);
+
+            // Input area
+            this._inputArea = document.createElement('div');
+            this._inputArea.className = 'nti-input-area';
+            this._inputArea.addEventListener('click', () => this._textInput.focus());
+
+            // Pills container
+            this._pillsContainer = document.createElement('span');
+            this._pillsContainer.style.display = 'contents';
+            this._inputArea.appendChild(this._pillsContainer);
+
+            // Text input
+            this._textInput = document.createElement('input');
+            this._textInput.type = 'text';
+            this._textInput.className = 'nti-text-input';
+            this._textInput.placeholder = this.placeholder;
+            this._textInput.addEventListener('input', () => this._onInput());
+            this._textInput.addEventListener('keydown', (e) => this._onKeydown(e));
+            this._textInput.addEventListener('focus', () => { if (this._textInput.value) this._onInput(); });
+            this._textInput.addEventListener('blur', () => {
+                setTimeout(() => this._hideDropdown(), 150);
+            });
+            this._inputArea.appendChild(this._textInput);
+
+            wrapper.appendChild(this._inputArea);
+
+            // Dropdown
+            this._dropdown = document.createElement('div');
+            this._dropdown.className = 'nti-dropdown';
+            this._dropdown.style.display = 'none';
+            wrapper.appendChild(this._dropdown);
+
+            container.appendChild(wrapper);
+        }
+
+        _renderPills() {
+            this._pillsContainer.innerHTML = '';
+            this.values.forEach((val, i) => {
+                const pill = document.createElement('span');
+                pill.className = 'nti-pill';
+                pill.innerHTML = this._esc(val) +
+                    '<span class="nti-pill-remove" data-index="' + i + '">&times;</span>';
+                pill.querySelector('.nti-pill-remove').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this._removeValue(i);
+                });
+                this._pillsContainer.appendChild(pill);
+            });
+        }
+
+        // --- Private: Metadata ---
+
+        _readFromMetadata() {
+            this.values = [];
+            if (!this.$metadataXml) return;
+
+            const $items = this.$metadataXml.find('CustomTags > ' + this.xmlParent + ' > ' + this.xmlChild);
+            $items.each((_, el) => {
+                const text = $(el).text().trim();
+                if (text) this.values.push(text);
+            });
+        }
+
+        // --- Private: Autocomplete ---
+
+        _onInput() {
+            const query = this._textInput.value.trim();
+            if (!query) {
+                this._hideDropdown();
+                return;
+            }
+            clearTimeout(this._debounceTimer);
+            this._debounceTimer = setTimeout(() => this._fetchSuggestions(query), 200);
+        }
+
+        async _fetchSuggestions(query) {
+            try {
+                const url = this.apiBase + '/families/' + encodeURIComponent(this.familyId) + '/search?q=' + encodeURIComponent(query);
+                const resp = await fetch(url);
+                if (!resp.ok) throw new Error('API error');
+                const data = await resp.json();
+
+                // Filter out already-selected values
+                this.suggestions = (data.tags || []).filter(t => !this.values.includes(t.label));
+                this.highlightIndex = -1;
+                this._renderDropdown();
+            } catch (err) {
+                console.error('[NeonTagsInput] Search error:', err);
+                this.suggestions = [];
+                this._renderDropdown();
+            }
+        }
+
+        _renderDropdown() {
+            this._dropdown.innerHTML = '';
+            if (this.suggestions.length === 0) {
+                const empty = document.createElement('div');
+                empty.className = 'nti-dropdown-empty';
+                empty.textContent = 'No matching tags';
+                this._dropdown.appendChild(empty);
+            } else {
+                this.suggestions.forEach((tag, i) => {
+                    const item = document.createElement('div');
+                    item.className = 'nti-dropdown-item' + (i === this.highlightIndex ? ' nti-highlighted' : '');
+                    item.textContent = tag.label;
+                    item.addEventListener('mousedown', (e) => {
+                        e.preventDefault();
+                        this._selectSuggestion(tag.label);
+                    });
+                    this._dropdown.appendChild(item);
+                });
+            }
+            this._dropdown.style.display = 'block';
+        }
+
+        _hideDropdown() {
+            this._dropdown.style.display = 'none';
+            this.suggestions = [];
+            this.highlightIndex = -1;
+        }
+
+        _onKeydown(e) {
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (this.suggestions.length > 0) {
+                    this.highlightIndex = Math.min(this.highlightIndex + 1, this.suggestions.length - 1);
+                    this._renderDropdown();
+                }
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (this.suggestions.length > 0) {
+                    this.highlightIndex = Math.max(this.highlightIndex - 1, 0);
+                    this._renderDropdown();
+                }
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                if (this.highlightIndex >= 0 && this.highlightIndex < this.suggestions.length) {
+                    this._selectSuggestion(this.suggestions[this.highlightIndex].label);
+                } else if (this._textInput.value.trim()) {
+                    // Allow free-text entry
+                    this._selectSuggestion(this._textInput.value.trim());
+                }
+            } else if (e.key === 'Backspace' && !this._textInput.value && this.values.length > 0) {
+                this._removeValue(this.values.length - 1);
+            } else if (e.key === 'Escape') {
+                this._hideDropdown();
+            }
+        }
+
+        _selectSuggestion(label) {
+            if (!this.values.includes(label)) {
+                this.values.push(label);
+                this._renderPills();
+            }
+            this._textInput.value = '';
+            this._hideDropdown();
+            this._textInput.focus();
+        }
+
+        _removeValue(index) {
+            this.values.splice(index, 1);
+            this._renderPills();
+        }
+
+        // --- Private: Helpers ---
+
+        _esc(str) {
+            const d = document.createElement('div');
+            d.textContent = str;
+            return d.innerHTML;
+        }
+
+        _escXml(str) {
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+    }
+
+    // =====================================================================
+    // Mockup Page Logic
+    // =====================================================================
+    let $metadataXml = null;
+    let topicsInput = null;
+    let geoInput = null;
+    let eventsInput = null;
+
+    function buildMetadataFromTextarea() {
+        const xmlStr = document.getElementById('xmlSource').value;
+        $metadataXml = $($.parseXML(xmlStr));
+    }
+
+    function initComponents() {
+        // Destroy existing
+        if (topicsInput) topicsInput.destroy();
+        if (geoInput) geoInput.destroy();
+        if (eventsInput) eventsInput.destroy();
+
+        buildMetadataFromTextarea();
+
+        // Determine API base - use PanelAPI if available
+        const apiBase = (typeof PanelAPI !== 'undefined' ? PanelAPI.buildApiPath('/tags') : '/tags');
+
+        topicsInput = new NeonTagsInput({
+            container: document.getElementById('topics-input-container'),
+            familyId: 'topic',
+            xmlParent: 'Topics',
+            xmlChild: 'Topic',
+            apiBase: apiBase,
+            $metadataXml: $metadataXml,
+            label: 'Topics'
+        });
+
+        geoInput = new NeonTagsInput({
+            container: document.getElementById('geo-input-container'),
+            familyId: 'geo',
+            xmlParent: 'Geography',
+            xmlChild: 'Place',
+            apiBase: apiBase,
+            $metadataXml: $metadataXml,
+            label: 'Geography'
+        });
+
+        eventsInput = new NeonTagsInput({
+            container: document.getElementById('events-input-container'),
+            familyId: 'events',
+            xmlParent: 'Events',
+            xmlChild: 'Event',
+            apiBase: apiBase,
+            $metadataXml: $metadataXml,
+            label: 'Events'
+        });
+    }
+
+    function reloadFromXml() {
+        initComponents();
+        document.getElementById('outputArea').style.display = 'none';
+    }
+
+    function readAllValues() {
+        const out = document.getElementById('outputArea');
+        const data = {
+            topics: { values: topicsInput.getValues(), xml: topicsInput.getXml() },
+            geography: { values: geoInput.getValues(), xml: geoInput.getXml() },
+            events: { values: eventsInput.getValues(), xml: eventsInput.getXml() }
+        };
+        out.textContent = JSON.stringify(data, null, 2);
+        out.style.display = 'block';
+    }
+
+    function writeAllToXml() {
+        topicsInput.writeToMetadata();
+        geoInput.writeToMetadata();
+        eventsInput.writeToMetadata();
+
+        // Serialize back to the textarea
+        const serializer = new XMLSerializer();
+        const xmlStr = serializer.serializeToString($metadataXml[0]);
+
+        // Pretty print
+        const formatted = xmlStr
+            .replace(/></g, '>\n<')
+            .replace(/\n<\//g, '</')
+            .split('\n')
+            .map(line => line.trim())
+            .join('\n');
+
+        document.getElementById('xmlSource').value = formatXml(xmlStr);
+
+        const out = document.getElementById('outputArea');
+        out.textContent = 'XML updated in textarea above.';
+        out.style.display = 'block';
+    }
+
+    function formatXml(xml) {
+        let formatted = '';
+        let indent = '';
+        const tab = '    ';
+        xml.split(/>\s*</).forEach(function(node) {
+            if (node.match(/^\/\w/)) indent = indent.substring(tab.length);
+            formatted += indent + '<' + node + '>\n';
+            if (node.match(/^<?\w[^>]*[^\/]$/) && !node.startsWith('?') && !node.startsWith('!')) indent += tab;
+        });
+        return formatted.substring(1, formatted.length - 2);
+    }
+
+    function copySnippet() {
+        const text = document.getElementById('codeSnippet').textContent;
+        navigator.clipboard.writeText(text).then(() => {
+            const btn = document.querySelector('.copy-btn');
+            btn.textContent = 'Copied!';
+            setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+        });
+    }
+
+    // Generate code snippet
+    function populateSnippet() {
+        const snippet = `<!-- NeonTagsInput: include jQuery (already available in Neon Object Panel) -->
+<!-- <script src="https://code.jquery.com/jquery-3.7.1.min.js"><\/script> -->
+
+<!-- NeonTagsInput Styles -->
+<style>
+.nti-container { position: relative; margin-bottom: 0.75rem; }
+.nti-label { display: block; font-size: 0.75rem; font-weight: 600; color: #6b7280; margin-bottom: 0.375rem; text-transform: uppercase; letter-spacing: 0.03em; }
+.nti-input-area { display: flex; flex-wrap: wrap; align-items: center; gap: 0.375rem; padding: 0.375rem 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: #fff; min-height: 2.25rem; cursor: text; transition: border-color 0.15s ease; }
+.nti-input-area:focus-within { border-color: #2847E2; box-shadow: 0 0 0 2px rgba(40, 71, 226, 0.12); }
+.nti-pill { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.125rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; background: #dbeafe; color: #1e40af; white-space: nowrap; line-height: 1.5; }
+.nti-pill-remove { cursor: pointer; opacity: 0.5; font-size: 0.875rem; line-height: 1; margin-left: 0.125rem; }
+.nti-pill-remove:hover { opacity: 1; }
+.nti-text-input { border: none; outline: none; font-size: 0.8125rem; flex: 1; min-width: 6rem; padding: 0.125rem 0; background: transparent; }
+.nti-dropdown { position: absolute; top: 100%; left: 0; right: 0; z-index: 50; background: #fff; border: 1px solid #d1d5db; border-top: none; border-radius: 0 0 0.375rem 0.375rem; max-height: 12rem; overflow-y: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+.nti-dropdown-item { padding: 0.5rem 0.75rem; font-size: 0.8125rem; cursor: pointer; transition: background 0.1s; }
+.nti-dropdown-item:hover, .nti-dropdown-item.nti-highlighted { background: #eef2fe; color: #2847E2; }
+.nti-dropdown-empty { padding: 0.5rem 0.75rem; font-size: 0.8125rem; color: #9ca3af; font-style: italic; }
+</style>
+
+<!-- Container elements -->
+<div id="topics-tags"></div>
+<div id="geography-tags"></div>
+
+<script>
+// --- Paste the NeonTagsInput class here ---
+// (full class code from the mockup page)
+
+// --- Initialize ---
+// \$metadataXml is provided by Neon Object Panel
+var topicsTags = new NeonTagsInput({
+    container: document.getElementById('topics-tags'),
+    familyId: 'topic',
+    xmlParent: 'Topics',       // reads/writes <CustomTags><Topics><Topic>...</Topic></Topics>
+    xmlChild: 'Topic',
+    apiBase: '/neon/api/demo-integration/tags',
+    \\$metadataXml: \\$metadataXml,
+    label: 'Topics'
+});
+
+var geoTags = new NeonTagsInput({
+    container: document.getElementById('geography-tags'),
+    familyId: 'geo',
+    xmlParent: 'Geography',    // reads/writes <CustomTags><Geography><Place>...</Place></Geography>
+    xmlChild: 'Place',
+    apiBase: '/neon/api/demo-integration/tags',
+    \\$metadataXml: \\$metadataXml,
+    label: 'Geography'
+});
+
+// --- When saving, call writeToMetadata() ---
+// topicsTags.writeToMetadata();
+// geoTags.writeToMetadata();
+
+// --- To read current values ---
+// topicsTags.getValues()  => ["Sport", "Technology"]
+// topicsTags.getXml()     => "<Topics><Topic>Sport</Topic>...</Topics>"
+<\/script>`;
+
+        document.getElementById('codeSnippet').textContent = snippet;
+    }
+
+    // Init on load
+    document.addEventListener('DOMContentLoaded', () => {
+        initComponents();
+        populateSnippet();
+    });
+    </script>
+</body>
+</html>

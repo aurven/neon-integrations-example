@@ -125,7 +125,9 @@ fastify.get("/services", function (request, reply) {
       { name: "Breaking News Publish", endpoint: "POST /widgets/breakingnews/publish", description: "Publish breaking news to Neon" },
       { name: "SmartOcto Dashboard", endpoint: "GET /widgets/smartocto-dashboard", demoUrl: "/widgets/smartocto-dashboard", description: "SmartOcto analytics dashboard (demo)" },
       { name: "Neon Analytics", endpoint: "GET /widgets/neon-analytics", demoUrl: "/widgets/neon-analytics?demo=true", description: "Production metrics dashboard with interactive charts - supports demo mode (?demo=true)" },
-      { name: "Welcome Widget", endpoint: "GET /widgets/welcome", demoUrl: "/widgets/welcome", description: "Onboarding widget for new users with quick tour and action cards" }
+      { name: "Welcome Widget", endpoint: "GET /widgets/welcome", demoUrl: "/widgets/welcome", description: "Onboarding widget for new users with quick tour and action cards" },
+      { name: "Tag Manager", endpoint: "GET /tags/widget", demoUrl: "/tags/widget", description: "Manage distribution tags, packages, and customer subscriptions" },
+      { name: "Tags Input Mockup", endpoint: "GET /tags/input-mockup", demoUrl: "/tags/input-mockup", description: "NeonTagsInput component mockup — copy-paste ready for Neon Object Panel" }
     ],
     panels: [
       { name: "Trello Panel", endpoint: "GET /panels/trello", demoUrl: "/panels/trello", description: "Trello card management panel for Neon CMS iframe embedding with PostMessage API" },
@@ -161,6 +163,17 @@ fastify.get("/services", function (request, reply) {
       { name: "Get Children", endpoint: "GET /iab/:type/children", description: "Get child categories for a parent ID" },
       { name: "Get Statistics", endpoint: "GET /iab/:type/stats", description: "Get taxonomy statistics" },
       { name: "Refresh Cache", endpoint: "POST /iab/refresh", description: "Force refresh taxonomies from GitHub" }
+    ],
+    tagManager: [
+      { name: "Tag Manager Widget", endpoint: "GET /tags/widget", demoUrl: "/tags/widget", description: "UI for managing distribution tags, packages, and customers" },
+      { name: "List Families", endpoint: "GET /tags/families", description: "List all tag families with their tags" },
+      { name: "Create Family", endpoint: "POST /tags/families", description: "Create a new tag family" },
+      { name: "Add Tag", endpoint: "POST /tags/families/:familyId/tags", description: "Add a tag to a family" },
+      { name: "List Packages", endpoint: "GET /tags/packages", description: "List all packages with tag and package references" },
+      { name: "Create Package", endpoint: "POST /tags/packages", description: "Create a distribution package" },
+      { name: "List Customers", endpoint: "GET /tags/customers", description: "List all customers with their subscriptions" },
+      { name: "Create Customer", endpoint: "POST /tags/customers", description: "Create a customer with package subscriptions" },
+      { name: "Customers by Package", endpoint: "GET /tags/customers/by-package/:packageId", description: "Get customers subscribed to a specific package" }
     ]
   };
 
@@ -377,6 +390,29 @@ setImmediate(async () => {
     }
   } catch (error) {
     console.error('[IAB Taxonomies] Failed to initialize:', error.message);
+  }
+});
+
+/**
+ *
+ * Tag Manager
+ *
+ */
+const tagManagerHandlers = require("./src/requestHandlers/tag-manager.js");
+fastify.register(async function (fastify) {
+  await tagManagerHandlers.registerRoutes(fastify, {
+    apikey: process.env.NEON_EXT_APIKEY
+  });
+});
+
+// Initialize tag manager data on startup (non-blocking)
+const tagManagerStore = require("./src/helpers/tag-manager-store");
+setImmediate(async () => {
+  try {
+    await tagManagerStore.initializeDefaults();
+    console.log('[Tag Manager] Data files initialized');
+  } catch (error) {
+    console.error('[Tag Manager] Failed to initialize:', error.message);
   }
 });
 

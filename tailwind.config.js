@@ -2,6 +2,7 @@
 module.exports = {
   content: [
     "./src/panels/**/*.hbs",
+    "./src/widgets/**/*.hbs",
   ],
   theme: {
     screens: {
