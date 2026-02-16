@@ -2,7 +2,7 @@ const store = require('../helpers/tag-manager-store');
 
 /**
  * Tag Manager Request Handlers
- * Provides REST API endpoints for managing distribution tags, packages, and customers
+ * Provides REST API endpoints for managing distribution tags, products, packages, customers, and streams
  */
 
 // --- Utility ---
@@ -11,11 +11,36 @@ function slugify(str) {
   return str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 }
 
+function isMaskedValue(val) {
+  return typeof val === 'string' && /^\*+.{0,4}$/.test(val);
+}
+
+function mergeSecrets(existing, incoming, type) {
+  if (!incoming) return existing;
+  if (!existing) return incoming;
+
+  const merged = { ...incoming };
+
+  for (const key of Object.keys(merged)) {
+    if (key === 'entries' && Array.isArray(merged.entries)) {
+      merged.entries = merged.entries.map((e, i) => {
+        if (isMaskedValue(e.value) && existing.entries && existing.entries[i]) {
+          return { ...e, value: existing.entries[i].value };
+        }
+        return e;
+      });
+    } else if (isMaskedValue(merged[key]) && existing[key]) {
+      merged[key] = existing[key];
+    }
+  }
+  return merged;
+}
+
 // --- Widget ---
 
 function tagManagerWidgetHandler(request, reply) {
   return reply.view("/src/widgets/tag-manager.hbs", {
-    seo: { title: "Tag Manager", description: "Manage distribution tags, packages, and customers" }
+    seo: { title: "Tag Manager", description: "Manage distribution tags, products, packages, customers, and streams" }
   });
 }
 
@@ -23,8 +48,13 @@ function tagManagerWidgetHandler(request, reply) {
 
 async function listFamilies(request, reply) {
   try {
+    const { type } = request.query || {};
     const data = await store.getTags();
-    return reply.send({ success: true, families: data ? data.families : [] });
+    let families = data ? data.families : [];
+    if (type) {
+      families = families.filter(f => f.type === type);
+    }
+    return reply.send({ success: true, families });
   } catch (error) {
     return reply.status(500).send({ success: false, error: error.message });
   }
@@ -49,10 +79,13 @@ async function getFamily(request, reply) {
 
 async function createFamily(request, reply) {
   try {
-    const { name, description } = request.body;
+    const { name, description, type } = request.body;
     if (!name) {
       return reply.status(400).send({ success: false, error: 'Missing required field: name' });
     }
+
+    const validTypes = ['categorization', 'system'];
+    const familyType = validTypes.includes(type) ? type : 'categorization';
 
     const data = await store.getTags() || { families: [] };
     const id = slugify(name);
@@ -61,7 +94,7 @@ async function createFamily(request, reply) {
       return reply.status(409).send({ success: false, error: 'A family with this name already exists' });
     }
 
-    const family = { id, name, description: description || '', tags: [] };
+    const family = { id, name, description: description || '', type: familyType, tags: [] };
     data.families.push(family);
     await store.saveTags(data);
 
@@ -74,7 +107,7 @@ async function createFamily(request, reply) {
 async function updateFamily(request, reply) {
   try {
     const { familyId } = request.params;
-    const { name, description } = request.body;
+    const { name, description, type } = request.body;
 
     const data = await store.getTags();
     if (!data) {
@@ -88,6 +121,10 @@ async function updateFamily(request, reply) {
 
     if (name !== undefined) family.name = name;
     if (description !== undefined) family.description = description;
+    if (type !== undefined) {
+      const validTypes = ['categorization', 'system'];
+      if (validTypes.includes(type)) family.type = type;
+    }
     await store.saveTags(data);
 
     return reply.send({ success: true, family });
@@ -110,22 +147,22 @@ async function deleteFamily(request, reply) {
       return reply.status(404).send({ success: false, error: 'Family not found' });
     }
 
-    // Collect tag IDs to clean up from packages
+    // Collect tag IDs to clean up from products
     const tagIds = data.families[familyIndex].tags.map(t => t.id);
     data.families.splice(familyIndex, 1);
     await store.saveTags(data);
 
-    // Cascading cleanup: remove these tags from packages
+    // Cascading cleanup: remove these tags from products
     if (tagIds.length > 0) {
-      const pkgData = await store.getPackages();
-      if (pkgData) {
+      const prodData = await store.getProducts();
+      if (prodData) {
         let changed = false;
-        for (const pkg of pkgData.packages) {
-          const before = pkg.tagIds.length;
-          pkg.tagIds = pkg.tagIds.filter(id => !tagIds.includes(id));
-          if (pkg.tagIds.length !== before) changed = true;
+        for (const prod of prodData.products) {
+          const before = prod.tagIds.length;
+          prod.tagIds = prod.tagIds.filter(id => !tagIds.includes(id));
+          if (prod.tagIds.length !== before) changed = true;
         }
-        if (changed) await store.savePackages(pkgData);
+        if (changed) await store.saveProducts(prodData);
       }
     }
 
@@ -194,16 +231,16 @@ async function removeTag(request, reply) {
     family.tags.splice(tagIndex, 1);
     await store.saveTags(data);
 
-    // Cascading cleanup: remove this tag from packages
-    const pkgData = await store.getPackages();
-    if (pkgData) {
+    // Cascading cleanup: remove this tag from products
+    const prodData = await store.getProducts();
+    if (prodData) {
       let changed = false;
-      for (const pkg of pkgData.packages) {
-        const before = pkg.tagIds.length;
-        pkg.tagIds = pkg.tagIds.filter(id => id !== tagId);
-        if (pkg.tagIds.length !== before) changed = true;
+      for (const prod of prodData.products) {
+        const before = prod.tagIds.length;
+        prod.tagIds = prod.tagIds.filter(id => id !== tagId);
+        if (prod.tagIds.length !== before) changed = true;
       }
-      if (changed) await store.savePackages(pkgData);
+      if (changed) await store.saveProducts(prodData);
     }
 
     return reply.send({ success: true, deleted: tagId });
@@ -247,6 +284,109 @@ function tagInputMockupHandler(request, reply) {
   });
 }
 
+// --- Products ---
+
+async function listProducts(request, reply) {
+  try {
+    const data = await store.getProducts();
+    return reply.send({ success: true, products: data ? data.products : [] });
+  } catch (error) {
+    return reply.status(500).send({ success: false, error: error.message });
+  }
+}
+
+async function createProduct(request, reply) {
+  try {
+    const { name, description, tagIds } = request.body;
+
+    if (!name) {
+      return reply.status(400).send({ success: false, error: 'Missing required field: name' });
+    }
+
+    const data = await store.getProducts() || { products: [] };
+    const id = 'prod-' + slugify(name);
+
+    if (data.products.find(p => p.id === id)) {
+      return reply.status(409).send({ success: false, error: 'A product with this name already exists' });
+    }
+
+    const product = {
+      id,
+      name,
+      description: description || '',
+      tagIds: tagIds || [],
+      createdAt: new Date().toISOString()
+    };
+    data.products.push(product);
+    await store.saveProducts(data);
+
+    return reply.send({ success: true, product });
+  } catch (error) {
+    return reply.status(500).send({ success: false, error: error.message });
+  }
+}
+
+async function updateProduct(request, reply) {
+  try {
+    const { productId } = request.params;
+    const { name, description, tagIds } = request.body;
+
+    const data = await store.getProducts();
+    if (!data) {
+      return reply.status(404).send({ success: false, error: 'No product data found' });
+    }
+
+    const product = data.products.find(p => p.id === productId);
+    if (!product) {
+      return reply.status(404).send({ success: false, error: 'Product not found' });
+    }
+
+    if (name !== undefined) product.name = name;
+    if (description !== undefined) product.description = description;
+    if (tagIds !== undefined) product.tagIds = tagIds;
+    await store.saveProducts(data);
+
+    return reply.send({ success: true, product });
+  } catch (error) {
+    return reply.status(500).send({ success: false, error: error.message });
+  }
+}
+
+async function deleteProduct(request, reply) {
+  try {
+    const { productId } = request.params;
+
+    const data = await store.getProducts();
+    if (!data) {
+      return reply.status(404).send({ success: false, error: 'No product data found' });
+    }
+
+    const prodIndex = data.products.findIndex(p => p.id === productId);
+    if (prodIndex === -1) {
+      return reply.status(404).send({ success: false, error: 'Product not found' });
+    }
+
+    data.products.splice(prodIndex, 1);
+    await store.saveProducts(data);
+
+    // Cascading cleanup: remove this product from packages
+    const pkgData = await store.getPackages();
+    if (pkgData) {
+      let changed = false;
+      for (const pkg of pkgData.packages) {
+        const before = pkg.productIds.length;
+        pkg.productIds = pkg.productIds.filter(id => id !== productId);
+        if (pkg.productIds.length !== before) changed = true;
+      }
+      if (changed) await store.savePackages(pkgData);
+    }
+
+    return reply.send({ success: true, deleted: productId });
+  } catch (error) {
+    return reply.status(500).send({ success: false, error: error.message });
+  }
+}
+
 // --- Packages ---
 
 async function listPackages(request, reply) {
@@ -260,7 +400,7 @@ async function listPackages(request, reply) {
 
 async function createPackage(request, reply) {
   try {
-    const { name, description, tagIds, packageIds } = request.body;
+    const { name, description, productIds } = request.body;
 
     if (!name) {
       return reply.status(400).send({ success: false, error: 'Missing required field: name' });
@@ -277,8 +417,7 @@ async function createPackage(request, reply) {
       id,
       name,
       description: description || '',
-      tagIds: tagIds || [],
-      packageIds: packageIds || [],
+      productIds: productIds || [],
       createdAt: new Date().toISOString()
     };
     data.packages.push(pkg);
@@ -293,7 +432,7 @@ async function createPackage(request, reply) {
 async function updatePackage(request, reply) {
   try {
     const { packageId } = request.params;
-    const { name, description, tagIds, packageIds } = request.body;
+    const { name, description, productIds } = request.body;
 
     const data = await store.getPackages();
     if (!data) {
@@ -307,8 +446,7 @@ async function updatePackage(request, reply) {
 
     if (name !== undefined) pkg.name = name;
     if (description !== undefined) pkg.description = description;
-    if (tagIds !== undefined) pkg.tagIds = tagIds;
-    if (packageIds !== undefined) pkg.packageIds = packageIds;
+    if (productIds !== undefined) pkg.productIds = productIds;
     await store.savePackages(data);
 
     return reply.send({ success: true, package: pkg });
@@ -332,11 +470,6 @@ async function deletePackage(request, reply) {
     }
 
     data.packages.splice(pkgIndex, 1);
-
-    // Also remove this package from other packages' packageIds
-    for (const pkg of data.packages) {
-      pkg.packageIds = pkg.packageIds.filter(id => id !== packageId);
-    }
     await store.savePackages(data);
 
     // Cascading cleanup: remove from customers
@@ -402,6 +535,7 @@ async function createCustomer(request, reply) {
       name,
       contact: contact || '',
       packageIds: packageIds || [],
+      streams: [],
       createdAt: new Date().toISOString()
     };
     data.customers.push(customer);
@@ -462,6 +596,223 @@ async function deleteCustomer(request, reply) {
   }
 }
 
+// --- Transformers Catalog ---
+
+async function listTransformers(request, reply) {
+  try {
+    const data = await store.getTransformers();
+    return reply.send({ success: true, transformers: data ? data.transformers : [] });
+  } catch (error) {
+    return reply.status(500).send({ success: false, error: error.message });
+  }
+}
+
+// --- Distribution Streams ---
+
+async function listAllStreams(request, reply) {
+  try {
+    const data = await store.getCustomers();
+    if (!data) {
+      return reply.send({ success: true, streams: [] });
+    }
+    const allStreams = [];
+    for (const cust of data.customers) {
+      for (const stream of (cust.streams || [])) {
+        allStreams.push({
+          ...stream,
+          secrets: store.maskSecrets(stream.secrets, stream.type),
+          customerId: cust.id,
+          customerName: cust.name
+        });
+      }
+    }
+    return reply.send({ success: true, streams: allStreams });
+  } catch (error) {
+    return reply.status(500).send({ success: false, error: error.message });
+  }
+}
+
+async function listStreams(request, reply) {
+  try {
+    const { customerId } = request.params;
+    const data = await store.getCustomers();
+    if (!data) {
+      return reply.status(404).send({ success: false, error: 'No customer data found' });
+    }
+    const customer = data.customers.find(c => c.id === customerId);
+    if (!customer) {
+      return reply.status(404).send({ success: false, error: 'Customer not found' });
+    }
+    const maskedStreams = (customer.streams || []).map(s => ({
+      ...s,
+      secrets: store.maskSecrets(s.secrets, s.type)
+    }));
+    return reply.send({ success: true, streams: maskedStreams, customerId });
+  } catch (error) {
+    return reply.status(500).send({ success: false, error: error.message });
+  }
+}
+
+async function createStream(request, reply) {
+  try {
+    const { customerId } = request.params;
+    const { name, type, destination, description, secrets, transformerIds } = request.body;
+
+    if (!name) {
+      return reply.status(400).send({ success: false, error: 'Missing required field: name' });
+    }
+    const validTypes = ['sftp', 's3', 'api', 'other'];
+    if (!validTypes.includes(type)) {
+      return reply.status(400).send({ success: false, error: 'Invalid stream type. Must be: ' + validTypes.join(', ') });
+    }
+
+    // Validate transformerIds
+    let validatedTransformerIds = [];
+    if (transformerIds && Array.isArray(transformerIds) && transformerIds.length > 0) {
+      if (type === 'api') {
+        return reply.status(400).send({ success: false, error: 'API streams do not support transformers' });
+      }
+      const tData = await store.getTransformers();
+      const catalogIds = tData ? tData.transformers.map(t => t.id) : [];
+      for (const tid of transformerIds) {
+        if (!catalogIds.includes(tid)) {
+          return reply.status(400).send({ success: false, error: `Unknown transformer: ${tid}` });
+        }
+      }
+      validatedTransformerIds = transformerIds;
+    }
+
+    const data = await store.getCustomers();
+    if (!data) {
+      return reply.status(404).send({ success: false, error: 'No customer data found' });
+    }
+    const customer = data.customers.find(c => c.id === customerId);
+    if (!customer) {
+      return reply.status(404).send({ success: false, error: 'Customer not found' });
+    }
+
+    if (!customer.streams) customer.streams = [];
+
+    const streamId = 'stream-' + slugify(name);
+    if (customer.streams.find(s => s.id === streamId)) {
+      return reply.status(409).send({ success: false, error: 'A stream with this name already exists for this customer' });
+    }
+
+    const stream = {
+      id: streamId,
+      name,
+      type,
+      destination: destination || {},
+      secrets: secrets || null,
+      transformerIds: validatedTransformerIds,
+      description: description || '',
+      createdAt: new Date().toISOString()
+    };
+    customer.streams.push(stream);
+    await store.saveCustomers(data);
+
+    return reply.send({
+      success: true,
+      stream: { ...stream, secrets: store.maskSecrets(stream.secrets, stream.type) },
+      customerId
+    });
+  } catch (error) {
+    return reply.status(500).send({ success: false, error: error.message });
+  }
+}
+
+async function updateStream(request, reply) {
+  try {
+    const { customerId, streamId } = request.params;
+    const { name, type, destination, description, secrets, transformerIds } = request.body;
+
+    const data = await store.getCustomers();
+    if (!data) {
+      return reply.status(404).send({ success: false, error: 'No customer data found' });
+    }
+    const customer = data.customers.find(c => c.id === customerId);
+    if (!customer) {
+      return reply.status(404).send({ success: false, error: 'Customer not found' });
+    }
+
+    const stream = (customer.streams || []).find(s => s.id === streamId);
+    if (!stream) {
+      return reply.status(404).send({ success: false, error: 'Stream not found' });
+    }
+
+    if (name !== undefined) stream.name = name;
+    if (type !== undefined) {
+      const validTypes = ['sftp', 's3', 'api', 'other'];
+      if (!validTypes.includes(type)) {
+        return reply.status(400).send({ success: false, error: 'Invalid stream type' });
+      }
+      stream.type = type;
+    }
+    if (destination !== undefined) stream.destination = destination;
+    if (description !== undefined) stream.description = description;
+
+    // Merge secrets preserving masked values
+    if (secrets !== undefined) {
+      stream.secrets = mergeSecrets(stream.secrets, secrets, stream.type);
+    }
+
+    // Validate and set transformerIds
+    if (transformerIds !== undefined) {
+      const effectiveType = stream.type;
+      if (effectiveType === 'api' && transformerIds.length > 0) {
+        return reply.status(400).send({ success: false, error: 'API streams do not support transformers' });
+      }
+      if (transformerIds.length > 0) {
+        const tData = await store.getTransformers();
+        const catalogIds = tData ? tData.transformers.map(t => t.id) : [];
+        for (const tid of transformerIds) {
+          if (!catalogIds.includes(tid)) {
+            return reply.status(400).send({ success: false, error: `Unknown transformer: ${tid}` });
+          }
+        }
+      }
+      stream.transformerIds = transformerIds;
+    }
+
+    await store.saveCustomers(data);
+
+    return reply.send({
+      success: true,
+      stream: { ...stream, secrets: store.maskSecrets(stream.secrets, stream.type) },
+      customerId
+    });
+  } catch (error) {
+    return reply.status(500).send({ success: false, error: error.message });
+  }
+}
+
+async function deleteStream(request, reply) {
+  try {
+    const { customerId, streamId } = request.params;
+
+    const data = await store.getCustomers();
+    if (!data) {
+      return reply.status(404).send({ success: false, error: 'No customer data found' });
+    }
+    const customer = data.customers.find(c => c.id === customerId);
+    if (!customer) {
+      return reply.status(404).send({ success: false, error: 'Customer not found' });
+    }
+
+    const streamIndex = (customer.streams || []).findIndex(s => s.id === streamId);
+    if (streamIndex === -1) {
+      return reply.status(404).send({ success: false, error: 'Stream not found' });
+    }
+
+    customer.streams.splice(streamIndex, 1);
+    await store.saveCustomers(data);
+
+    return reply.send({ success: true, deleted: streamId, customerId });
+  } catch (error) {
+    return reply.status(500).send({ success: false, error: error.message });
+  }
+}
+
 // --- Route Registration ---
 
 async function registerRoutes(fastify, options) {
@@ -501,6 +852,12 @@ async function registerRoutes(fastify, options) {
   // Tags input component mockup
   fastify.get('/tags/input-mockup', tagInputMockupHandler);
 
+  // Products
+  fastify.get('/tags/products', listProducts);
+  fastify.post('/tags/products', createProduct);
+  fastify.put('/tags/products/:productId', updateProduct);
+  fastify.delete('/tags/products/:productId', deleteProduct);
+
   // Packages
   fastify.get('/tags/packages', listPackages);
   fastify.post('/tags/packages', createPackage);
@@ -513,6 +870,16 @@ async function registerRoutes(fastify, options) {
   fastify.post('/tags/customers', createCustomer);
   fastify.put('/tags/customers/:customerId', updateCustomer);
   fastify.delete('/tags/customers/:customerId', deleteCustomer);
+
+  // Transformers catalog
+  fastify.get('/tags/transformers', listTransformers);
+
+  // Distribution Streams
+  fastify.get('/tags/streams', listAllStreams);
+  fastify.get('/tags/customers/:customerId/streams', listStreams);
+  fastify.post('/tags/customers/:customerId/streams', createStream);
+  fastify.put('/tags/customers/:customerId/streams/:streamId', updateStream);
+  fastify.delete('/tags/customers/:customerId/streams/:streamId', deleteStream);
 }
 
 module.exports = { registerRoutes };

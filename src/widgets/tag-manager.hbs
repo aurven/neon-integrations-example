@@ -114,6 +114,9 @@
             border-color: #2847E2;
             box-shadow: 0 0 0 2px rgba(40, 71, 226, 0.15);
         }
+        select.input-field {
+            appearance: auto;
+        }
         .family-sidebar-item {
             padding: 0.625rem 1rem;
             border-radius: 0.5rem;
@@ -200,6 +203,132 @@
         .family-color-5 { background: #ffe4e6; color: #be123c; }
         .family-color-6 { background: #ccfbf1; color: #115e59; }
         .family-color-7 { background: #fef9c3; color: #854d0e; }
+        /* Family type badges */
+        .family-type-badge {
+            display: inline-block;
+            font-size: 0.625rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            margin-left: 0.375rem;
+            vertical-align: middle;
+        }
+        .family-type-categorization { background: #dbeafe; color: #1e40af; }
+        .family-type-system { background: #fef3c7; color: #92400e; }
+        /* Product pill */
+        .product-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.125rem 0.5rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            background: #ede9fe;
+            color: #5b21b6;
+        }
+        /* Stream type badges */
+        .stream-type-badge {
+            display: inline-block;
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            padding: 0.125rem 0.5rem;
+            border-radius: 0.25rem;
+        }
+        .stream-type-sftp { background: #dbeafe; color: #1e40af; }
+        .stream-type-s3 { background: #fce7f3; color: #9d174d; }
+        .stream-type-api { background: #d1fae5; color: #065f46; }
+        .stream-type-other { background: #f3f4f6; color: #374151; }
+        /* Secrets status indicator */
+        .secrets-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.6875rem;
+            font-weight: 500;
+            padding: 0.125rem 0.5rem;
+            border-radius: 0.25rem;
+        }
+        .secrets-indicator.has-secrets { background: #d1fae5; color: #065f46; }
+        .secrets-indicator.no-secrets { background: #f3f4f6; color: #9ca3af; }
+        /* Transformer pipeline visualization */
+        .pipeline-viz {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            flex-wrap: wrap;
+            font-size: 0.75rem;
+            margin-top: 0.575rem;
+        }
+        .pipeline-node {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.125rem 0.5rem;
+            border-radius: 0.375rem;
+            background: #eef2fe;
+            color: #2847E2;
+            font-weight: 500;
+            font-size: 0.6875rem;
+        }
+        .pipeline-node.pipeline-source { background: #d1fae5; color: #065f46; }
+        .pipeline-node.pipeline-dest { background: #fce7f3; color: #9d174d; }
+        .pipeline-arrow { color: #9ca3af; font-size: 0.75rem; }
+        /* Transformer builder in modal */
+        .transformer-pool {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            max-height: 10rem;
+            overflow-y: auto;
+        }
+        .transformer-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.375rem 0.5rem;
+            border-radius: 0.375rem;
+            font-size: 0.8125rem;
+            cursor: pointer;
+            transition: background 0.1s ease;
+        }
+        .transformer-item:hover { background: #f3f4f6; }
+        .transformer-item .tf-desc { font-size: 0.6875rem; color: #9ca3af; }
+        .pipeline-builder {
+            border: 1px dashed #d1d5db;
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            min-height: 3rem;
+        }
+        .pipeline-builder-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.375rem 0.5rem;
+            margin-bottom: 0.25rem;
+            background: #eef2fe;
+            border-radius: 0.375rem;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            color: #2847E2;
+        }
+        .pipeline-builder-item .move-btns {
+            display: flex;
+            gap: 0.125rem;
+        }
+        .pipeline-builder-item .move-btns button {
+            background: transparent;
+            border: 1px solid #b9cbfb;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            font-size: 0.6875rem;
+            padding: 0 0.25rem;
+            color: #2847E2;
+            line-height: 1.2;
+        }
+        .pipeline-builder-item .move-btns button:hover { background: #dbeafe; }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -208,14 +337,16 @@
         <!-- Header -->
         <div class="mb-6">
             <h1 class="text-2xl font-bold text-gray-800">Tag Manager</h1>
-            <p class="text-gray-500 text-sm mt-1">Manage distribution tags, packages, and customer subscriptions</p>
+            <p class="text-gray-500 text-sm mt-1">Manage distribution tags, products, packages, customers, and streams</p>
         </div>
 
         <!-- Tabs -->
-        <div class="flex space-x-2 mb-6">
+        <div class="flex space-x-2 mb-6 flex-wrap">
             <button class="tab-btn active" data-tab="tags" onclick="switchTab('tags')">Tags</button>
+            <button class="tab-btn" data-tab="products" onclick="switchTab('products')">Products</button>
             <button class="tab-btn" data-tab="packages" onclick="switchTab('packages')">Packages</button>
             <button class="tab-btn" data-tab="customers" onclick="switchTab('customers')">Customers</button>
+            <button class="tab-btn" data-tab="streams" onclick="switchTab('streams')">Distribution Streams</button>
         </div>
 
         <!-- ==================== TAGS TAB ==================== -->
@@ -245,10 +376,21 @@
             </div>
         </div>
 
+        <!-- ==================== PRODUCTS TAB ==================== -->
+        <div id="panel-products" class="tab-panel" hidden>
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-semibold text-gray-700">Products</h3>
+                <button class="btn-primary" onclick="showCreateProductModal()">+ New Product</button>
+            </div>
+            <div id="productList" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <!-- populated by JS -->
+            </div>
+        </div>
+
         <!-- ==================== PACKAGES TAB ==================== -->
         <div id="panel-packages" class="tab-panel" hidden>
             <div class="flex items-center justify-between mb-4">
-                <h3 class="font-semibold text-gray-700">Distribution Packages</h3>
+                <h3 class="font-semibold text-gray-700">Packages</h3>
                 <button class="btn-primary" onclick="showCreatePackageModal()">+ New Package</button>
             </div>
             <div id="packageList" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -266,6 +408,16 @@
                 <!-- populated by JS -->
             </div>
         </div>
+
+        <!-- ==================== DISTRIBUTION STREAMS TAB ==================== -->
+        <div id="panel-streams" class="tab-panel" hidden>
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-semibold text-gray-700">Distribution Streams</h3>
+            </div>
+            <div id="streamsList">
+                <!-- populated by JS: grouped by customer -->
+            </div>
+        </div>
     </div>
 
     <!-- Modal container -->
@@ -276,10 +428,13 @@
         // STATE
         // =============================================
         let families = [];
+        let products = [];
         let packages = [];
         let customers = [];
         let selectedFamilyId = null;
         const familyColors = {};
+        let transformersCatalog = [];
+        let modalSelectedTransformers = [];
 
         // =============================================
         // API HELPERS
@@ -337,6 +492,13 @@
                 </div>`;
         }
 
+        function showWideModal(html) {
+            document.getElementById('modalContainer').innerHTML = `
+                <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+                    <div class="modal-content" style="max-width:42rem;">${html}</div>
+                </div>`;
+        }
+
         function closeModal() {
             document.getElementById('modalContainer').innerHTML = '';
         }
@@ -353,8 +515,10 @@
             });
 
             if (tab === 'tags') loadFamilies();
+            if (tab === 'products') loadProducts();
             if (tab === 'packages') loadPackages();
             if (tab === 'customers') loadCustomers();
+            if (tab === 'streams') loadStreams();
         }
 
         // =============================================
@@ -396,8 +560,11 @@
             }
             el.innerHTML = families.map(f => `
                 <div class="family-sidebar-item ${f.id === selectedFamilyId ? 'active' : ''}"
-                     onclick="selectFamily('${f.id}')">
-                    <div class="font-medium">${esc(f.name)}</div>
+                    onclick="selectFamily('${f.id}')">
+                    <div class="font-medium">
+                        ${esc(f.name)}
+                        <span class="family-type-badge family-type-${f.type || 'categorization'}">${(f.type === 'system' ? 's' : 'c') || 'c'}</span>
+                    </div>
                     <div class="text-xs text-gray-400">${f.tags.length} tag${f.tags.length !== 1 ? 's' : ''}</div>
                 </div>
             `).join('');
@@ -417,11 +584,12 @@
                 return;
             }
             const colorClass = familyColors[family.id] || 'family-color-0';
+            const typeBadge = `<span class="family-type-badge family-type-${family.type || 'categorization'}">${family.type || 'categorization'}</span>`;
             el.innerHTML = `
                 <div class="flex items-start justify-between mb-4">
                     <div>
-                        <h3 class="text-lg font-semibold text-gray-800">${esc(family.name)}</h3>
-                        <p class="text-sm text-gray-500">${esc(family.description || '')}</p>
+                        <h3 class="text-lg font-semibold text-gray-800">${esc(family.name)} ${typeBadge}</h3>
+                        <p class="text-sm text-gray-500 mt-4">${esc(family.description || '')}</p>
                     </div>
                     <div class="flex gap-2">
                         <button class="btn-secondary text-xs" onclick="showEditFamilyModal('${family.id}')">Edit</button>
@@ -461,7 +629,7 @@
         }
 
         async function removeTag(familyId, tagId) {
-            if (!confirm('Remove this tag? It will also be removed from any packages using it.')) return;
+            if (!confirm('Remove this tag? It will also be removed from any products using it.')) return;
             const data = await apiDelete(`/tags/families/${familyId}/tags/${tagId}`);
             if (data.success) {
                 showToast('Tag removed');
@@ -481,6 +649,13 @@
                         <label class="text-sm font-medium text-gray-700">Description</label>
                         <input type="text" id="modalFamilyDesc" class="input-field mt-1" placeholder="Optional description">
                     </div>
+                    <div>
+                        <label class="text-sm font-medium text-gray-700">Type</label>
+                        <select id="modalFamilyType" class="input-field mt-1">
+                            <option value="categorization">Categorization</option>
+                            <option value="system">System</option>
+                        </select>
+                    </div>
                     <div class="flex gap-2 justify-end pt-2">
                         <button class="btn-secondary" onclick="closeModal()">Cancel</button>
                         <button class="btn-primary" onclick="createFamily()">Create</button>
@@ -493,8 +668,9 @@
         async function createFamily() {
             const name = document.getElementById('modalFamilyName').value.trim();
             const description = document.getElementById('modalFamilyDesc').value.trim();
+            const type = document.getElementById('modalFamilyType').value;
             if (!name) return;
-            const data = await apiPost('/tags/families', { name, description });
+            const data = await apiPost('/tags/families', { name, description, type });
             if (data.success) {
                 showToast(`Family "${name}" created`);
                 closeModal();
@@ -517,6 +693,13 @@
                         <label class="text-sm font-medium text-gray-700">Description</label>
                         <input type="text" id="modalFamilyDesc" class="input-field mt-1" value="${esc(family.description || '')}">
                     </div>
+                    <div>
+                        <label class="text-sm font-medium text-gray-700">Type</label>
+                        <select id="modalFamilyType" class="input-field mt-1">
+                            <option value="categorization" ${(family.type || 'categorization') === 'categorization' ? 'selected' : ''}>Categorization</option>
+                            <option value="system" ${family.type === 'system' ? 'selected' : ''}>System</option>
+                        </select>
+                    </div>
                     <div class="flex gap-2 justify-end pt-2">
                         <button class="btn-secondary" onclick="closeModal()">Cancel</button>
                         <button class="btn-primary" onclick="updateFamilyFromModal('${familyId}')">Save</button>
@@ -528,8 +711,9 @@
         async function updateFamilyFromModal(familyId) {
             const name = document.getElementById('modalFamilyName').value.trim();
             const description = document.getElementById('modalFamilyDesc').value.trim();
+            const type = document.getElementById('modalFamilyType').value;
             if (!name) return;
-            const data = await apiPut(`/tags/families/${familyId}`, { name, description });
+            const data = await apiPut(`/tags/families/${familyId}`, { name, description, type });
             if (data.success) {
                 showToast('Family updated');
                 closeModal();
@@ -539,7 +723,7 @@
 
         async function confirmDeleteFamily(familyId) {
             const family = families.find(f => f.id === familyId);
-            if (!confirm(`Delete family "${family.name}" and all its tags? Tags will be removed from any packages using them.`)) return;
+            if (!confirm(`Delete family "${family.name}" and all its tags? Tags will be removed from any products using them.`)) return;
             const data = await apiDelete(`/tags/families/${familyId}`);
             if (data.success) {
                 showToast('Family deleted');
@@ -549,17 +733,17 @@
         }
 
         // =============================================
-        // PACKAGES
+        // PRODUCTS
         // =============================================
-        async function loadPackages() {
-            const [pkgData, famData] = await Promise.all([
-                api('/tags/packages'),
+        async function loadProducts() {
+            const [prodData, famData] = await Promise.all([
+                api('/tags/products'),
                 api('/tags/families')
             ]);
-            packages = pkgData.packages || [];
+            products = prodData.products || [];
             families = famData.families || [];
             buildFamilyColorMap();
-            renderPackageList();
+            renderProductList();
         }
 
         function resolveTagLabel(tagId) {
@@ -570,22 +754,131 @@
             return { label: tagId, familyId: null };
         }
 
-        function renderPackageList() {
-            const el = document.getElementById('packageList');
-            if (packages.length === 0) {
-                el.innerHTML = '<div class="empty-state col-span-full">No packages yet. Create one to bundle tags together.</div>';
+        function renderProductList() {
+            const el = document.getElementById('productList');
+            if (products.length === 0) {
+                el.innerHTML = '<div class="empty-state col-span-full">No products yet. Create one to bundle tags together.</div>';
                 return;
             }
-            el.innerHTML = packages.map(pkg => {
-                const tagPills = pkg.tagIds.map(tid => {
+            el.innerHTML = products.map(prod => {
+                const tagPills = prod.tagIds.map(tid => {
                     const resolved = resolveTagLabel(tid);
                     const colorClass = familyColors[resolved.familyId] || 'family-color-0';
                     return `<span class="tag-pill ${colorClass}" style="font-size:0.75rem;padding:0.125rem 0.5rem;">${esc(resolved.label)}</span>`;
                 }).join('');
 
-                const subPkgs = pkg.packageIds.map(pid => {
-                    const sub = packages.find(p => p.id === pid);
-                    return sub ? `<span class="tag-pill" style="background:#f3f4f6;color:#374151;font-size:0.75rem;padding:0.125rem 0.5rem;">&#128230; ${esc(sub.name)}</span>` : '';
+                return `
+                <div class="card">
+                    <div class="flex items-start justify-between mb-2">
+                        <h4 class="font-semibold text-gray-800">${esc(prod.name)}</h4>
+                        <div class="flex gap-1">
+                            <button class="btn-secondary text-xs" style="padding:0.2rem 0.5rem;" onclick="showEditProductModal('${prod.id}')">Edit</button>
+                            <button class="btn-danger text-xs" style="padding:0.2rem 0.5rem;" onclick="confirmDeleteProduct('${prod.id}')">Del</button>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-500 mb-3">${esc(prod.description || '')}</p>
+                    <div class="section-title">Tags</div>
+                    <div class="flex flex-wrap gap-1">${tagPills || '<span class="text-xs text-gray-400">None</span>'}</div>
+                </div>`;
+            }).join('');
+        }
+
+        function showCreateProductModal() {
+            showProductModal(null);
+        }
+
+        function showEditProductModal(productId) {
+            const prod = products.find(p => p.id === productId);
+            showProductModal(prod);
+        }
+
+        function showProductModal(prod) {
+            const isEdit = !!prod;
+            const title = isEdit ? 'Edit Product' : 'Create Product';
+            const btnLabel = isEdit ? 'Save' : 'Create';
+            const action = isEdit ? `saveProduct('${prod.id}')` : `saveProduct(null)`;
+
+            const tagCheckboxes = families.map(fam => {
+                if (fam.tags.length === 0) return '';
+                const checks = fam.tags.map(t => {
+                    const checked = prod && prod.tagIds.includes(t.id) ? 'checked' : '';
+                    return `<div class="checkbox-item"><input type="checkbox" name="prodTag" value="${t.id}" ${checked}><span>${esc(t.label)}</span></div>`;
+                }).join('');
+                return `<div class="mb-2"><div class="text-xs font-semibold text-gray-500 mb-1">${esc(fam.name)} <span class="family-type-badge family-type-${fam.type || 'categorization'}" style="font-size:0.5625rem;">${fam.type || 'cat.'}</span></div>${checks}</div>`;
+            }).join('');
+
+            showModal(`
+                <h3 class="text-lg font-semibold mb-4">${title}</h3>
+                <div class="space-y-3">
+                    <div>
+                        <label class="text-sm font-medium text-gray-700">Name</label>
+                        <input type="text" id="modalProdName" class="input-field mt-1" value="${isEdit ? esc(prod.name) : ''}" ${isEdit ? 'readonly style="background:#f9fafb;"' : ''}>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium text-gray-700">Description</label>
+                        <input type="text" id="modalProdDesc" class="input-field mt-1" value="${isEdit ? esc(prod.description || '') : ''}">
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium text-gray-700">Tags</label>
+                        <div class="mt-1 max-h-40 overflow-y-auto border rounded-lg p-2">${tagCheckboxes || '<span class="text-sm text-gray-400">No tags available</span>'}</div>
+                    </div>
+                    <div class="flex gap-2 justify-end pt-2">
+                        <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+                        <button class="btn-primary" onclick="${action}">${btnLabel}</button>
+                    </div>
+                </div>
+            `);
+        }
+
+        async function saveProduct(productId) {
+            const name = document.getElementById('modalProdName').value.trim();
+            const description = document.getElementById('modalProdDesc').value.trim();
+            if (!name) return;
+
+            const tagIds = Array.from(document.querySelectorAll('input[name="prodTag"]:checked')).map(cb => cb.value);
+
+            if (productId) {
+                const data = await apiPut(`/tags/products/${productId}`, { description, tagIds });
+                if (data.success) { showToast('Product updated'); closeModal(); await loadProducts(); }
+            } else {
+                const data = await apiPost('/tags/products', { name, description, tagIds });
+                if (data.success) { showToast(`Product "${name}" created`); closeModal(); await loadProducts(); }
+            }
+        }
+
+        async function confirmDeleteProduct(productId) {
+            const prod = products.find(p => p.id === productId);
+            if (!confirm(`Delete product "${prod.name}"? It will be removed from any packages using it.`)) return;
+            const data = await apiDelete(`/tags/products/${productId}`);
+            if (data.success) {
+                showToast('Product deleted');
+                await loadProducts();
+            }
+        }
+
+        // =============================================
+        // PACKAGES
+        // =============================================
+        async function loadPackages() {
+            const [pkgData, prodData] = await Promise.all([
+                api('/tags/packages'),
+                api('/tags/products')
+            ]);
+            packages = pkgData.packages || [];
+            products = prodData.products || [];
+            renderPackageList();
+        }
+
+        function renderPackageList() {
+            const el = document.getElementById('packageList');
+            if (packages.length === 0) {
+                el.innerHTML = '<div class="empty-state col-span-full">No packages yet. Create one to bundle products together.</div>';
+                return;
+            }
+            el.innerHTML = packages.map(pkg => {
+                const productPills = (pkg.productIds || []).map(pid => {
+                    const prod = products.find(p => p.id === pid);
+                    return `<span class="product-pill">${esc(prod ? prod.name : pid)}</span>`;
                 }).join('');
 
                 return `
@@ -598,12 +891,8 @@
                         </div>
                     </div>
                     <p class="text-sm text-gray-500 mb-3">${esc(pkg.description || '')}</p>
-                    <div class="section-title">Tags</div>
-                    <div class="flex flex-wrap gap-1 mb-2">${tagPills || '<span class="text-xs text-gray-400">None</span>'}</div>
-                    ${pkg.packageIds.length > 0 ? `
-                        <div class="section-title mt-2">Included Packages</div>
-                        <div class="flex flex-wrap gap-1">${subPkgs}</div>
-                    ` : ''}
+                    <div class="section-title">Products</div>
+                    <div class="flex flex-wrap gap-1">${productPills || '<span class="text-xs text-gray-400">None</span>'}</div>
                 </div>`;
             }).join('');
         }
@@ -623,24 +912,9 @@
             const btnLabel = isEdit ? 'Save' : 'Create';
             const action = isEdit ? `savePackage('${pkg.id}')` : `savePackage(null)`;
 
-            const allTags = [];
-            families.forEach(fam => {
-                fam.tags.forEach(t => allTags.push({ ...t, familyName: fam.name, familyId: fam.id }));
-            });
-
-            const tagCheckboxes = families.map(fam => {
-                if (fam.tags.length === 0) return '';
-                const checks = fam.tags.map(t => {
-                    const checked = pkg && pkg.tagIds.includes(t.id) ? 'checked' : '';
-                    return `<div class="checkbox-item"><input type="checkbox" name="pkgTag" value="${t.id}" ${checked}><span>${esc(t.label)}</span></div>`;
-                }).join('');
-                return `<div class="mb-2"><div class="text-xs font-semibold text-gray-500 mb-1">${esc(fam.name)}</div>${checks}</div>`;
-            }).join('');
-
-            const otherPackages = packages.filter(p => !pkg || p.id !== pkg.id);
-            const pkgCheckboxes = otherPackages.map(p => {
-                const checked = pkg && pkg.packageIds.includes(p.id) ? 'checked' : '';
-                return `<div class="checkbox-item"><input type="checkbox" name="pkgPkg" value="${p.id}" ${checked}><span>${esc(p.name)}</span></div>`;
+            const productCheckboxes = products.map(p => {
+                const checked = pkg && (pkg.productIds || []).includes(p.id) ? 'checked' : '';
+                return `<div class="checkbox-item"><input type="checkbox" name="pkgProd" value="${p.id}" ${checked}><span>${esc(p.name)}</span></div>`;
             }).join('');
 
             showModal(`
@@ -655,14 +929,9 @@
                         <input type="text" id="modalPkgDesc" class="input-field mt-1" value="${isEdit ? esc(pkg.description || '') : ''}">
                     </div>
                     <div>
-                        <label class="text-sm font-medium text-gray-700">Tags</label>
-                        <div class="mt-1 max-h-40 overflow-y-auto border rounded-lg p-2">${tagCheckboxes || '<span class="text-sm text-gray-400">No tags available</span>'}</div>
+                        <label class="text-sm font-medium text-gray-700">Products</label>
+                        <div class="mt-1 max-h-40 overflow-y-auto border rounded-lg p-2">${productCheckboxes || '<span class="text-sm text-gray-400">No products available. Create products first.</span>'}</div>
                     </div>
-                    ${otherPackages.length > 0 ? `
-                    <div>
-                        <label class="text-sm font-medium text-gray-700">Include Packages</label>
-                        <div class="mt-1 max-h-32 overflow-y-auto border rounded-lg p-2">${pkgCheckboxes}</div>
-                    </div>` : ''}
                     <div class="flex gap-2 justify-end pt-2">
                         <button class="btn-secondary" onclick="closeModal()">Cancel</button>
                         <button class="btn-primary" onclick="${action}">${btnLabel}</button>
@@ -676,21 +945,20 @@
             const description = document.getElementById('modalPkgDesc').value.trim();
             if (!name) return;
 
-            const tagIds = Array.from(document.querySelectorAll('input[name="pkgTag"]:checked')).map(cb => cb.value);
-            const packageIds = Array.from(document.querySelectorAll('input[name="pkgPkg"]:checked')).map(cb => cb.value);
+            const productIds = Array.from(document.querySelectorAll('input[name="pkgProd"]:checked')).map(cb => cb.value);
 
             if (packageId) {
-                const data = await apiPut(`/tags/packages/${packageId}`, { description, tagIds, packageIds });
+                const data = await apiPut(`/tags/packages/${packageId}`, { description, productIds });
                 if (data.success) { showToast('Package updated'); closeModal(); await loadPackages(); }
             } else {
-                const data = await apiPost('/tags/packages', { name, description, tagIds, packageIds });
+                const data = await apiPost('/tags/packages', { name, description, productIds });
                 if (data.success) { showToast(`Package "${name}" created`); closeModal(); await loadPackages(); }
             }
         }
 
         async function confirmDeletePackage(packageId) {
             const pkg = packages.find(p => p.id === packageId);
-            if (!confirm(`Delete package "${pkg.name}"? It will be removed from any customers and other packages.`)) return;
+            if (!confirm(`Delete package "${pkg.name}"? It will be removed from any customers using it.`)) return;
             const data = await apiDelete(`/tags/packages/${packageId}`);
             if (data.success) {
                 showToast('Package deleted');
@@ -723,6 +991,8 @@
                     return `<span class="tag-pill" style="background:#eef2fe;color:#2847E2;font-size:0.75rem;padding:0.125rem 0.5rem;">${esc(pkg ? pkg.name : pid)}</span>`;
                 }).join('');
 
+                const streamCount = (cust.streams || []).length;
+
                 return `
                 <div class="card">
                     <div class="flex items-start justify-between mb-2">
@@ -734,7 +1004,11 @@
                     </div>
                     ${cust.contact ? `<p class="text-sm text-gray-500 mb-3">${esc(cust.contact)}</p>` : ''}
                     <div class="section-title">Subscribed Packages</div>
-                    <div class="flex flex-wrap gap-1">${pkgPills || '<span class="text-xs text-gray-400">None</span>'}</div>
+                    <div class="flex flex-wrap gap-1 mb-3">${pkgPills || '<span class="text-xs text-gray-400">None</span>'}</div>
+                    <div class="section-title">Distribution Streams</div>
+                    <div class="text-sm text-gray-500">${streamCount} stream${streamCount !== 1 ? 's' : ''} configured
+                        <button class="text-xs text-blue-600 ml-1 cursor-pointer bg-transparent border-none" onclick="switchTab('streams')">View &rarr;</button>
+                    </div>
                 </div>`;
             }).join('');
         }
@@ -805,6 +1079,553 @@
             if (data.success) {
                 showToast('Customer deleted');
                 await loadCustomers();
+            }
+        }
+
+        // =============================================
+        // DISTRIBUTION STREAMS
+        // =============================================
+        async function loadStreams() {
+            const [custData, tfData] = await Promise.all([
+                api('/tags/customers'),
+                api('/tags/transformers')
+            ]);
+            customers = custData.customers || [];
+            transformersCatalog = tfData.transformers || [];
+            renderStreamsList();
+        }
+
+        function renderStreamsList() {
+            const el = document.getElementById('streamsList');
+
+            if (customers.length === 0) {
+                el.innerHTML = '<div class="empty-state">No customers yet. Create customers first, then add distribution streams.</div>';
+                return;
+            }
+
+            el.innerHTML = customers.map(cust => {
+                const custStreams = cust.streams || [];
+                const streamCards = custStreams.length === 0
+                    ? '<div class="text-sm text-gray-400 py-2">No streams configured</div>'
+                    : custStreams.map(s => {
+                        const destSummary = formatDestination(s.type, s.destination);
+                        const hasSecrets = s.secrets && Object.keys(s.secrets).length > 0;
+                        const secretsHtml = hasSecrets
+                            ? '<span class="secrets-indicator has-secrets">&#128274; Secrets configured</span>'
+                            : '<span class="secrets-indicator no-secrets">No secrets</span>';
+
+                        let pipelineHtml = '';
+                        if (s.type !== 'api') {
+                            if (s.transformerIds && s.transformerIds.length > 0) {
+                                const nodes = s.transformerIds.map(tid => {
+                                    const tf = transformersCatalog.find(t => t.id === tid);
+                                    return `<span class="pipeline-arrow">&#8594;</span><span class="pipeline-node">${esc(tf ? tf.name : tid)}</span>`;
+                                }).join('');
+                                pipelineHtml = `<div class="pipeline-viz">
+                                    <span class="pipeline-node pipeline-source">Content</span>
+                                    ${nodes}
+                                    <span class="pipeline-arrow">&#8594;</span>
+                                    <span class="pipeline-node pipeline-dest">${esc(s.type.toUpperCase())} Dest.</span>
+                                </div>`;
+                            } else {
+                                pipelineHtml = '<div class="pipeline-viz" style="color:#9ca3af;font-style:italic;font-size:0.75rem;">No transformers configured</div>';
+                            }
+                        }
+
+                        return `
+                        <div style="padding:0.625rem 0;border-bottom:1px solid #f3f4f6;">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <span class="stream-type-badge stream-type-${s.type}">${esc(s.type)}</span>
+                                    <span class="font-medium text-sm">${esc(s.name)}</span>
+                                    ${destSummary ? `<span class="text-xs text-gray-400">${destSummary}</span>` : ''}
+                                    <!-- ${secretsHtml} -->
+                                </div>
+                                <div class="flex gap-1 flex-shrink-0">
+                                    <button class="btn-secondary text-xs" style="padding:0.15rem 0.4rem;" onclick="showEditStreamModal('${cust.id}','${s.id}')">Edit</button>
+                                    <button class="btn-danger text-xs" style="padding:0.15rem 0.4rem;" onclick="confirmDeleteStream('${cust.id}','${s.id}')">Del</button>
+                                </div>
+                            </div>
+                            ${pipelineHtml}
+                        </div>`;
+                    }).join('');
+
+                return `
+                <div class="card mb-4">
+                    <div class="flex items-center justify-between mb-3">
+                        <h4 class="font-semibold text-gray-800">${esc(cust.name)}</h4>
+                        <button class="btn-primary text-xs" style="padding:0.25rem 0.625rem;" onclick="showCreateStreamModal('${cust.id}')">+ Add Stream</button>
+                    </div>
+                    ${streamCards}
+                </div>`;
+            }).join('');
+        }
+
+        function formatDestination(type, dest) {
+            if (!dest) return '';
+            if (type === 'sftp' && dest.host) return `${esc(dest.host)}${dest.path ? esc(dest.path) : ''}`;
+            if (type === 's3' && dest.bucket) return `s3://${esc(dest.bucket)}${dest.path ? '/' + esc(dest.path) : ''}`;
+            if (type === 'api' && dest.endpoint) return esc(dest.endpoint);
+            if (type === 'other' && dest.details) return esc(dest.details);
+            return '';
+        }
+
+        function showCreateStreamModal(customerId) {
+            showStreamModal(customerId, null);
+        }
+
+        function showEditStreamModal(customerId, streamId) {
+            const cust = customers.find(c => c.id === customerId);
+            const stream = cust ? (cust.streams || []).find(s => s.id === streamId) : null;
+            showStreamModal(customerId, stream);
+        }
+
+        function showStreamModal(customerId, stream) {
+            const isEdit = !!stream;
+            const title = isEdit ? 'Edit Stream' : 'Add Distribution Stream';
+            const btnLabel = isEdit ? 'Save' : 'Create';
+            const action = isEdit ? `saveStream('${customerId}','${stream.id}')` : `saveStream('${customerId}',null)`;
+
+            const types = ['sftp', 's3', 'api', 'other'];
+            const typeOptions = types.map(t => {
+                const sel = stream && stream.type === t ? 'selected' : '';
+                return `<option value="${t}" ${sel}>${t.toUpperCase()}</option>`;
+            }).join('');
+
+            showWideModal(`
+                <h3 class="text-lg font-semibold mb-4">${title}</h3>
+                <div class="space-y-3">
+                    <div>
+                        <label class="text-sm font-medium text-gray-700">Name</label>
+                        <input type="text" id="modalStreamName" class="input-field mt-1" value="${isEdit ? esc(stream.name) : ''}" placeholder="e.g. SFTP Europe Feed">
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium text-gray-700">Type</label>
+                        <select id="modalStreamType" class="input-field mt-1" onchange="onStreamTypeChange()">
+                            ${typeOptions}
+                        </select>
+                    </div>
+                    <div id="streamDestFields">
+                        <!-- dynamic destination fields -->
+                    </div>
+                    <div id="streamSecretsFields">
+                        <!-- dynamic secrets fields -->
+                    </div>
+                    <div id="streamTransformerSection">
+                        <!-- dynamic transformer pipeline builder -->
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium text-gray-700">Description</label>
+                        <input type="text" id="modalStreamDesc" class="input-field mt-1" value="${isEdit ? esc(stream.description || '') : ''}" placeholder="Optional description">
+                    </div>
+                    <div class="flex gap-2 justify-end pt-2">
+                        <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+                        <button class="btn-primary" onclick="${action}">${btnLabel}</button>
+                    </div>
+                </div>
+            `);
+
+            // Populate dynamic fields after modal is rendered
+            setTimeout(() => {
+                updateStreamDestFields(stream ? stream.destination : null);
+                updateStreamSecretsFields(stream ? stream.secrets : null);
+                updateTransformerSection(stream ? stream.transformerIds : null);
+            }, 50);
+        }
+
+        function onStreamTypeChange() {
+            updateStreamDestFields();
+            updateStreamSecretsFields();
+            updateTransformerSection();
+        }
+
+        // --- Destination fields ---
+
+        function updateStreamDestFields(existingDest) {
+            const type = document.getElementById('modalStreamType').value;
+            const container = document.getElementById('streamDestFields');
+            const dest = existingDest || {};
+
+            let fields = '';
+            if (type === 'sftp') {
+                fields = `
+                    <div class="space-y-2">
+                        <div>
+                            <label class="text-xs font-medium text-gray-600">Host</label>
+                            <input type="text" id="destHost" class="input-field mt-1" value="${esc(dest.host || '')}" placeholder="sftp.example.com">
+                        </div>
+                        <div>
+                            <label class="text-xs font-medium text-gray-600">Path</label>
+                            <input type="text" id="destPath" class="input-field mt-1" value="${esc(dest.path || '')}" placeholder="/feeds/europe/">
+                        </div>
+                    </div>`;
+            } else if (type === 's3') {
+                fields = `
+                    <div class="space-y-2">
+                        <div>
+                            <label class="text-xs font-medium text-gray-600">Bucket</label>
+                            <input type="text" id="destBucket" class="input-field mt-1" value="${esc(dest.bucket || '')}" placeholder="my-bucket">
+                        </div>
+                        <div>
+                            <label class="text-xs font-medium text-gray-600">Prefix / Path</label>
+                            <input type="text" id="destPath" class="input-field mt-1" value="${esc(dest.path || '')}" placeholder="feeds/europe/">
+                        </div>
+                        <div>
+                            <label class="text-xs font-medium text-gray-600">Region</label>
+                            <input type="text" id="destRegion" class="input-field mt-1" value="${esc(dest.region || '')}" placeholder="eu-west-1">
+                        </div>
+                    </div>`;
+            } else if (type === 'api') {
+                fields = `
+                    <div>
+                        <label class="text-xs font-medium text-gray-600">Endpoint URL</label>
+                        <input type="text" id="destEndpoint" class="input-field mt-1" value="${esc(dest.endpoint || '')}" placeholder="https://api.example.com/ingest">
+                    </div>`;
+            } else {
+                fields = `
+                    <div>
+                        <label class="text-xs font-medium text-gray-600">Details</label>
+                        <input type="text" id="destDetails" class="input-field mt-1" value="${esc(dest.details || '')}" placeholder="Connection details...">
+                    </div>`;
+            }
+
+            container.innerHTML = `<label class="text-sm font-medium text-gray-700">Destination</label>${fields}`;
+        }
+
+        function collectDestination() {
+            const type = document.getElementById('modalStreamType').value;
+            if (type === 'sftp') {
+                return {
+                    host: (document.getElementById('destHost')?.value || '').trim(),
+                    path: (document.getElementById('destPath')?.value || '').trim()
+                };
+            } else if (type === 's3') {
+                return {
+                    bucket: (document.getElementById('destBucket')?.value || '').trim(),
+                    path: (document.getElementById('destPath')?.value || '').trim(),
+                    region: (document.getElementById('destRegion')?.value || '').trim()
+                };
+            } else if (type === 'api') {
+                return {
+                    endpoint: (document.getElementById('destEndpoint')?.value || '').trim()
+                };
+            } else {
+                return {
+                    details: (document.getElementById('destDetails')?.value || '').trim()
+                };
+            }
+        }
+
+        // --- Secrets fields ---
+
+        function updateStreamSecretsFields(existingSecrets) {
+            const type = document.getElementById('modalStreamType').value;
+            const container = document.getElementById('streamSecretsFields');
+            const secrets = existingSecrets || {};
+
+            let fields = '';
+
+            if (type === 'sftp') {
+                fields = `
+                    <div class="space-y-2">
+                        <div>
+                            <label class="text-xs font-medium text-gray-600">Username</label>
+                            <input type="text" id="secretUsername" class="input-field mt-1" value="${esc(secrets.username || '')}" placeholder="SFTP username">
+                        </div>
+                        <div>
+                            <label class="text-xs font-medium text-gray-600">Password</label>
+                            <input type="password" id="secretPassword" class="input-field mt-1" value="${esc(secrets.password || '')}" placeholder="SFTP password">
+                        </div>
+                        <div>
+                            <label class="text-xs font-medium text-gray-600">SSH Key Path <span class="text-gray-400">(optional, alternative to password)</span></label>
+                            <input type="text" id="secretSshKeyPath" class="input-field mt-1" value="${esc(secrets.sshKeyPath || '')}" placeholder="/path/to/key.pem">
+                        </div>
+                    </div>`;
+            } else if (type === 's3') {
+                fields = `
+                    <div class="space-y-2">
+                        <div>
+                            <label class="text-xs font-medium text-gray-600">AWS Access Key ID</label>
+                            <input type="text" id="secretAccessKeyId" class="input-field mt-1" value="${esc(secrets.accessKeyId || '')}" placeholder="AKIA...">
+                        </div>
+                        <div>
+                            <label class="text-xs font-medium text-gray-600">AWS Secret Access Key</label>
+                            <input type="password" id="secretSecretAccessKey" class="input-field mt-1" value="${esc(secrets.secretAccessKey || '')}" placeholder="Secret access key">
+                        </div>
+                    </div>`;
+            } else if (type === 'api') {
+                const authMethod = secrets.authMethod || 'api-key';
+                const authOptions = [
+                    { value: 'api-key', label: 'API Key' },
+                    { value: 'bearer-token', label: 'Bearer Token' },
+                    { value: 'basic-auth', label: 'Basic Auth (username + password)' },
+                    { value: 'oauth2-client-credentials', label: 'OAuth2 Client Credentials' },
+                    { value: 'custom-header', label: 'Custom Header' }
+                ];
+                const authSelect = authOptions.map(o =>
+                    `<option value="${o.value}" ${authMethod === o.value ? 'selected' : ''}>${o.label}</option>`
+                ).join('');
+
+                fields = `
+                    <div class="space-y-2">
+                        <div>
+                            <label class="text-xs font-medium text-gray-600">Auth Method</label>
+                            <select id="secretAuthMethod" class="input-field mt-1" onchange="updateApiAuthFields()">
+                                ${authSelect}
+                            </select>
+                        </div>
+                        <div id="apiAuthFields"></div>
+                    </div>`;
+            } else {
+                // 'other': key-value pairs
+                const entries = (secrets.entries && Array.isArray(secrets.entries)) ? secrets.entries : [];
+                const rows = entries.map((e, i) => `
+                    <div class="flex gap-2 items-center" data-entry-idx="${i}">
+                        <input type="text" class="input-field other-secret-key" value="${esc(e.key || '')}" placeholder="Key" style="width:40%;">
+                        <input type="password" class="input-field other-secret-val" value="${esc(e.value || '')}" placeholder="Value" style="width:50%;">
+                        <button class="btn-danger text-xs" style="padding:0.15rem 0.3rem;" onclick="removeOtherSecretRow(this)">&times;</button>
+                    </div>
+                `).join('');
+
+                fields = `
+                    <div id="otherSecretsEntries" class="space-y-2">${rows}</div>
+                    <button class="btn-secondary text-xs mt-2" onclick="addOtherSecretRow()">+ Add Secret</button>`;
+            }
+
+            container.innerHTML = `<label class="text-sm font-medium text-gray-700">Secrets / Credentials</label><div class="mt-1">${fields}</div>`;
+
+            // After rendering API auth fields, populate the sub-fields
+            if (type === 'api') {
+                setTimeout(() => updateApiAuthFields(existingSecrets), 50);
+            }
+        }
+
+        function updateApiAuthFields(existingSecrets) {
+            const method = document.getElementById('secretAuthMethod').value;
+            const container = document.getElementById('apiAuthFields');
+            const secrets = existingSecrets || {};
+
+            let fields = '';
+            if (method === 'api-key') {
+                fields = `<div>
+                    <label class="text-xs font-medium text-gray-600">API Key</label>
+                    <input type="password" id="secretApiKey" class="input-field mt-1" value="${esc(secrets.apiKey || '')}" placeholder="API key">
+                </div>`;
+            } else if (method === 'bearer-token') {
+                fields = `<div>
+                    <label class="text-xs font-medium text-gray-600">Bearer Token</label>
+                    <input type="password" id="secretBearerToken" class="input-field mt-1" value="${esc(secrets.bearerToken || '')}" placeholder="Bearer token">
+                </div>`;
+            } else if (method === 'basic-auth') {
+                fields = `
+                <div><label class="text-xs font-medium text-gray-600">Username</label>
+                    <input type="text" id="secretUsername" class="input-field mt-1" value="${esc(secrets.username || '')}" placeholder="Username"></div>
+                <div class="mt-2"><label class="text-xs font-medium text-gray-600">Password</label>
+                    <input type="password" id="secretPassword" class="input-field mt-1" value="${esc(secrets.password || '')}" placeholder="Password"></div>`;
+            } else if (method === 'oauth2-client-credentials') {
+                fields = `
+                <div><label class="text-xs font-medium text-gray-600">Client ID</label>
+                    <input type="text" id="secretClientId" class="input-field mt-1" value="${esc(secrets.clientId || '')}" placeholder="Client ID"></div>
+                <div class="mt-2"><label class="text-xs font-medium text-gray-600">Client Secret</label>
+                    <input type="password" id="secretClientSecret" class="input-field mt-1" value="${esc(secrets.clientSecret || '')}" placeholder="Client secret"></div>`;
+            } else if (method === 'custom-header') {
+                fields = `
+                <div><label class="text-xs font-medium text-gray-600">Header Name</label>
+                    <input type="text" id="secretHeaderName" class="input-field mt-1" value="${esc(secrets.headerName || '')}" placeholder="X-Custom-Header"></div>
+                <div class="mt-2"><label class="text-xs font-medium text-gray-600">Header Value</label>
+                    <input type="password" id="secretHeaderValue" class="input-field mt-1" value="${esc(secrets.headerValue || '')}" placeholder="Header value"></div>`;
+            }
+            container.innerHTML = fields;
+        }
+
+        function addOtherSecretRow() {
+            const container = document.getElementById('otherSecretsEntries');
+            const row = document.createElement('div');
+            row.className = 'flex gap-2 items-center';
+            row.innerHTML = `
+                <input type="text" class="input-field other-secret-key" placeholder="Key" style="width:40%;">
+                <input type="password" class="input-field other-secret-val" placeholder="Value" style="width:50%;">
+                <button class="btn-danger text-xs" style="padding:0.15rem 0.3rem;" onclick="removeOtherSecretRow(this)">&times;</button>`;
+            container.appendChild(row);
+        }
+
+        function removeOtherSecretRow(btn) {
+            btn.closest('.flex').remove();
+        }
+
+        function collectSecrets() {
+            const type = document.getElementById('modalStreamType').value;
+
+            if (type === 'sftp') {
+                const result = {
+                    username: (document.getElementById('secretUsername')?.value || '').trim(),
+                    password: (document.getElementById('secretPassword')?.value || '').trim()
+                };
+                const sshKeyPath = (document.getElementById('secretSshKeyPath')?.value || '').trim();
+                if (sshKeyPath) result.sshKeyPath = sshKeyPath;
+                return result;
+            } else if (type === 's3') {
+                return {
+                    accessKeyId: (document.getElementById('secretAccessKeyId')?.value || '').trim(),
+                    secretAccessKey: (document.getElementById('secretSecretAccessKey')?.value || '').trim()
+                };
+            } else if (type === 'api') {
+                const authMethod = document.getElementById('secretAuthMethod')?.value || 'api-key';
+                const secrets = { authMethod };
+                if (authMethod === 'api-key') secrets.apiKey = (document.getElementById('secretApiKey')?.value || '').trim();
+                if (authMethod === 'bearer-token') secrets.bearerToken = (document.getElementById('secretBearerToken')?.value || '').trim();
+                if (authMethod === 'basic-auth') {
+                    secrets.username = (document.getElementById('secretUsername')?.value || '').trim();
+                    secrets.password = (document.getElementById('secretPassword')?.value || '').trim();
+                }
+                if (authMethod === 'oauth2-client-credentials') {
+                    secrets.clientId = (document.getElementById('secretClientId')?.value || '').trim();
+                    secrets.clientSecret = (document.getElementById('secretClientSecret')?.value || '').trim();
+                }
+                if (authMethod === 'custom-header') {
+                    secrets.headerName = (document.getElementById('secretHeaderName')?.value || '').trim();
+                    secrets.headerValue = (document.getElementById('secretHeaderValue')?.value || '').trim();
+                }
+                return secrets;
+            } else {
+                // 'other' -- collect key-value pairs
+                const entries = [];
+                document.querySelectorAll('#otherSecretsEntries > div').forEach(row => {
+                    const key = row.querySelector('.other-secret-key')?.value?.trim() || '';
+                    const value = row.querySelector('.other-secret-val')?.value?.trim() || '';
+                    if (key || value) entries.push({ key, value });
+                });
+                return { entries };
+            }
+        }
+
+        // --- Transformer pipeline builder ---
+
+        function updateTransformerSection(existingTransformerIds) {
+            const type = document.getElementById('modalStreamType').value;
+            const container = document.getElementById('streamTransformerSection');
+
+            if (type === 'api') {
+                container.innerHTML = '';
+                container.hidden = true;
+                modalSelectedTransformers = [];
+                return;
+            }
+
+            container.hidden = false;
+            modalSelectedTransformers = existingTransformerIds ? [...existingTransformerIds] : [];
+            renderTransformerBuilder();
+        }
+
+        function renderTransformerBuilder() {
+            const container = document.getElementById('streamTransformerSection');
+
+            // Available pool: all catalog items not in selected
+            const available = transformersCatalog.filter(t => !modalSelectedTransformers.includes(t.id));
+
+            // Selected pipeline
+            const selected = modalSelectedTransformers.map(id => transformersCatalog.find(t => t.id === id)).filter(Boolean);
+
+            const availableHtml = available.length === 0
+                ? '<div class="text-xs text-gray-400 p-2">All transformers assigned</div>'
+                : available.map(t => `
+                    <div class="transformer-item" onclick="addTransformerToModal('${t.id}')">
+                        <div>
+                            <span class="font-medium">${esc(t.name)}</span>
+                            <div class="tf-desc">${esc(t.description)}</div>
+                        </div>
+                        <span style="color:#2847E2;font-size:0.75rem;font-weight:600;">+ Add</span>
+                    </div>
+                `).join('');
+
+            const pipelineHtml = selected.length === 0
+                ? '<div class="text-xs text-gray-400 p-2 text-center">Click "+ Add" to add transformers to the pipeline</div>'
+                : selected.map((t, i) => `
+                    <div class="pipeline-builder-item">
+                        <span>${i + 1}. ${esc(t.name)}</span>
+                        <div class="move-btns">
+                            ${i > 0 ? `<button onclick="moveTransformerInModal(${i}, -1)" title="Move up">&#9650;</button>` : ''}
+                            ${i < selected.length - 1 ? `<button onclick="moveTransformerInModal(${i}, 1)" title="Move down">&#9660;</button>` : ''}
+                            <button onclick="removeTransformerFromModal(${i})" title="Remove" style="color:#ef4444;border-color:#fca5a5;">&times;</button>
+                        </div>
+                    </div>
+                `).join('');
+
+            // Visual pipeline preview
+            const previewHtml = selected.length > 0
+                ? `<div class="pipeline-viz mt-2">
+                     <span class="pipeline-node pipeline-source">Content</span>
+                     ${selected.map(t => `<span class="pipeline-arrow">&#8594;</span><span class="pipeline-node">${esc(t.name)}</span>`).join('')}
+                     <span class="pipeline-arrow">&#8594;</span>
+                     <span class="pipeline-node pipeline-dest">Destination</span>
+                   </div>`
+                : '';
+
+            container.innerHTML = `
+                <label class="text-sm font-medium text-gray-700">Content Transformers Pipeline</label>
+                <div class="mt-1" style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+                    <div>
+                        <div class="text-xs font-semibold text-gray-500 mb-1">Available</div>
+                        <div class="transformer-pool">${availableHtml}</div>
+                    </div>
+                    <div>
+                        <div class="text-xs font-semibold text-gray-500 mb-1">Pipeline (ordered)</div>
+                        <div class="pipeline-builder">${pipelineHtml}</div>
+                    </div>
+                </div>
+                ${previewHtml}
+            `;
+        }
+
+        function addTransformerToModal(id) {
+            if (!modalSelectedTransformers.includes(id)) {
+                modalSelectedTransformers.push(id);
+                renderTransformerBuilder();
+            }
+        }
+
+        function removeTransformerFromModal(index) {
+            modalSelectedTransformers.splice(index, 1);
+            renderTransformerBuilder();
+        }
+
+        function moveTransformerInModal(index, direction) {
+            const newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= modalSelectedTransformers.length) return;
+            const temp = modalSelectedTransformers[index];
+            modalSelectedTransformers[index] = modalSelectedTransformers[newIndex];
+            modalSelectedTransformers[newIndex] = temp;
+            renderTransformerBuilder();
+        }
+
+        // --- Save stream ---
+
+        async function saveStream(customerId, streamId) {
+            const name = document.getElementById('modalStreamName').value.trim();
+            const type = document.getElementById('modalStreamType').value;
+            const description = document.getElementById('modalStreamDesc').value.trim();
+            const destination = collectDestination();
+            const secrets = collectSecrets();
+            const transformerIds = type !== 'api' ? [...modalSelectedTransformers] : [];
+            if (!name) return;
+
+            const body = { name, type, destination, description, secrets, transformerIds };
+
+            if (streamId) {
+                const data = await apiPut(`/tags/customers/${customerId}/streams/${streamId}`, body);
+                if (data.success) { showToast('Stream updated'); closeModal(); await loadStreams(); }
+            } else {
+                const data = await apiPost(`/tags/customers/${customerId}/streams`, body);
+                if (data.success) { showToast(`Stream "${name}" created`); closeModal(); await loadStreams(); }
+            }
+        }
+
+        async function confirmDeleteStream(customerId, streamId) {
+            if (!confirm('Delete this distribution stream?')) return;
+            const data = await apiDelete(`/tags/customers/${customerId}/streams/${streamId}`);
+            if (data.success) {
+                showToast('Stream deleted');
+                await loadStreams();
             }
         }
 

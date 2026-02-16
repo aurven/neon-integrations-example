@@ -165,15 +165,20 @@ fastify.get("/services", function (request, reply) {
       { name: "Refresh Cache", endpoint: "POST /iab/refresh", description: "Force refresh taxonomies from GitHub" }
     ],
     tagManager: [
-      { name: "Tag Manager Widget", endpoint: "GET /tags/widget", demoUrl: "/tags/widget", description: "UI for managing distribution tags, packages, and customers" },
-      { name: "List Families", endpoint: "GET /tags/families", description: "List all tag families with their tags" },
-      { name: "Create Family", endpoint: "POST /tags/families", description: "Create a new tag family" },
+      { name: "Tag Manager Widget", endpoint: "GET /tags/widget", demoUrl: "/tags/widget", description: "UI for managing distribution tags, products, packages, customers, and streams" },
+      { name: "List Families", endpoint: "GET /tags/families", description: "List all tag families (supports ?type=categorization|system filter)" },
+      { name: "Create Family", endpoint: "POST /tags/families", description: "Create a new tag family with type (categorization or system)" },
       { name: "Add Tag", endpoint: "POST /tags/families/:familyId/tags", description: "Add a tag to a family" },
-      { name: "List Packages", endpoint: "GET /tags/packages", description: "List all packages with tag and package references" },
-      { name: "Create Package", endpoint: "POST /tags/packages", description: "Create a distribution package" },
-      { name: "List Customers", endpoint: "GET /tags/customers", description: "List all customers with their subscriptions" },
+      { name: "List Products", endpoint: "GET /tags/products", description: "List all products with their tag references" },
+      { name: "Create Product", endpoint: "POST /tags/products", description: "Create a product (aggregates tags)" },
+      { name: "List Packages", endpoint: "GET /tags/packages", description: "List all packages with their product references" },
+      { name: "Create Package", endpoint: "POST /tags/packages", description: "Create a package (aggregates products)" },
+      { name: "List Customers", endpoint: "GET /tags/customers", description: "List all customers with their subscriptions and streams" },
       { name: "Create Customer", endpoint: "POST /tags/customers", description: "Create a customer with package subscriptions" },
-      { name: "Customers by Package", endpoint: "GET /tags/customers/by-package/:packageId", description: "Get customers subscribed to a specific package" }
+      { name: "Customers by Package", endpoint: "GET /tags/customers/by-package/:packageId", description: "Get customers subscribed to a specific package" },
+      { name: "List All Streams", endpoint: "GET /tags/streams", description: "List all distribution streams across customers" },
+      { name: "Create Stream", endpoint: "POST /tags/customers/:customerId/streams", description: "Add a distribution stream to a customer (sftp, s3, api, other)" },
+      { name: "List Transformers", endpoint: "GET /tags/transformers", description: "List available content transformers for stream pipelines" }
     ]
   };
 

@@ -4,6 +4,7 @@
       "id": "geo",
       "name": "Geography",
       "description": "Geographic distribution tags",
+      "type": "categorization",
       "tags": [
         {
           "id": "geo-europe",
@@ -27,6 +28,7 @@
       "id": "topic",
       "name": "Topics",
       "description": "Content topic tags",
+      "type": "categorization",
       "tags": [
         {
           "id": "topic-sport",
@@ -48,20 +50,29 @@
     },
     {
       "id": "format",
-      "name": "Content Format",
-      "description": "Content format and type tags",
+      "name": "People",
+      "description": "People tags",
+      "type": "categorization",
       "tags": [
         {
-          "id": "format-longform",
-          "label": "Longform"
+          "id": "format-donald-trump",
+          "label": "Donald Trump"
         },
         {
-          "id": "format-breaking",
-          "label": "Breaking News"
+          "id": "format-sergio-mattarella",
+          "label": "Sergio Mattarella"
         },
         {
-          "id": "format-opinion",
-          "label": "Opinion"
+          "id": "format-giorgia-meloni",
+          "label": "Giorgia Meloni"
+        },
+        {
+          "id": "format-sanae-sakamoto",
+          "label": "Sanae Sakamoto (高市 早苗)"
+        },
+        {
+          "id": "format-masoumeh-masih-alinejad-ghomikolayi",
+          "label": "Masoumeh \"Masih\" Alinejad-Ghomikolayi (معصومه علی‌نژاد قمی‌کُلایی)"
         }
       ]
     },
@@ -69,13 +80,30 @@
       "id": "events",
       "name": "Events",
       "description": "Special Events we are covering",
+      "type": "categorization",
       "tags": [
         {
           "id": "events-sanremo-2026",
           "label": "Sanremo 2026"
         }
       ]
+    },
+    {
+      "id": "distribution",
+      "name": "Flow",
+      "description": "Flow Type Tag",
+      "type": "system",
+      "tags": [
+        {
+          "id": "distribution-adn",
+          "label": "ADN"
+        },
+        {
+          "id": "distribution-aki",
+          "label": "AKI"
+        }
+      ]
     }
   ],
-  "lastUpdated": "2026-02-10T16:01:25.359Z"
+  "lastUpdated": "2026-02-16T16:13:00.041Z"
 }
