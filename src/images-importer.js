@@ -5,6 +5,7 @@ const neon = require('./helpers/neon-bo-api.js');
 const edapi = require('./helpers/edapi-utils.js');
 const utils = require('./helpers/utils.js');
 const siteshelpers = require('./helpers/sites-helpers.js');
+const { findAllElementsByNodeType, findElementByNodeType, extractTextFromElements } = require('./helpers/neon-content-parser.js');
 
 function isTrelloUrl(url) {
     return /^https?:\/\/(www\.)?trello\.com\//.test(url);
@@ -162,25 +163,51 @@ async function prepareNeonImage({ siteName, targetId, environment }) {
     }
 }
 
+function extractImageCaptions(model) {
+  const storyEl = model?.files?.content?.data?.elements?.find(el => el.nodeType === 'story');
+  const imageGroups = findAllElementsByNodeType(storyEl?.elements || [], 'web-image-group');
+
+  return imageGroups.map(group => {
+    const captionGroup = findElementByNodeType(group.elements || [], 'web-image-caption');
+    if (!captionGroup) return { caption: null, credit: null };
+    const captionEl = findElementByNodeType(captionGroup.elements || [], 'caption');
+    const creditEl  = findElementByNodeType(captionGroup.elements || [], 'credit');
+    return {
+      caption: captionEl ? extractTextFromElements(captionEl.elements) : null,
+      credit:  creditEl  ? extractTextFromElements(creditEl.elements)  : null,
+    };
+  });
+}
+
 async function modelImagesToMethode(model, {workFolder, channel, issueDate}) {
-  
+
   const siteName = model.pubInfo.siteName;
-  
+  const captions = extractImageCaptions(model);
+
   const images = model.links?.hyperlink?.image?.map?.(image => image.targetId) || [];
   const methodeImages = {};
   
   for (let i = 0; i < images.length; i++) {
     const targetId = images[i];
     const neonImage = await prepareNeonImage({ siteName, targetId, environment: 'live' })
+    if (!neonImage) {
+      console.warn(`⚠️ WARNING: Could not retrieve image ${targetId} from Neon (site: ${siteName}). Skipping image.`);
+      continue;
+    }
     const methodeData = await uploadImageToMethode({ neonImage, workFolder, channel, issueDate });
-    // methodeImages[targetId] = methodeData;
+    if (!methodeData) {
+      console.warn(`⚠️ WARNING: Could not upload image ${targetId} to Methode. Skipping image.`);
+      continue;
+    }
     methodeImages[targetId] = {
       loid: methodeData.id,
       uuid: methodeData.pstate.uuid,
       path: methodeData.path,
       fileref: methodeData.path + '?uuid=' + methodeData.pstate.uuid,
       width: neonImage.width,
-      height: neonImage.height
+      height: neonImage.height,
+      caption: captions[i]?.caption || null,
+      credit:  captions[i]?.credit  || null,
     };
   }
   

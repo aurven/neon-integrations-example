@@ -7,6 +7,7 @@ const cheerio = require('cheerio');
 const edapi = require('./helpers/edapi-utils.js');
 const dayjs = require('dayjs');
 const images = require('./images-importer.js');
+const { findElementByNodeType, extractTextFromElements } = require('./helpers/neon-content-parser.js');
 
 const USERNAME = process.env.EDAPI_USERNAME;
 const PASSWORD = process.env.EDAPI_PASSWORD;
@@ -78,7 +79,8 @@ const processWebhookData = async (model) => {
     
     const $doc = cheerio.load(neonXmlContent, { xml: true }, false);
     
-    $doc('grouphead').append(`<subhead><p><![CDATA[<?EM-dummyText Subhead ?>]]></p></subhead>`);
+    const summaryText = extractSummaryFromModel(model) || '<?EM-dummyText Subhead ?>';
+    $doc('grouphead').append(`<subhead><p><![CDATA[${summaryText}]]></p></subhead>`);
 
     const xmlDeclarations = `<?xml version="1.0" encoding="UTF-8"?>
         <!DOCTYPE doc SYSTEM "/SysConfig/Rules/EidosMedia.dtd">
@@ -105,12 +107,22 @@ const processWebhookData = async (model) => {
   return { info, name, content, xmlDeclarations, $doc };
 };
 
+function extractSummaryFromModel(model) {
+  if (model.summary?.trim()) return model.summary.trim();
+  const storyEl = model?.files?.content?.data?.elements?.find(el => el.nodeType === 'story');
+  const summaryEl = findElementByNodeType(storyEl?.elements || [], 'summary');
+  return summaryEl ? extractTextFromElements(summaryEl.elements) : null;
+}
+
 function addPrintImageGroup($doc, methodeImage) {
+  const captionText = methodeImage.caption || '<?EM-dummyText Caption ?>';
+  const creditText  = methodeImage.credit  || '<?EM-dummyText Credit ?>';
+
   const groupElement = `
       <print-image-group class="default" group="media"
           id="${utils.generateAutoId()}">
           <print-image
-            id="${utils.generateAutoId()}" 
+            id="${utils.generateAutoId()}"
             fileref="${methodeImage.fileref}"
             softCrop="Tabloid"
             tmx="${methodeImage.width} ${methodeImage.height} ${methodeImage.width} ${methodeImage.height}"
@@ -118,14 +130,14 @@ function addPrintImageGroup($doc, methodeImage) {
           />
           <print-image-caption id="${utils.generateAutoId()}">
               <p>
-                  <caption><![CDATA[<?EM-dummyText Caption ?>]]></caption>
+                  <caption><![CDATA[${captionText}]]></caption>
                   <ld pattern=" " />
-                  <credit><![CDATA[<?EM-dummyText Credit ?>]]></credit>
+                  <credit><![CDATA[${creditText}]]></credit>
               </p>
           </print-image-caption>
       </print-image-group>
   `;
-  
+
   $doc('story').prepend(groupElement);
 }
 

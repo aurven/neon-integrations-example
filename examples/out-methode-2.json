@@ -1,0 +1,843 @@
+{
+  id: "029b-1f4fdb7e1f1b-b3f7e4218fd8-1000",
+  version: "029b-1f4fdb7e1f1b-b3f7e4218fd8-1000-348744616757",
+  timestamp: "2026-01-19T09:30:16.757Z",
+  foreignId: "96db92574885fc27c08625575b06f91a008905ac",
+  foreignSource: "96db92574885fc27c08625575b06f91a008905ac",
+  title: "Trump dismisses parliamentary recall idea and praises Starmer’s Brexit efforts",
+  summary: "US president says he likes PM ‘even though he’s a liberal’, lauding his handling of trade deal and progress since EU exit",
+  authors: [
+    "Quincy Quill",
+  ],
+  sys: {
+    kind: "content",
+    baseType: "article",
+    type: "article",
+    creationTime: "2025-07-15T00:00:00.000Z",
+    createdBy: {
+      userId: "48685ef5-8c3d-3e51-9a29-6048c23fc3b1",
+      userName: "Quincy Quill",
+    },
+    updateTime: "2026-01-19T09:30:16.757Z",
+    updatedBy: {
+      userId: "62038d84-f161-3579-a5f1-7aba053f999a",
+      userName: "Aureliano",
+    },
+  },
+  pubInfo: {
+    siteName: "TheGlobe",
+    status: "LIVE",
+    publicationTime: "2025-07-15T08:53:09.000Z",
+    publishedBy: {
+      userId: "62038d84-f161-3579-a5f1-7aba053f999a",
+      userName: "Aureliano",
+    },
+    sectionPath: "/news/north-america/",
+    webhookData: {
+      methodeHook: {},
+    },
+    priority: 4,
+    paywallLevel: "FREE",
+    visible: true,
+  },
+  attributes: {
+    tags: [],
+    teaser: {},
+    contentIds: {
+      teaserTitle: "QqZNVHme09vQvLU",
+      teaserSummary: "QJ8jl6hgWgVuExw",
+      title: "QwhFlYv1mm1eXoz",
+      summary: "QelJ5IkSlsTXShv",
+    },
+    byline: "Jessica Elgot Deputy political editor",
+    modifiable: true,
+  },
+  files: {
+    content: {
+      fileName: "Trump dismisses parliamentary recall idea and praises Starmer’s Brexit efforts",
+      mimeType: "application/json",
+      updatedBy: {
+        userId: "62038d84-f161-3579-a5f1-7aba053f999a",
+        userName: "Aureliano",
+      },
+      updateTime: "2026-01-19T09:07:24.552Z",
+      size: 11305,
+      data: {
+        elements: [
+          {
+            nodeType: "story",
+            attributes: {
+              id: "U30334276834pwh",
+            },
+            elements: [
+              {
+                nodeType: "web-image-group",
+                attributes: {
+                  enabledcropslist: "Wide,Square,Portrait,Ultrawide",
+                  id: "QLbrWKPJCP44hig",
+                },
+                elements: [
+                  {
+                    nodeType: "image",
+                    attributes: {
+                      src: "/resources/029b-1f4fdb8044ea-b5d3e90db098-1000/:1200x675:dHJhbnNsYXRlKC0xMy42ODQwMyAtOTAuMDE0MDUpIHNjYWxlKDUuOTMzMzUyIDUuOTMzMzUyKQ==/trump-dismisses-parliamentary-recall-idea-and-praises-starmers-brexit-efforts-1000.jpeg?s=lOzbdefICgduBin09odOT8FJKa-qrtzToVu4fB3O_PE",
+                      id: "QxjY57ZmVyUOiH6",
+                      softCrop: "Wide",
+                      softcropenabled: "enabled",
+                      tmx: "205.71 164.57 1200 675",
+                      xtransform: "translate(-13.68403 -90.01405) scale(5.933352 5.933352)",
+                    },
+                    elements: [],
+                  },
+                  {
+                    nodeType: "image",
+                    attributes: {
+                      src: "/resources/029b-1f4fdb8044ea-b5d3e90db098-1000/:490x490:dHJhbnNsYXRlKC02NS43NTQ5NCAtOS4yMzM0OCkgc2NhbGUoMy40MDAxNDQgMy40MDAxMTIp/trump-dismisses-parliamentary-recall-idea-and-praises-starmers-brexit-efforts-1000.jpeg?s=1F_SZyrPXQ6CT0OltnNV5oIdqtrB9SfPJj-cMQIpHOY",
+                      id: "Q44EbQn7GJB6u7y",
+                      softCrop: "Square",
+                      softcropenabled: "enabled",
+                      tmx: "205.71 164.57 490 490",
+                      xtransform: "translate(-65.75494 -9.23348) scale(3.400144 3.400112)",
+                    },
+                    elements: [],
+                  },
+                  {
+                    nodeType: "image",
+                    attributes: {
+                      src: "/resources/029b-1f4fdb8044ea-b5d3e90db098-1000/:556x988:dHJhbnNsYXRlKC05MTIuNDY2NDQgLTEzMC4yODA2KSBzY2FsZSg4LjY4NDAyMyA4LjY4NDYyNik=/trump-dismisses-parliamentary-recall-idea-and-praises-starmers-brexit-efforts-1000.jpeg?s=4E-eFu_D7etW-bOYKqoqY_l-HCHehmb9lZohp5b2wvY",
+                      id: "QmaM8PnyefnBGbZ",
+                      softCrop: "Portrait",
+                      softcropenabled: "enabled",
+                      tmx: "205.71 164.57 556 988",
+                      xtransform: "translate(-912.46644 -130.2806) scale(8.684023 8.684626)",
+                    },
+                    elements: [],
+                  },
+                  {
+                    nodeType: "image",
+                    attributes: {
+                      src: "/resources/029b-1f4fdb8044ea-b5d3e90db098-1000/:2048x800:dHJhbnNsYXRlKC0xNy43NTcyNiAtMzI3LjE1NDI0KSBzY2FsZSgxMC4xMjYxNzIgMTAuMTI2MTcyKQ==/trump-dismisses-parliamentary-recall-idea-and-praises-starmers-brexit-efforts-1000.jpeg?s=AA5tdGQ8CvVozLV-Q03uLI9sNxAnmJi0_pyqw28HtaU",
+                      id: "Q9jC8SP5u8FDrfU",
+                      softCrop: "Ultrawide",
+                      softcropenabled: "enabled",
+                      tmx: "205.71 164.57 2048 800",
+                      xtransform: "translate(-17.75726 -327.15424) scale(10.126172 10.126172)",
+                    },
+                    elements: [],
+                  },
+                  {
+                    nodeType: "web-image-caption",
+                    attributes: {
+                      id: "U71771518516liH",
+                    },
+                    elements: [
+                      {
+                        nodeType: "caption",
+                        attributes: {
+                          "emxed-trx-captiongroup": "web-image-caption",
+                          "emxed-trx-captionsequence": "0",
+                          "emxed-trx-captiontitle": "Caption",
+                          "emxed-trx-captiontype": "caption",
+                          "emxed-trx-iscaption": "true",
+                          id: "QnOlFg3gOHieLOR",
+                        },
+                        elements: [
+                          {
+                            nodeType: "p",
+                            attributes: {
+                              id: "U52888860200CSY",
+                            },
+                            elements: [
+                              {
+                                nodeType: "plainText",
+                                value: "Starmer invited Trump to come to the UK in September for an unprecedented second state visit.",
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                      {
+                        nodeType: "credit",
+                        attributes: {
+                          "emxed-trx-captiongroup": "web-image-caption",
+                          "emxed-trx-captionsequence": "0",
+                          "emxed-trx-captiontitle": "Credit",
+                          "emxed-trx-captiontype": "credit",
+                          "emxed-trx-iscaption": "true",
+                          id: "QObefG0cGubXSA7",
+                        },
+                        elements: [
+                          {
+                            nodeType: "p",
+                            attributes: {
+                              id: "U23158376852sWS",
+                            },
+                            elements: [
+                              {
+                                nodeType: "plainText",
+                                value: "Photograph: Carl Court/AP",
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+              {
+                nodeType: "grouphead",
+                attributes: {},
+                elements: [
+                  {
+                    nodeType: "overhead",
+                    attributes: {
+                      id: "QpPj78NjeUK78gq",
+                    },
+                    elements: [
+                      {
+                        nodeType: "p",
+                        attributes: {
+                          id: "U56334180148KFv",
+                        },
+                        elements: [],
+                      },
+                    ],
+                  },
+                  {
+                    nodeType: "headline",
+                    attributes: {
+                      id: "QwhFlYv1mm1eXoz",
+                    },
+                    elements: [
+                      {
+                        nodeType: "p",
+                        attributes: {
+                          id: "U57857763720juM",
+                        },
+                        elements: [
+                          {
+                            nodeType: "plainText",
+                            value: "Trump dismisses parliamentary recall idea and praises Starmer’s Brexit efforts",
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+              {
+                nodeType: "summary",
+                attributes: {
+                  id: "QelJ5IkSlsTXShv",
+                },
+                elements: [
+                  {
+                    nodeType: "p",
+                    attributes: {
+                      id: "U25640800137RSV",
+                    },
+                    elements: [
+                      {
+                        nodeType: "plainText",
+                        value: "US president says he likes PM ‘even though he’s a liberal’, lauding his handling of trade deal and progress since EU exit",
+                      },
+                    ],
+                  },
+                ],
+              },
+              {
+                nodeType: "byline",
+                attributes: {
+                  id: "QSYAQBFj8ZSXKnx",
+                },
+                elements: [
+                  {
+                    nodeType: "p",
+                    attributes: {
+                      id: "U56476668575gFC",
+                    },
+                    elements: [
+                      {
+                        nodeType: "plainText",
+                        value: "Jessica Elgot Deputy political editor",
+                      },
+                    ],
+                  },
+                ],
+              },
+              {
+                nodeType: "text",
+                attributes: {
+                  id: "QPlQWNdP0kcFDtx",
+                },
+                elements: [
+                  {
+                    nodeType: "p",
+                    attributes: {
+                      id: "U45156352588UNe",
+                    },
+                    elements: [
+                      {
+                        nodeType: "plainText",
+                        value: "Donald Trump has said he does not want parliament to be recalled for his state visit to the UK, praising Keir Starmer, and saying that, despite being a liberal, the prime minister was straightening out a “sloppy” Brexit.",
+                      },
+                    ],
+                  },
+                  {
+                    nodeType: "p",
+                    attributes: {
+                      id: "U78856501703IPo",
+                    },
+                    elements: [
+                      {
+                        nodeType: "plainText",
+                        value: "Speaking in a rare interview with the BBC, the president said he had made trade agreements to lower tariffs on the UK specifically because of his affinity with Britain, saying he believed in its special relationship with the US.",
+                      },
+                    ],
+                  },
+                  {
+                    nodeType: "p",
+                    attributes: {
+                      id: "U88332745122HwN",
+                    },
+                    elements: [
+                      {
+                        nodeType: "plainText",
+                        value: "Trump added that he was convinced the UK would come to the US’s aid if it were at war. He said: “I think they would be. I don’t think a lot of the other countries would be.",
+                      },
+                    ],
+                  },
+                  {
+                    nodeType: "p",
+                    attributes: {
+                      id: "U84580482462jnL",
+                    },
+                    elements: [
+                      {
+                        nodeType: "plainText",
+                        value: "“It’s a special relationship. Look, that’s why I made a deal with them … For the most part in terms of your competitors and in terms of the European Union, I haven’t made a deal. Now the UK is very special … they have been a really true ally.”",
+                      },
+                    ],
+                  },
+                  {
+                    nodeType: "p",
+                    attributes: {
+                      id: "U55082326718uBC",
+                    },
+                    elements: [
+                      {
+                        nodeType: "plainText",
+                        value: "Trump, who will visit the UK for an unprecedented second state visit in September, said he was happy only to visit Starmer and King Charles, rather than having the opportunity to address parliament, like the French president, Emmanuel Macron, did last week. Parliament will be in recess during Trump’s state visit.",
+                      },
+                    ],
+                  },
+                  {
+                    nodeType: "p",
+                    attributes: {
+                      id: "U11202245821tJU",
+                    },
+                    elements: [
+                      {
+                        nodeType: "plainText",
+                        value: "The Reform UK leader, Nigel Farage, said parliament should be recalled for an address from Trump, but the US president said he was not interested. “I think let them go and have a good time. I don’t want that.",
+                      },
+                    ],
+                  },
+                  {
+                    nodeType: "p",
+                    attributes: {
+                      id: "U64634733120Pup",
+                    },
+                    elements: [
+                      {
+                        nodeType: "plainText",
+                        value: "“I want to have a good time and respect to King Charles, because he’s a great gentleman.”",
+                      },
+                    ],
+                  },
+                  {
+                    nodeType: "p",
+                    attributes: {
+                      id: "U85718358312pSF",
+                    },
+                    elements: [
+                      {
+                        nodeType: "plainText",
+                        value: "Trump, who has been a key advocate of Brexit, suggested he did not think its potential had been fulfilled – but said Starmer was making progress.",
+                      },
+                    ],
+                  },
+                  {
+                    nodeType: "p",
+                    attributes: {
+                      id: "U38733667163usE",
+                    },
+                    elements: [
+                      {
+                        nodeType: "plainText",
+                        value: "“No, I think, I think it’s been on the sloppy side, but I think it’s getting straightened out. I really like the prime minister a lot even though he’s a liberal. I think he’s, you know, he did a good trade deal with us.”",
+                      },
+                    ],
+                  },
+                  {
+                    nodeType: "p",
+                    attributes: {
+                      id: "U20618531548Fhy",
+                    },
+                    elements: [
+                      {
+                        nodeType: "plainText",
+                        value: "Trump said he believed there was a new-found respect for him among world leaders, now he had twice won the presidency.",
+                      },
+                    ],
+                  },
+                  {
+                    nodeType: "p",
+                    attributes: {
+                      id: "U68731317036xfh",
+                    },
+                    elements: [
+                      {
+                        nodeType: "plainText",
+                        value: "“When you do it twice, it’s the big difference. I also think that over the years, they’ve gotten to know me. This is not an easy crowd to break into,” he said. “These are smart people heading up very, very successful … countries, you know, they’re Germany and France, Spain and, yeah, big.”",
+                      },
+                    ],
+                  },
+                  {
+                    nodeType: "p",
+                    attributes: {
+                      id: "U63684100272QZG",
+                    },
+                    elements: [
+                      {
+                        nodeType: "plainText",
+                        value: "Asked if he felt world leaders were being too obsequious and deferential, Trump said: “Well, I think they’re just trying to be nice.”",
+                      },
+                    ],
+                  },
+                  {
+                    nodeType: "p",
+                    attributes: {
+                      id: "U68624512025GRG",
+                    },
+                    elements: [
+                      {
+                        nodeType: "plainText",
+                        value: "Trump said he was “disappointed, but not done” with the Russian president, Vladimir Putin, hours after he announced a ",
+                      },
+                      {
+                        nodeType: "anchor",
+                        attributes: {
+                          "emxed-trx-anchor-element": "true",
+                          href: "https://www.theguardian.com/world/2025/jul/14/trumps-hazy-ukraine-arms-announcement-marks-a-tonal-u-turn",
+                        },
+                        elements: [
+                          {
+                            nodeType: "plainText",
+                            value: "military deal with Nato countries",
+                          },
+                        ],
+                      },
+                      {
+                        nodeType: "plainText",
+                        value: " to arm Ukraine.",
+                      },
+                    ],
+                  },
+                  {
+                    nodeType: "p",
+                    attributes: {
+                      id: "U76244003611gUN",
+                    },
+                    elements: [
+                      {
+                        nodeType: "anchor",
+                        attributes: {
+                          "emxed-trx-anchor-element": "true",
+                          href: "https://www.theguardian.com/world/2025/jul/14/kyiv-hails-us-weapons-deal-as-moscow-dismisses-trump-sanctions-threat",
+                        },
+                        elements: [
+                          {
+                            nodeType: "plainText",
+                            value: "His announcement",
+                          },
+                        ],
+                      },
+                      {
+                        nodeType: "plainText",
+                        value: ", alongside the Nato secretary general, Mark Rutte, in the Oval Office, has been viewed in Europe as an important shift from Washington.",
+                      },
+                    ],
+                  },
+                  {
+                    nodeType: "p",
+                    attributes: {
+                      id: "U36878627534ldz",
+                    },
+                    elements: [
+                      {
+                        nodeType: "plainText",
+                        value: "When asked if he was done with Putin, the president replied: “I’m disappointed in him, but I’m not done with him. But I’m disappointed in him.",
+                      },
+                    ],
+                  },
+                  {
+                    nodeType: "p",
+                    attributes: {
+                      id: "U55054334634EtW",
+                    },
+                    elements: [
+                      {
+                        nodeType: "plainText",
+                        value: "“We had a deal done four times and then you go home and you see he just attacked a nursing home in Kyiv. And so what the hell was that all about?” Asked if he trusted Putin, he said: “I trust almost nobody, to be honest with you.”",
+                      },
+                    ],
+                  },
+                  {
+                    nodeType: "p",
+                    attributes: {
+                      id: "U54053054140VUE",
+                    },
+                    elements: [
+                      {
+                        nodeType: "plainText",
+                        value: "Trump also said he strongly supported Nato, saying that rather than being “obsolete” as he had previously said, it was now “becoming the opposite of that”.",
+                      },
+                    ],
+                  },
+                  {
+                    nodeType: "p",
+                    attributes: {
+                      id: "U57434757777OJp",
+                    },
+                    elements: [
+                      {
+                        nodeType: "plainText",
+                        value: "He said it was “very unfair because the United States paid for almost 100% of it, but now they are paying their own bills”.",
+                      },
+                    ],
+                  },
+                  {
+                    nodeType: "p",
+                    attributes: {
+                      id: "U40053106665WvP",
+                    },
+                    elements: [
+                      {
+                        nodeType: "plainText",
+                        value: "Asked if he believed in Nato’s fundamental article 5 on collective defence, he said: “I think collective defence is fine.” But he later added that he believed Britain was one of the only countries that would come to the aid of the US if needed.",
+                      },
+                    ],
+                  },
+                  {
+                    nodeType: "p",
+                    attributes: {
+                      id: "U01621012410CAV",
+                    },
+                    elements: [
+                      {
+                        nodeType: "plainText",
+                        value: "“One of the problems with Nato was, we have to fight for them but will they actually fight for us if we had a war? And I will say this, I believe that the UK would fight with us. It’s just been so many years and I really think the relationship is just a really good one.”",
+                      },
+                    ],
+                  },
+                  {
+                    nodeType: "p",
+                    attributes: {
+                      id: "U11483121245oEg",
+                    },
+                    elements: [
+                      {
+                        nodeType: "plainText",
+                        value: "In the interview, Trump also reflected on the attempt to assassinate him, which the BBC journalist Gary O’Donoghue witnessed at a rally in Butler, Pennsylvania, last July.",
+                      },
+                    ],
+                  },
+                  {
+                    nodeType: "p",
+                    attributes: {
+                      id: "U73341483016hvO",
+                    },
+                    elements: [
+                      {
+                        nodeType: "plainText",
+                        value: "“We had 55,000 people, and it was dead silence. And so, you know, I assumed that they expected the worst,” he said. “And so I had to let them know I was OK, which is what I did. That’s why I tried to get up as quick as possible. They had a stretcher ready to go. I said: ‘No, thank you.’ I actually had a big argument with them. They wanted me on a stretcher. And I said: ‘Nope, I’m not doing that.’”",
+                      },
+                    ],
+                  },
+                  {
+                    nodeType: "p",
+                    attributes: {
+                      id: "U87366744767EQO",
+                    },
+                    elements: [
+                      {
+                        nodeType: "plainText",
+                        value: "Trump said he did not like to spend time thinking about that day – but acknowledged it could affect him deeply if he started to dwell on it. He said: “I like to think about it as little as possible.",
+                      },
+                    ],
+                  },
+                  {
+                    nodeType: "p",
+                    attributes: {
+                      id: "U73861714740jgT",
+                    },
+                    elements: [
+                      {
+                        nodeType: "plainText",
+                        value: "“I don’t like dwelling on it, because if I did, it might be life-changing. I don’t want it to be that.”",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            nodeType: "teaser",
+            attributes: {},
+            elements: [
+              {
+                nodeType: "web-image-group",
+                attributes: {
+                  id: "Q5L54pRBIe6Bbya",
+                },
+                elements: [
+                  {
+                    nodeType: "image",
+                    attributes: {
+                      id: "QCWDHLIkviaLD7S",
+                      softCrop: "Wide",
+                    },
+                    elements: [],
+                  },
+                  {
+                    nodeType: "image",
+                    attributes: {
+                      id: "Q9TjjSAaZKdVpGd",
+                      softCrop: "Square",
+                    },
+                    elements: [],
+                  },
+                  {
+                    nodeType: "image",
+                    attributes: {
+                      id: "QbLoKT1YBS5mgKJ",
+                      softCrop: "Portrait",
+                    },
+                    elements: [],
+                  },
+                  {
+                    nodeType: "image",
+                    attributes: {
+                      id: "QM39hf3nTnUzKsm",
+                      softCrop: "Ultrawide",
+                    },
+                    elements: [],
+                  },
+                ],
+              },
+              {
+                nodeType: "grouphead",
+                attributes: {},
+                elements: [
+                  {
+                    nodeType: "headline",
+                    attributes: {
+                      id: "QqZNVHme09vQvLU",
+                    },
+                    elements: [
+                      {
+                        nodeType: "p",
+                        attributes: {
+                          id: "U12151320366adH",
+                        },
+                        elements: [],
+                      },
+                    ],
+                  },
+                ],
+              },
+              {
+                nodeType: "summary",
+                attributes: {
+                  id: "QJ8jl6hgWgVuExw",
+                },
+                elements: [
+                  {
+                    nodeType: "p",
+                    attributes: {
+                      id: "U31832582706ltc",
+                    },
+                    elements: [],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+        attributes: {
+          id: "U06508115464mMG",
+          style: "padding-left: 75px;",
+        },
+        nodeType: "doc",
+      },
+      jsonFileEmbeddedNoImage: true,
+    },
+  },
+  links: {
+    hyperlink: {
+      image: [
+        {
+          targetId: "029b-1f4fdb8044ea-b5d3e90db098-1000",
+          metadata: {
+            baseType: "image",
+            type: "image",
+            metadataType: "generic",
+            softCrops: {
+              Square: {
+                id: "Q44EbQn7GJB6u7y",
+                tmx: "205.71 164.57 490 490",
+                xtransform: "translate(-65.75494 -9.23348) scale(3.400144 3.400112)",
+              },
+              Wide: {
+                id: "QxjY57ZmVyUOiH6",
+                tmx: "205.71 164.57 1200 675",
+                xtransform: "translate(-13.68403 -90.01405) scale(5.933352 5.933352)",
+              },
+              Ultrawide: {
+                id: "Q9jC8SP5u8FDrfU",
+                tmx: "205.71 164.57 2048 800",
+                xtransform: "translate(-17.75726 -327.15424) scale(10.126172 10.126172)",
+              },
+              Portrait: {
+                id: "QmaM8PnyefnBGbZ",
+                tmx: "205.71 164.57 556 988",
+                xtransform: "translate(-912.46644 -130.2806) scale(8.684023 8.684626)",
+              },
+            },
+            groupId: "QLbrWKPJCP44hig",
+          },
+          key: 1537228672809129000,
+          dynamicCropsResourceUrls: {
+            Square_thumb: "/resources/029b-1f4fdb8044ea-b5d3e90db098-1000/format/thumb:490x490:dHJhbnNsYXRlKC02NS43NTQ5NCAtOS4yMzM0OCkgc2NhbGUoMy40MDAxNDQgMy40MDAxMTIp/trump-dismisses-parliamentary-recall-idea-and-praises-starmers-brexit-efforts-1000.webp?s=Ah6I3yGbyKK0vzs3ItBnUz9HXrhKgJKfOFKWhd_VoZE",
+            Wide_large: "/resources/029b-1f4fdb8044ea-b5d3e90db098-1000/format/large:1200x675:dHJhbnNsYXRlKC0xMy42ODQwMyAtOTAuMDE0MDUpIHNjYWxlKDUuOTMzMzUyIDUuOTMzMzUyKQ==/trump-dismisses-parliamentary-recall-idea-and-praises-starmers-brexit-efforts-1000.webp?s=CR5NA5Am5LlWqqSXlkvEIALXCiwaqcM6rXoty_rufDo",
+            Ultrawide_large: "/resources/029b-1f4fdb8044ea-b5d3e90db098-1000/format/large:2048x800:dHJhbnNsYXRlKC0xNy43NTcyNiAtMzI3LjE1NDI0KSBzY2FsZSgxMC4xMjYxNzIgMTAuMTI2MTcyKQ==/trump-dismisses-parliamentary-recall-idea-and-praises-starmers-brexit-efforts-1000.webp?s=315jNBMmCjSVZHj2Axb1Zdv4bl3LFe0Se6sByAV_j1g",
+            Portrait_small: "/resources/029b-1f4fdb8044ea-b5d3e90db098-1000/format/small:556x988:dHJhbnNsYXRlKC05MTIuNDY2NDQgLTEzMC4yODA2KSBzY2FsZSg4LjY4NDAyMyA4LjY4NDYyNik=/trump-dismisses-parliamentary-recall-idea-and-praises-starmers-brexit-efforts-1000.webp?s=0VBXbm8o9bLpvePX2tuyRL6XwRn1arxzHsWU6_-8OPk",
+            Ultrawide_small: "/resources/029b-1f4fdb8044ea-b5d3e90db098-1000/format/small:2048x800:dHJhbnNsYXRlKC0xNy43NTcyNiAtMzI3LjE1NDI0KSBzY2FsZSgxMC4xMjYxNzIgMTAuMTI2MTcyKQ==/trump-dismisses-parliamentary-recall-idea-and-praises-starmers-brexit-efforts-1000.webp?s=oeceDQO0LrfZ8YTlYdHJWP4VzDcGnc6FkheCZyCfhM0",
+            Square_large: "/resources/029b-1f4fdb8044ea-b5d3e90db098-1000/format/large:490x490:dHJhbnNsYXRlKC02NS43NTQ5NCAtOS4yMzM0OCkgc2NhbGUoMy40MDAxNDQgMy40MDAxMTIp/trump-dismisses-parliamentary-recall-idea-and-praises-starmers-brexit-efforts-1000.webp?s=3LtpmmcbyB52CrI-J7t8BIXmaJ7hSyTexnNXF4aAn7c",
+            Wide_thumb: "/resources/029b-1f4fdb8044ea-b5d3e90db098-1000/format/thumb:1200x675:dHJhbnNsYXRlKC0xMy42ODQwMyAtOTAuMDE0MDUpIHNjYWxlKDUuOTMzMzUyIDUuOTMzMzUyKQ==/trump-dismisses-parliamentary-recall-idea-and-praises-starmers-brexit-efforts-1000.webp?s=pTvaYJLC6pz79N5WeFcXCSuspCixxl0nS7U3q_0wvhg",
+            Ultrawide_thumb: "/resources/029b-1f4fdb8044ea-b5d3e90db098-1000/format/thumb:2048x800:dHJhbnNsYXRlKC0xNy43NTcyNiAtMzI3LjE1NDI0KSBzY2FsZSgxMC4xMjYxNzIgMTAuMTI2MTcyKQ==/trump-dismisses-parliamentary-recall-idea-and-praises-starmers-brexit-efforts-1000.webp?s=SxwIQmr45W97Y0XQCYp4um3_BHMhZkWVs95IMhU4ZZ8",
+            Square_small: "/resources/029b-1f4fdb8044ea-b5d3e90db098-1000/format/small:490x490:dHJhbnNsYXRlKC02NS43NTQ5NCAtOS4yMzM0OCkgc2NhbGUoMy40MDAxNDQgMy40MDAxMTIp/trump-dismisses-parliamentary-recall-idea-and-praises-starmers-brexit-efforts-1000.webp?s=C06sbVA0392UCm6vNLutQKZ25WtdnJsUBLRbMZUpdTU",
+            Wide_small: "/resources/029b-1f4fdb8044ea-b5d3e90db098-1000/format/small:1200x675:dHJhbnNsYXRlKC0xMy42ODQwMyAtOTAuMDE0MDUpIHNjYWxlKDUuOTMzMzUyIDUuOTMzMzUyKQ==/trump-dismisses-parliamentary-recall-idea-and-praises-starmers-brexit-efforts-1000.webp?s=78tRGDRCrThmBGBq1K3gO4yDeMx3KFtvY_zRaS5v9Wc",
+            Portrait_thumb: "/resources/029b-1f4fdb8044ea-b5d3e90db098-1000/format/thumb:556x988:dHJhbnNsYXRlKC05MTIuNDY2NDQgLTEzMC4yODA2KSBzY2FsZSg4LjY4NDAyMyA4LjY4NDYyNik=/trump-dismisses-parliamentary-recall-idea-and-praises-starmers-brexit-efforts-1000.webp?s=7EfZwMFq1R1qC54lp_k1qMmoWr58RhP2v3OOBqP0qzU",
+            Portrait_large: "/resources/029b-1f4fdb8044ea-b5d3e90db098-1000/format/large:556x988:dHJhbnNsYXRlKC05MTIuNDY2NDQgLTEzMC4yODA2KSBzY2FsZSg4LjY4NDAyMyA4LjY4NDYyNik=/trump-dismisses-parliamentary-recall-idea-and-praises-starmers-brexit-efforts-1000.webp?s=NAQw1FLAzCCR08xtgTUl2sFK6XyH6vQQPunvkXaO0N8",
+          },
+        },
+      ],
+    },
+    system: {
+      mainPicture: [
+        {
+          targetId: "029b-1f4fdb8044ea-b5d3e90db098-1000",
+          metadata: {
+            baseType: "image",
+            type: "image",
+            metadataType: "generic",
+            softCrops: {
+              Square: {
+                id: "Q44EbQn7GJB6u7y",
+                tmx: "205.71 164.57 490 490",
+                xtransform: "translate(-65.75494 -9.23348) scale(3.400144 3.400112)",
+              },
+              Wide: {
+                id: "QxjY57ZmVyUOiH6",
+                tmx: "205.71 164.57 1200 675",
+                xtransform: "translate(-13.68403 -90.01405) scale(5.933352 5.933352)",
+              },
+              Ultrawide: {
+                id: "Q9jC8SP5u8FDrfU",
+                tmx: "205.71 164.57 2048 800",
+                xtransform: "translate(-17.75726 -327.15424) scale(10.126172 10.126172)",
+              },
+              Portrait: {
+                id: "QmaM8PnyefnBGbZ",
+                tmx: "205.71 164.57 556 988",
+                xtransform: "translate(-912.46644 -130.2806) scale(8.684023 8.684626)",
+              },
+            },
+            groupId: "QLbrWKPJCP44hig",
+          },
+          key: 1537228672809129000,
+          dynamicCropsResourceUrls: {
+            Square_thumb: "/resources/029b-1f4fdb8044ea-b5d3e90db098-1000/format/thumb:490x490:dHJhbnNsYXRlKC02NS43NTQ5NCAtOS4yMzM0OCkgc2NhbGUoMy40MDAxNDQgMy40MDAxMTIp/trump-dismisses-parliamentary-recall-idea-and-praises-starmers-brexit-efforts-1000.webp?s=Ah6I3yGbyKK0vzs3ItBnUz9HXrhKgJKfOFKWhd_VoZE",
+            Wide_large: "/resources/029b-1f4fdb8044ea-b5d3e90db098-1000/format/large:1200x675:dHJhbnNsYXRlKC0xMy42ODQwMyAtOTAuMDE0MDUpIHNjYWxlKDUuOTMzMzUyIDUuOTMzMzUyKQ==/trump-dismisses-parliamentary-recall-idea-and-praises-starmers-brexit-efforts-1000.webp?s=CR5NA5Am5LlWqqSXlkvEIALXCiwaqcM6rXoty_rufDo",
+            Ultrawide_large: "/resources/029b-1f4fdb8044ea-b5d3e90db098-1000/format/large:2048x800:dHJhbnNsYXRlKC0xNy43NTcyNiAtMzI3LjE1NDI0KSBzY2FsZSgxMC4xMjYxNzIgMTAuMTI2MTcyKQ==/trump-dismisses-parliamentary-recall-idea-and-praises-starmers-brexit-efforts-1000.webp?s=315jNBMmCjSVZHj2Axb1Zdv4bl3LFe0Se6sByAV_j1g",
+            Portrait_small: "/resources/029b-1f4fdb8044ea-b5d3e90db098-1000/format/small:556x988:dHJhbnNsYXRlKC05MTIuNDY2NDQgLTEzMC4yODA2KSBzY2FsZSg4LjY4NDAyMyA4LjY4NDYyNik=/trump-dismisses-parliamentary-recall-idea-and-praises-starmers-brexit-efforts-1000.webp?s=0VBXbm8o9bLpvePX2tuyRL6XwRn1arxzHsWU6_-8OPk",
+            Ultrawide_small: "/resources/029b-1f4fdb8044ea-b5d3e90db098-1000/format/small:2048x800:dHJhbnNsYXRlKC0xNy43NTcyNiAtMzI3LjE1NDI0KSBzY2FsZSgxMC4xMjYxNzIgMTAuMTI2MTcyKQ==/trump-dismisses-parliamentary-recall-idea-and-praises-starmers-brexit-efforts-1000.webp?s=oeceDQO0LrfZ8YTlYdHJWP4VzDcGnc6FkheCZyCfhM0",
+            Square_large: "/resources/029b-1f4fdb8044ea-b5d3e90db098-1000/format/large:490x490:dHJhbnNsYXRlKC02NS43NTQ5NCAtOS4yMzM0OCkgc2NhbGUoMy40MDAxNDQgMy40MDAxMTIp/trump-dismisses-parliamentary-recall-idea-and-praises-starmers-brexit-efforts-1000.webp?s=3LtpmmcbyB52CrI-J7t8BIXmaJ7hSyTexnNXF4aAn7c",
+            Wide_thumb: "/resources/029b-1f4fdb8044ea-b5d3e90db098-1000/format/thumb:1200x675:dHJhbnNsYXRlKC0xMy42ODQwMyAtOTAuMDE0MDUpIHNjYWxlKDUuOTMzMzUyIDUuOTMzMzUyKQ==/trump-dismisses-parliamentary-recall-idea-and-praises-starmers-brexit-efforts-1000.webp?s=pTvaYJLC6pz79N5WeFcXCSuspCixxl0nS7U3q_0wvhg",
+            Ultrawide_thumb: "/resources/029b-1f4fdb8044ea-b5d3e90db098-1000/format/thumb:2048x800:dHJhbnNsYXRlKC0xNy43NTcyNiAtMzI3LjE1NDI0KSBzY2FsZSgxMC4xMjYxNzIgMTAuMTI2MTcyKQ==/trump-dismisses-parliamentary-recall-idea-and-praises-starmers-brexit-efforts-1000.webp?s=SxwIQmr45W97Y0XQCYp4um3_BHMhZkWVs95IMhU4ZZ8",
+            Square_small: "/resources/029b-1f4fdb8044ea-b5d3e90db098-1000/format/small:490x490:dHJhbnNsYXRlKC02NS43NTQ5NCAtOS4yMzM0OCkgc2NhbGUoMy40MDAxNDQgMy40MDAxMTIp/trump-dismisses-parliamentary-recall-idea-and-praises-starmers-brexit-efforts-1000.webp?s=C06sbVA0392UCm6vNLutQKZ25WtdnJsUBLRbMZUpdTU",
+            Wide_small: "/resources/029b-1f4fdb8044ea-b5d3e90db098-1000/format/small:1200x675:dHJhbnNsYXRlKC0xMy42ODQwMyAtOTAuMDE0MDUpIHNjYWxlKDUuOTMzMzUyIDUuOTMzMzUyKQ==/trump-dismisses-parliamentary-recall-idea-and-praises-starmers-brexit-efforts-1000.webp?s=78tRGDRCrThmBGBq1K3gO4yDeMx3KFtvY_zRaS5v9Wc",
+            Portrait_thumb: "/resources/029b-1f4fdb8044ea-b5d3e90db098-1000/format/thumb:556x988:dHJhbnNsYXRlKC05MTIuNDY2NDQgLTEzMC4yODA2KSBzY2FsZSg4LjY4NDAyMyA4LjY4NDYyNik=/trump-dismisses-parliamentary-recall-idea-and-praises-starmers-brexit-efforts-1000.webp?s=7EfZwMFq1R1qC54lp_k1qMmoWr58RhP2v3OOBqP0qzU",
+            Portrait_large: "/resources/029b-1f4fdb8044ea-b5d3e90db098-1000/format/large:556x988:dHJhbnNsYXRlKC05MTIuNDY2NDQgLTEzMC4yODA2KSBzY2FsZSg4LjY4NDAyMyA4LjY4NDYyNik=/trump-dismisses-parliamentary-recall-idea-and-praises-starmers-brexit-efforts-1000.webp?s=NAQw1FLAzCCR08xtgTUl2sFK6XyH6vQQPunvkXaO0N8",
+          },
+        },
+      ],
+    },
+  },
+  pubInfoEx: {
+    TheGlobe: {
+      siteName: "TheGlobe",
+      status: "LIVE",
+      publicationTime: "2025-07-15T08:53:09.000Z",
+      publishedBy: {
+        userId: "62038d84-f161-3579-a5f1-7aba053f999a",
+        userName: "Aureliano",
+      },
+      liveInfo: {
+        version: "029b-1f4fdb7e1f1b-b3f7e4218fd8-1000-348744616757",
+        sourceVersion: "029b-1f4fdb7e1f1b-b3f7e4218fd8-1000-n348743246714",
+        publicationTime: "2025-07-15T08:53:09.000Z",
+        publishedBy: {
+          userId: "62038d84-f161-3579-a5f1-7aba053f999a",
+          userName: "Aureliano",
+        },
+      },
+      stageInfo: {
+        version: "029b-1f4fdb7e1f1b-b3f7e4218fd8-1000-n348743246714",
+        publicationTime: "2026-01-19T09:07:26.714Z",
+        publishedBy: {
+          userId: "62038d84-f161-3579-a5f1-7aba053f999a",
+          userName: "Aureliano",
+        },
+      },
+      previewInfo: {
+        version: "029b-1f4fdb7e1f1b-b3f7e4218fd8-1000-n348743246714",
+        publicationTime: "2026-01-19T09:07:26.714Z",
+        publishedBy: {
+          userId: "62038d84-f161-3579-a5f1-7aba053f999a",
+          userName: "Aureliano",
+        },
+      },
+      sectionPath: "/news/north-america/",
+      webhookData: {
+        methodeHook: {},
+      },
+      priority: 4,
+      paywallLevel: "FREE",
+      visible: true,
+    },
+  },
+  providers: [
+    "Theguardian",
+  ],
+  url: "/news/north-america/029b-1f4fdb7e1f1b-b3f7e4218fd8-1000/index.html",
+  resourceUrl: "/resources/029b-1f4fdb7e1f1b-b3f7e4218fd8-1000/trump_dismisses_parliamentary_recall_idea_and_praises_starmer_s_brexit_efforts.json",
+  picture: "029b-1f4fdb8044ea-b5d3e90db098-1000",
+  lastModified: 1768815016757,
+  dataType: "node",
+  etag: "029b-1f4fdb7e1f1b-b3f7e4218fd8-1000-348744616757",
+}
