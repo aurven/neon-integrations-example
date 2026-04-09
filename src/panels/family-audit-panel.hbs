@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Family Audit</title>
+    <script src="/js/panel-api-helper.js"></script>
+    <script src="/neon/api/demo-integration/js/panel-api-helper.js"></script>
+    <link rel="stylesheet" href="/css/tailwind-panels.css">
+    <link rel="stylesheet" href="/neon/api/demo-integration/css/tailwind-panels.css">
+    <link rel="stylesheet" href="/fonts/fa6/css/fontawesome.css">
+    <link rel="stylesheet" href="/neon/api/demo-integration/fonts/fa6/css/fontawesome.css">
+    <link rel="stylesheet" href="/fonts/fa6/css/solid.css">
+    <link rel="stylesheet" href="/neon/api/demo-integration/fonts/fa6/css/solid.css">
+    <link rel="stylesheet" href="/css/family-audit-panel.css">
+    <link rel="stylesheet" href="/neon/api/demo-integration/css/family-audit-panel.css">
+</head>
+<body>
+<div id="famaud-root">
+    <header class="famaud-header">
+        <h1 class="famaud-title">Audit Timeline</h1>
+        <div class="famaud-view-pill">
+            <button class="famaud-view-toggle active" data-view="standard">Standard</button>
+            <button class="famaud-view-toggle" data-view="advanced">Advanced</button>
+        </div>
+    </header>
+    <div id="famaud-content"></div>
+</div>
+
+<script>
+const CONFIG = { neonAppUrl: '{{neonAppUrl}}', apiKey: '{{{apiKey}}}' };
+</script>
+<script src="/js/family-audit-panel.js"></script>
+<script src="/neon/api/demo-integration/js/family-audit-panel.js"></script>
+</body>
+</html>

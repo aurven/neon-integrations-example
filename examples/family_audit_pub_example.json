@@ -1,0 +1,125 @@
+{
+  "results": [
+    {
+      "@type": "WebEventItem",
+      "item": {
+        "type": "notificationpsn",
+        "requestId": "2a145535-3a5f-4c37-92ac-b8735e97b187",
+        "timestamp": "2026-04-01T19:36:18.759Z",
+        "responseStatusCode": 500,
+        "resourceCall": "/psn/<notify>/test",
+        "viewStatus": "LIVE",
+        "localHostName": "eidos-psn-0",
+        "serviceId": "psn",
+        "siteName": [
+          "NextFrontier"
+        ],
+        "indexRetry": 0,
+        "durationMs": 0,
+        "wakeupId": "psn:eidos-psn-0_1775072178364",
+        "involvedNodes": 2,
+        "deltaMsFromPublish": 913,
+        "externalRefs": [
+          null,
+          null
+        ],
+        "involvedRefs": [
+          "02a4-204987613519-559e3b3d8230-1000",
+          "02a4-20498519d325-1391b2a6099f-1000"
+        ],
+        "endpointsResults": {}
+      },
+      "score": 0,
+      "sortValues": {
+        "timestamp": "1775072178759"
+      }
+    },
+    {
+      "@type": "WebEventItem",
+      "item": {
+        "type": "notificationpsn",
+        "requestId": "266b0747-bc81-4dce-adb1-d03e20ca3238",
+        "timestamp": "2026-04-01T19:36:12.532Z",
+        "responseStatusCode": 500,
+        "resourceCall": "/psn/<notify>/test",
+        "viewStatus": "LIVE",
+        "localHostName": "eidos-psn-0",
+        "serviceId": "psn",
+        "siteName": [
+          "TheGlobe"
+        ],
+        "indexRetry": 0,
+        "durationMs": 0,
+        "wakeupId": "psn:eidos-psn-0_1775072171601",
+        "involvedNodes": 2,
+        "deltaMsFromPublish": 1196,
+        "externalRefs": [
+          null,
+          null
+        ],
+        "involvedRefs": [
+          "02a4-204987613519-559e3b3d8230-1000",
+          "02a4-20498519d325-1391b2a6099f-1000"
+        ],
+        "endpointsResults": {}
+      },
+      "score": 0,
+      "sortValues": {
+        "timestamp": "1775072172532"
+      }
+    },
+    {
+      "@type": "WebEventItem",
+      "item": {
+        "type": "notificationpsn",
+        "requestId": "d444ffbe-401e-4e2c-9ed6-361b343f159e",
+        "timestamp": "2026-04-01T19:31:17.234Z",
+        "responseStatusCode": 500,
+        "resourceCall": "/psn/<notify>/test",
+        "viewStatus": "LIVE",
+        "localHostName": "eidos-psn-0",
+        "serviceId": "psn",
+        "siteName": [
+          "TheGlobe"
+        ],
+        "indexRetry": 0,
+        "durationMs": 12,
+        "wakeupId": "psn:eidos-psn-0_1775071875061",
+        "involvedNodes": 1,
+        "deltaMsFromPublish": 3082,
+        "externalRefs": [
+          null
+        ],
+        "involvedRefs": [
+          "02a4-20498519d325-1391b2a6099f-1000"
+        ],
+        "endpointsResults": {}
+      },
+      "score": 0,
+      "sortValues": {
+        "timestamp": "1775071877234"
+      }
+    }
+  ],
+  "aggregations": {
+    "resourceCall": {
+      "type": "buckets",
+      "name": "resourceCall",
+      "buckets": [
+        {
+          "type": "term",
+          "key": "/psn/<notify>/test",
+          "docCount": 3,
+          "aggregations": []
+        }
+      ]
+    }
+  },
+  "metadata": {
+    "tookMs": 18,
+    "maxScore": 0,
+    "totalHits": 3,
+    "offset": 0,
+    "maxResults": 1000
+  }
+}

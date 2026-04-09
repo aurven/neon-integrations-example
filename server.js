@@ -126,6 +126,7 @@ fastify.get("/services", function (request, reply) {
       { name: "SmartOcto Dashboard", endpoint: "GET /widgets/smartocto-dashboard", demoUrl: "/widgets/smartocto-dashboard", description: "SmartOcto analytics dashboard (demo)" },
       { name: "Neon Analytics", endpoint: "GET /widgets/neon-analytics", demoUrl: "/widgets/neon-analytics?demo=true", description: "Production metrics dashboard with interactive charts - supports demo mode (?demo=true)" },
       { name: "Welcome Widget", endpoint: "GET /widgets/welcome", demoUrl: "/widgets/welcome", description: "Onboarding widget for new users with quick tour and action cards" },
+      { name: "Planning Board", endpoint: "GET /widgets/planning-board", demoUrl: "/widgets/planning-board", description: "Editorial task planning board with Kanban and Calendar views" },
       { name: "Tag Manager", endpoint: "GET /tags/widget", demoUrl: "/tags/widget", description: "Manage distribution tags, packages, and customer subscriptions" },
       { name: "Tags Input Mockup", endpoint: "GET /tags/input-mockup", demoUrl: "/tags/input-mockup", description: "NeonTagsInput component mockup — copy-paste ready for Neon Object Panel" }
     ],
@@ -140,7 +141,9 @@ fastify.get("/services", function (request, reply) {
       { name: "Méthode API Proxy", endpoint: "ALL /panels/methode/api/*", description: "Proxy for Méthode Editorial API calls with authentication and object retrieval" },
       { name: "QuickChart Panel", endpoint: "GET /panels/quickchart", demoUrl: "/panels/quickchart", description: "QuickChart.io gallery panel for browsing and importing chart examples as PNG assets into Neon CMS" },
       { name: "Social Media Panel", endpoint: "GET /panels/social-media", demoUrl: "/panels/social-media", description: "Social media publishing panel with AI-powered content generation for Facebook, X, Instagram, Threads, and Bluesky" },
-      { name: "Social Media API Proxy", endpoint: "ALL /panels/social-media/api/*", description: "Proxy for social media API calls (AI generation, Bluesky metrics) with authentication" }
+      { name: "Social Media API Proxy", endpoint: "ALL /panels/social-media/api/*", description: "Proxy for social media API calls (AI generation, Bluesky metrics) with authentication" },
+      { name: "Family Audit Panel", endpoint: "GET /panels/family-audit", demoUrl: "/panels/family-audit?demo=true", description: "Vertical audit timeline for any Neon object — standard and advanced verbosity levels" },
+      { name: "Family Audit API Proxy", endpoint: "GET /panels/family-audit/api/events", description: "Proxy for Neon metrics family_audit API with familyRef authentication" }
     ],
     webhooks: [
       { name: "Neon Webhook Handler", endpoint: "POST /in/neon/webhook", description: "Process incoming Neon CMS webhooks with multi-site routing" },
@@ -236,6 +239,7 @@ fastify.post("/widgets/breakingnews/publish", widgetHandlers.breakingNewsPublish
 fastify.get("/widgets/smartocto-dashboard", widgetHandlers.smartOctoDashboardHandler);
 fastify.get("/widgets/neon-analytics", widgetHandlers.neonAnalyticsDashboardHandler);
 fastify.get("/widgets/welcome", widgetHandlers.welcomeWidgetHandler);
+fastify.get("/widgets/planning-board", widgetHandlers.planningBoardWidgetHandler);
 
 /**
  *
@@ -293,6 +297,23 @@ fastify.register(async function (fastify) {
     method: ['GET', 'POST', 'PUT', 'DELETE'],
     url: '/panels/social-media/api/*',
     handler: panelHandlers.socialMediaApiProxyHandler
+  });
+});
+fastify.get("/panels/family-audit", panelHandlers.familyAuditPanelHandler);
+fastify.register(async function (fastify) {
+  fastify.route({
+    method: ['GET'],
+    url: '/panels/family-audit/api/events',
+    handler: panelHandlers.familyAuditApiProxyHandler
+  });
+});
+const claudeChatHandlers = require("./src/requestHandlers/claude-chat-handler.js");
+fastify.get("/panels/claude-chat", claudeChatHandlers.claudeChatPanelHandler);
+fastify.register(async function (fastify) {
+  fastify.route({
+    method: ['POST'],
+    url: '/panels/claude-chat/api/chat',
+    handler: claudeChatHandlers.claudeChatApiHandler
   });
 });
 

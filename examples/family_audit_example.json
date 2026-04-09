@@ -1,0 +1,167 @@
+{
+  "results": [
+    {
+      "@type": "WebEventItem",
+      "item": {
+        "type": "authoringmetric",
+        "requestId": "6d40de14-4be8-409a-9b15-1ab3ec67e9f1",
+        "timestamp": "2026-04-01T17:04:41.176Z",
+        "responseStatusCode": 200,
+        "requestCall": "PUT /contents/nodes/lock",
+        "resourceCall": "PUT /contents/nodes/lock",
+        "requestQueryParameters": { },
+        "requestHostName": "neon-app-test-region-a.neon.test",
+        "localHostName": "test-region-a-contents-67cd4d9864-ncszz",
+        "serviceId": "contents",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+        "userName": "Cristiano",
+        "scope": "NeonApp",
+        "userId": "ac8820bb-5e38-3844-bdac-4f8e5a71f5c7",
+        "indexRetry": 0,
+        "durationMs": 115,
+        "workerToServiceMs": 4,
+        "parallelOnStart": 1,
+        "updatedCount": 1,
+        "removedCount": 0,
+        "involvedRefs": [
+          "02a3-20290d6820a4-d149a3a02a54-1000"
+        ],
+        "externalRefs": [ ],
+        "types": [
+          "article"
+        ],
+        "workflows": [
+          "Story/Created"
+        ],
+        "workFolderPaths": [
+          "/Convergent/News"
+        ]
+      },
+      "score": 1
+    },
+    {
+      "@type": "WebEventItem",
+      "item": {
+        "type": "authoringmetric",
+        "requestId": "faa00434-3741-4cab-8b88-b2eaa31a12b5",
+        "timestamp": "2026-04-01T17:04:50.527Z",
+        "responseStatusCode": 200,
+        "requestCall": "PUT /contents/story/02a3-20290d6820a4-d149a3a02a54-1000",
+        "resourceCall": "PUT /contents/story/{id}",
+        "requestQueryString": "saveMode=MAJOR_CHECKIN&keepCheckedout=true",
+        "requestQueryParameters": {
+          "saveMode": [
+            "MAJOR_CHECKIN"
+          ],
+          "keepCheckedout": [
+            "true"
+          ]
+        },
+        "requestHostName": "neon-app-test-region-a.neon.test",
+        "localHostName": "test-region-a-contents-67cd4d9864-ncszz",
+        "serviceId": "contents",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+        "userName": "Cristiano",
+        "scope": "NeonApp",
+        "userId": "ac8820bb-5e38-3844-bdac-4f8e5a71f5c7",
+        "indexRetry": 0,
+        "durationMs": 503,
+        "workerToServiceMs": 6,
+        "parallelOnStart": 1,
+        "updatedCount": 1,
+        "removedCount": 0,
+        "involvedRefs": [
+          "02a3-20290d6820a4-d149a3a02a54-1000"
+        ],
+        "externalRefs": [ ],
+        "types": [
+          "article"
+        ],
+        "workflows": [
+          "Story/Created"
+        ],
+        "workFolderPaths": [
+          "/Convergent/News"
+        ]
+      },
+      "score": 1
+    },
+    {
+      "@type": "WebEventItem",
+      "item": {
+        "type": "authoringmetric",
+        "requestId": "22d3efe0-1b4e-4d6e-aa92-3e7ccaa72df8",
+        "timestamp": "2026-04-01T17:04:51.081Z",
+        "responseStatusCode": 200,
+        "requestCall": "PUT /contents/nodes/unlock",
+        "resourceCall": "PUT /contents/nodes/unlock",
+        "requestQueryString": "unlockMode=UNDO",
+        "requestQueryParameters": {
+          "unlockMode": [
+            "UNDO"
+          ]
+        },
+        "requestHostName": "neon-app-test-region-a.neon.test",
+        "localHostName": "test-region-a-contents-67cd4d9864-ncszz",
+        "serviceId": "contents",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+        "userName": "Cristiano",
+        "scope": "NeonApp",
+        "userId": "ac8820bb-5e38-3844-bdac-4f8e5a71f5c7",
+        "indexRetry": 0,
+        "durationMs": 32,
+        "workerToServiceMs": 2,
+        "parallelOnStart": 1,
+        "updatedCount": 1,
+        "removedCount": 0,
+        "involvedRefs": [
+          "02a3-20290d6820a4-d149a3a02a54-1000"
+        ],
+        "externalRefs": [ ],
+        "types": [
+          "article"
+        ],
+        "workflows": [
+          "Story/Created"
+        ],
+        "workFolderPaths": [
+          "/Convergent/News"
+        ]
+      },
+      "score": 1
+    }
+  ],
+  "aggregations": {
+    "resourceCall": {
+      "type": "buckets",
+      "name": "resourceCall",
+      "buckets": [
+        {
+          "type": "term",
+          "key": "PUT /contents/nodes/lock",
+          "docCount": 1,
+          "aggregations": [ ]
+        },
+        {
+          "type": "term",
+          "key": "PUT /contents/nodes/unlock",
+          "docCount": 1,
+          "aggregations": [ ]
+        },
+        {
+          "type": "term",
+          "key": "PUT /contents/story/{id}",
+          "docCount": 1,
+          "aggregations": [ ]
+        }
+      ]
+    }
+  },
+  "metadata": {
+    "tookMs": 3,
+    "maxScore": 1,
+    "totalHits": 3,
+    "offset": 0,
+    "maxResults": 1000
+  }
+}

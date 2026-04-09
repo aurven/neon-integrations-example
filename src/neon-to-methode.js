@@ -11,7 +11,7 @@ const images = require('./images-importer.js');
 const USERNAME = process.env.EDAPI_USERNAME;
 const PASSWORD = process.env.EDAPI_PASSWORD;
 const TEMPLATE = '/SysConfig/Product/Shared/Templates/Default/story.xml';
-const CHANNEL = 'Tabloid';
+const CHANNEL = '';
 const WORKFOLDER = '/Product/World';
 
 // Process webhook data
@@ -68,7 +68,12 @@ const processWebhookData = async (model) => {
         "emxed-trx-component",
         "emxed-trx-iscaption",
       ],
-      excludeTags: ["style", "web-image-group", "teaser", "oembedblock"],
+      excludeTags: [
+        "style",
+        //"web-image-group",
+        "teaser",
+        "oembedblock"
+      ],
     });
     
     const $doc = cheerio.load(neonXmlContent, { xml: true }, false);

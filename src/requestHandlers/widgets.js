@@ -308,6 +308,22 @@ function welcomeWidgetHandler(request, reply) {
   return reply.view("/src/widgets/welcome-widget.hbs", params);
 }
 
+function planningBoardWidgetHandler(request, reply) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) {
+    return reply.status(401).send({ error: "Unauthorized" });
+  }
+
+  let params = {
+    seo: {
+      title: "Planning Board",
+      description: "Editorial task planning board for newsroom workflow management"
+    },
+    neonAppUrl: process.env.NEON_APP_URL
+  };
+  return reply.view("/src/widgets/planning-board.hbs", params);
+}
+
 module.exports = {
   testWidgetHandler,
   dropWidgetHandler,
@@ -317,5 +333,6 @@ module.exports = {
   breakingNewsPublishHandler,
   smartOctoDashboardHandler,
   neonAnalyticsDashboardHandler,
-  welcomeWidgetHandler
+  welcomeWidgetHandler,
+  planningBoardWidgetHandler
 };

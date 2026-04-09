@@ -801,6 +801,40 @@ async function socialMediaApiProxyHandler(request, reply) {
   }
 }
 
+function familyAuditPanelHandler(request, reply) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) return reply.status(401).send({ error: 'Unauthorized' });
+
+  return reply.view('/src/panels/family-audit-panel.hbs', {
+    seo: seo,
+    apiKey: auth.apikey,
+    neonAppUrl: process.env.NEON_APP_URL
+  });
+}
+
+async function familyAuditApiProxyHandler(request, reply) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) return reply.status(401).send({ error: 'Unauthorized' });
+
+  const { familyRef } = request.query;
+  if (!familyRef) return reply.status(400).send({ error: 'familyRef is required' });
+
+  try {
+    const neonBoUrl = process.env.NEON_BO_URL || process.env.NEON_APP_URL;
+    const url = `${neonBoUrl}/core/metrics/metrics/family_audit?familyRef=${encodeURIComponent(familyRef)}&date=now`;
+    const response = await axios.get(url, {
+      headers: { 'Authorization': `Bearer ${auth.apikey}` }
+    });
+    return reply.send(response.data);
+  } catch (error) {
+    console.error('[Family Audit API] Error:', error);
+    return reply.status(error.response?.status || 500).send({
+      error: 'Failed to fetch audit events',
+      details: error.response?.data || error.message
+    });
+  }
+}
+
 module.exports = {
   trelloPanelHandler,
   trelloApiProxyHandler,
@@ -817,5 +851,7 @@ module.exports = {
   ga4AnalyticsPanelHandler,
   smartOctoPanelHandler,
   socialMediaPanelHandler,
-  socialMediaApiProxyHandler
+  socialMediaApiProxyHandler,
+  familyAuditPanelHandler,
+  familyAuditApiProxyHandler
 };
