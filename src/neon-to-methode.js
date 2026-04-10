@@ -68,6 +68,7 @@ const processWebhookData = async (model) => {
         "emxed-trx-captiontype",
         "emxed-trx-component",
         "emxed-trx-iscaption",
+        "emxed-trx-anchor-element",
       ],
       excludeTags: [
         "style",
@@ -77,8 +78,6 @@ const processWebhookData = async (model) => {
     });
     
     const $doc = cheerio.load(neonXmlContent, { xml: true }, false);
-
-    transformWebImageGroups($doc);
 
     const summaryText = extractSummaryFromModel(model) || '<?EM-dummyText Subhead ?>';
     $doc('grouphead').append(`<subhead><p><![CDATA[${summaryText}]]></p></subhead>`);
@@ -115,26 +114,51 @@ function extractSummaryFromModel(model) {
   return summaryEl ? extractTextFromElements(summaryEl.elements) : null;
 }
 
-function transformWebImageGroups($doc) {
+function resolveMethodeFileref(neonSrc, imageReferences) {
+  if (!neonSrc || !imageReferences) return null;
+  const matched = Object.entries(imageReferences).find(([targetId]) => neonSrc.includes(targetId));
+  return matched ? matched[1].fileref : null;
+}
+
+function replaceImageWithWebImage($doc, img, imageReferences) {
+  const $img = $doc(img);
+  const attribs = { ...(img.attribs || {}) };
+  const fileref = resolveMethodeFileref(attribs.src, imageReferences);
+  if (fileref) attribs.fileref = fileref;
+  delete attribs.src;
+  const attribStr = Object.entries(attribs).map(([k, v]) => ` ${k}="${v}"`).join('');
+  $img.replaceWith(`<web-image${attribStr}/>`);
+}
+
+function injectFilerefIntoImage($doc, img, imageReferences) {
+  const $img = $doc(img);
+  const fileref = resolveMethodeFileref($img.attr('src'), imageReferences);
+  if (fileref) $img.attr('fileref', fileref);
+  $img.removeAttr('src');
+}
+
+function restructureCaptionGroup($doc, captionEl, captionTag) {
+  const $captionGroup = $doc(captionEl);
+  const captionText = $captionGroup.find('caption').text() || '<?EM-dummyText Caption ?>';
+  const creditText  = $captionGroup.find('credit').text()  || '<?EM-dummyText Credit ?>';
+  $captionGroup.replaceWith(
+    `<${captionTag}><p><caption>${captionText}</caption><credit>${creditText}</credit></p></${captionTag}>`
+  );
+}
+
+function transformWebImageGroups($doc, imageReferences) {
+  // web-image-group: <image> → <web-image> with fileref; <web-image-caption> restructured
   $doc('web-image-group').each((_, group) => {
     const $group = $doc(group);
+    $group.find('image').each((_, img) => replaceImageWithWebImage($doc, img, imageReferences));
+    $group.find('web-image-caption').each((_, cap) => restructureCaptionGroup($doc, cap, 'web-image-caption'));
+  });
 
-    // Rename <image> to <web-image>
-    $group.find('image').each((_, img) => {
-      const $img = $doc(img);
-      const attribs = Object.entries(img.attribs || {})
-        .map(([k, v]) => ` ${k}="${v}"`)
-        .join('');
-      $img.replaceWith(`<web-image${attribs}/>`);
-    });
-
-    // Restructure <web-image-caption> children into <p><caption>...</caption><credit>...</credit></p>
-    $group.find('web-image-caption').each((_, captionGroup) => {
-      const $captionGroup = $doc(captionGroup);
-      const captionText = $captionGroup.find('caption').text() || '<?EM-dummyText Caption ?>';
-      const creditText  = $captionGroup.find('credit').text()  || '<?EM-dummyText Credit ?>';
-      $captionGroup.html(`<p><caption>${captionText}</caption><credit>${creditText}</credit></p>`);
-    });
+  // inline-media-group: same treatment, but caption tag is image-caption → web-image-caption
+  $doc('inline-media-group').each((_, group) => {
+    const $group = $doc(group);
+    $group.find('image').each((_, img) => injectFilerefIntoImage($doc, img, imageReferences));
+    $group.find('image-caption').each((_, cap) => restructureCaptionGroup($doc, cap, 'web-image-caption'));
   });
 }
 
@@ -225,13 +249,15 @@ async function processNeonStoryV2 (model) {
       attributes: null
     });
     const imageReferences = await images.modelImagesToMethode(
-      model, { 
+      model, {
         channel: CHANNEL,
         workFolder: WORKFOLDER,
         issueDate
       }
     );
-    
+
+    transformWebImageGroups($doc, imageReferences);
+
     Object.values(imageReferences).forEach(imageReference => {
       addPrintImageGroup($doc, imageReference);
     });
