@@ -71,14 +71,15 @@ const processWebhookData = async (model) => {
       ],
       excludeTags: [
         "style",
-        //"web-image-group",
         "teaser",
         "oembedblock"
       ],
     });
     
     const $doc = cheerio.load(neonXmlContent, { xml: true }, false);
-    
+
+    transformWebImageGroups($doc);
+
     const summaryText = extractSummaryFromModel(model) || '<?EM-dummyText Subhead ?>';
     $doc('grouphead').append(`<subhead><p><![CDATA[${summaryText}]]></p></subhead>`);
 
@@ -112,6 +113,29 @@ function extractSummaryFromModel(model) {
   const storyEl = model?.files?.content?.data?.elements?.find(el => el.nodeType === 'story');
   const summaryEl = findElementByNodeType(storyEl?.elements || [], 'summary');
   return summaryEl ? extractTextFromElements(summaryEl.elements) : null;
+}
+
+function transformWebImageGroups($doc) {
+  $doc('web-image-group').each((_, group) => {
+    const $group = $doc(group);
+
+    // Rename <image> to <web-image>
+    $group.find('image').each((_, img) => {
+      const $img = $doc(img);
+      const attribs = Object.entries(img.attribs || {})
+        .map(([k, v]) => ` ${k}="${v}"`)
+        .join('');
+      $img.replaceWith(`<web-image${attribs}/>`);
+    });
+
+    // Restructure <web-image-caption> children into <p><caption>...</caption><credit>...</credit></p>
+    $group.find('web-image-caption').each((_, captionGroup) => {
+      const $captionGroup = $doc(captionGroup);
+      const captionText = $captionGroup.find('caption').text() || '<?EM-dummyText Caption ?>';
+      const creditText  = $captionGroup.find('credit').text()  || '<?EM-dummyText Credit ?>';
+      $captionGroup.html(`<p><caption>${captionText}</caption><credit>${creditText}</credit></p>`);
+    });
+  });
 }
 
 function addPrintImageGroup($doc, methodeImage) {
