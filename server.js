@@ -421,6 +421,42 @@ setImmediate(async () => {
 
 /**
  *
+ * Neon Config Cache API
+ *
+ */
+const neonConfigHandlers = require("./src/requestHandlers/neon-config.js");
+fastify.register(async function (fastify) {
+  await neonConfigHandlers.registerRoutes(fastify, {
+    apikey: process.env.NEON_EXT_APIKEY
+  });
+});
+
+// Initialize Neon config cache on startup (non-blocking)
+const { initializeAll: initializeNeonConfig } = require("./src/connectors/neon-config-connector");
+setImmediate(async () => {
+  try {
+    console.log('[Neon Config] Initializing cache...');
+    const results = await initializeNeonConfig();
+
+    if (results.initialized.length > 0) {
+      console.log(`[Neon Config] ✓ Fetched and cached: ${results.initialized.join(', ')}`);
+    }
+    if (results.cached.length > 0) {
+      console.log(`[Neon Config] ✓ Already cached: ${results.cached.join(', ')}`);
+    }
+    if (results.errors.length > 0) {
+      console.error(`[Neon Config] ✗ Errors: ${results.errors.length}`);
+      results.errors.forEach(err => {
+        console.error(`  - ${err.type}: ${err.error}`);
+      });
+    }
+  } catch (error) {
+    console.error('[Neon Config] Failed to initialize:', error.message);
+  }
+});
+
+/**
+ *
  * Tag Manager
  *
  */

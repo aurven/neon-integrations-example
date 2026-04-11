@@ -816,18 +816,21 @@ async function familyAuditApiProxyHandler(request, reply) {
   const auth = authenticate(request, reply);
   if (!auth.authenticated) return reply.status(401).send({ error: 'Unauthorized' });
 
-  const { familyRef } = request.query;
+  const { familyRef, date } = request.query;
   if (!familyRef) return reply.status(400).send({ error: 'familyRef is required' });
 
   try {
-    const neonBoUrl = process.env.NEON_BO_URL || process.env.NEON_APP_URL;
-    const url = `${neonBoUrl}/core/metrics/metrics/family_audit?familyRef=${encodeURIComponent(familyRef)}&date=now`;
-    const response = await axios.get(url, {
-      headers: { 'Authorization': `Bearer ${auth.apikey}` }
+    await neonV2.login();
+    const result = await neonV2.getMetricsData('metrics/family_audit', {
+      familyRef,
+      date: date || 'now'
     });
-    return reply.send(response.data);
+    await neonV2.logout();
+    console.log('[Family Audit API] << OUT: fetched audit events for', familyRef);
+    return reply.send(result);
   } catch (error) {
-    console.error('[Family Audit API] Error:', error);
+    console.error('[Family Audit API] Error:', error.message);
+    try { await neonV2.logout(); } catch (_) {}
     return reply.status(error.response?.status || 500).send({
       error: 'Failed to fetch audit events',
       details: error.response?.data || error.message

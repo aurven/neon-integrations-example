@@ -255,6 +255,26 @@ class NeonClient {
         }, 'Users retrieved', true);
     }
 
+    async getGroups() {
+        try {
+            return await this.makeRequest({
+                method: 'get',
+                url: '/directory/groups?limit=100'
+            }, 'Groups retrieved', true);
+        } catch (error) {
+            console.warn(`⚠️ [${this.sessionId}] getGroups(): endpoint unavailable (${error.response?.status || error.code}), returning stub`);
+            // TODO: remove stub when /directory/groups is confirmed available on this Neon BO version
+            return {
+                groups: [
+                    { name: 'editors',      realm: 'default' },
+                    { name: 'admins',       realm: 'default' },
+                    { name: 'contributors', realm: 'default' },
+                    { name: 'readers',      realm: 'default' }
+                ]
+            };
+        }
+    }
+
     async addUserToGroup(userId, groupName) {
         return await this.makeRequest({
             method: 'post',
@@ -328,6 +348,27 @@ class NeonClient {
         }, `Assigned new workflow step to ${familyRef}`);
     }
 
+    async getWorkflowDefinitions() {
+        try {
+            return await this.makeRequest({
+                method: 'get',
+                url: '/workflow/definitions'
+            }, 'Workflow definitions retrieved', true);
+        } catch (error) {
+            console.warn(`⚠️ [${this.sessionId}] getWorkflowDefinitions(): endpoint unavailable (${error.response?.status || error.code}), returning stub`);
+            // TODO: remove stub when a real workflow-list endpoint is confirmed on this Neon BO version
+            return {
+                workflows: [
+                    { name: 'Story/Created'   },
+                    { name: 'Story/Edit'      },
+                    { name: 'Story/Ready'     },
+                    { name: 'Story/Published' },
+                    { name: 'Story/Archived'  }
+                ]
+            };
+        }
+    }
+
     /**
      * Promotion
      */
@@ -382,13 +423,14 @@ class NeonClient {
         }, 'Available metrics reports retrieved', true);
     }
 
-    async getMetricsData(reportId) {
+    async getMetricsData(reportId, queryParams = {}) {
         if (!reportId) {
             throw new Error('Report ID is required');
         }
         return await this.makeRequest({
             method: 'get',
-            url: `/core/metrics/${reportId}`
+            url: `/core/metrics/${reportId}`,
+            params: queryParams
         }, `Metrics data for ${reportId} retrieved`, true);
     }
 
@@ -493,6 +535,7 @@ module.exports = {
     publishSiteNode: (options, realm, viewStatus) => defaultClient.publishSiteNode(options, realm, viewStatus),
     createUser: (options) => defaultClient.createUser(options),
     getUsers: () => defaultClient.getUsers(),
+    getGroups: () => defaultClient.getGroups(),
     addUserToGroup: (userId, groupName) => defaultClient.addUserToGroup(userId, groupName),
     createGroup: (options) => defaultClient.createGroup(options),
     updateGroup: (options) => defaultClient.updateGroup(options),
@@ -501,11 +544,12 @@ module.exports = {
     createBasefolder: (options) => defaultClient.createBasefolder(options),
     getNextSteps: (familyRef) => defaultClient.getNextSteps(familyRef),
     nextStepAssignment: (familyRef, options) => defaultClient.nextStepAssignment(familyRef, options),
+    getWorkflowDefinitions: () => defaultClient.getWorkflowDefinitions(),
     putNode: (params) => defaultClient.putNode(params),
     promoteNode: (familyRef, params) => defaultClient.promoteNode(familyRef, params),
     promoteNodeEverywhere: (familyRef, params) => defaultClient.promoteNodeEverywhere(familyRef, params),
     discoveryServices: () => defaultClient.discoveryServices(),
     searchContents: (queryPayload, numberOfNodes, numberOfIds) => defaultClient.searchContents(queryPayload, numberOfNodes, numberOfIds),
     getMetricsReports: () => defaultClient.getMetricsReports(),
-    getMetricsData: (reportId) => defaultClient.getMetricsData(reportId)
+    getMetricsData: (reportId, queryParams) => defaultClient.getMetricsData(reportId, queryParams)
 };
