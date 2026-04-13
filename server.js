@@ -248,7 +248,7 @@ fastify.get("/widgets/planning-board", widgetHandlers.planningBoardWidgetHandler
  */
 const panelHandlers = require("./src/requestHandlers/panels.js");
 fastify.get("/panels/trello", panelHandlers.trelloPanelHandler);
-fastify.get("/panels/external-sources", panelHandlers.externalSourcesPanelHandler);
+fastify.get("/panels/external-sources", panelHandlers.externalSourcesPanelV2Handler);
 fastify.get("/panels/methode", panelHandlers.methodePanelHandler);
 fastify.get("/panels/quickchart", panelHandlers.quickchartPanelHandler);
 fastify.get("/panels/article-pdf", panelHandlers.articlePdfPanelHandler);

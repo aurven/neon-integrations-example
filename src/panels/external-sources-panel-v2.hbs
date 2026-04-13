@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>External Sources</title>
+    <script src="/js/panel-api-helper.js"></script>
+    <script src="/neon/api/demo-integration/js/panel-api-helper.js"></script>
+    <link rel="stylesheet" href="/css/tailwind-panels.css">
+    <link rel="stylesheet" href="/neon/api/demo-integration/css/tailwind-panels.css">
+    <link rel="stylesheet" href="/css/external-sources-panel-v2.css">
+    <link rel="stylesheet" href="/neon/api/demo-integration/css/external-sources-panel-v2.css">
+</head>
+<body>
+<div id="es-root">
+
+    <!-- Header: providers + toolbar -->
+    <header class="es-header">
+        <!-- Provider row -->
+        <div class="es-providers">
+            <button class="es-provider-btn active" data-source="pexels" title="Pexels">
+                <img src="/assets/logos/pexels.svg" alt="Pexels" class="es-provider-logo">
+            </button>
+            <button class="es-provider-btn" data-source="youtube" title="YouTube">
+                <img src="/assets/logos/youtube.svg" alt="YouTube" class="es-provider-logo">
+            </button>
+            <button class="es-provider-btn" data-source="dailymotion" title="DailyMotion">
+                <img src="/assets/logos/dailymotion.svg" alt="DailyMotion" class="es-provider-logo">
+            </button>
+        </div>
+
+        <!-- Type + search toolbar -->
+        <div class="es-toolbar">
+            <!-- Asset-type pill (hidden for video-only sources) -->
+            <div class="es-type-pill" id="esTypePill">
+                <button class="es-type-btn active" data-type="photos">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+                    </svg>
+                    Photos
+                </button>
+                <button class="es-type-btn" data-type="videos">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/>
+                    </svg>
+                    Videos
+                </button>
+            </div>
+
+            <!-- Search -->
+            <div class="es-search-wrap">
+                <input id="esSearchInput" type="text" class="es-search-input" placeholder="Search…">
+            </div>
+            <button id="esSearchBtn" class="es-btn es-btn-primary" title="Search">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+            </button>
+            <button id="esClearBtn" class="es-btn es-btn-clear" title="Clear">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Scrollable content -->
+    <div id="es-content">
+        <!-- Loading -->
+        <div id="esLoading" class="es-state" style="display:none">
+            <div class="es-spinner"></div>
+            <span class="es-state-text">Loading…</span>
+        </div>
+
+        <!-- No results -->
+        <div id="esNoResults" class="es-state" style="display:none">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <span class="es-state-text">No results found. Try a different search.</span>
+        </div>
+
+        <!-- Grid -->
+        <div id="esGrid" class="es-grid"></div>
+    </div>
+</div>
+
+<!-- Preview modal -->
+<div id="esModalBackdrop" class="es-modal-backdrop">
+    <div class="es-modal" id="esModal">
+        <div class="es-modal-header">
+            <span class="es-modal-title" id="esModalTitle"></span>
+            <button class="es-modal-close" id="esModalClose">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+        </div>
+        <div class="es-modal-media" id="esModalMedia"></div>
+        <div class="es-modal-body">
+            <div class="es-modal-fields" id="esModalFields"></div>
+            <div class="es-modal-actions">
+                <button class="es-modal-btn es-modal-btn-insert" id="esModalInsert">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                    </svg>
+                    Insert
+                </button>
+                <button class="es-modal-btn es-modal-btn-external" id="esModalOpen">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+                    </svg>
+                    View original
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ── State ──────────────────────────────────────────────
+const state = {
+    apiKey: '{{{apiKey}}}',
+    neonAppUrl: '{{{neonAppUrl}}}',
+    currentSource: 'pexels',
+    currentType: 'photos',
+    currentQuery: '',
+    isLoading: false,
+    neonContext: null,
+    modalAsset: null
+};
+
+// ── DOM refs ───────────────────────────────────────────
+const els = {
+    searchInput:   document.getElementById('esSearchInput'),
+    searchBtn:     document.getElementById('esSearchBtn'),
+    clearBtn:      document.getElementById('esClearBtn'),
+    typePill:      document.getElementById('esTypePill'),
+    grid:          document.getElementById('esGrid'),
+    loading:       document.getElementById('esLoading'),
+    noResults:     document.getElementById('esNoResults'),
+    modalBackdrop: document.getElementById('esModalBackdrop'),
+    modalTitle:    document.getElementById('esModalTitle'),
+    modalMedia:    document.getElementById('esModalMedia'),
+    modalFields:   document.getElementById('esModalFields'),
+    modalInsert:   document.getElementById('esModalInsert'),
+    modalOpen:     document.getElementById('esModalOpen'),
+    modalClose:    document.getElementById('esModalClose')
+};
+
+// ── Helpers ────────────────────────────────────────────
+function esc(text) {
+    const map = { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;' };
+    return String(text || '').replace(/[&<>"']/g, m => map[m]);
+}
+
+function formatNum(n) {
+    const v = parseInt(n);
+    if (isNaN(v)) return '';
+    if (v >= 1e6) return (v/1e6).toFixed(1) + 'M';
+    if (v >= 1000) return (v/1000).toFixed(1) + 'K';
+    return v.toString();
+}
+
+function apiCall(endpoint) {
+    const path = `/panels/external-sources/api/${endpoint}`;
+    return PanelAPI.apiCallJson(path, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json', 'apikey': state.apiKey }
+    });
+}
+
+// ── PostMessage setup ──────────────────────────────────
+function setupPostMessage() {
+    window.addEventListener('message', (e) => {
+        if (e.origin !== state.neonAppUrl && e.origin !== window.parent.origin) return;
+        const d = e.data;
+        if (!d) return;
+
+        // Context handshake
+        if (d.key === 'getInfo') { state.neonContext = d.info; return; }
+
+        // Insert operation result from Neon
+        if (d.type === 'neonContext' && d.key === 'insertObject' && d.outcome === 'ok') {
+            onInsertSuccess();
+        }
+    });
+    window.parent.postMessage({ type: 'panel-ready', info: { op: 'getInfo' } }, window.parent.origin);
+}
+
+// ── Source / type switching ────────────────────────────
+function switchSource(source) {
+    state.currentSource = source;
+    document.querySelectorAll('[data-source]').forEach(b =>
+        b.classList.toggle('active', b.dataset.source === source));
+
+    const videoOnly = source === 'youtube' || source === 'dailymotion';
+    els.typePill.style.display = videoOnly ? 'none' : '';
+    if (videoOnly) state.currentType = 'videos';
+
+    loadDefaultAssets();
+}
+
+function switchType(type) {
+    state.currentType = type;
+    document.querySelectorAll('[data-type]').forEach(b =>
+        b.classList.toggle('active', b.dataset.type === type));
+    loadDefaultAssets();
+}
+
+// ── Search ─────────────────────────────────────────────
+function loadDefaultAssets() { searchAssets(''); }
+
+function performSearch() {
+    state.currentQuery = els.searchInput.value.trim();
+    searchAssets(state.currentQuery);
+}
+
+function clearSearch() {
+    els.searchInput.value = '';
+    state.currentQuery = '';
+    loadDefaultAssets();
+}
+
+async function searchAssets(query) {
+    if (state.isLoading) return;
+    setLoading(true);
+    els.grid.innerHTML = '';
+    els.noResults.style.display = 'none';
+
+    try {
+        let assets = [];
+        if (state.currentSource === 'pexels')          assets = await fetchPexels(query);
+        else if (state.currentSource === 'youtube')    assets = await fetchYouTube(query);
+        else if (state.currentSource === 'dailymotion') assets = await fetchDailyMotion(query);
+
+        if (!assets.length) { els.noResults.style.display = 'flex'; }
+        else { els.grid.innerHTML = assets.map(renderCard).join(''); }
+    } catch (err) {
+        console.error('Search error:', err);
+        els.noResults.style.display = 'flex';
+    } finally {
+        setLoading(false);
+    }
+}
+
+// ── Source fetchers ────────────────────────────────────
+async function fetchPexels(query) {
+    const isPhoto = state.currentType === 'photos';
+    const apiPath = isPhoto
+        ? (query ? `v1/search` : `v1/curated`)
+        : (query ? `videos/search` : `videos/popular`);
+    const url = query
+        ? `pexels/${apiPath}?query=${encodeURIComponent(query)}&per_page=20`
+        : `pexels/${apiPath}?per_page=20`;
+    const data = await apiCall(url);
+    return isPhoto ? (data.photos || []) : (data.videos || []);
+}
+
+async function fetchYouTube(query) {
+    let params, endpoint;
+    if (query) {
+        endpoint = 'search';
+        params = `part=snippet&type=video&maxResults=20&q=${encodeURIComponent(query)}`;
+    } else {
+        endpoint = 'videos';
+        params = 'part=snippet,contentDetails,statistics&chart=mostPopular&maxResults=20';
+    }
+    const data = await apiCall(`youtube/${endpoint}?${params}`);
+    return (data.items || []).map(item => ({
+        id: item.id?.videoId || item.id,
+        title: item.snippet.title,
+        thumbnail_url: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.medium?.url,
+        channel: item.snippet.channelTitle,
+        publishedAt: item.snippet.publishedAt,
+        videoUrl: `https://www.youtube.com/watch?v=${item.id?.videoId || item.id}`,
+        embedUrl: `https://www.youtube.com/embed/${item.id?.videoId || item.id}`,
+        viewCount: item.statistics?.viewCount,
+        _source: 'youtube'
+    }));
+}
+
+async function fetchDailyMotion(query) {
+    let params = 'fields=id,title,thumbnail_720_url,thumbnail_url,duration,created_time,views_total,owner.screenname,url&limit=20';
+    params += query ? `&search=${encodeURIComponent(query)}` : '&featured=true';
+    const data = await apiCall(`dailymotion/videos?${params}`);
+    return (data.list || []).map(item => ({
+        id: item.id,
+        title: item.title,
+        thumbnail_url: item.thumbnail_720_url || item.thumbnail_url,
+        channel: item['owner.screenname'] || 'Unknown',
+        publishedAt: new Date(item.created_time * 1000).toISOString(),
+        videoUrl: item.url || `https://www.dailymotion.com/video/${item.id}`,
+        embedUrl: `https://www.dailymotion.com/embed/video/${item.id}`,
+        viewCount: item.views_total,
+        _source: 'dailymotion'
+    }));
+}
+
+// ── Asset helpers ──────────────────────────────────────
+function getThumb(asset, size = 'medium') {
+    if (state.currentSource === 'pexels') {
+        return state.currentType === 'photos' ? (asset.src?.[size] || asset.src?.medium) : asset.image;
+    }
+    return asset.thumbnail_url || '';
+}
+
+function getTitle(asset) {
+    if (state.currentSource === 'pexels') {
+        return asset.alt || `By ${asset.photographer || asset.user?.name || 'Unknown'}`;
+    }
+    return asset.title || 'Untitled';
+}
+
+function getMeta(asset) {
+    if (state.currentSource === 'pexels') {
+        return `By ${asset.photographer || asset.user?.name || 'Unknown'}`;
+    }
+    const views = asset.viewCount ? ` · ${formatNum(asset.viewCount)} views` : '';
+    return `${asset.channel || ''}${views}`;
+}
+
+function getInsertUrl(asset) {
+    if (state.currentSource === 'pexels') {
+        if (state.currentType === 'photos') return getThumb(asset, 'original');
+        const sorted = [...(asset.video_files || [])].sort((a,b) =>
+            ((b.width||0)*(b.height||0)) - ((a.width||0)*(a.height||0)));
+        return sorted[0]?.link || null;
+    }
+    return asset.videoUrl || asset.embedUrl || null;
+}
+
+// ── Card rendering ─────────────────────────────────────
+function renderCard(asset) {
+    const isVideo = state.currentType === 'videos';
+    const thumb = esc(getThumb(asset));
+    const title = esc(getTitle(asset));
+    const meta  = esc(getMeta(asset));
+    const data  = esc(JSON.stringify(asset));
+
+    const videoOverlay = isVideo ? `
+        <div class="es-play-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="5 3 19 12 5 21 5 3"/>
+            </svg>
+        </div>` : '';
+
+    const typeBadge = `
+        <div class="es-type-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                ${isVideo
+                    ? '<polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/>'
+                    : '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>'}
+            </svg>
+        </div>`;
+
+    return `
+        <div class="es-card" data-asset="${data}">
+            <div class="es-thumb-wrap">
+                <img class="es-thumb" src="${thumb}" alt="${title}" loading="lazy">
+                ${videoOverlay}
+                ${typeBadge}
+            </div>
+            <div class="es-card-body">
+                <div class="es-card-title" title="${title}">${title}</div>
+                <div class="es-card-meta">${meta}</div>
+            </div>
+            <div class="es-card-actions">
+                <button class="es-card-btn es-card-btn-insert" onclick="cardInsert(this)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                    </svg>
+                    <span class="es-card-btn-label">Insert</span>
+                </button>
+                <button class="es-card-btn es-card-btn-preview" title="Preview" onclick="cardPreview(this)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                    </svg>
+                </button>
+            </div>
+        </div>`;
+}
+
+// ── Insert loading state ───────────────────────────────
+// Tracks the currently pending insert button so we can reset it
+let _insertPendingBtn = null;
+let _insertTimeoutId  = null;
+const INSERT_TIMEOUT_MS = 30000;
+
+function setInsertLoading(btn, loading) {
+    if (loading) {
+        _insertPendingBtn = btn;
+        btn.disabled = true;
+        btn.dataset.originalHtml = btn.innerHTML;
+        btn.innerHTML = `
+            <span class="es-btn-spinner"></span>
+        `;
+        btn.classList.add('es-card-btn-loading');
+    } else {
+        if (btn) {
+            btn.disabled = false;
+            if (btn.dataset.originalHtml) btn.innerHTML = btn.dataset.originalHtml;
+            btn.classList.remove('es-card-btn-loading', 'es-card-btn-error');
+        }
+        _insertPendingBtn = null;
+        if (_insertTimeoutId) { clearTimeout(_insertTimeoutId); _insertTimeoutId = null; }
+    }
+}
+
+function onInsertSuccess() {
+    // Flash green briefly then reset
+    if (_insertPendingBtn) {
+        _insertPendingBtn.classList.remove('es-card-btn-loading');
+        _insertPendingBtn.classList.add('es-card-btn-success');
+        _insertPendingBtn.innerHTML = `
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+            </svg>`;
+        const btn = _insertPendingBtn;
+        _insertPendingBtn = null;
+        if (_insertTimeoutId) { clearTimeout(_insertTimeoutId); _insertTimeoutId = null; }
+        setTimeout(() => setInsertLoading(btn, false), 1500);
+    }
+}
+
+function onInsertError() {
+    if (_insertPendingBtn) {
+        const btn = _insertPendingBtn;
+        btn.disabled = false;
+        btn.classList.remove('es-card-btn-loading');
+        btn.classList.add('es-card-btn-error');
+        btn.innerHTML = `
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>`;
+        _insertPendingBtn = null;
+        if (_insertTimeoutId) { clearTimeout(_insertTimeoutId); _insertTimeoutId = null; }
+        // Restore after 2s so the user can retry
+        setTimeout(() => setInsertLoading(btn, false), 2000);
+    }
+}
+
+// ── Card actions ───────────────────────────────────────
+function cardInsert(btn) {
+    if (btn.disabled) return;
+    const asset = JSON.parse(btn.closest('.es-card').dataset.asset);
+    doInsert(asset, btn);
+}
+
+function cardPreview(btn) {
+    const asset = JSON.parse(btn.closest('.es-card').dataset.asset);
+    openModal(asset);
+}
+
+function doInsert(asset, btn) {
+    const url = getInsertUrl(asset);
+    if (!url) return console.error('No URL for asset:', asset);
+
+    if (btn) {
+        setInsertLoading(btn, true);
+        // Safety timeout — if no response arrives, reset after 30s
+        _insertTimeoutId = setTimeout(() => onInsertError(), INSERT_TIMEOUT_MS);
+    }
+
+    window.parent.postMessage({
+        type: 'insert-object',
+        info: { op: 'uploadAndInsertAsset', url, targetWorkfolder: state.neonContext?.workfolderId || null }
+    }, window.parent.origin);
+}
+
+// ── Modal ──────────────────────────────────────────────
+function openModal(asset) {
+    state.modalAsset = asset;
+    const isVideo = state.currentType === 'videos';
+    const title = getTitle(asset);
+
+    els.modalTitle.textContent = title;
+
+    // Media
+    if (isVideo && (state.currentSource === 'youtube' || state.currentSource === 'dailymotion')) {
+        els.modalMedia.innerHTML = `<iframe src="${esc(asset.embedUrl)}" allowfullscreen></iframe>`;
+    } else if (isVideo && state.currentSource === 'pexels') {
+        const src = asset.video_files?.[1]?.link || getInsertUrl(asset) || '';
+        els.modalMedia.innerHTML = `<video poster="${esc(getThumb(asset,'large'))}" controls><source src="${esc(src)}" type="video/mp4"></video>`;
+    } else {
+        els.modalMedia.innerHTML = `<img src="${esc(getThumb(asset,'large'))}" alt="${esc(title)}">`;
+    }
+
+    // Fields
+    const rows = [
+        ['Source', state.currentSource],
+        ['Type', state.currentType.slice(0,-1)]
+    ];
+    if (state.currentSource === 'pexels') {
+        rows.push(['By', asset.photographer || asset.user?.name || 'Unknown']);
+        if (asset.width && asset.height) rows.push(['Size', `${asset.width} × ${asset.height}`]);
+    } else {
+        if (asset.channel) rows.push(['Channel', asset.channel]);
+        if (asset.viewCount) rows.push(['Views', formatNum(asset.viewCount)]);
+        if (asset.publishedAt) rows.push(['Published', new Date(asset.publishedAt).toLocaleDateString()]);
+    }
+    els.modalFields.innerHTML = rows.map(([k,v]) =>
+        `<div class="es-modal-field">
+            <span class="es-modal-field-label">${esc(k)}</span>
+            <span class="es-modal-field-value">${esc(v)}</span>
+        </div>`).join('');
+
+    // Open URL for "View original"
+    const origUrl = state.currentSource === 'pexels'
+        ? getThumb(asset, 'original')
+        : (asset.videoUrl || '');
+    els.modalOpen.dataset.url = origUrl;
+
+    els.modalBackdrop.classList.add('open');
+}
+
+function closeModal() {
+    els.modalBackdrop.classList.remove('open');
+    els.modalMedia.innerHTML = '';
+    state.modalAsset = null;
+}
+
+// ── UI helpers ─────────────────────────────────────────
+function setLoading(on) {
+    state.isLoading = on;
+    els.loading.style.display = on ? 'flex' : 'none';
+}
+
+// ── Event wiring ───────────────────────────────────────
+function setupEvents() {
+    document.querySelectorAll('[data-source]').forEach(b =>
+        b.addEventListener('click', () => switchSource(b.dataset.source)));
+
+    document.querySelectorAll('[data-type]').forEach(b =>
+        b.addEventListener('click', () => switchType(b.dataset.type)));
+
+    els.searchBtn.addEventListener('click', performSearch);
+    els.searchInput.addEventListener('keypress', e => { if (e.key === 'Enter') performSearch(); });
+    els.clearBtn.addEventListener('click', clearSearch);
+
+    els.modalClose.addEventListener('click', closeModal);
+    els.modalBackdrop.addEventListener('click', e => { if (e.target === els.modalBackdrop) closeModal(); });
+
+    els.modalInsert.addEventListener('click', () => { if (state.modalAsset) doInsert(state.modalAsset, els.modalInsert); });
+    els.modalOpen.addEventListener('click', () => {
+        const url = els.modalOpen.dataset.url;
+        if (url) window.open(url, '_blank');
+    });
+}
+
+// ── Expose globals needed by inline onclick ────────────
+window.cardInsert  = cardInsert;
+window.cardPreview = cardPreview;
+
+// ── Init ───────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    setupPostMessage();
+    setupEvents();
+    loadDefaultAssets();
+});
+</script>
+</body>
+</html>

@@ -801,6 +801,22 @@ async function socialMediaApiProxyHandler(request, reply) {
   }
 }
 
+function externalSourcesPanelV2Handler(request, reply) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) return reply.status(401).send({ error: 'Unauthorized' });
+
+  return reply.view('/src/panels/external-sources-panel-v2.hbs', {
+    seo: seo,
+    apiKey: auth.apikey,
+    neonAppUrl: process.env.NEON_APP_URL,
+    pexelsApiKey: process.env.PEXELS_APIKEY,
+    youtubeApiKey: process.env.YOUTUBE_APIKEY,
+    dailymotionApiKey: process.env.DAILYMOTION_APIKEY,
+    dailymotionApiSecret: process.env.DAILYMOTION_APISECRET,
+    integrationsApiKey: auth.apikey
+  });
+}
+
 function familyAuditPanelV2Handler(request, reply) {
   const auth = authenticate(request, reply);
   if (!auth.authenticated) return reply.status(401).send({ error: 'Unauthorized' });
@@ -842,6 +858,7 @@ module.exports = {
   trelloPanelHandler,
   trelloApiProxyHandler,
   externalSourcesPanelHandler,
+  externalSourcesPanelV2Handler,
   pexelsApiProxyHandler,
   youtubeApiProxyHandler,
   dailymotionApiProxyHandler,
