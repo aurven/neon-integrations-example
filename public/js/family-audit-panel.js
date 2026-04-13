@@ -210,7 +210,7 @@ const EVENT_LABELS = {
     'PUT /contents/story/{id}':                               { label: 'Saved',              icon: 'fa-solid fa-floppy-disk',      color: '#2847E2' },
     'PUT /publication/publish/{id}':                          { label: 'Published',          icon: 'fa-solid fa-rocket',           color: '#16a34a' },
     'POST /contents/nodes/{id}/promote/{viewStatus}':         { label: 'Published',          icon: 'fa-solid fa-tower-broadcast',  color: '#16a34a' },
-    'POST /contents/nodes/{id}/livepromote':                  { label: 'Published',          icon: 'fa-solid fa-tower-broadcast',  color: '#16a34a' },
+    'POST /contents/nodes/{id}/livepromote':                  { label: 'Published LIVE',     icon: 'fa-solid fa-tower-broadcast',  color: '#16a34a' },
     'DELETE /contents/nodes/{id}/promote/{viewStatus}':       { label: 'Unpublished from',   icon: 'fa-solid fa-circle-xmark',     color: '#6B7280' },
     'POST /workflow/instance/task/nextStepAssignment':        { label: 'Workflow change',    icon: 'fa-solid fa-code-branch',      color: '#0891b2' },
     '/psn/<notify>/test':                                     { label: 'Notification sent',  icon: 'fa-solid fa-satellite-dish',   color: '#d97706' },
@@ -242,12 +242,32 @@ function getEventMeta(item) {
     return base;
 }
 
+// ===== FILTER CONFIG =====
+// Maps each resourceCall to a filter category key
+const RESOURCE_CALL_CATEGORY = {
+    'PUT /contents/nodes/lock':                               'lock',
+    'PUT /contents/nodes/unlock':                             'lock',
+    'PUT /contents/story/{id}':                               'save',
+    'POST /contents/story':                                   'create',
+    'PUT /publication/publish/{id}':                          'publish',
+    'POST /contents/nodes/{id}/promote/{viewStatus}':         'publish',
+    'POST /contents/nodes/{id}/livepromote':                  'publish',
+    'DELETE /contents/nodes/{id}/promote/{viewStatus}':       'unpublish',
+    'POST /workflow/instance/task/nextStepAssignment':        'workflow',
+    '/psn/<notify>/test':                                     'notification',
+};
+
+function getEventCategory(item) {
+    return RESOURCE_CALL_CATEGORY[item.resourceCall] || 'other';
+}
+
 // ===== STATE =====
 const IS_DEMO = new URLSearchParams(window.location.search).get('demo') === 'true';
 const state = {
     familyRef: new URLSearchParams(window.location.search).get('familyRef') || null,
     view: 'standard',
-    events: []
+    events: [],
+    activeFilters: new Set(['lock', 'save', 'create', 'publish', 'unpublish', 'workflow', 'notification', 'other'])
 };
 
 // ===== UTILITIES =====
@@ -392,10 +412,15 @@ function renderTimeline() {
         return;
     }
 
-    // Sort newest-first
-    const sorted = [...state.events].sort((a, b) =>
-        new Date(b.timestamp) - new Date(a.timestamp)
-    );
+    // Sort newest-first, then apply active filters
+    const sorted = [...state.events]
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+        .filter(item => state.activeFilters.has(getEventCategory(item)));
+
+    if (!sorted.length) {
+        renderEmpty('No events match the current filters.');
+        return;
+    }
 
     // Group by date for separators
     let html = '<div class="famaud-timeline">';
@@ -471,6 +496,23 @@ function initHeader() {
     });
 }
 
+// ===== FILTER BUTTONS =====
+function initFilters() {
+    document.querySelectorAll('.famaud-filter-btn[data-filter]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const key = btn.dataset.filter;
+            if (state.activeFilters.has(key)) {
+                state.activeFilters.delete(key);
+                btn.classList.remove('active');
+            } else {
+                state.activeFilters.add(key);
+                btn.classList.add('active');
+            }
+            renderTimeline();
+        });
+    });
+}
+
 // ===== POSTMESSAGE =====
 function setupPostMessage() {
     window.addEventListener('message', (event) => {
@@ -492,6 +534,7 @@ function setupPostMessage() {
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', async () => {
     initHeader();
+    initFilters();
     setupPostMessage();
 
     // Pre-warm config cache before first render so workflow colors and user

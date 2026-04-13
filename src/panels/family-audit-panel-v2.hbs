@@ -18,7 +18,29 @@
 <body>
 <div id="famaud-root">
     <header class="famaud-header">
-        <h1 class="famaud-title">Audit Timeline</h1>
+        <div class="famaud-filter-row" id="famaud-filter-row">
+            <button class="famaud-filter-btn active" data-filter="lock" title="Lock / Unlock">
+                <i class="fa-solid fa-lock"></i>
+            </button>
+            <button class="famaud-filter-btn active" data-filter="save" title="Save">
+                <i class="fa-solid fa-floppy-disk"></i>
+            </button>
+            <button class="famaud-filter-btn active" data-filter="create" title="Create">
+                <i class="fa-solid fa-file-circle-plus"></i>
+            </button>
+            <button class="famaud-filter-btn active" data-filter="publish" title="Publish">
+                <i class="fa-solid fa-tower-broadcast"></i>
+            </button>
+            <button class="famaud-filter-btn active" data-filter="unpublish" title="Unpublish">
+                <i class="fa-solid fa-circle-xmark"></i>
+            </button>
+            <button class="famaud-filter-btn active" data-filter="workflow" title="Workflow">
+                <i class="fa-solid fa-code-branch"></i>
+            </button>
+            <button class="famaud-filter-btn active" data-filter="notification" title="Notification">
+                <i class="fa-solid fa-satellite-dish"></i>
+            </button>
+        </div>
         <div class="famaud-view-pill">
             <button class="famaud-view-toggle active" data-view="standard">Standard</button>
             <button class="famaud-view-toggle" data-view="advanced">Advanced</button>
