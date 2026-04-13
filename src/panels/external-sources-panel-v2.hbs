@@ -181,8 +181,9 @@ function setupPostMessage() {
         if (d.key === 'getInfo') { state.neonContext = d.info; return; }
 
         // Insert operation result from Neon
-        if (d.type === 'neonContext' && d.key === 'insertObject' && d.outcome === 'ok') {
-            onInsertSuccess();
+        if (d.type === 'neonContext' && d.key === 'uploadAndInsertAsset') {
+            if (d.success === true) onInsertSuccess();
+            else onInsertError();
         }
     });
     window.parent.postMessage({ type: 'panel-ready', info: { op: 'getInfo' } }, window.parent.origin);
