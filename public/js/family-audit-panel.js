@@ -208,6 +208,7 @@ const EVENT_LABELS = {
     'PUT /contents/nodes/lock':                               { label: 'Locked',             icon: 'fa-solid fa-lock',             color: '#6B7280' },
     'PUT /contents/nodes/unlock':                             { label: 'Unlocked',           icon: 'fa-solid fa-lock-open',        color: '#6B7280' },
     'PUT /contents/story/{id}':                               { label: 'Saved',              icon: 'fa-solid fa-floppy-disk',      color: '#2847E2' },
+    'POST /contents/story/{id}/contentitem/{contentItemId}':  { label: 'Changed from Site',  icon: 'fa-solid fa-edit',             color: '#2847E2' },
     'PUT /publication/publish/{id}':                          { label: 'Published',          icon: 'fa-solid fa-rocket',           color: '#16a34a' },
     'POST /contents/nodes/{id}/promote/{viewStatus}':         { label: 'Published',          icon: 'fa-solid fa-tower-broadcast',  color: '#16a34a' },
     'POST /contents/nodes/{id}/livepromote':                  { label: 'Published LIVE',     icon: 'fa-solid fa-tower-broadcast',  color: '#16a34a' },
