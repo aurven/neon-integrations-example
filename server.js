@@ -299,7 +299,7 @@ fastify.register(async function (fastify) {
     handler: panelHandlers.socialMediaApiProxyHandler
   });
 });
-fastify.get("/panels/family-audit", panelHandlers.familyAuditPanelHandler);
+fastify.get("/panels/family-audit", panelHandlers.familyAuditPanelV2Handler);
 fastify.register(async function (fastify) {
   fastify.route({
     method: ['GET'],

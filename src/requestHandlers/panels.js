@@ -801,11 +801,11 @@ async function socialMediaApiProxyHandler(request, reply) {
   }
 }
 
-function familyAuditPanelHandler(request, reply) {
+function familyAuditPanelV2Handler(request, reply) {
   const auth = authenticate(request, reply);
   if (!auth.authenticated) return reply.status(401).send({ error: 'Unauthorized' });
 
-  return reply.view('/src/panels/family-audit-panel.hbs', {
+  return reply.view('/src/panels/family-audit-panel-v2.hbs', {
     seo: seo,
     apiKey: auth.apikey,
     neonAppUrl: process.env.NEON_APP_URL
@@ -855,6 +855,6 @@ module.exports = {
   smartOctoPanelHandler,
   socialMediaPanelHandler,
   socialMediaApiProxyHandler,
-  familyAuditPanelHandler,
+  familyAuditPanelV2Handler,
   familyAuditApiProxyHandler
 };

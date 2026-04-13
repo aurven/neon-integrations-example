@@ -286,7 +286,7 @@ function formatRelTime(iso) {
     if (hr < 24) return `${hr} hour${hr !== 1 ? 's' : ''} ago`;
     const days = Math.floor(hr / 24);
     if (days < 30) return `${days} day${days !== 1 ? 's' : ''} ago`;
-    return formatAbsTime(iso);
+    return null;
 }
 
 function formatAbsTime(iso) {
@@ -320,13 +320,11 @@ function renderEventHtml(item) {
         ? `<img class="famaud-avatar famaud-avatar-img" src="${esc(profilePicUrl)}" alt="${esc(actorName)}" loading="lazy">`
         : `<span class="famaud-avatar" style="background:${avatarColor}">${esc(initials)}</span>`;
 
-    // Workflow badges: use configured color if available, else default purple
+    // Workflow badges: grey chip with a small colored dot
     const workflowBadges = (item.workflows || []).map(w => {
         const wfColor = NeonConfig.getWorkflowColor(w);
-        const style = wfColor
-            ? `style="background:${wfColor}22; color:${wfColor}; border: 1px solid ${wfColor}55;"`
-            : '';
-        return `<span class="famaud-badge famaud-badge-workflow" ${style}>${esc(w)}</span>`;
+        const dotStyle = wfColor ? `style="background:${wfColor}"` : '';
+        return `<span class="famaud-badge famaud-badge-workflow"><span class="famaud-badge-workflow-dot" ${dotStyle}></span>${esc(w)}</span>`;
     }).join('');
 
     let advancedHtml = '';
@@ -367,11 +365,15 @@ function renderEventHtml(item) {
                     <div class="famaud-card-title-row">
                         <span class="famaud-label">${esc(meta.label)}</span>
                         ${!ok ? `<span class="famaud-badge famaud-badge-err">${item.responseStatusCode}</span>` : ''}
-                        ${workflowBadges}
                     </div>
-                    <span class="famaud-time-chip" title="${esc(formatAbsTime(item.timestamp))}">${esc(formatRelTime(item.timestamp))}</span>
+                    <span class="famaud-time-chip">
+                        ${formatRelTime(item.timestamp) ? `<span class="famaud-time-rel">${esc(formatRelTime(item.timestamp))}</span>` : ''}
+                        <span class="famaud-time-abs">${esc(formatAbsTime(item.timestamp))}</span>
+                    </span>
                 </div>
                 <div class="famaud-card-actor">
+                    ${workflowBadges}
+                    <span class="famaud-card-actor-spacer"></span>
                     ${avatarHtml}
                     <span class="famaud-actor-name">${esc(actorName)}</span>
                 </div>
