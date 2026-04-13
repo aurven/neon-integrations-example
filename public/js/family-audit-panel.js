@@ -133,11 +133,13 @@ const NeonConfig = (() => {
 
     const MOCK_WORKFLOWS = {
         workflows: [
-            { name: 'Story/Created',   color: '#7c3aed' },
-            { name: 'Story/Edit',      color: '#0891b2' },
-            { name: 'Story/Ready',     color: '#d97706' },
-            { name: 'Story/Published', color: '#16a34a' },
-            { name: 'Story/Archived',  color: '#6B7280' }
+            { name: 'Story/Created',        color: '#ffd670' },
+            { name: 'Story/Imported',       color: '#83c5be' },
+            { name: 'Story/Revision',       color: '#ff70a6' },
+            { name: 'Story/AutoRevision',   color: '#006d77' },
+            { name: 'Story/Edit',           color: '#ff9770' },
+            { name: 'Story/Ready',          color: '#70d6ff' },
+            { name: 'Story/Archived',       color: '#6B7280' }
         ]
     };
 
@@ -224,14 +226,6 @@ function extractViewStatus(requestCall) {
 }
 
 function getEventMeta(item) {
-    // Special case: unlock with UNDO mode = discard (restored to last save)
-    if (item.resourceCall === 'PUT /contents/nodes/unlock') {
-        const mode = (item.requestQueryParameters?.unlockMode || [])[0];
-        if (mode === 'UNDO') {
-            return { label: 'Unlocked (discarded changes)', icon: 'fa-solid fa-rotate-left', color: '#6B7280' };
-        }
-    }
-
     const base = EVENT_LABELS[item.resourceCall];
     if (!base) return { label: item.resourceCall || 'Unknown', icon: 'fa-solid fa-gear', color: '#9ca3af' };
 

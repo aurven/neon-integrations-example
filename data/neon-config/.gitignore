@@ -1,0 +1,5 @@
+# Ignore all cached taxonomy JSON files
+*.json
+
+# Keep the directory structure
+!.gitignore
