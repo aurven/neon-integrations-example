@@ -44,8 +44,8 @@ body {
     justify-content: space-between;
     padding: 0 1rem;
     height: 3rem;
-    /* background: var(--famaud-surface);
-    border-bottom: 2px solid var(--famaud-border); */
+    /* background: var(--famaud-surface); */
+    border-bottom: 1px solid var(--famaud-border);
     flex-shrink: 0;
     z-index: 1;
 }
