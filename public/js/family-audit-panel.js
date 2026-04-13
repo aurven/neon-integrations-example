@@ -209,8 +209,8 @@ const EVENT_LABELS = {
     'PUT /contents/nodes/unlock':                             { label: 'Unlocked',           icon: 'fa-solid fa-lock-open',        color: '#6B7280' },
     'PUT /contents/story/{id}':                               { label: 'Saved',              icon: 'fa-solid fa-floppy-disk',      color: '#2847E2' },
     'PUT /publication/publish/{id}':                          { label: 'Published',          icon: 'fa-solid fa-rocket',           color: '#16a34a' },
-    'POST /contents/nodes/{id}/promote/{viewStatus}':         { label: 'Published on',       icon: 'fa-solid fa-tower-broadcast',  color: '#16a34a' },
-    'DELETE /contents/nodes/{id}/promote/{viewStatus}':       { label: 'Unpublished from',   icon: 'fa-solid fa-circle-xmark',     color: '#dc2626' },
+    'POST /contents/nodes/{id}/promote/{viewStatus}':         { label: 'Published',          icon: 'fa-solid fa-tower-broadcast',  color: '#16a34a' },
+    'DELETE /contents/nodes/{id}/promote/{viewStatus}':       { label: 'Unpublished from',   icon: 'fa-solid fa-circle-xmark',     color: '#6B7280' },
     'POST /workflow/instance/task/nextStepAssignment':        { label: 'Workflow change',    icon: 'fa-solid fa-code-branch',      color: '#0891b2' },
     '/psn/<notify>/test':                                     { label: 'Notification sent',  icon: 'fa-solid fa-satellite-dish',   color: '#d97706' },
 };
