@@ -1,0 +1,1071 @@
+{
+    "results": [
+        {
+            "@type": "WebEventItem",
+            "item": {
+                "type": "authoringmetric",
+                "requestId": "a2f78b2e-ab5a-4deb-97ae-5e86cf1117ab",
+                "timestamp": "2026-05-07T08:41:30.529Z",
+                "responseStatusCode": 200,
+                "requestCall": "PUT /contents/nodes/lock",
+                "resourceCall": "PUT /contents/nodes/lock",
+                "requestQueryParameters": {},
+                "requestHostName": "neon-app-demo.eks-dev.dev.eidosmedia.io",
+                "localHostName": "demo-contents-55b968fcc9-k4hlh",
+                "serviceId": "contents",
+                "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36",
+                "userName": "Aureliano",
+                "scope": "NeonApp",
+                "userId": "62038d84-f161-3579-a5f1-7aba053f999a",
+                "indexRetry": 0,
+                "durationMs": 70,
+                "workerToServiceMs": 5,
+                "parallelOnStart": 1,
+                "updatedCount": 1,
+                "removedCount": 0,
+                "involvedRefs": [
+                    "02a4-207ef8addede-a4c23b1126bd-1000"
+                ],
+                "externalRefs": [],
+                "types": [
+                    "article"
+                ],
+                "workflows": [
+                    "Story/Ready"
+                ],
+                "workFolderPaths": [
+                    "/Convergent/Culture"
+                ]
+            },
+            "score": 0,
+            "sortValues": {
+                "timestamp": "1778143290529"
+            }
+        },
+        {
+            "@type": "WebEventItem",
+            "item": {
+                "type": "authoringmetric",
+                "requestId": "9c58e250-1d95-4fad-a438-f199a10530da",
+                "timestamp": "2026-05-07T08:40:52.525Z",
+                "responseStatusCode": 200,
+                "requestCall": "POST /contents/rooms/02a4-207ef8addede-a4c23b1126bd-1000/story",
+                "resourceCall": "POST /contents/rooms/{roomId}/story",
+                "requestQueryString": "saveMode=RELEASE_MAJOR",
+                "requestQueryParameters": {
+                    "saveMode": [
+                        "RELEASE_MAJOR"
+                    ]
+                },
+                "requestHostName": "demo-contents.demo-neon.svc.cluster.local",
+                "localHostName": "demo-contents-55b968fcc9-k4hlh",
+                "serviceId": "contents",
+                "userAgent": "axios/1.13.5",
+                "userName": "editor-persister",
+                "userId": "editor-persister",
+                "indexRetry": 0,
+                "durationMs": 3032,
+                "workerToServiceMs": 1,
+                "parallelOnStart": 1,
+                "updatedCount": 1,
+                "removedCount": 0,
+                "involvedRefs": [
+                    "02a4-207ef8addede-a4c23b1126bd-1000"
+                ],
+                "externalRefs": [],
+                "types": [
+                    "article"
+                ],
+                "workflows": [
+                    "Story/Ready"
+                ],
+                "workFolderPaths": [
+                    "/Convergent/Culture"
+                ]
+            },
+            "score": 0,
+            "sortValues": {
+                "timestamp": "1778143252525"
+            }
+        },
+        {
+            "@type": "WebEventItem",
+            "item": {
+                "type": "authoringmetric",
+                "requestId": "5e73c9a3-20cd-409e-ad1f-39bbf4cb1368",
+                "timestamp": "2026-05-07T08:40:50.998Z",
+                "responseStatusCode": 200,
+                "requestCall": "DELETE /contents/rooms/02a4-207ef8addede-a4c23b1126bd-1000/join/NeonApp-0s3nackcsxe",
+                "resourceCall": "DELETE /contents/rooms/{roomId}/join/{participantId}",
+                "requestQueryParameters": {},
+                "requestHostName": "neon-app-demo.eks-dev.dev.eidosmedia.io",
+                "localHostName": "demo-contents-55b968fcc9-k4hlh",
+                "serviceId": "contents",
+                "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36",
+                "userName": "Aureliano",
+                "scope": "NeonApp",
+                "userId": "62038d84-f161-3579-a5f1-7aba053f999a",
+                "indexRetry": 0,
+                "durationMs": 36,
+                "workerToServiceMs": 10,
+                "parallelOnStart": 1,
+                "updatedCount": 0,
+                "removedCount": 0,
+                "involvedRefs": [
+                    "02a4-207ef8addede-a4c23b1126bd-1000"
+                ]
+            },
+            "score": 0,
+            "sortValues": {
+                "timestamp": "1778143250998"
+            }
+        },
+        {
+            "@type": "WebEventItem",
+            "item": {
+                "type": "authoringmetric",
+                "requestId": "0515afb6-518c-41c2-8654-050ca0232b3a",
+                "timestamp": "2026-05-07T08:39:38.725Z",
+                "responseStatusCode": 200,
+                "requestCall": "POST /contents/rooms/02a4-207ef8addede-a4c23b1126bd-1000/join/NeonApp-0s3nackcsxe",
+                "resourceCall": "POST /contents/rooms/{roomId}/join/{participantId}",
+                "requestQueryParameters": {},
+                "requestHostName": "neon-app-demo.eks-dev.dev.eidosmedia.io",
+                "localHostName": "demo-contents-55b968fcc9-k4hlh",
+                "serviceId": "contents",
+                "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36",
+                "userName": "Aureliano",
+                "scope": "NeonApp",
+                "userId": "62038d84-f161-3579-a5f1-7aba053f999a",
+                "indexRetry": 0,
+                "durationMs": 682,
+                "workerToServiceMs": 4,
+                "parallelOnStart": 1,
+                "updatedCount": 1,
+                "removedCount": 0,
+                "involvedRefs": [
+                    "02a4-207ef8addede-a4c23b1126bd-1000"
+                ],
+                "externalRefs": [],
+                "types": [
+                    "article"
+                ],
+                "workflows": [
+                    "Story/Ready"
+                ],
+                "workFolderPaths": [
+                    "/Convergent/Culture"
+                ]
+            },
+            "score": 0,
+            "sortValues": {
+                "timestamp": "1778143178725"
+            }
+        },
+        {
+            "@type": "WebEventItem",
+            "item": {
+                "type": "authoringmetric",
+                "requestId": "6a84b269-83d9-41ae-bd29-8a4957700573",
+                "timestamp": "2026-04-28T14:18:16.196Z",
+                "responseStatusCode": 200,
+                "requestCall": "PUT /contents/nodes/unlock",
+                "resourceCall": "PUT /contents/nodes/unlock",
+                "requestQueryString": "unlockMode=UNDO",
+                "requestQueryParameters": {
+                    "unlockMode": [
+                        "UNDO"
+                    ]
+                },
+                "requestHostName": "neon-app-demo.eks-dev.dev.eidosmedia.io",
+                "localHostName": "demo-contents-6bbbcf8d5d-ljdxp",
+                "serviceId": "contents",
+                "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+                "userName": "Gita",
+                "scope": "NeonApp",
+                "userId": "f52f7b97-277f-34b7-9d30-3fdf19d73aa9",
+                "indexRetry": 0,
+                "durationMs": 78,
+                "workerToServiceMs": 14,
+                "parallelOnStart": 1,
+                "updatedCount": 1,
+                "removedCount": 0,
+                "involvedRefs": [
+                    "02a4-207ef8addede-a4c23b1126bd-1000"
+                ],
+                "externalRefs": [],
+                "types": [
+                    "article"
+                ],
+                "workflows": [
+                    "Story/Ready"
+                ],
+                "workFolderPaths": [
+                    "/Convergent/Culture"
+                ]
+            },
+            "score": 0,
+            "sortValues": {
+                "timestamp": "1777385896196"
+            }
+        },
+        {
+            "@type": "WebEventItem",
+            "item": {
+                "type": "authoringmetric",
+                "requestId": "8e3950d7-3e97-4640-91fe-f52114fc5523",
+                "timestamp": "2026-04-28T14:06:35.646Z",
+                "responseStatusCode": 200,
+                "requestCall": "PUT /contents/nodes/lock",
+                "resourceCall": "PUT /contents/nodes/lock",
+                "requestQueryParameters": {},
+                "requestHostName": "neon-app-demo.eks-dev.dev.eidosmedia.io",
+                "localHostName": "demo-contents-6bbbcf8d5d-ljdxp",
+                "serviceId": "contents",
+                "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+                "userName": "Gita",
+                "scope": "NeonApp",
+                "userId": "f52f7b97-277f-34b7-9d30-3fdf19d73aa9",
+                "indexRetry": 0,
+                "durationMs": 47,
+                "workerToServiceMs": 4,
+                "parallelOnStart": 1,
+                "updatedCount": 1,
+                "removedCount": 0,
+                "involvedRefs": [
+                    "02a4-207ef8addede-a4c23b1126bd-1000"
+                ],
+                "externalRefs": [],
+                "types": [
+                    "article"
+                ],
+                "workflows": [
+                    "Story/Ready"
+                ],
+                "workFolderPaths": [
+                    "/Convergent/Culture"
+                ]
+            },
+            "score": 0,
+            "sortValues": {
+                "timestamp": "1777385195646"
+            }
+        },
+        {
+            "@type": "WebEventItem",
+            "item": {
+                "type": "authoringmetric",
+                "requestId": "0c90135e-ed97-49bf-805e-a9f4e1755e37",
+                "timestamp": "2026-04-28T14:01:45.384Z",
+                "responseStatusCode": 200,
+                "requestCall": "PUT /contents/nodes/unlock",
+                "resourceCall": "PUT /contents/nodes/unlock",
+                "requestQueryString": "unlockMode=UNDO",
+                "requestQueryParameters": {
+                    "unlockMode": [
+                        "UNDO"
+                    ]
+                },
+                "requestHostName": "neon-app-demo.eks-dev.dev.eidosmedia.io",
+                "localHostName": "demo-contents-6bbbcf8d5d-ljdxp",
+                "serviceId": "contents",
+                "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+                "userName": "Gita",
+                "scope": "NeonApp",
+                "userId": "f52f7b97-277f-34b7-9d30-3fdf19d73aa9",
+                "indexRetry": 0,
+                "durationMs": 50,
+                "workerToServiceMs": 4,
+                "parallelOnStart": 1,
+                "updatedCount": 1,
+                "removedCount": 0,
+                "involvedRefs": [
+                    "02a4-207ef8addede-a4c23b1126bd-1000"
+                ],
+                "externalRefs": [],
+                "types": [
+                    "article"
+                ],
+                "workflows": [
+                    "Story/Ready"
+                ],
+                "workFolderPaths": [
+                    "/Convergent/Culture"
+                ]
+            },
+            "score": 0,
+            "sortValues": {
+                "timestamp": "1777384905384"
+            }
+        },
+        {
+            "@type": "WebEventItem",
+            "item": {
+                "type": "authoringmetric",
+                "requestId": "f5fc62a9-4976-4cb7-a436-6044a46b6269",
+                "timestamp": "2026-04-28T13:41:12.222Z",
+                "responseStatusCode": 200,
+                "requestCall": "PUT /contents/nodes/lock",
+                "resourceCall": "PUT /contents/nodes/lock",
+                "requestQueryParameters": {},
+                "requestHostName": "neon-app-demo.eks-dev.dev.eidosmedia.io",
+                "localHostName": "demo-contents-6bbbcf8d5d-ljdxp",
+                "serviceId": "contents",
+                "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+                "userName": "Gita",
+                "scope": "NeonApp",
+                "userId": "f52f7b97-277f-34b7-9d30-3fdf19d73aa9",
+                "indexRetry": 0,
+                "durationMs": 40,
+                "workerToServiceMs": 4,
+                "parallelOnStart": 1,
+                "updatedCount": 1,
+                "removedCount": 0,
+                "involvedRefs": [
+                    "02a4-207ef8addede-a4c23b1126bd-1000"
+                ],
+                "externalRefs": [],
+                "types": [
+                    "article"
+                ],
+                "workflows": [
+                    "Story/Ready"
+                ],
+                "workFolderPaths": [
+                    "/Convergent/Culture"
+                ]
+            },
+            "score": 0,
+            "sortValues": {
+                "timestamp": "1777383672222"
+            }
+        },
+        {
+            "@type": "WebEventItem",
+            "item": {
+                "type": "authoringmetric",
+                "requestId": "aa8f92e1-1071-4b12-aebc-177d5ea044d8",
+                "timestamp": "2026-04-28T10:27:39.717Z",
+                "responseStatusCode": 200,
+                "requestCall": "PUT /contents/nodes/unlock",
+                "resourceCall": "PUT /contents/nodes/unlock",
+                "requestQueryString": "unlockMode=UNDO",
+                "requestQueryParameters": {
+                    "unlockMode": [
+                        "UNDO"
+                    ]
+                },
+                "requestHostName": "neon-app-demo.eks-dev.dev.eidosmedia.io",
+                "localHostName": "demo-contents-6bbbcf8d5d-ljdxp",
+                "serviceId": "contents",
+                "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+                "userName": "Gita",
+                "scope": "NeonApp",
+                "userId": "f52f7b97-277f-34b7-9d30-3fdf19d73aa9",
+                "indexRetry": 0,
+                "durationMs": 73,
+                "workerToServiceMs": 15,
+                "parallelOnStart": 1,
+                "updatedCount": 1,
+                "removedCount": 0,
+                "involvedRefs": [
+                    "02a4-207ef8addede-a4c23b1126bd-1000"
+                ],
+                "externalRefs": [],
+                "types": [
+                    "article"
+                ],
+                "workflows": [
+                    "Story/Ready"
+                ],
+                "workFolderPaths": [
+                    "/Convergent/Culture"
+                ]
+            },
+            "score": 0,
+            "sortValues": {
+                "timestamp": "1777372059717"
+            }
+        },
+        {
+            "@type": "WebEventItem",
+            "item": {
+                "type": "promotemetric",
+                "requestId": "1193261b-eb5b-4408-b0c6-b03311b5bd27",
+                "timestamp": "2026-04-28T09:55:00.857Z",
+                "responseStatusCode": 200,
+                "requestCall": "POST /contents/nodes/02a4-207ef8addede-a4c23b1126bd-1000/livepromote",
+                "resourceCall": "POST /contents/nodes/{id}/livepromote",
+                "requestQueryParameters": {},
+                "requestHostName": "neon-app-demo.eks-dev.dev.eidosmedia.io",
+                "localHostName": "demo-contents-6bbbcf8d5d-ljdxp",
+                "serviceId": "contents",
+                "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+                "userName": "Gita",
+                "scope": "NeonApp",
+                "userId": "f52f7b97-277f-34b7-9d30-3fdf19d73aa9",
+                "siteName": [
+                    "TheGlobe"
+                ],
+                "indexRetry": 0,
+                "durationMs": 1552,
+                "workerToServiceMs": 4,
+                "parallelOnStart": 1,
+                "lambdaResamples": 1,
+                "totalLambdaExecutionMillis": 1002,
+                "involvedRefs": [
+                    "02a4-207ef8addede-a4c23b1126bd-1000",
+                    "02a4-207efbee032a-78c604cf65ff-1000"
+                ],
+                "totalNodes": 2,
+                "updatedCount": 1,
+                "removedCount": 0,
+                "publishedCount": 1,
+                "publishedExtRefs": [],
+                "updatedExtRefs": [],
+                "removedExtRefs": [],
+                "publishedRefs": [
+                    "02a4-207efbee032a-78c604cf65ff-1000"
+                ],
+                "updatedRefs": [
+                    "02a4-207ef8addede-a4c23b1126bd-1000"
+                ],
+                "removedRefs": []
+            },
+            "score": 0,
+            "sortValues": {
+                "timestamp": "1777370100857"
+            }
+        },
+        {
+            "@type": "WebEventItem",
+            "item": {
+                "type": "authoringmetric",
+                "requestId": "f100f8b3-2cd2-4393-bc09-6abbf99beb31",
+                "timestamp": "2026-04-28T09:54:00.807Z",
+                "responseStatusCode": 200,
+                "requestCall": "PUT /contents/story/02a4-207ef8addede-a4c23b1126bd-1000",
+                "resourceCall": "PUT /contents/story/{id}",
+                "requestQueryString": "saveMode=MAJOR_CHECKIN&keepCheckedout=true",
+                "requestQueryParameters": {
+                    "saveMode": [
+                        "MAJOR_CHECKIN"
+                    ],
+                    "keepCheckedout": [
+                        "true"
+                    ]
+                },
+                "requestHostName": "neon-app-demo.eks-dev.dev.eidosmedia.io",
+                "localHostName": "demo-contents-6bbbcf8d5d-ljdxp",
+                "serviceId": "contents",
+                "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+                "userName": "Gita",
+                "scope": "NeonApp",
+                "userId": "f52f7b97-277f-34b7-9d30-3fdf19d73aa9",
+                "indexRetry": 0,
+                "durationMs": 400,
+                "workerToServiceMs": 4,
+                "parallelOnStart": 1,
+                "updatedCount": 1,
+                "removedCount": 0,
+                "involvedRefs": [
+                    "02a4-207ef8addede-a4c23b1126bd-1000"
+                ],
+                "externalRefs": [],
+                "types": [
+                    "article"
+                ],
+                "workflows": [
+                    "Story/Ready"
+                ],
+                "workFolderPaths": [
+                    "/Convergent/Culture"
+                ]
+            },
+            "score": 0,
+            "sortValues": {
+                "timestamp": "1777370040807"
+            }
+        },
+        {
+            "@type": "WebEventItem",
+            "item": {
+                "type": "authoringmetric",
+                "requestId": "6d322bfa-281a-4d0d-948f-0598d6a9c2bc",
+                "timestamp": "2026-04-28T09:53:54.189Z",
+                "responseStatusCode": 200,
+                "requestCall": "PUT /contents/nodes/lock",
+                "resourceCall": "PUT /contents/nodes/lock",
+                "requestQueryParameters": {},
+                "requestHostName": "neon-app-demo.eks-dev.dev.eidosmedia.io",
+                "localHostName": "demo-contents-6bbbcf8d5d-ljdxp",
+                "serviceId": "contents",
+                "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+                "userName": "Gita",
+                "scope": "NeonApp",
+                "userId": "f52f7b97-277f-34b7-9d30-3fdf19d73aa9",
+                "indexRetry": 0,
+                "durationMs": 52,
+                "workerToServiceMs": 4,
+                "parallelOnStart": 1,
+                "updatedCount": 1,
+                "removedCount": 0,
+                "involvedRefs": [
+                    "02a4-207ef8addede-a4c23b1126bd-1000"
+                ],
+                "externalRefs": [],
+                "types": [
+                    "article"
+                ],
+                "workflows": [
+                    "Story/Ready"
+                ],
+                "workFolderPaths": [
+                    "/Convergent/Culture"
+                ]
+            },
+            "score": 0,
+            "sortValues": {
+                "timestamp": "1777370034189"
+            }
+        },
+        {
+            "@type": "WebEventItem",
+            "item": {
+                "type": "authoringmetric",
+                "requestId": "54d9934d-ba5c-419e-8664-820d0fbedd23",
+                "timestamp": "2026-04-28T09:53:51.800Z",
+                "responseStatusCode": 200,
+                "requestCall": "PUT /contents/nodes/unlock",
+                "resourceCall": "PUT /contents/nodes/unlock",
+                "requestQueryString": "unlockMode=UNDO",
+                "requestQueryParameters": {
+                    "unlockMode": [
+                        "UNDO"
+                    ]
+                },
+                "requestHostName": "neon-app-demo.eks-dev.dev.eidosmedia.io",
+                "localHostName": "demo-contents-6bbbcf8d5d-ljdxp",
+                "serviceId": "contents",
+                "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+                "userName": "Gita",
+                "scope": "NeonApp",
+                "userId": "f52f7b97-277f-34b7-9d30-3fdf19d73aa9",
+                "indexRetry": 0,
+                "durationMs": 76,
+                "workerToServiceMs": 4,
+                "parallelOnStart": 1,
+                "updatedCount": 1,
+                "removedCount": 0,
+                "involvedRefs": [
+                    "02a4-207ef8addede-a4c23b1126bd-1000"
+                ],
+                "externalRefs": [],
+                "types": [
+                    "article"
+                ],
+                "workflows": [
+                    "Story/Ready"
+                ],
+                "workFolderPaths": [
+                    "/Convergent/Culture"
+                ]
+            },
+            "score": 0,
+            "sortValues": {
+                "timestamp": "1777370031800"
+            }
+        },
+        {
+            "@type": "WebEventItem",
+            "item": {
+                "type": "authoringmetric",
+                "requestId": "4f572a56-7a11-40e9-bded-391e64a6989a",
+                "timestamp": "2026-04-28T09:53:41.464Z",
+                "responseStatusCode": 200,
+                "requestCall": "POST /workflow/instance/task/nextStepAssignment",
+                "resourceCall": "POST /workflow/instance/task/nextStepAssignment",
+                "requestQueryString": "objRef=02a4-207ef8addede-a4c23b1126bd-1000",
+                "requestQueryParameters": {
+                    "objRef": [
+                        "02a4-207ef8addede-a4c23b1126bd-1000"
+                    ]
+                },
+                "requestHostName": "neon-app-demo.eks-dev.dev.eidosmedia.io",
+                "localHostName": "demo-workflow-675b69bfdf-md86d",
+                "serviceId": "workflow",
+                "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+                "userName": "Gita",
+                "scope": "NeonApp",
+                "userId": "f52f7b97-277f-34b7-9d30-3fdf19d73aa9",
+                "indexRetry": 0,
+                "durationMs": 306,
+                "workerToServiceMs": 5,
+                "parallelOnStart": 1,
+                "updatedCount": 1,
+                "removedCount": 0,
+                "involvedRefs": [
+                    "02a4-207ef8addede-a4c23b1126bd-1000"
+                ],
+                "externalRefs": [],
+                "types": [
+                    "article"
+                ],
+                "workflows": [
+                    "Story/Ready"
+                ],
+                "workFolderPaths": [
+                    "/Convergent/Culture"
+                ]
+            },
+            "score": 0,
+            "sortValues": {
+                "timestamp": "1777370021464"
+            }
+        },
+        {
+            "@type": "WebEventItem",
+            "item": {
+                "type": "authoringmetric",
+                "requestId": "824054cb-410e-4ba7-bfa4-81e71843ce43",
+                "timestamp": "2026-04-28T09:39:29.788Z",
+                "responseStatusCode": 200,
+                "requestCall": "POST /workflow/instance/task/nextStepAssignment",
+                "resourceCall": "POST /workflow/instance/task/nextStepAssignment",
+                "requestQueryString": "objRef=02a4-207ef8addede-a4c23b1126bd-1000",
+                "requestQueryParameters": {
+                    "objRef": [
+                        "02a4-207ef8addede-a4c23b1126bd-1000"
+                    ]
+                },
+                "requestHostName": "neon-app-demo.eks-dev.dev.eidosmedia.io",
+                "localHostName": "demo-workflow-675b69bfdf-md86d",
+                "serviceId": "workflow",
+                "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+                "userName": "Gita",
+                "scope": "NeonApp",
+                "userId": "f52f7b97-277f-34b7-9d30-3fdf19d73aa9",
+                "indexRetry": 0,
+                "durationMs": 261,
+                "workerToServiceMs": 6,
+                "parallelOnStart": 1,
+                "updatedCount": 1,
+                "removedCount": 0,
+                "involvedRefs": [
+                    "02a4-207ef8addede-a4c23b1126bd-1000"
+                ],
+                "externalRefs": [],
+                "types": [
+                    "article"
+                ],
+                "workflows": [
+                    "Story/Edit"
+                ],
+                "workFolderPaths": [
+                    "/Convergent/Culture"
+                ]
+            },
+            "score": 0,
+            "sortValues": {
+                "timestamp": "1777369169788"
+            }
+        },
+        {
+            "@type": "WebEventItem",
+            "item": {
+                "type": "authoringmetric",
+                "requestId": "2652f81c-2215-4915-bdbe-4d1999c01451",
+                "timestamp": "2026-04-28T09:22:02.430Z",
+                "responseStatusCode": 200,
+                "requestCall": "PUT /contents/story/02a4-207ef8addede-a4c23b1126bd-1000",
+                "resourceCall": "PUT /contents/story/{id}",
+                "requestQueryString": "saveMode=MAJOR_CHECKIN&keepCheckedout=true",
+                "requestQueryParameters": {
+                    "saveMode": [
+                        "MAJOR_CHECKIN"
+                    ],
+                    "keepCheckedout": [
+                        "true"
+                    ]
+                },
+                "requestHostName": "neon-app-demo.eks-dev.dev.eidosmedia.io",
+                "localHostName": "demo-contents-6bbbcf8d5d-ljdxp",
+                "serviceId": "contents",
+                "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+                "userName": "Gita",
+                "scope": "NeonApp",
+                "userId": "f52f7b97-277f-34b7-9d30-3fdf19d73aa9",
+                "indexRetry": 0,
+                "durationMs": 423,
+                "workerToServiceMs": 19,
+                "parallelOnStart": 1,
+                "updatedCount": 1,
+                "removedCount": 0,
+                "involvedRefs": [
+                    "02a4-207ef8addede-a4c23b1126bd-1000"
+                ],
+                "externalRefs": [],
+                "types": [
+                    "article"
+                ],
+                "workflows": [
+                    "Story/Created"
+                ],
+                "workFolderPaths": [
+                    "/Convergent/Culture"
+                ]
+            },
+            "score": 0,
+            "sortValues": {
+                "timestamp": "1777368122430"
+            }
+        },
+        {
+            "@type": "WebEventItem",
+            "item": {
+                "type": "authoringmetric",
+                "requestId": "4d74f7ae-6ea3-422b-b282-6a1c88f23fb4",
+                "timestamp": "2026-04-28T09:20:59.332Z",
+                "responseStatusCode": 200,
+                "requestCall": "PUT /contents/nodes/lock",
+                "resourceCall": "PUT /contents/nodes/lock",
+                "requestQueryParameters": {},
+                "requestHostName": "neon-app-demo.eks-dev.dev.eidosmedia.io",
+                "localHostName": "demo-contents-6bbbcf8d5d-ljdxp",
+                "serviceId": "contents",
+                "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+                "userName": "Gita",
+                "scope": "NeonApp",
+                "userId": "f52f7b97-277f-34b7-9d30-3fdf19d73aa9",
+                "indexRetry": 0,
+                "durationMs": 36,
+                "workerToServiceMs": 4,
+                "parallelOnStart": 1,
+                "updatedCount": 1,
+                "removedCount": 0,
+                "involvedRefs": [
+                    "02a4-207ef8addede-a4c23b1126bd-1000"
+                ],
+                "externalRefs": [],
+                "types": [
+                    "article"
+                ],
+                "workflows": [
+                    "Story/Created"
+                ],
+                "workFolderPaths": [
+                    "/Convergent/Culture"
+                ]
+            },
+            "score": 0,
+            "sortValues": {
+                "timestamp": "1777368059332"
+            }
+        },
+        {
+            "@type": "WebEventItem",
+            "item": {
+                "type": "authoringmetric",
+                "requestId": "e0834b75-fbb5-465f-813d-4cc87d59cc2d",
+                "timestamp": "2026-04-28T09:20:58.149Z",
+                "responseStatusCode": 200,
+                "requestCall": "PUT /contents/nodes/unlock",
+                "resourceCall": "PUT /contents/nodes/unlock",
+                "requestQueryString": "unlockMode=UNDO",
+                "requestQueryParameters": {
+                    "unlockMode": [
+                        "UNDO"
+                    ]
+                },
+                "requestHostName": "neon-app-demo.eks-dev.dev.eidosmedia.io",
+                "localHostName": "demo-contents-6bbbcf8d5d-ljdxp",
+                "serviceId": "contents",
+                "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+                "userName": "Gita",
+                "scope": "NeonApp",
+                "userId": "f52f7b97-277f-34b7-9d30-3fdf19d73aa9",
+                "indexRetry": 0,
+                "durationMs": 41,
+                "workerToServiceMs": 5,
+                "parallelOnStart": 1,
+                "updatedCount": 1,
+                "removedCount": 0,
+                "involvedRefs": [
+                    "02a4-207ef8addede-a4c23b1126bd-1000"
+                ],
+                "externalRefs": [],
+                "types": [
+                    "article"
+                ],
+                "workflows": [
+                    "Story/Created"
+                ],
+                "workFolderPaths": [
+                    "/Convergent/Culture"
+                ]
+            },
+            "score": 0,
+            "sortValues": {
+                "timestamp": "1777368058149"
+            }
+        },
+        {
+            "@type": "WebEventItem",
+            "item": {
+                "type": "authoringmetric",
+                "requestId": "789b60d2-4694-4f51-aba6-f96e14df3141",
+                "timestamp": "2026-04-28T09:20:56.942Z",
+                "responseStatusCode": 200,
+                "requestCall": "PUT /contents/story/02a4-207ef8addede-a4c23b1126bd-1000",
+                "resourceCall": "PUT /contents/story/{id}",
+                "requestQueryString": "saveMode=MINOR_CHECKIN&keepCheckedout=true",
+                "requestQueryParameters": {
+                    "saveMode": [
+                        "MINOR_CHECKIN"
+                    ],
+                    "keepCheckedout": [
+                        "true"
+                    ]
+                },
+                "requestHostName": "neon-app-demo.eks-dev.dev.eidosmedia.io",
+                "localHostName": "demo-contents-6bbbcf8d5d-ljdxp",
+                "serviceId": "contents",
+                "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+                "userName": "Gita",
+                "scope": "NeonApp",
+                "userId": "f52f7b97-277f-34b7-9d30-3fdf19d73aa9",
+                "indexRetry": 0,
+                "durationMs": 325,
+                "workerToServiceMs": 4,
+                "parallelOnStart": 1,
+                "updatedCount": 1,
+                "removedCount": 0,
+                "involvedRefs": [
+                    "02a4-207ef8addede-a4c23b1126bd-1000"
+                ],
+                "externalRefs": [],
+                "types": [
+                    "article"
+                ],
+                "workflows": [
+                    "Story/Created"
+                ],
+                "workFolderPaths": [
+                    "/Convergent/Culture"
+                ]
+            },
+            "score": 0,
+            "sortValues": {
+                "timestamp": "1777368056942"
+            }
+        },
+        {
+            "@type": "WebEventItem",
+            "item": {
+                "type": "authoringmetric",
+                "requestId": "2fb3df42-9e6f-437c-af79-a700754b6e2f",
+                "timestamp": "2026-04-28T09:19:40.777Z",
+                "responseStatusCode": 200,
+                "requestCall": "PUT /contents/story/02a4-207ef8addede-a4c23b1126bd-1000",
+                "resourceCall": "PUT /contents/story/{id}",
+                "requestQueryString": "saveMode=MINOR_CHECKIN&keepCheckedout=true",
+                "requestQueryParameters": {
+                    "saveMode": [
+                        "MINOR_CHECKIN"
+                    ],
+                    "keepCheckedout": [
+                        "true"
+                    ]
+                },
+                "requestHostName": "neon-app-demo.eks-dev.dev.eidosmedia.io",
+                "localHostName": "demo-contents-6bbbcf8d5d-ljdxp",
+                "serviceId": "contents",
+                "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+                "userName": "Gita",
+                "scope": "NeonApp",
+                "userId": "f52f7b97-277f-34b7-9d30-3fdf19d73aa9",
+                "indexRetry": 0,
+                "durationMs": 368,
+                "workerToServiceMs": 19,
+                "parallelOnStart": 1,
+                "updatedCount": 1,
+                "removedCount": 0,
+                "involvedRefs": [
+                    "02a4-207ef8addede-a4c23b1126bd-1000"
+                ],
+                "externalRefs": [],
+                "types": [
+                    "article"
+                ],
+                "workflows": [
+                    "Story/Created"
+                ],
+                "workFolderPaths": [
+                    "/Convergent/Culture"
+                ]
+            },
+            "score": 0,
+            "sortValues": {
+                "timestamp": "1777367980777"
+            }
+        },
+        {
+            "@type": "WebEventItem",
+            "item": {
+                "type": "authoringmetric",
+                "requestId": "75853ffa-a5ad-4b91-8482-fb1f105cf92d",
+                "timestamp": "2026-04-28T09:14:21.035Z",
+                "responseStatusCode": 200,
+                "requestCall": "PUT /contents/story/02a4-207ef8addede-a4c23b1126bd-1000",
+                "resourceCall": "PUT /contents/story/{id}",
+                "requestQueryString": "saveMode=MAJOR_CHECKIN&keepCheckedout=true",
+                "requestQueryParameters": {
+                    "saveMode": [
+                        "MAJOR_CHECKIN"
+                    ],
+                    "keepCheckedout": [
+                        "true"
+                    ]
+                },
+                "requestHostName": "neon-app-demo.eks-dev.dev.eidosmedia.io",
+                "localHostName": "demo-contents-6bbbcf8d5d-ljdxp",
+                "serviceId": "contents",
+                "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+                "userName": "Gita",
+                "scope": "NeonApp",
+                "userId": "f52f7b97-277f-34b7-9d30-3fdf19d73aa9",
+                "indexRetry": 0,
+                "durationMs": 340,
+                "workerToServiceMs": 10,
+                "parallelOnStart": 1,
+                "updatedCount": 1,
+                "removedCount": 0,
+                "involvedRefs": [
+                    "02a4-207ef8addede-a4c23b1126bd-1000"
+                ],
+                "externalRefs": [],
+                "types": [
+                    "article"
+                ],
+                "workflows": [
+                    "Story/Created"
+                ],
+                "workFolderPaths": [
+                    "/Convergent/Culture"
+                ]
+            },
+            "score": 0,
+            "sortValues": {
+                "timestamp": "1777367661035"
+            }
+        },
+        {
+            "@type": "WebEventItem",
+            "item": {
+                "type": "authoringmetric",
+                "requestId": "3ab8780c-b0b2-4746-8a5e-b34420dfd5be",
+                "timestamp": "2026-04-28T09:11:40.882Z",
+                "responseStatusCode": 200,
+                "requestCall": "POST /contents/story",
+                "resourceCall": "POST /contents/story",
+                "requestQueryParameters": {},
+                "requestHostName": "neon-app-demo.eks-dev.dev.eidosmedia.io",
+                "localHostName": "demo-contents-6bbbcf8d5d-ljdxp",
+                "serviceId": "contents",
+                "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+                "userName": "Gita",
+                "scope": "NeonApp",
+                "userId": "f52f7b97-277f-34b7-9d30-3fdf19d73aa9",
+                "indexRetry": 0,
+                "durationMs": 776,
+                "workerToServiceMs": 19,
+                "parallelOnStart": 1,
+                "updatedCount": 1,
+                "removedCount": 0,
+                "involvedRefs": [
+                    "02a4-207ef8addede-a4c23b1126bd-1000"
+                ],
+                "externalRefs": [],
+                "types": [
+                    "article"
+                ],
+                "workFolderPaths": [
+                    "/Convergent/Culture"
+                ]
+            },
+            "score": 0,
+            "sortValues": {
+                "timestamp": "1777367500882"
+            }
+        }
+    ],
+    "aggregations": {
+        "resourceCall": {
+            "type": "buckets",
+            "name": "resourceCall",
+            "buckets": [
+                {
+                    "type": "term",
+                    "key": "PUT /contents/nodes/lock",
+                    "docCount": 5,
+                    "aggregations": []
+                },
+                {
+                    "type": "term",
+                    "key": "PUT /contents/nodes/unlock",
+                    "docCount": 5,
+                    "aggregations": []
+                },
+                {
+                    "type": "term",
+                    "key": "PUT /contents/story/{id}",
+                    "docCount": 5,
+                    "aggregations": []
+                },
+                {
+                    "type": "term",
+                    "key": "POST /workflow/instance/task/nextStepAssignment",
+                    "docCount": 2,
+                    "aggregations": []
+                },
+                {
+                    "type": "term",
+                    "key": "DELETE /contents/rooms/{roomId}/join/{participantId}",
+                    "docCount": 1,
+                    "aggregations": []
+                },
+                {
+                    "type": "term",
+                    "key": "POST /contents/nodes/{id}/livepromote",
+                    "docCount": 1,
+                    "aggregations": []
+                },
+                {
+                    "type": "term",
+                    "key": "POST /contents/rooms/{roomId}/join/{participantId}",
+                    "docCount": 1,
+                    "aggregations": []
+                },
+                {
+                    "type": "term",
+                    "key": "POST /contents/rooms/{roomId}/story",
+                    "docCount": 1,
+                    "aggregations": []
+                },
+                {
+                    "type": "term",
+                    "key": "POST /contents/story",
+                    "docCount": 1,
+                    "aggregations": []
+                }
+            ]
+        }
+    },
+    "metadata": {
+        "tookMs": 12,
+        "maxScore": 0,
+        "totalHits": 22,
+        "offset": 0,
+        "maxResults": 1000
+    }
+}

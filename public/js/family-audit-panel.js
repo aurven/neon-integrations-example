@@ -204,17 +204,20 @@ const NeonConfig = (() => {
 // ===== EVENT LABEL MAP =====
 // icon: Font Awesome 6 Free class string (fa-solid or fa-regular)
 const EVENT_LABELS = {
-    'POST /contents/story':                                   { label: 'Created',            icon: 'fa-solid fa-file-circle-plus', color: '#7c3aed' },
-    'PUT /contents/nodes/lock':                               { label: 'Locked',             icon: 'fa-solid fa-lock',             color: '#6B7280' },
-    'PUT /contents/nodes/unlock':                             { label: 'Unlocked',           icon: 'fa-solid fa-lock-open',        color: '#6B7280' },
-    'PUT /contents/story/{id}':                               { label: 'Saved',              icon: 'fa-solid fa-floppy-disk',      color: '#2847E2' },
-    'POST /contents/story/{id}/contentitem/{contentItemId}':  { label: 'Changed from Site',  icon: 'fa-solid fa-edit',             color: '#2847E2' },
-    'PUT /publication/publish/{id}':                          { label: 'Published',          icon: 'fa-solid fa-rocket',           color: '#16a34a' },
-    'POST /contents/nodes/{id}/promote/{viewStatus}':         { label: 'Published',          icon: 'fa-solid fa-tower-broadcast',  color: '#16a34a' },
-    'POST /contents/nodes/{id}/livepromote':                  { label: 'Published LIVE',     icon: 'fa-solid fa-tower-broadcast',  color: '#16a34a' },
-    'DELETE /contents/nodes/{id}/promote/{viewStatus}':       { label: 'Unpublished from',   icon: 'fa-solid fa-circle-xmark',     color: '#6B7280' },
-    'POST /workflow/instance/task/nextStepAssignment':        { label: 'Workflow change',    icon: 'fa-solid fa-code-branch',      color: '#0891b2' },
-    '/psn/<notify>/test':                                     { label: 'Notification sent',  icon: 'fa-solid fa-satellite-dish',   color: '#d97706' },
+    'POST /contents/story':                                   { label: 'Created',               icon: 'fa-solid fa-file-circle-plus', color: '#7c3aed' },
+    'PUT /contents/nodes/lock':                               { label: 'Locked',                icon: 'fa-solid fa-lock',             color: '#6B7280' },
+    'PUT /contents/nodes/unlock':                             { label: 'Unlocked',              icon: 'fa-solid fa-lock-open',        color: '#6B7280' },
+    'PUT /contents/story/{id}':                               { label: 'Saved',                 icon: 'fa-solid fa-floppy-disk',      color: '#2847E2' },
+    'POST /contents/story/{id}/contentitem/{contentItemId}':  { label: 'Changed from Site',     icon: 'fa-solid fa-edit',             color: '#2847E2' },
+    'PUT /publication/publish/{id}':                          { label: 'Published',             icon: 'fa-solid fa-rocket',           color: '#16a34a' },
+    'POST /contents/nodes/{id}/promote/{viewStatus}':         { label: 'Published',             icon: 'fa-solid fa-tower-broadcast',  color: '#16a34a' },
+    'POST /contents/nodes/{id}/livepromote':                  { label: 'Published LIVE',        icon: 'fa-solid fa-tower-broadcast',  color: '#16a34a' },
+    'DELETE /contents/nodes/{id}/promote/{viewStatus}':       { label: 'Unpublished from',      icon: 'fa-solid fa-circle-xmark',     color: '#6B7280' },
+    'POST /workflow/instance/task/nextStepAssignment':        { label: 'Workflow change',       icon: 'fa-solid fa-code-branch',      color: '#0891b2' },
+    '/psn/<notify>/test':                                     { label: 'Notification sent',     icon: 'fa-solid fa-satellite-dish',   color: '#d97706' },
+    'POST /contents/rooms/{roomId}/story':                    { label: 'Collaboration saved',   icon: 'fa-solid fa-users',            color: '#7c3aed' },
+    'POST /contents/rooms/{roomId}/join/{participantId}':     { label: 'Collaborator joined',   icon: 'fa-solid fa-user-plus',        color: '#0891b2' },
+    'DELETE /contents/rooms/{roomId}/join/{participantId}':   { label: 'Collaborator left',     icon: 'fa-solid fa-user-minus',       color: '#6B7280' },
 };
 
 /**
@@ -256,6 +259,9 @@ const RESOURCE_CALL_CATEGORY = {
     'DELETE /contents/nodes/{id}/promote/{viewStatus}':       'unpublish',
     'POST /workflow/instance/task/nextStepAssignment':        'workflow',
     '/psn/<notify>/test':                                     'notification',
+    'POST /contents/rooms/{roomId}/story':                    'collaboration',
+    'POST /contents/rooms/{roomId}/join/{participantId}':     'collaboration',
+    'DELETE /contents/rooms/{roomId}/join/{participantId}':   'collaboration',
 };
 
 function getEventCategory(item) {
@@ -268,7 +274,7 @@ const state = {
     familyRef: new URLSearchParams(window.location.search).get('familyRef') || null,
     view: 'standard',
     events: [],
-    activeFilters: new Set(['lock', 'save', 'create', 'publish', 'unpublish', 'workflow', 'notification', 'other'])
+    activeFilters: new Set(['lock', 'save', 'create', 'publish', 'unpublish', 'workflow', 'notification', 'collaboration', 'other'])
 };
 
 // ===== UTILITIES =====
