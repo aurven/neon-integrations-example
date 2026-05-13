@@ -16,293 +16,39 @@
     <meta name="twitter:card" content="summary">
     <link rel="stylesheet" href="/css/tailwind-panels.css">
     <link rel="stylesheet" href="/neon/api/demo-integration/css/tailwind-panels.css">
+    <link rel="stylesheet" href="/css/breakingnews-widget.css">
+    <link rel="stylesheet" href="/neon/api/demo-integration/css/breakingnews-widget.css">
     <script src="/js/panel-api-helper.js"></script>
     <script src="/neon/api/demo-integration/js/panel-api-helper.js"></script>
-    <style>
-        :root {
-            --neon-blue: #2847E2;
-            --neon-pink: #F75880;
-            --neon-black: #1D1930;
-            --neon-white: #FFFFFF;
-            --neon-text-primary: #1F2937;
-            --neon-text-secondary: #6B7280;
-            --neon-border: #E5E7EB;
-            --neon-background: #F9FAFB;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background-color: var(--neon-background);
-            color: var(--neon-text-primary);
-            margin: 0;
-            padding: 0;
-        }
-
-        .widget-container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 24px;
-        }
-
-        .widget-container.embedded {
-            padding: 12px;
-        }
-
-        /* Header */
-        .widget-header {
-            background: #fff;
-            border: 1px solid var(--neon-border);
-            border-radius: 8px;
-            padding: 16px 20px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .widget-header-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
-            background: linear-gradient(135deg, var(--neon-blue) 0%, var(--neon-pink) 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .widget-header-icon svg {
-            width: 22px;
-            height: 22px;
-            color: #fff;
-        }
-
-        .widget-header-text h1 {
-            margin: 0;
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--neon-text-primary);
-        }
-
-        .widget-header-text p {
-            margin: 2px 0 0;
-            font-size: 12px;
-            color: var(--neon-text-secondary);
-        }
-
-        .widget-header.hidden {
-            display: none;
-        }
-
-        /* Form card */
-        .form-card {
-            background: #fff;
-            border: 1px solid var(--neon-border);
-            border-radius: 8px;
-            padding: 24px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-        }
-
-        .form-card.embedded {
-            box-shadow: none;
-            border: none;
-            padding: 8px 0;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group:last-of-type {
-            margin-bottom: 24px;
-        }
-
-        label {
-            display: block;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--neon-text-primary);
-            margin-bottom: 6px;
-        }
-
-        label .required {
-            color: #EF4444;
-            margin-left: 2px;
-        }
-
-        input[type="text"],
-        textarea {
-            width: 100%;
-            box-sizing: border-box;
-            padding: 8px 12px;
-            border: 1px solid var(--neon-border);
-            border-radius: 6px;
-            font-size: 14px;
-            font-family: inherit;
-            color: var(--neon-text-primary);
-            background: #fff;
-            outline: none;
-            transition: border-color 0.15s, box-shadow 0.15s;
-        }
-
-        input[type="text"]:focus,
-        textarea:focus {
-            border-color: var(--neon-blue);
-            box-shadow: 0 0 0 3px rgba(40, 71, 226, 0.1);
-        }
-
-        input[type="text"]::placeholder,
-        textarea::placeholder {
-            color: var(--neon-text-secondary);
-        }
-
-        textarea {
-            resize: vertical;
-        }
-
-        /* Buttons */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            padding: 9px 18px;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: 500;
-            font-family: inherit;
-            cursor: pointer;
-            border: none;
-            transition: background-color 0.15s, opacity 0.15s;
-        }
-
-        .btn:disabled {
-            opacity: 0.55;
-            cursor: not-allowed;
-        }
-
-        .btn-primary {
-            background-color: var(--neon-blue);
-            color: #fff;
-            width: 100%;
-        }
-
-        .btn-primary:hover:not(:disabled) {
-            background-color: #1e38c2;
-        }
-
-        .btn-secondary {
-            background-color: #F3F4F6;
-            color: var(--neon-text-primary);
-        }
-
-        .btn-secondary:hover:not(:disabled) {
-            background-color: #E5E7EB;
-        }
-
-        .btn-success {
-            background-color: var(--neon-blue);
-            color: #fff;
-        }
-
-        .btn-success:hover:not(:disabled) {
-            background-color: #1e38c2;
-        }
-
-        .btn-danger {
-            background-color: #EF4444;
-            color: #fff;
-        }
-
-        .btn-danger:hover:not(:disabled) {
-            background-color: #DC2626;
-        }
-
-        /* Spinner */
-        .spinner-svg {
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        /* Progress / result card */
-        .result-card {
-            background: #fff;
-            border: 1px solid var(--neon-border);
-            border-radius: 8px;
-            padding: 24px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-            display: none;
-        }
-
-        .result-card.visible {
-            display: block;
-        }
-
-        .result-card.success {
-            border-color: #BBF7D0;
-            background-color: #F0FDF4;
-        }
-
-        .result-card.error {
-            border-color: #FECACA;
-            background-color: #FEF2F2;
-        }
-
-        .result-message {
-            text-align: center;
-            font-size: 14px;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .result-message.success {
-            color: #15803D;
-        }
-
-        .result-message.error {
-            color: #B91C1C;
-        }
-
-        .result-buttons {
-            display: flex;
-            gap: 8px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-    </style>
 </head>
 
 <body>
-    <div id="widget-container" class="widget-container">
+    <div id="bn-container" class="bn-container">
 
         <!-- Header (hidden when embedded) -->
-        <div id="widget-header" class="widget-header">
-            <div class="widget-header-icon">
+        <div id="bn-header" class="bn-header">
+            <div class="bn-header-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
             </div>
-            <div class="widget-header-text">
-                <h1>Breaking News Publisher</h1>
-                <p>Create and publish breaking news articles instantly</p>
+            <div>
+                <p class="bn-header-title">Breaking News Publisher</p>
+                <p class="bn-header-subtitle">Create and publish breaking news articles instantly</p>
             </div>
         </div>
 
         <!-- Form -->
-        <div id="form-card" class="form-card">
-            <form id="breakingNewsForm">
-                <div class="form-group">
-                    <label for="headline">Headline <span class="required">*</span></label>
+        <div id="bn-form-card" class="bn-card">
+            <form id="bn-form">
+                <div class="bn-form-group">
+                    <label class="bn-label" for="bn-headline">
+                        Headline <span class="bn-required">*</span>
+                    </label>
                     <input
+                        class="bn-input"
                         type="text"
-                        id="headline"
+                        id="bn-headline"
                         name="headline"
                         required
                         maxlength="255"
@@ -310,10 +56,11 @@
                     >
                 </div>
 
-                <div class="form-group">
-                    <label for="summary">Summary</label>
+                <div class="bn-form-group">
+                    <label class="bn-label" for="bn-summary">Summary</label>
                     <textarea
-                        id="summary"
+                        class="bn-textarea"
+                        id="bn-summary"
                         name="summary"
                         rows="3"
                         maxlength="500"
@@ -321,116 +68,117 @@
                     ></textarea>
                 </div>
 
-                <div class="form-group">
-                    <label for="body">Body</label>
+                <div class="bn-form-group">
+                    <label class="bn-label" for="bn-body">Body</label>
                     <textarea
-                        id="body"
+                        class="bn-textarea"
+                        id="bn-body"
                         name="body"
                         rows="6"
                         placeholder="Enter the main content of the breaking news (optional)"
                     ></textarea>
                 </div>
 
-                <button type="submit" id="publishBtn" class="btn btn-primary">
+                <button type="submit" id="bn-publish-btn" class="bn-btn bn-btn-primary">
                     Publish Breaking News
                 </button>
             </form>
         </div>
 
         <!-- Result card (progress / success / error) -->
-        <div id="result-card" class="result-card">
-            <div id="result-message" class="result-message"></div>
-            <div id="result-buttons" class="result-buttons"></div>
+        <div id="bn-result-card" class="bn-result-card">
+            <div id="bn-result-message" class="bn-result-message"></div>
+            <div id="bn-result-buttons" class="bn-result-buttons"></div>
         </div>
 
     </div>
 
     <script>
         // ── Embedding detection ──────────────────────────────────────────────
-        const embedded = (typeof PanelAPI !== 'undefined') ? PanelAPI.isEmbedded() : (window.self !== window.top);
+        const bnEmbedded = (typeof PanelAPI !== 'undefined') ? PanelAPI.isEmbedded() : (window.self !== window.top);
 
-        if (embedded) {
-            document.getElementById('widget-header').classList.add('hidden');
-            document.getElementById('widget-container').classList.add('embedded');
-            document.getElementById('form-card').classList.add('embedded');
+        if (bnEmbedded) {
+            document.getElementById('bn-header').classList.add('hidden');
+            document.getElementById('bn-container').classList.add('bn-embedded');
+            document.getElementById('bn-form-card').classList.add('bn-embedded');
         }
 
-        // ── Spinner SVG helper ───────────────────────────────────────────────
-        function spinnerSvg(cls = '') {
-            return `<svg class="spinner-svg ${cls}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" width="18" height="18">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        // ── SVG icon helpers ─────────────────────────────────────────────────
+        function bnSpinnerSvg() {
+            return `<svg class="bn-spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" width="18" height="18">
+                <circle style="opacity:.25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>`;
         }
 
-        function checkSvg() {
+        function bnCheckSvg() {
             return `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" width="18" height="18">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
             </svg>`;
         }
 
-        function crossSvg() {
+        function bnCrossSvg() {
             return `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" width="18" height="18">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
             </svg>`;
         }
 
         // ── Result card helpers ──────────────────────────────────────────────
-        const resultCard = document.getElementById('result-card');
-        const resultMessage = document.getElementById('result-message');
-        const resultButtons = document.getElementById('result-buttons');
+        const bnResultCard = document.getElementById('bn-result-card');
+        const bnResultMessage = document.getElementById('bn-result-message');
+        const bnResultButtons = document.getElementById('bn-result-buttons');
 
-        function showResult(state, messageHtml, buttons = []) {
-            resultCard.className = `result-card visible${state ? ' ' + state : ''}`;
-            resultMessage.className = `result-message${state ? ' ' + state : ''}`;
-            resultMessage.innerHTML = messageHtml;
+        function bnShowResult(state, messageHtml, buttons = []) {
+            bnResultCard.className = `bn-result-card bn-visible${state ? ' bn-' + state : ''}`;
+            bnResultMessage.className = `bn-result-message${state ? ' bn-' + state : ''}`;
+            bnResultMessage.innerHTML = messageHtml;
 
-            resultButtons.innerHTML = '';
+            bnResultButtons.innerHTML = '';
             buttons.forEach(({ label, style, onClick }) => {
                 const btn = document.createElement('button');
-                btn.className = `btn btn-${style || 'secondary'}`;
+                btn.className = `bn-btn bn-btn-${style || 'secondary'}`;
                 btn.innerHTML = label;
                 btn.onclick = onClick;
-                resultButtons.appendChild(btn);
+                bnResultButtons.appendChild(btn);
             });
         }
 
-        function hideResult() {
-            resultCard.className = 'result-card';
+        function bnHideResult() {
+            bnResultCard.className = 'bn-result-card';
         }
 
         // ── Form show/hide ───────────────────────────────────────────────────
-        const formCard = document.getElementById('form-card');
-        const publishBtn = document.getElementById('publishBtn');
+        const bnFormCard = document.getElementById('bn-form-card');
+        const bnPublishBtn = document.getElementById('bn-publish-btn');
 
-        function showForm() {
-            formCard.style.display = '';
-            publishBtn.disabled = false;
-            publishBtn.innerHTML = 'Publish Breaking News';
+        function bnShowForm() {
+            bnFormCard.style.display = '';
+            bnPublishBtn.disabled = false;
+            bnPublishBtn.innerHTML = 'Publish Breaking News';
         }
 
-        function hideForm() {
-            formCard.style.display = 'none';
+        function bnHideForm() {
+            bnFormCard.style.display = 'none';
         }
 
         // ── Form submission ──────────────────────────────────────────────────
-        document.getElementById('breakingNewsForm').addEventListener('submit', async function (e) {
+        document.getElementById('bn-form').addEventListener('submit', async function (e) {
             e.preventDefault();
 
-            const headline = document.getElementById('headline').value.trim();
-            const summary = document.getElementById('summary').value.trim();
-            const body = document.getElementById('body').value.trim();
+            const headline = document.getElementById('bn-headline').value.trim();
+            const summary = document.getElementById('bn-summary').value.trim();
+            const body = document.getElementById('bn-body').value.trim();
 
             if (!headline) {
                 alert('Headline is required.');
                 return;
             }
 
-            publishBtn.disabled = true;
-            publishBtn.innerHTML = `${spinnerSvg()} Publishing...`;
+            bnPublishBtn.disabled = true;
+            bnPublishBtn.innerHTML = `${bnSpinnerSvg()} Publishing...`;
 
-            hideForm();
-            showResult('', `${spinnerSvg()} Publishing breaking news to Neon...`);
+            bnHideForm();
+            bnShowResult('', `${bnSpinnerSvg()} Publishing breaking news to Neon...`);
 
             try {
                 const formData = new URLSearchParams();
@@ -461,7 +209,7 @@
                     const familyRef = result.neon && result.neon[0];
                     const neonAppUrl = '{{neonAppUrl}}';
 
-                    showResult('success', `${checkSvg()} Breaking news published <strong>successfully</strong>!`, [
+                    bnShowResult('success', `${bnCheckSvg()} Breaking news published <strong>successfully</strong>!`, [
                         familyRef && neonAppUrl ? {
                             label: 'Open in Neon',
                             style: 'success',
@@ -471,28 +219,28 @@
                             label: 'Publish Another',
                             style: 'secondary',
                             onClick: () => {
-                                document.getElementById('breakingNewsForm').reset();
-                                hideResult();
-                                showForm();
+                                document.getElementById('bn-form').reset();
+                                bnHideResult();
+                                bnShowForm();
                             }
                         }
                     ].filter(Boolean));
                 } else {
-                    showResult('error', `${crossSvg()} Failed to publish: ${result.message || 'Unknown error'}`, [
+                    bnShowResult('error', `${bnCrossSvg()} Failed to publish: ${result.message || 'Unknown error'}`, [
                         {
                             label: 'Try Again',
                             style: 'danger',
-                            onClick: () => { hideResult(); showForm(); }
+                            onClick: () => { bnHideResult(); bnShowForm(); }
                         }
                     ]);
                 }
             } catch (err) {
                 console.error('Error publishing breaking news:', err);
-                showResult('error', `${crossSvg()} Network error: ${err.message}`, [
+                bnShowResult('error', `${bnCrossSvg()} Network error: ${err.message}`, [
                     {
                         label: 'Try Again',
                         style: 'danger',
-                        onClick: () => { hideResult(); showForm(); }
+                        onClick: () => { bnHideResult(); bnShowForm(); }
                     }
                 ]);
             }
