@@ -187,12 +187,7 @@ function breakingNewsWidgetHandler(request, reply) {
   // params is an object we'll pass to our handlebars template
   let params = { seo: seo, neonAppUrl: process.env.NEON_APP_URL };
 
-  // Check for theme query parameter
-  const theme = request.query.theme;
-  const templatePath = theme === 'light' ? "/src/widgets/breakingnews-light.hbs" : "/src/widgets/breakingnews.hbs";
-
-  // The Handlebars code will be able to access the parameter values and build them into the page
-  return reply.view(templatePath, params);
+  return reply.view("/src/widgets/breakingnews-light.hbs", params);
 }
 
 function smartOctoDashboardHandler(request, reply) {

@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" href="/assets/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{seo.title}}</title>
-    
-    <!-- Meta tags for SEO and social sharing -->
+    <link rel="icon" href="/assets/favicon.ico">
     <link rel="canonical" href="{{seo.url}}">
     <meta name="description" content="{{seo.description}}">
     <meta property="og:title" content="{{seo.title}} - Breaking News Publisher">
@@ -16,416 +14,490 @@
     <meta property="og:description" content="{{seo.description}}">
     <meta property="og:image" content="{{seo.image}}">
     <meta name="twitter:card" content="summary">
-
-    <!-- Tailwind CSS CDN for shadcn/ui styling -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              border: "hsl(214.3 31.8% 91.4%)",
-              input: "hsl(214.3 31.8% 91.4%)",
-              ring: "hsl(221.2 83.2% 53.3%)",
-              background: "hsl(0 0% 100%)",
-              foreground: "hsl(222.2 84% 4.9%)",
-              primary: {
-                DEFAULT: "hsl(221.2 83.2% 53.3%)",
-                foreground: "hsl(210 40% 98%)",
-              },
-              secondary: {
-                DEFAULT: "hsl(210 40% 96%)",
-                foreground: "hsl(222.2 84% 4.9%)",
-              },
-              destructive: {
-                DEFAULT: "hsl(0 84.2% 60.2%)",
-                foreground: "hsl(210 40% 98%)",
-              },
-              muted: {
-                DEFAULT: "hsl(210 40% 96%)",
-                foreground: "hsl(215.4 16.3% 46.9%)",
-              },
-              accent: {
-                DEFAULT: "hsl(210 40% 96%)",
-                foreground: "hsl(222.2 84% 4.9%)",
-              },
-              popover: {
-                DEFAULT: "hsl(0 0% 100%)",
-                foreground: "hsl(222.2 84% 4.9%)",
-              },
-              card: {
-                DEFAULT: "hsl(0 0% 100%)",
-                foreground: "hsl(222.2 84% 4.9%)",
-              },
-            },
-          }
-        }
-      }
-    </script>
-  </head>
-  <body class="bg-background text-foreground min-h-screen font-sans antialiased">
-    <div id="main-container" class="container mx-auto p-6 max-w-2xl">
-      <div class="space-y-8">
-        <div id="breaking-news-header" class="text-center space-y-2">
-          <h1 class="text-3xl font-bold tracking-tight">Breaking News Publisher</h1>
-          <p class="text-muted-foreground">Create and publish breaking news articles</p>
-        </div>
-        
-        <!-- Breaking News Form -->
-        <div id="formContainer">
-          <div class="bg-card rounded-lg border shadow-sm p-6">
-            <form id="breakingNewsForm" class="space-y-6">
-              <div class="space-y-2">
-                <label for="headline" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                  Headline <span class="text-destructive">*</span>
-                </label>
-                <input 
-                  type="text" 
-                  id="headline" 
-                  name="headline" 
-                  required 
-                  maxlength="255" 
-                  placeholder="Enter breaking news headline"
-                  class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-              </div>
-              
-              <div class="space-y-2">
-                <label for="summary" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                  Summary
-                </label>
-                <textarea 
-                  id="summary" 
-                  name="summary" 
-                  rows="3" 
-                  maxlength="500" 
-                  placeholder="Enter a brief summary (optional)"
-                  class="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
-                ></textarea>
-              </div>
-              
-              <div class="space-y-2">
-                <label for="body" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                  Body
-                </label>
-                <textarea 
-                  id="body" 
-                  name="body" 
-                  rows="8" 
-                  placeholder="Enter the main content of the breaking news (optional)"
-                  class="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
-                ></textarea>
-              </div>
-              
-              <button 
-                type="submit" 
-                id="publishBtn" 
-                class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full"
-              >
-                Publish Breaking News
-              </button>
-            </form>
-          </div>
-        </div>
-          
-        <!-- Progress Message Container -->
-        <div id="progressContainer" class="progress-container hidden">
-          <div class="bg-card rounded-lg border shadow-sm p-6">
-            <div id="progressMessage" class="progress-message text-center mb-4"></div>
-            <div id="progressButtons" class="progress-buttons flex gap-2 justify-center flex-wrap"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <script>
-      // Progress Message API with shadcn/ui styling
-      class ProgressMessageAPI {
-        constructor(containerId, messageId, buttonsId) {
-          this.container = document.getElementById(containerId);
-          this.messageEl = document.getElementById(messageId);
-          this.buttonsEl = document.getElementById(buttonsId);
-          this.isVisible = false;
+    <link rel="stylesheet" href="/css/tailwind-panels.css">
+    <link rel="stylesheet" href="/neon/api/demo-integration/css/tailwind-panels.css">
+    <script src="/js/panel-api-helper.js"></script>
+    <script src="/neon/api/demo-integration/js/panel-api-helper.js"></script>
+    <style>
+        :root {
+            --neon-blue: #2847E2;
+            --neon-pink: #F75880;
+            --neon-black: #1D1930;
+            --neon-white: #FFFFFF;
+            --neon-text-primary: #1F2937;
+            --neon-text-secondary: #6B7280;
+            --neon-border: #E5E7EB;
+            --neon-background: #F9FAFB;
         }
 
-        show() {
-          if (!this.isVisible) {
-            this.container.classList.remove('hidden');
-            this.container.classList.add('animate-in', 'fade-in-0', 'slide-in-from-bottom-2');
-            this.isVisible = true;
-
-            setTimeout(() => {
-              this.messageEl.classList.add('animate-in', 'fade-in-0');
-              this.buttonsEl.classList.add('animate-in', 'fade-in-0', 'slide-in-from-bottom-1');
-            }, 100);
-          }
-          return this;
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--neon-background);
+            color: var(--neon-text-primary);
+            margin: 0;
+            padding: 0;
         }
 
-        hide() {
-          this.messageEl.classList.add('animate-out', 'fade-out-0');
-          this.buttonsEl.classList.add('animate-out', 'fade-out-0');
-
-          setTimeout(() => {
-            this.container.classList.add('hidden');
-            this.container.classList.remove('animate-in', 'fade-in-0', 'slide-in-from-bottom-2');
-            this.messageEl.classList.remove('animate-in', 'fade-in-0', 'animate-out', 'fade-out-0');
-            this.buttonsEl.classList.remove('animate-in', 'fade-in-0', 'slide-in-from-bottom-1', 'animate-out', 'fade-out-0');
-            this.isVisible = false;
-          }, 300);
-
-          return this;
+        .widget-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 24px;
         }
 
-        updateMessage(message) {
-          this.messageEl.innerHTML = message;
-          return this;
+        .widget-container.embedded {
+            padding: 12px;
         }
 
-        setStyle(style) {
-          // Reset classes
-          this.container.className = 'progress-container';
-          this.container.classList.remove('hidden');
-          
-          // Apply base card styling
-          const cardDiv = this.container.querySelector('.bg-card');
-          cardDiv.className = 'bg-card rounded-lg border shadow-sm p-6';
-          
-          // Apply style-specific classes
-          if (style === 'success') {
-            cardDiv.classList.add('border-green-200', 'bg-green-50');
-            this.messageEl.className = 'progress-message text-center mb-4 text-green-800';
-          } else if (style === 'error') {
-            cardDiv.classList.add('border-red-200', 'bg-red-50');
-            this.messageEl.className = 'progress-message text-center mb-4 text-red-800';
-          } else {
-            this.messageEl.className = 'progress-message text-center mb-4';
-          }
-          
-          return this;
+        /* Header */
+        .widget-header {
+            background: #fff;
+            border: 1px solid var(--neon-border);
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
-        clearButtons() {
-          this.buttonsEl.innerHTML = '';
-          return this;
+        .widget-header-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--neon-blue) 0%, var(--neon-pink) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
         }
 
-        addButton(text, onclick, style = 'primary') {
-          const button = document.createElement('button');
-          button.textContent = text;
-          button.onclick = onclick;
-          
-          // Base button classes
-          let buttonClasses = 'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2';
-          
-          // Style-specific classes
-          if (style === 'success') {
-            buttonClasses += ' bg-blue-600 text-white hover:bg-blue-700';
-          } else if (style === 'danger') {
-            buttonClasses += ' bg-destructive text-destructive-foreground hover:bg-destructive/90';
-          } else if (style === 'secondary') {
-            buttonClasses += ' bg-secondary text-secondary-foreground hover:bg-secondary/80';
-          } else {
-            buttonClasses += ' bg-primary text-primary-foreground hover:bg-primary/90';
-          }
-          
-          button.className = buttonClasses;
-          this.buttonsEl.appendChild(button);
-          return this;
+        .widget-header-icon svg {
+            width: 22px;
+            height: 22px;
+            color: #fff;
         }
 
-        update(options = {}) {
-          const hasMessage = options.message !== undefined;
-          const hasButtons = options.buttons !== undefined;
-          const hasStyle = options.style !== undefined;
-
-          if (hasStyle) {
-            this.setStyle(options.style);
-          }
-
-          if (hasMessage) {
-            this.updateMessage(options.message);
-          }
-
-          if (hasButtons) {
-            this.buttonsEl.innerHTML = '';
-            options.buttons.forEach(btn => {
-              this.addButton(btn.text, btn.onclick, btn.style || 'primary');
-            });
-          }
-
-          if (options.show !== false && !this.isVisible) {
-            this.show();
-          }
-
-          return this;
+        .widget-header-text h1 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--neon-text-primary);
         }
-      }
-      
-      // Initialize the Progress Message API
-      const progressAPI = new ProgressMessageAPI('progressContainer', 'progressMessage', 'progressButtons');
-      
-      // Form visibility functions
-      function hideForm() {
-        document.getElementById('formContainer').style.display = 'none';
-      }
-      
-      function showForm() {
-        document.getElementById('formContainer').style.display = 'block';
-      }
-      
-      // Form submission handler
-      document.getElementById('breakingNewsForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        const headline = document.getElementById('headline').value.trim();
-        const summary = document.getElementById('summary').value.trim();
-        const body = document.getElementById('body').value.trim();
-        
-        if (!headline) {
-          alert('Headline is required.');
-          return;
+
+        .widget-header-text p {
+            margin: 2px 0 0;
+            font-size: 12px;
+            color: var(--neon-text-secondary);
         }
-        
-        // Disable the submit button
-        const publishBtn = document.getElementById('publishBtn');
-        publishBtn.disabled = true;
-        publishBtn.innerHTML = `
-          <svg class="animate-spin -ml-1 mr-3 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-          Publishing...
-        `;
-        
-        // Hide form and show progress message
-        hideForm();
-        progressAPI.update({
-          message: `
-            <div class="flex items-center justify-center gap-2">
-              <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              Publishing breaking news to Neon...
-            </div>
-          `,
-          style: 'default',
-          buttons: []
-        });
-        
-        try {
-          const formData = new URLSearchParams();
-          formData.append('headline', headline);
-          formData.append('summary', summary);
-          formData.append('body', body);
-          
-          const response = await fetch('./breakingnews/publish', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: formData
-          });
-          
-          const result = await response.json();
-          
-          if (response.ok) {
-            // Success
-            const familyRef = result.neon[0];
-            
-            progressAPI.update({
-              message: `
-                <div class="flex items-center justify-center gap-2 text-green-700">
-                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                  </svg>
-                  Breaking news published <strong>successfully</strong>!
-                </div>
-              `,
-              style: 'success',
-              buttons: [
-                {
-                  text: 'Open',
-                  style: 'success',
-                  onclick: () => {
-                    window.open(`{{neonAppUrl}}/neon/app/neon.html#open/${familyRef}`);
-                  }
-                },
-                {
-                  text: 'Publish Another',
-                  style: 'secondary',
-                  onclick: () => {
-                    document.getElementById('breakingNewsForm').reset();
-                    progressAPI.hide();
-                    showForm();
-                    publishBtn.disabled = false;
-                    publishBtn.textContent = 'Publish Breaking News';
-                  }
-                }
-              ]
-            });
-          } else {
-            // Error
-            progressAPI.update({
-              message: `
-                <div class="flex items-center justify-center gap-2 text-red-700">
-                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                  </svg>
-                  Failed to publish breaking news: ${result.message || 'Unknown error'}
-                </div>
-              `,
-              style: 'error',
-              buttons: [
-                {
-                  text: 'Try Again',
-                  style: 'danger',
-                  onclick: () => {
-                    progressAPI.hide();
-                    showForm();
-                    publishBtn.disabled = false;
-                    publishBtn.textContent = 'Publish Breaking News';
-                  }
-                }
-              ]
-            });
-          }
-        } catch (error) {
-          console.error('Error publishing breaking news:', error);
-          progressAPI.update({
-            message: `
-              <div class="flex items-center justify-center gap-2 text-red-700">
-                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+
+        .widget-header.hidden {
+            display: none;
+        }
+
+        /* Form card */
+        .form-card {
+            background: #fff;
+            border: 1px solid var(--neon-border);
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+        }
+
+        .form-card.embedded {
+            box-shadow: none;
+            border: none;
+            padding: 8px 0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group:last-of-type {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--neon-text-primary);
+            margin-bottom: 6px;
+        }
+
+        label .required {
+            color: #EF4444;
+            margin-left: 2px;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 8px 12px;
+            border: 1px solid var(--neon-border);
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            color: var(--neon-text-primary);
+            background: #fff;
+            outline: none;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus {
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 0 3px rgba(40, 71, 226, 0.1);
+        }
+
+        input[type="text"]::placeholder,
+        textarea::placeholder {
+            color: var(--neon-text-secondary);
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 9px 18px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            font-family: inherit;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.15s, opacity 0.15s;
+        }
+
+        .btn:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background-color: var(--neon-blue);
+            color: #fff;
+            width: 100%;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background-color: #1e38c2;
+        }
+
+        .btn-secondary {
+            background-color: #F3F4F6;
+            color: var(--neon-text-primary);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background-color: #E5E7EB;
+        }
+
+        .btn-success {
+            background-color: var(--neon-blue);
+            color: #fff;
+        }
+
+        .btn-success:hover:not(:disabled) {
+            background-color: #1e38c2;
+        }
+
+        .btn-danger {
+            background-color: #EF4444;
+            color: #fff;
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            background-color: #DC2626;
+        }
+
+        /* Spinner */
+        .spinner-svg {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Progress / result card */
+        .result-card {
+            background: #fff;
+            border: 1px solid var(--neon-border);
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+            display: none;
+        }
+
+        .result-card.visible {
+            display: block;
+        }
+
+        .result-card.success {
+            border-color: #BBF7D0;
+            background-color: #F0FDF4;
+        }
+
+        .result-card.error {
+            border-color: #FECACA;
+            background-color: #FEF2F2;
+        }
+
+        .result-message {
+            text-align: center;
+            font-size: 14px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .result-message.success {
+            color: #15803D;
+        }
+
+        .result-message.error {
+            color: #B91C1C;
+        }
+
+        .result-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="widget-container" class="widget-container">
+
+        <!-- Header (hidden when embedded) -->
+        <div id="widget-header" class="widget-header">
+            <div class="widget-header-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
-                Network error: ${error.message}
-              </div>
-            `,
-            style: 'error',
-            buttons: [
-              {
-                text: 'Try Again',
-                style: 'danger',
-                onclick: () => {
-                  progressAPI.hide();
-                  showForm();
-                  publishBtn.disabled = false;
-                  publishBtn.textContent = 'Publish Breaking News';
-                }
-              }
-            ]
-          });
-        }
-      });
+            </div>
+            <div class="widget-header-text">
+                <h1>Breaking News Publisher</h1>
+                <p>Create and publish breaking news articles instantly</p>
+            </div>
+        </div>
 
-      if(window.location != window.parent.location) {
-        document.getElementById('breaking-news-header').style.display = 'none';
-        document.getElementById('main-container').classList.remove('p-6');
-        document.getElementById('formContainer').style.marginTop = '0';
-        document.querySelector('#formContainer .bg-card').classList.remove('shadow-sm');
-        document.querySelector('#formContainer .bg-card').classList.remove('border');
-      }
+        <!-- Form -->
+        <div id="form-card" class="form-card">
+            <form id="breakingNewsForm">
+                <div class="form-group">
+                    <label for="headline">Headline <span class="required">*</span></label>
+                    <input
+                        type="text"
+                        id="headline"
+                        name="headline"
+                        required
+                        maxlength="255"
+                        placeholder="Enter breaking news headline"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="summary">Summary</label>
+                    <textarea
+                        id="summary"
+                        name="summary"
+                        rows="3"
+                        maxlength="500"
+                        placeholder="Enter a brief summary (optional)"
+                    ></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="body">Body</label>
+                    <textarea
+                        id="body"
+                        name="body"
+                        rows="6"
+                        placeholder="Enter the main content of the breaking news (optional)"
+                    ></textarea>
+                </div>
+
+                <button type="submit" id="publishBtn" class="btn btn-primary">
+                    Publish Breaking News
+                </button>
+            </form>
+        </div>
+
+        <!-- Result card (progress / success / error) -->
+        <div id="result-card" class="result-card">
+            <div id="result-message" class="result-message"></div>
+            <div id="result-buttons" class="result-buttons"></div>
+        </div>
+
+    </div>
+
+    <script>
+        // ── Embedding detection ──────────────────────────────────────────────
+        const embedded = (typeof PanelAPI !== 'undefined') ? PanelAPI.isEmbedded() : (window.self !== window.top);
+
+        if (embedded) {
+            document.getElementById('widget-header').classList.add('hidden');
+            document.getElementById('widget-container').classList.add('embedded');
+            document.getElementById('form-card').classList.add('embedded');
+        }
+
+        // ── Spinner SVG helper ───────────────────────────────────────────────
+        function spinnerSvg(cls = '') {
+            return `<svg class="spinner-svg ${cls}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" width="18" height="18">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>`;
+        }
+
+        function checkSvg() {
+            return `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" width="18" height="18">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+            </svg>`;
+        }
+
+        function crossSvg() {
+            return `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" width="18" height="18">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>`;
+        }
+
+        // ── Result card helpers ──────────────────────────────────────────────
+        const resultCard = document.getElementById('result-card');
+        const resultMessage = document.getElementById('result-message');
+        const resultButtons = document.getElementById('result-buttons');
+
+        function showResult(state, messageHtml, buttons = []) {
+            resultCard.className = `result-card visible${state ? ' ' + state : ''}`;
+            resultMessage.className = `result-message${state ? ' ' + state : ''}`;
+            resultMessage.innerHTML = messageHtml;
+
+            resultButtons.innerHTML = '';
+            buttons.forEach(({ label, style, onClick }) => {
+                const btn = document.createElement('button');
+                btn.className = `btn btn-${style || 'secondary'}`;
+                btn.innerHTML = label;
+                btn.onclick = onClick;
+                resultButtons.appendChild(btn);
+            });
+        }
+
+        function hideResult() {
+            resultCard.className = 'result-card';
+        }
+
+        // ── Form show/hide ───────────────────────────────────────────────────
+        const formCard = document.getElementById('form-card');
+        const publishBtn = document.getElementById('publishBtn');
+
+        function showForm() {
+            formCard.style.display = '';
+            publishBtn.disabled = false;
+            publishBtn.innerHTML = 'Publish Breaking News';
+        }
+
+        function hideForm() {
+            formCard.style.display = 'none';
+        }
+
+        // ── Form submission ──────────────────────────────────────────────────
+        document.getElementById('breakingNewsForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const headline = document.getElementById('headline').value.trim();
+            const summary = document.getElementById('summary').value.trim();
+            const body = document.getElementById('body').value.trim();
+
+            if (!headline) {
+                alert('Headline is required.');
+                return;
+            }
+
+            publishBtn.disabled = true;
+            publishBtn.innerHTML = `${spinnerSvg()} Publishing...`;
+
+            hideForm();
+            showResult('', `${spinnerSvg()} Publishing breaking news to Neon...`);
+
+            try {
+                const formData = new URLSearchParams();
+                formData.append('headline', headline);
+                formData.append('summary', summary);
+                formData.append('body', body);
+
+                const endpoint = '/widgets/breakingnews/publish';
+                let response;
+
+                if (typeof PanelAPI !== 'undefined') {
+                    response = await PanelAPI.apiCall(endpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: formData
+                    });
+                } else {
+                    response = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: formData
+                    });
+                }
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    const familyRef = result.neon && result.neon[0];
+                    const neonAppUrl = '{{neonAppUrl}}';
+
+                    showResult('success', `${checkSvg()} Breaking news published <strong>successfully</strong>!`, [
+                        familyRef && neonAppUrl ? {
+                            label: 'Open in Neon',
+                            style: 'success',
+                            onClick: () => window.open(`${neonAppUrl}/neon/app/neon.html#open/${familyRef}`)
+                        } : null,
+                        {
+                            label: 'Publish Another',
+                            style: 'secondary',
+                            onClick: () => {
+                                document.getElementById('breakingNewsForm').reset();
+                                hideResult();
+                                showForm();
+                            }
+                        }
+                    ].filter(Boolean));
+                } else {
+                    showResult('error', `${crossSvg()} Failed to publish: ${result.message || 'Unknown error'}`, [
+                        {
+                            label: 'Try Again',
+                            style: 'danger',
+                            onClick: () => { hideResult(); showForm(); }
+                        }
+                    ]);
+                }
+            } catch (err) {
+                console.error('Error publishing breaking news:', err);
+                showResult('error', `${crossSvg()} Network error: ${err.message}`, [
+                    {
+                        label: 'Try Again',
+                        style: 'danger',
+                        onClick: () => { hideResult(); showForm(); }
+                    }
+                ]);
+            }
+        });
     </script>
-  </body>
+</body>
+
 </html>
