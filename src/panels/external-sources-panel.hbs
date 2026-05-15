@@ -430,6 +430,11 @@
 
             const cards = assets.map(asset => createAssetCard(asset)).join('');
             domEls.assetGrid.innerHTML = cards;
+
+            domEls.assetGrid.querySelectorAll('.asset-card').forEach(card => {
+                card.addEventListener('dragstart', handleCardDragStart);
+                card.addEventListener('dragend', handleCardDragEnd);
+            });
         }
 
         // Create asset card
@@ -440,7 +445,14 @@
             const meta = getAssetMeta(asset);
 
             return `
-                <div class="asset-card bg-white rounded-lg shadow-md overflow-hidden" data-asset='${escapeHtml(JSON.stringify(asset))}'>
+                <div class="asset-card bg-white rounded-lg shadow-md overflow-hidden" draggable="true" data-asset='${escapeHtml(JSON.stringify(asset))}'>
+                    <div class="drag-handle" title="Drag to insert">
+                        <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+                            <circle cx="3" cy="2" r="1.2"/><circle cx="9" cy="2" r="1.2"/>
+                            <circle cx="3" cy="6" r="1.2"/><circle cx="9" cy="6" r="1.2"/>
+                            <circle cx="3" cy="10" r="1.2"/><circle cx="9" cy="10" r="1.2"/>
+                        </svg>
+                    </div>
                     <div class="asset-thumbnail">
                         <img src="${thumbnailUrl}" alt="${escapeHtml(title)}" loading="lazy">
                         ${isVideo ? 
@@ -545,32 +557,19 @@
             return sortedVideos[0].link;
         }
 
-        // Asset actions
-        function insertAsset(button) {
-            const card = button.closest('.asset-card');
-            const asset = JSON.parse(card.dataset.asset);
-
-            let url;
+        // Derive the canonical asset URL for a given asset object
+        function getAssetUrl(asset) {
             if (state.currentSource === 'pexels') {
-                // Check if it's a photo or video based on current type
-                if (state.currentType === 'photos') {
-                    url = getImageUrl(asset, 'original');
-                } else {
-                    // For videos, get the highest quality video link
-                    url = getHighestQualityVideo(asset);
-                }
+                return state.currentType === 'photos'
+                    ? getImageUrl(asset, 'original')
+                    : getHighestQualityVideo(asset);
             } else if (state.currentSource === 'youtube' || state.currentSource === 'dailymotion') {
-                // For YouTube and DailyMotion, use the video URL or embed URL
-                url = asset.videoUrl || asset.embedUrl;
+                return asset.videoUrl || asset.embedUrl;
             }
+            return null;
+        }
 
-            if (!url) {
-                console.error('Failed to get asset URL:', asset);
-                return;
-            }
-
-            console.log('Inserting asset:', url);
-
+        function sendInsertPostMessage(url) {
             window.parent.postMessage({
                 type: 'insert-object',
                 info: {
@@ -579,6 +578,52 @@
                     targetWorkfolder: state.neonContext?.workfolderId || null
                 }
             }, window.parent.origin);
+        }
+
+        // Asset actions
+        function insertAsset(button) {
+            const card = button.closest('.asset-card');
+            const asset = JSON.parse(card.dataset.asset);
+            const url = getAssetUrl(asset);
+
+            if (!url) {
+                console.error('Failed to get asset URL:', asset);
+                return;
+            }
+
+            console.log('Inserting asset:', url);
+            sendInsertPostMessage(url);
+        }
+
+        // Drag handlers — enable dragging cards onto contenteditable fields
+        // in the parent window or other windows/tabs
+        function handleCardDragStart(e) {
+            const card = e.currentTarget.closest('.asset-card');
+            const asset = JSON.parse(card.dataset.asset);
+            const url = getAssetUrl(asset);
+            if (!url) return;
+
+            e.dataTransfer.effectAllowed = 'copy';
+            e.dataTransfer.setData('text/plain', url);
+            e.dataTransfer.setData('text/uri-list', url);
+
+            state.pendingDragUrl = url;
+            card.classList.add('dragging');
+
+            const img = card.querySelector('img');
+            if (img) e.dataTransfer.setDragImage(img, 40, 40);
+        }
+
+        function handleCardDragEnd(e) {
+            const card = e.currentTarget.closest('.asset-card');
+            card.classList.remove('dragging');
+
+            // dropEffect is 'none' when no valid drop target accepted the drag.
+            // In that case fall back to postMessage so the CMS can handle the insert.
+            if (e.dataTransfer.dropEffect === 'none' && state.pendingDragUrl) {
+                sendInsertPostMessage(state.pendingDragUrl);
+            }
+            state.pendingDragUrl = null;
         }
 
         function showModal(button) {

@@ -185,3 +185,37 @@
 .tab-button svg {
     display: inline;
 }
+
+/* Drag-and-drop styles */
+.asset-card[draggable="true"] {
+    cursor: grab;
+    position: relative;
+}
+
+.asset-card[draggable="true"]:active {
+    cursor: grabbing;
+    opacity: 0.75;
+}
+
+.asset-card.dragging {
+    opacity: 0.5;
+    outline: 2px dashed #2847E2;
+}
+
+.drag-handle {
+    position: absolute;
+    top: 0.4rem;
+    left: 0.4rem;
+    z-index: 10;
+    color: rgba(255, 255, 255, 0.9);
+    background: rgba(0, 0, 0, 0.45);
+    border-radius: 0.25rem;
+    padding: 0.2rem 0.25rem;
+    line-height: 0;
+    cursor: grab;
+    transition: background 0.15s ease;
+}
+
+.drag-handle:hover {
+    background: rgba(40, 71, 226, 0.8);
+}

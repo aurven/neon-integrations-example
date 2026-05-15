@@ -241,12 +241,40 @@ body {
     border: 1px solid var(--es-border);
     box-shadow: var(--es-elevation-1);
     overflow: hidden;
-    cursor: default;
+    cursor: grab;
     transition: box-shadow 0.2s, border-color 0.2s, transform 0.15s;
     display: flex;
     flex-direction: column;
     container-type: inline-size;
     container-name: es-card-container;
+    position: relative;
+}
+
+.es-card:active {
+    cursor: grabbing;
+}
+
+.es-card.es-dragging {
+    opacity: 0.5;
+    outline: 2px dashed var(--es-accent);
+}
+
+.es-drag-handle {
+    position: absolute;
+    top: 0.4rem;
+    left: 0.4rem;
+    z-index: 10;
+    color: rgba(255, 255, 255, 0.9);
+    background: rgba(0, 0, 0, 0.45);
+    border-radius: 4px;
+    padding: 0.2rem 0.25rem;
+    line-height: 0;
+    cursor: grab;
+    transition: background 0.15s ease;
+}
+
+.es-drag-handle:hover {
+    background: var(--es-accent);
 }
 
 .es-card:hover {
@@ -383,6 +411,24 @@ body {
 
 .es-card-btn-insert:hover {
     background: var(--es-accent-hover);
+}
+
+.es-card-btn-copy {
+    background: var(--es-bg);
+    color: var(--es-text-secondary);
+    border: 1px solid var(--es-border);
+    flex: 0 0 1.625rem;
+}
+
+.es-card-btn-copy:hover {
+    background: #EBEBF0;
+    color: var(--es-text);
+}
+
+.es-card-btn-copied {
+    background: #1a8a4a !important;
+    color: #fff !important;
+    border-color: transparent !important;
 }
 
 .es-card-btn-preview {

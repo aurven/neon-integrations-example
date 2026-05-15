@@ -236,7 +236,13 @@ async function searchAssets(query) {
         else if (state.currentSource === 'dailymotion') assets = await fetchDailyMotion(query);
 
         if (!assets.length) { els.noResults.style.display = 'flex'; }
-        else { els.grid.innerHTML = assets.map(renderCard).join(''); }
+        else {
+            els.grid.innerHTML = assets.map(renderCard).join('');
+            els.grid.querySelectorAll('.es-card').forEach(card => {
+                card.addEventListener('dragstart', handleCardDragStart);
+                card.addEventListener('dragend', handleCardDragEnd);
+            });
+        }
     } catch (err) {
         console.error('Search error:', err);
         els.noResults.style.display = 'flex';
@@ -324,9 +330,7 @@ function getMeta(asset) {
 function getInsertUrl(asset) {
     if (state.currentSource === 'pexels') {
         if (state.currentType === 'photos') return getThumb(asset, 'original');
-        const sorted = [...(asset.video_files || [])].sort((a,b) =>
-            ((b.width||0)*(b.height||0)) - ((a.width||0)*(a.height||0)));
-        return sorted[0]?.link || null;
+        return asset.url || null;
     }
     return asset.videoUrl || asset.embedUrl || null;
 }
@@ -356,7 +360,14 @@ function renderCard(asset) {
         </div>`;
 
     return `
-        <div class="es-card" data-asset="${data}">
+        <div class="es-card" draggable="true" data-asset="${data}">
+            <div class="es-drag-handle" title="Drag to insert">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+                    <circle cx="3" cy="2" r="1.2"/><circle cx="9" cy="2" r="1.2"/>
+                    <circle cx="3" cy="6" r="1.2"/><circle cx="9" cy="6" r="1.2"/>
+                    <circle cx="3" cy="10" r="1.2"/><circle cx="9" cy="10" r="1.2"/>
+                </svg>
+            </div>
             <div class="es-thumb-wrap">
                 <img class="es-thumb" src="${thumb}" alt="${title}" loading="lazy">
                 ${videoOverlay}
@@ -372,6 +383,11 @@ function renderCard(asset) {
                         <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
                     </svg>
                     <span class="es-card-btn-label">Insert</span>
+                </button>
+                <button class="es-card-btn es-card-btn-copy" title="Copy URL" onclick="cardCopyUrl(this)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                    </svg>
                 </button>
                 <button class="es-card-btn es-card-btn-preview" title="Preview" onclick="cardPreview(this)">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -453,6 +469,18 @@ function cardPreview(btn) {
     openModal(asset);
 }
 
+function cardCopyUrl(btn) {
+    const asset = JSON.parse(btn.closest('.es-card').dataset.asset);
+    const url = getInsertUrl(asset);
+    if (!url) return;
+    navigator.clipboard.writeText(url).then(() => {
+        const orig = btn.innerHTML;
+        btn.classList.add('es-card-btn-copied');
+        btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+        setTimeout(() => { btn.classList.remove('es-card-btn-copied'); btn.innerHTML = orig; }, 1500);
+    });
+}
+
 function doInsert(asset, btn) {
     const url = getInsertUrl(asset);
     if (!url) return console.error('No URL for asset:', asset);
@@ -467,6 +495,38 @@ function doInsert(asset, btn) {
         type: 'insert-object',
         info: { op: 'uploadAndInsertAsset', url, targetWorkfolder: state.neonContext?.workfolderId || null }
     }, window.parent.origin);
+}
+
+// ── Drag-and-drop ──────────────────────────────────────
+function handleCardDragStart(e) {
+    const card = e.currentTarget.closest('.es-card');
+    const asset = JSON.parse(card.dataset.asset);
+    const url = getInsertUrl(asset);
+    if (!url) return;
+
+    e.dataTransfer.effectAllowed = 'copy';
+    e.dataTransfer.setData('text/plain', url);
+    e.dataTransfer.setData('text/uri-list', url);
+
+    state.pendingDragUrl = url;
+    card.classList.add('es-dragging');
+
+    const img = card.querySelector('img');
+    if (img) e.dataTransfer.setDragImage(img, 40, 40);
+}
+
+function handleCardDragEnd(e) {
+    const card = e.currentTarget.closest('.es-card');
+    card.classList.remove('es-dragging');
+
+    // dropEffect 'none' means no target accepted the drop — fall back to postMessage
+    if (e.dataTransfer.dropEffect === 'none' && state.pendingDragUrl) {
+        window.parent.postMessage({
+            type: 'insert-object',
+            info: { op: 'uploadAndInsertAsset', url: state.pendingDragUrl, targetWorkfolder: state.neonContext?.workfolderId || null }
+        }, window.parent.origin);
+    }
+    state.pendingDragUrl = null;
 }
 
 // ── Modal ──────────────────────────────────────────────
