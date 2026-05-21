@@ -15,6 +15,17 @@ const TEMPLATE = '/SysConfig/Product/Shared/Templates/Default/story.xml';
 const CHANNEL = '';
 const WORKFOLDER = '/Product/World';
 
+// Channel exclusion rules for tags
+// Format: { tagName: '!ChannelName' } to exclude a tag from a specific channel
+// Example: { table: '!Tabloid', figure: '!Web' }
+const DEFAULT_CHANNEL_RULES = {
+  table: '!Tabloid'
+};
+
+const getChannelRules = (customRules = {}) => {
+  return { ...DEFAULT_CHANNEL_RULES, ...customRules };
+};
+
 // Process webhook data
 const processWebhookData = async (model) => {
   const generateInfoFromModel = (model) => {
@@ -75,6 +86,7 @@ const processWebhookData = async (model) => {
         "teaser",
         "oembedblock"
       ],
+      channelRules: getChannelRules(),
     });
     
     const $doc = cheerio.load(neonXmlContent, { xml: true }, false);
@@ -177,11 +189,7 @@ function addPrintImageGroup($doc, methodeImage) {
             xtransform="translate(0 0) scale(1 1)"
           />
           <print-image-caption id="${utils.generateAutoId()}">
-              <p>
-                  <caption><![CDATA[${captionText}]]></caption>
-                  <ld pattern=" " />
-                  <credit><![CDATA[${creditText}]]></credit>
-              </p>
+              <p><caption><![CDATA[${captionText}]]></caption><ld pattern=" " /><credit><![CDATA[${creditText}]]></credit></p>
           </print-image-caption>
       </print-image-group>
   `;
