@@ -231,31 +231,74 @@ async function processNeonStory(model) {
 };
 
 async function processNeonStoryV2 (model) {
+  const { MethodeClient } = require('./helpers/methode-bo-api.js');
+  const methodeClient = new MethodeClient();
+
   try {
     const { info, name, xmlDeclarations, $doc } = await processWebhookData(model);
 
     const issueDate = dayjs().add(1, 'day').format('YYYYMMDD');
 
-    await edapi.login({
-      username: USERNAME,
-      password: PASSWORD,
-    });
-    const loid = await edapi.createStory({
-      name,
-      issueDate,
-      template: TEMPLATE,
-      channel: CHANNEL,
-      workFolder: WORKFOLDER,
-      // attributes: info.attributes,
-      // attributes: {
-      //   metadata: {
-      //     general: {
-      //       priority: 'High'
-      //     }
-      //   }
-      // },
-      attributes: null
-    });
+    await methodeClient.login({ username: USERNAME, password: PASSWORD });
+
+    // Check if this Neon object was already sent to Méthode via methodeHook writeback
+    const existingStoryId = info.pubInfo?.webhookData?.methodeHook?.storyId;
+    let loid;
+
+    if (existingStoryId) {
+      console.log(`🔍 methodeHook found — checking if story ${existingStoryId} exists in Méthode...`);
+      let existingStory = null;
+      try {
+        existingStory = await methodeClient.getObject(existingStoryId);
+      } catch (err) {
+        console.warn(`⚠️ Could not fetch story ${existingStoryId} from Méthode: ${err.message}. Will create a new one.`);
+      }
+
+      if (existingStory) {
+        console.log(`✅ Story ${existingStoryId} exists in Méthode — will update instead of creating.`);
+        loid = existingStoryId;
+
+        // Check if this story is linked to a page (PrintPageLinked role)
+        console.log(`Checking if story ${existingStoryId} is linked to a page...`);
+        let linkedObjects = null;
+        try {
+          linkedObjects = await methodeClient.getObjectLinked(existingStoryId, 'EOM::PrintPageLinked');
+          console.log(`Linked objects for ${existingStoryId}: ${JSON.stringify(linkedObjects, null, 2)}`);
+        } catch (err) {
+          console.warn(`⚠️ Could not check PrintPageLinked for ${existingStoryId}: ${err.message}`);
+        }
+
+        const isLinkedToPage = linkedObjects?.roles?.length > 0;
+        if (isLinkedToPage) {
+          console.log(`📄 Story ${existingStoryId} is linked to a page — checking for Tabloid channel copy...`);
+
+          const hasTabloidCopy = linkedObjects.roles.some(
+            role => role.bundleChildChannel === 'Tabloid' || role.channel === 'Tabloid'
+          );
+
+          if (!hasTabloidCopy) {
+            console.log(`📋 No Tabloid channel copy found — creating one...`);
+            await methodeClient.createChannelCopy(existingStoryId, 'Tabloid', 'Neutral');
+          } else {
+            console.log(`✅ Tabloid channel copy already exists — skipping creation.`);
+          }
+        }
+      } else {
+        console.log(`⚠️ Story ${existingStoryId} not found in Méthode — creating a new story.`);
+      }
+    }
+
+    if (!loid) {
+      loid = await methodeClient.createStory({
+        name,
+        issueDate,
+        template: TEMPLATE,
+        channel: CHANNEL,
+        workFolder: WORKFOLDER,
+        attributes: null
+      });
+    }
+
     const imageReferences = await images.modelImagesToMethode(
       model, {
         channel: CHANNEL,
@@ -269,13 +312,21 @@ async function processNeonStoryV2 (model) {
     Object.values(imageReferences).forEach(imageReference => {
       addPrintImageGroup($doc, imageReference);
     });
-    
+
     const content = xmlDeclarations + $doc.html();
     const cleanedContent = utils.stripAllCData(content);
-    loid && (await edapi.putContentToStory(loid, cleanedContent));
-    
-    await edapi.logout();
-    
+    loid && (await methodeClient.putContentToStory(loid, cleanedContent));
+
+    await methodeClient.sendMessage({
+      subject: `New update for Story from Digital (${loid})`,
+      body: 'There are new updates on the Master copy of a story already linked to a page. Please review the changes and update the channel copy if necessary.',
+      recipients: ['aureliano.ventrella'], // Méthode principal names (users or groups)
+      priority: '1',       // optional, defaults to '1'
+      attachments: []      // optional, defaults to []
+    });
+
+    await methodeClient.logout();
+
     console.log('Neon item imported successfully!');
 
     return {
@@ -287,6 +338,7 @@ async function processNeonStoryV2 (model) {
     };
   } catch (error) {
     console.error(error);
+    await methodeClient.cleanup();
   }
 };
 

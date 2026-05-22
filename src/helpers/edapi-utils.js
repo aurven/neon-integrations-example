@@ -114,7 +114,7 @@ async function getObjects(loids) {
     };
 
     try {
-        await client.request(config)
+        return await client.request(config)
             .then((response) => {
                 // console.log(JSON.stringify(response.data));
                 const objectInfo = response.data.result;
@@ -285,6 +285,82 @@ async function putContentToStory(loid, content) {
  * Helper function to get story shape and handle complex workflow for PDF preview generation
  * This retrieves the story shape JSON which contains layout information needed for preview
  */
+async function getObjectLinked(id, roleType = null) {
+    const queryParams = new URLSearchParams({ id });
+    if (roleType) queryParams.append('roleType', roleType);
+
+    const url = `${EDAPIURL}/object/linked?${queryParams}`;
+
+    const config = {
+        method: 'get',
+        maxBodyLength: Infinity,
+        url,
+        headers: { 'Content-Type': 'application/json' }
+    };
+
+    try {
+        return await client.request(config)
+            .then((response) => {
+                return response.data.result || response.data;
+            })
+            .catch((error) => {
+                console.error(`❌ ERROR: ${error.code}`);
+                console.error(JSON.stringify(error.response?.data));
+                return null;
+            });
+    } catch (error) {
+        console.error(`Get object linked failed for ID ${id}:`, error.response?.data || error.message);
+    }
+
+    return null;
+}
+
+async function createChannelCopy(loid, channel = 'Tabloid', inheritFrom = 'Neutral') {
+    const url = `${EDAPIURL}/v3/container/bundle/${loid}/channelcopy`;
+
+    const payload = {
+        showAdditionalInfo: true,
+        showPath: true,
+        showSystemAttributes: true,
+        showAttributes: true,
+        showUsageTickets: true,
+        showVirtualAttributes: true,
+        showXml: true,
+        showUniquenessString: true,
+        checkIn: true,
+        unlock: true,
+        channel,
+        inheritFrom,
+        source: loid,
+        keepCheckedOut: false
+    };
+
+    const config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        url,
+        headers: { 'Content-Type': 'application/json' },
+        data: payload
+    };
+
+    try {
+        return await client.request(config)
+            .then((response) => {
+                console.log(`Channel copy created for LOID: ${loid} (channel: ${channel})`);
+                return response.data.result || response.data;
+            })
+            .catch((error) => {
+                console.error(`❌ ERROR: ${error.code}`);
+                console.error(JSON.stringify(error.response?.data));
+                return null;
+            });
+    } catch (error) {
+        console.error(`Create channel copy failed for LOID ${loid}:`, error.response?.data || error.message);
+    }
+
+    return null;
+}
+
 async function getStoryShapeWithContent(loid) {
     const { MethodeClient } = require('./methode-bo-api.js');
     
@@ -432,6 +508,8 @@ module.exports = {
     logout,
     getObjects,
     getObject,
+    getObjectLinked,
+    createChannelCopy,
     createStory,
     createObject,
     readContent,

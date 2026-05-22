@@ -1,4 +1,4 @@
-const neonBoApi = require("../helpers/neon-bo-api-v2.js");
+const neonBoApi = require("../helpers/neon-bo-api-v3.js");
 
 /**
  * Fetch and prepare articles from Neon CMS
@@ -6,9 +6,6 @@ const neonBoApi = require("../helpers/neon-bo-api-v2.js");
  * @param {number} limit - Number of articles to fetch (default: 10)
  */
 async function fetchArticles(limit = 10) {
-  // Login to Neon CMS
-  await neonBoApi.login();
-
   // Build search query to fetch articles
   const queryPayload = {
     queryStatement: {

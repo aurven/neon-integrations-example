@@ -1,4 +1,4 @@
-const neonApi = require('../helpers/neon-bo-api-v2.js');
+const neonApi = require('../helpers/neon-bo-api-v3.js');
 const { safeLogRequest, withNeonSession } = require("../helpers/utils.js");
 const { authenticate } = require("../helpers/auth.js");
 const fs = require('fs');

@@ -1,7 +1,7 @@
 const openaiPrompts = require("../ai/openai.js");
 const pexels = require('../connectors/pexels-connector.js');
 const cleaner = require('../content-cleaner.js');
-const neon = require('../helpers/neon-bo-api.js');
+const neon = require('../helpers/neon-bo-api-v3.js');
 const { safeLogRequest } = require("../helpers/utils.js");
 const { authenticate } = require("../helpers/auth.js");
 

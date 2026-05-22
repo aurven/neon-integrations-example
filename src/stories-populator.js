@@ -1,7 +1,7 @@
 const dayjs = require('dayjs');
 const utils = require('./helpers/utils.js');
 const neonUtils = require('./helpers/neon-utils.js');
-const neon = require('./helpers/neon-bo-api.js');
+const neon = require('./helpers/neon-bo-api-v3.js');
 const deepl = require('deepl-node');
 const images = require('./images-importer.js');
 
@@ -131,8 +131,6 @@ async function populateNeonInstance(data, options = {site: null, workspace: null
   
     createdIds = [];
   
-    await neon.login();
-
     return await data.reduce(async (promiseAcc, story) => {
         console.log(story.id || story.title);
 
@@ -150,9 +148,8 @@ async function populateNeonInstance(data, options = {site: null, workspace: null
         });
     }, Promise.resolve())
         .then(() => {
-            neon.logout();
             return createdIds;
-        });  
+        });
 }
 
 async function testStoryTranslations(data, options = {site: null, workspace: null, language: 'en', translate: null}) {

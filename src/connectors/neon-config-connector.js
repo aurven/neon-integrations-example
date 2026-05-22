@@ -1,6 +1,6 @@
 const fs = require('fs').promises;
 const path = require('path');
-const { NeonClient } = require('../helpers/neon-bo-api-v2');
+const { NeonClient } = require('../helpers/neon-bo-api-v3');
 
 const CACHE_DIR = path.join(process.cwd(), 'data', 'neon-config');
 
@@ -64,35 +64,28 @@ async function fetchFromNeon(type) {
 
     const client = new NeonClient();
 
-    try {
-        await client.login();
+    if (type === 'usersGroups') {
+        const [usersResult, groupsResult] = await Promise.all([
+            client.getUsers(),
+            client.getGroups()
+        ]);
 
-        if (type === 'usersGroups') {
-            const [usersResult, groupsResult] = await Promise.all([
-                client.getUsers(),
-                client.getGroups()
-            ]);
+        return {
+            lastUpdated: new Date().toISOString(),
+            source: 'neon-bo',
+            users:  usersResult?.users  || (Array.isArray(usersResult)  ? usersResult  : []),
+            groups: groupsResult?.groups || (Array.isArray(groupsResult) ? groupsResult : [])
+        };
+    }
 
-            return {
-                lastUpdated: new Date().toISOString(),
-                source: 'neon-bo',
-                users:  usersResult?.users  || (Array.isArray(usersResult)  ? usersResult  : []),
-                groups: groupsResult?.groups || (Array.isArray(groupsResult) ? groupsResult : [])
-            };
-        }
+    if (type === 'workflows') {
+        const workflowsResult = await client.getWorkflowDefinitions();
 
-        if (type === 'workflows') {
-            const workflowsResult = await client.getWorkflowDefinitions();
-
-            return {
-                lastUpdated: new Date().toISOString(),
-                source: 'neon-bo',
-                workflows: workflowsResult?.workflows || (Array.isArray(workflowsResult) ? workflowsResult : [])
-            };
-        }
-
-    } finally {
-        try { await client.logout(); } catch (_) {}
+        return {
+            lastUpdated: new Date().toISOString(),
+            source: 'neon-bo',
+            workflows: workflowsResult?.workflows || (Array.isArray(workflowsResult) ? workflowsResult : [])
+        };
     }
 }
 

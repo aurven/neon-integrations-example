@@ -398,16 +398,9 @@ function safeLogRequest(headers, body) {
  * });
  */
 async function withNeonSession(operation, options = {}) {
-  const { NeonClient } = require('./neon-bo-api-v2.js');
+  const { NeonClient } = require('./neon-bo-api-v3.js');
   const client = new NeonClient(options);
-
-  try {
-    await client.login();
-    const result = await operation(client);
-    return result;
-  } finally {
-    await client.logout();
-  }
+  return await operation(client);
 }
 
 module.exports = {

@@ -391,6 +391,63 @@ class MethodeClient {
         }
     }
 
+    async createChannelCopy(loid, channel = 'Tabloid', inheritFrom = 'Neutral') {
+        if (!loid) {
+            throw new Error('loid is required');
+        }
+
+        const payload = {
+            showAdditionalInfo: true,
+            showPath: true,
+            showSystemAttributes: true,
+            showAttributes: true,
+            showUsageTickets: true,
+            showVirtualAttributes: true,
+            showXml: true,
+            showUniquenessString: true,
+            checkIn: true,
+            unlock: true,
+            channel,
+            inheritFrom,
+            source: loid,
+            keepCheckedOut: false
+        };
+
+        try {
+            const response = await this.makeRequest({
+                method: 'post',
+                url: `/v3/container/bundle/${loid}/channelcopy`,
+                data: payload
+            }, `Channel copy created for LOID: ${loid} (channel: ${channel})`, true);
+
+            return response.result || response;
+        } catch (error) {
+            console.error(`Create channel copy failed for LOID ${loid}:`, error.message);
+            throw error;
+        }
+    }
+
+    async sendMessage({ subject, body, recipients, priority = '1', attachments = [] }) {
+        if (!subject || !body || !Array.isArray(recipients) || recipients.length === 0) {
+            throw new Error('subject, body, and recipients are required');
+        }
+
+        const payload = { subject, body, recipients, priority, attachments };
+
+        try {
+            const response = await this.makeRequest({
+                method: 'post',
+                url: '/message',
+                data: payload
+            }, `Message sent to: ${recipients.join(', ')}`, true);
+
+            return response.result || response;
+        } catch (error) {
+            console.error('Send message failed:', error.message);
+            throw error;
+        }
+    }
+
     async createStoryPreview(id, payload, getPdf = false) {
         if (!id || !payload) {
             throw new Error('id and payload are required');
@@ -535,5 +592,7 @@ module.exports = {
     getBinaryContent: (loid, format, maxSize) => defaultClient.getBinaryContent(loid, format, maxSize),
     putContentToStory: (loid, content) => defaultClient.putContentToStory(loid, content),
     getStoryShape: (loid, options) => defaultClient.getStoryShape(loid, options),
-    createStoryPreview: (id, payload, getPdf) => defaultClient.createStoryPreview(id, payload, getPdf)
+    createStoryPreview: (id, payload, getPdf) => defaultClient.createStoryPreview(id, payload, getPdf),
+    createChannelCopy: (loid, channel, inheritFrom) => defaultClient.createChannelCopy(loid, channel, inheritFrom),
+    sendMessage: (options) => defaultClient.sendMessage(options)
 };

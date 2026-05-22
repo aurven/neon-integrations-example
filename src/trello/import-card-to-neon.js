@@ -1,7 +1,7 @@
 const dayjs = require('dayjs');
 const utils = require('../helpers/utils.js');
 const neonUtils = require('../helpers/neon-utils.js');
-const neon = require('../helpers/neon-bo-api.js');
+const neon = require('../helpers/neon-bo-api-v3.js');
 const images = require('../images-importer.js');
 
 const defaultSite = 'TheGlobe';
@@ -105,14 +105,8 @@ async function newNodeFromTopic(topic) {
 async function importCard (trelloCard) {
   const topic = cardOptionsTransformer(trelloCard);
   
-  await neon.login();
-  
   const neonId = await newNodeFromTopic(topic);
-  
   topic.neon.familyRef = neonId;
-  
-  await neon.logout();
-  
   return topic;
 }
 

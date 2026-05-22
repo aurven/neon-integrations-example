@@ -1,5 +1,5 @@
 const utils = require('./utils.js');
-const neon = require('./neon-bo-api.js');
+const neon = require('./neon-bo-api-v3.js');
 
 async function workflowTransitionTo({ familyRef, targetStateName, targetWorkflowName = null, priority = 0, principals = [], comment = '' }) {
     const getNextStepsResult = await neon.getNextSteps?.(familyRef);

@@ -1,7 +1,6 @@
 const seo = require("../seo.json");
 const axios = require("axios");
-const neon = require("../helpers/neon-bo-api.js");
-const neonV2 = require("../helpers/neon-bo-api-v2.js");
+const neon = require("../helpers/neon-bo-api-v3.js");
 const imagesImporter = require("../images-importer.js");
 const { MethodeClient } = require("../helpers/methode-bo-api.js");
 const { createStoryPreviewWithSetup } = require("../helpers/edapi-utils.js");
@@ -340,22 +339,15 @@ async function uploadAssetHandler(request, reply) {
   }
   
   try {
-    console.log(`Starting Neon session for asset upload: ${imageUrl}`);
-    
-    // Login to Neon
-    await neon.login();
-    
-    // Upload the image
+    console.log(`Starting asset upload: ${imageUrl}`);
+
     const uploadResult = await imagesImporter.uploadImage({
       imageName: imageName || `trello-asset-${Date.now()}`,
       imageUrl: imageUrl,
       workspace: workspace || '/Convergent/News',
       story: {}
     });
-    
-    // Logout from Neon
-    await neon.logout();
-    
+
     console.log(`Asset uploaded successfully:`, uploadResult);
     
     return reply.send({
@@ -366,14 +358,6 @@ async function uploadAssetHandler(request, reply) {
     
   } catch (error) {
     console.error('Asset upload error:', error.message);
-    
-    // Ensure logout even on error
-    try {
-      await neon.logout();
-    } catch (logoutError) {
-      console.error('Error during cleanup logout:', logoutError.message);
-    }
-    
     return reply.status(500).send({
       error: 'Asset upload failed',
       details: error.message
@@ -613,20 +597,13 @@ async function generateArticlePdfHandler(request, reply) {
       // Normal mode: fetch from Neon API using v2
       console.log(`Generating PDF for object: ${objectId}`);
 
-      // Login to Neon (v2)
-      await neonV2.login();
-
-      // Fetch article data from Neon
+        // Fetch article data from Neon
       console.log(`Fetching article data for: ${objectId}`);
-      articleObject = await neonV2.getNode(objectId);
+      articleObject = await neon.getNode(objectId);
 
       if (!articleObject) {
-        await neonV2.logout();
         return reply.status(404).send({ error: "Article not found" });
       }
-
-      // Logout from Neon
-      await neonV2.logout();
     }
 
     // Parse article content
@@ -664,15 +641,6 @@ async function generateArticlePdfHandler(request, reply) {
 
   } catch (error) {
     console.error('Error generating PDF:', error);
-
-    // Ensure logout even on error (only if not in demo mode)
-    if (!demoMode) {
-      try {
-        await neonV2.logout();
-      } catch (logoutError) {
-        console.error('Error during cleanup logout:', logoutError.message);
-      }
-    }
 
     return reply.status(500).send({
       error: 'PDF generation failed',
@@ -836,17 +804,14 @@ async function familyAuditApiProxyHandler(request, reply) {
   if (!familyRef) return reply.status(400).send({ error: 'familyRef is required' });
 
   try {
-    await neonV2.login();
-    const result = await neonV2.getMetricsData('metrics/family_audit', {
+    const result = await neon.getMetricsData('metrics/family_audit', {
       familyRef,
       date: date || 'now'
     });
-    await neonV2.logout();
     console.log('[Family Audit API] << OUT: fetched audit events for', familyRef);
     return reply.send(result);
   } catch (error) {
     console.error('[Family Audit API] Error:', error.message);
-    try { await neonV2.logout(); } catch (_) {}
     return reply.status(error.response?.status || 500).send({
       error: 'Failed to fetch audit events',
       details: error.response?.data || error.message

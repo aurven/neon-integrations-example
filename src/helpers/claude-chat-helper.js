@@ -1,7 +1,7 @@
 'use strict';
 
 const Anthropic = require('@anthropic-ai/sdk');
-const { NeonClient } = require('./neon-bo-api-v2.js');
+const { NeonClient } = require('./neon-bo-api-v3.js');
 const crypto = require('crypto');
 
 // ---------------------------------------------------------------------------
@@ -310,9 +310,7 @@ async function handleChatTurn({ sessionId, userMessage, neonContext, role, rawRe
   let neonClient = null;
 
   try {
-    // Create and login NeonClient (one per turn)
     neonClient = new NeonClient();
-    await neonClient.login();
 
     const tools = buildNeonTools(session.neonContext || neonContext, neonClient, role);
 
@@ -452,9 +450,6 @@ async function handleChatTurn({ sessionId, userMessage, neonContext, role, rawRe
     sseDone(rawReply);
   } finally {
     clearInterval(keepalive);
-    if (neonClient) {
-      try { await neonClient.logout(); } catch (_) { /* ignore */ }
-    }
     rawReply.end();
   }
 }
