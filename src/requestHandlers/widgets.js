@@ -332,7 +332,8 @@ function neonGridWidgetHandler(request, reply) {
       description: "AG-Grid list of articles from Neon CMS"
     },
     neonAppUrl: process.env.NEON_APP_URL,
-    apiKey: auth.apikey
+    apiKey: auth.apikey,
+    demo: request.query.demo === 'true'
   };
   return reply.view("/src/widgets/neon-grid.hbs", params);
 }

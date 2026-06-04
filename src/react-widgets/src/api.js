@@ -12,5 +12,7 @@ async function apiFetch(path) {
 }
 
 export function fetchArticles() {
-  return apiFetch('/api/neon/grid/articles');
+  const demo = window.CONFIG?.demo;
+  const url = demo ? '/api/neon/grid/articles?demo=true' : '/api/neon/grid/articles';
+  return apiFetch(url);
 }
