@@ -129,7 +129,8 @@ fastify.get("/services", function (request, reply) {
       { name: "Planning Board", endpoint: "GET /widgets/planning-board", demoUrl: "/widgets/planning-board", description: "Editorial task planning board with Kanban and Calendar views" },
       { name: "Neon Grid", endpoint: "GET /widgets/neon-grid", demoUrl: "/widgets/neon-grid?demo=true", description: "AG-Grid article list from Neon CMS — headline, summary, date, status columns (supports demo mode with ?demo=true)" },
       { name: "Tag Manager", endpoint: "GET /tags/widget", demoUrl: "/tags/widget", description: "Manage distribution tags, packages, and customer subscriptions" },
-      { name: "Tags Input Mockup", endpoint: "GET /tags/input-mockup", demoUrl: "/tags/input-mockup", description: "NeonTagsInput component mockup — copy-paste ready for Neon Object Panel" }
+      { name: "Tags Input Mockup", endpoint: "GET /tags/input-mockup", demoUrl: "/tags/input-mockup", description: "NeonTagsInput component mockup — copy-paste ready for Neon Object Panel" },
+      { name: "Print Query Board", endpoint: "GET /widgets/print-query-board", demoUrl: "/widgets/print-query-board", description: "Kanban board for planning print edition stories — segment by section (with char budget), priority, desk, or access. Drag cards to reclassify." }
     ],
     panels: [
       { name: "Trello Panel", endpoint: "GET /panels/trello", demoUrl: "/panels/trello", description: "Trello card management panel for Neon CMS iframe embedding with PostMessage API" },
@@ -243,6 +244,7 @@ fastify.get("/widgets/welcome", widgetHandlers.welcomeWidgetHandler);
 fastify.get("/widgets/planning-board", widgetHandlers.planningBoardWidgetHandler);
 fastify.get("/widgets/neon-grid", widgetHandlers.neonGridWidgetHandler);
 fastify.get("/api/neon/grid/articles", widgetHandlers.neonGridDataHandler);
+fastify.get("/widgets/print-query-board", widgetHandlers.printQueryBoardHandler);
 
 /**
  *

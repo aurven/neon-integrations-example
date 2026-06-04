@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "build": "vite build",
+    "build:print-query-board": "vite build --config vite.print-query-board.config.js",
     "dev": "vite"
   },
   "dependencies": {

@@ -400,6 +400,17 @@ async function neonGridDataHandler(request, reply) {
   }
 }
 
+function printQueryBoardHandler(request, reply) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) return reply.status(401).send({ error: 'Unauthorized' });
+
+  return reply.view('/src/widgets/print-query-board.hbs', {
+    seo: { title: 'Print Query Board', description: 'Kanban board for planning print edition stories by section, priority, desk, or access' },
+    neonAppUrl: process.env.NEON_APP_URL,
+    apiKey: auth.apikey,
+  });
+}
+
 module.exports = {
   testWidgetHandler,
   dropWidgetHandler,
@@ -413,4 +424,5 @@ module.exports = {
   planningBoardWidgetHandler,
   neonGridWidgetHandler,
   neonGridDataHandler,
+  printQueryBoardHandler,
 };
