@@ -18,6 +18,9 @@ const renameCssPlugin = () => ({
 
 export default defineConfig({
   plugins: [react(), renameCssPlugin()],
+  define: {
+    'process.env.NODE_ENV': JSON.stringify('production')
+  },
   build: {
     lib: {
       entry: 'src/main.jsx',
