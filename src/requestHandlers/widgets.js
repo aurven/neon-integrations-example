@@ -4,6 +4,7 @@ const openai = require("../ai/openai.js");
 const storiesPopulator = require("../stories-populator.js");
 const { safeLogRequest } = require("../helpers/utils.js");
 const { authenticate } = require("../helpers/auth.js");
+const neonBoApi = require("../helpers/neon-bo-api-v3.js");
 
 function testWidgetHandler(request, reply) {
   const auth = authenticate(request, reply);
@@ -319,6 +320,71 @@ function planningBoardWidgetHandler(request, reply) {
   return reply.view("/src/widgets/planning-board.hbs", params);
 }
 
+function neonGridWidgetHandler(request, reply) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) {
+    return reply.status(401).send({ error: "Unauthorized" });
+  }
+
+  let params = {
+    seo: {
+      title: "Neon Articles Grid",
+      description: "AG-Grid list of articles from Neon CMS"
+    },
+    neonAppUrl: process.env.NEON_APP_URL,
+    apiKey: auth.apikey
+  };
+  return reply.view("/src/widgets/neon-grid.hbs", params);
+}
+
+async function neonGridDataHandler(request, reply) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) {
+    return reply.status(401).send({ error: "Unauthorized" });
+  }
+
+  const queryPayload = {
+    queryStatement: {
+      bool: {
+        and: [
+          { type: "match", path: "typeName", match: "article*" }
+        ]
+      },
+      sort: {
+        type: "fields",
+        sorts: [
+          { path: "versionInfo.createFamilyTime", order: "DESC" }
+        ]
+      }
+    },
+    variables: {
+      domain: ["editorial"]
+    },
+    options: {
+      showLoadPublishInfo: true,
+      showSystemAttributes: true
+    }
+  };
+
+  try {
+    const searchResults = await neonBoApi.searchContents(queryPayload, 50, 50);
+    const nodes = searchResults.nodes || [];
+
+    const articles = nodes.map(node => ({
+      id: node.familyRef,
+      headline: node.title || '',
+      summary: node.nodeMeta?.teaser?.title || '',
+      date: node.updateTs || null,
+      status: node.workflowInfo?.workflow || 'Unknown'
+    }));
+
+    return reply.status(200).send({ articles });
+  } catch (error) {
+    console.error('neonGridDataHandler error:', error);
+    return reply.status(500).send({ error: 'Failed to fetch articles from Neon' });
+  }
+}
+
 module.exports = {
   testWidgetHandler,
   dropWidgetHandler,
@@ -329,5 +395,7 @@ module.exports = {
   smartOctoDashboardHandler,
   neonAnalyticsDashboardHandler,
   welcomeWidgetHandler,
-  planningBoardWidgetHandler
+  planningBoardWidgetHandler,
+  neonGridWidgetHandler,
+  neonGridDataHandler,
 };
