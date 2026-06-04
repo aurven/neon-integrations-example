@@ -351,7 +351,8 @@ async function neonGridDataHandler(request, reply) {
     headline: node.title || '',
     summary: node.nodeMeta?.teaser?.title || '',
     date: node.updateTs || null,
-    status: node.workflowInfo?.workflow || 'Unknown'
+    status: node.versionInfo?.workflowInfo?.workflow || 'Unknown',
+    statusColor: node.versionInfo?.workflowInfo?.color || null
   }));
 
   if (demoMode) {

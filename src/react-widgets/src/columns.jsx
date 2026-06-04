@@ -1,11 +1,5 @@
-function StatusCellRenderer({ value }) {
-  const colors = {
-    PUBLISHED: '#22c55e',
-    DRAFT: '#f59e0b',
-    READY: '#3b82f6',
-    ARCHIVED: '#6b7280'
-  };
-  const bg = colors[value?.toUpperCase()] ?? '#9ca3af';
+function StatusCellRenderer({ value, data }) {
+  const bg = data?.statusColor ?? '#9ca3af';
   return (
     <span style={{
       display: 'inline-block',
