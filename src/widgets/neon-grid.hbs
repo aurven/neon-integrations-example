@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{seo.title}}</title>
+  <link rel="stylesheet" href="/css/tailwind-panels.css">
+  <link rel="stylesheet" href="/neon/api/demo-integration/css/tailwind-panels.css">
+  <link rel="stylesheet" href="/js/react/neon-grid-widget.css">
+  <link rel="stylesheet" href="/neon/api/demo-integration/js/react/neon-grid-widget.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script>
+    window.CONFIG = {
+      neonAppUrl: '{{neonAppUrl}}',
+      apiKey: '{{{apiKey}}}'
+    };
+  </script>
+  <script src="/js/react/neon-grid-widget.js"></script>
+  <script src="/neon/api/demo-integration/js/react/neon-grid-widget.js"></script>
+</body>
+</html>
