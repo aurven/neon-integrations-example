@@ -26,7 +26,6 @@ export default defineConfig({
       formats: ['iife']
     },
     outDir: '../../public/js/react',
-    emptyOutDir: false,
-    cssFileName: 'neon-grid-widget'
+    emptyOutDir: false
   }
 })

@@ -47,7 +47,6 @@ export default function NeonGridWidget() {
         rowData={rowData}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
-        animateRows={true}
         pagination={true}
         paginationPageSize={25}
       />
