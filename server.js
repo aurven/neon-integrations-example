@@ -127,7 +127,7 @@ fastify.get("/services", function (request, reply) {
       { name: "Neon Analytics", endpoint: "GET /widgets/neon-analytics", demoUrl: "/widgets/neon-analytics?demo=true", description: "Production metrics dashboard with interactive charts - supports demo mode (?demo=true)" },
       { name: "Welcome Widget", endpoint: "GET /widgets/welcome", demoUrl: "/widgets/welcome", description: "Onboarding widget for new users with quick tour and action cards" },
       { name: "Planning Board", endpoint: "GET /widgets/planning-board", demoUrl: "/widgets/planning-board", description: "Editorial task planning board with Kanban and Calendar views" },
-      { name: "Neon Grid", endpoint: "GET /widgets/neon-grid", demoUrl: "/widgets/neon-grid", description: "AG-Grid article list from Neon CMS — headline, summary, date, status columns" },
+      { name: "Neon Grid", endpoint: "GET /widgets/neon-grid", demoUrl: "/widgets/neon-grid?demo=true", description: "AG-Grid article list from Neon CMS — headline, summary, date, status columns (supports demo mode with ?demo=true)" },
       { name: "Tag Manager", endpoint: "GET /tags/widget", demoUrl: "/tags/widget", description: "Manage distribution tags, packages, and customer subscriptions" },
       { name: "Tags Input Mockup", endpoint: "GET /tags/input-mockup", demoUrl: "/tags/input-mockup", description: "NeonTagsInput component mockup — copy-paste ready for Neon Object Panel" }
     ],

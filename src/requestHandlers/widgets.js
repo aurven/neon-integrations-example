@@ -343,6 +343,28 @@ async function neonGridDataHandler(request, reply) {
     return reply.status(401).send({ error: "Unauthorized" });
   }
 
+  const demoMode = request.query.demo === 'true';
+
+  const mapNodes = (nodes) => nodes.map(node => ({
+    id: node.familyRef,
+    headline: node.title || '',
+    summary: node.nodeMeta?.teaser?.title || '',
+    date: node.updateTs || null,
+    status: node.workflowInfo?.workflow || 'Unknown'
+  }));
+
+  if (demoMode) {
+    try {
+      const fs = require('fs');
+      const path = require('path');
+      const demoData = JSON.parse(fs.readFileSync(path.join(__dirname, '../../examples/search-results.json'), 'utf8'));
+      return reply.status(200).send({ articles: mapNodes(demoData.nodes || []) });
+    } catch (error) {
+      console.error('neonGridDataHandler demo error:', error);
+      return reply.status(500).send({ error: 'Failed to load demo data' });
+    }
+  }
+
   const queryPayload = {
     queryStatement: {
       bool: {
@@ -368,16 +390,7 @@ async function neonGridDataHandler(request, reply) {
 
   try {
     const searchResults = await neonBoApi.searchContents(queryPayload, 50, 50);
-    const nodes = searchResults.nodes || [];
-
-    const articles = nodes.map(node => ({
-      id: node.familyRef,
-      headline: node.title || '',
-      summary: node.nodeMeta?.teaser?.title || '',
-      date: node.updateTs || null,
-      status: node.workflowInfo?.workflow || 'Unknown'
-    }));
-
+    const articles = mapNodes(searchResults.nodes || []);
     return reply.status(200).send({ articles });
   } catch (error) {
     console.error('neonGridDataHandler error:', error);
