@@ -240,6 +240,8 @@ fastify.get("/widgets/smartocto-dashboard", widgetHandlers.smartOctoDashboardHan
 fastify.get("/widgets/neon-analytics", widgetHandlers.neonAnalyticsDashboardHandler);
 fastify.get("/widgets/welcome", widgetHandlers.welcomeWidgetHandler);
 fastify.get("/widgets/planning-board", widgetHandlers.planningBoardWidgetHandler);
+fastify.get("/widgets/neon-grid", widgetHandlers.neonGridWidgetHandler);
+fastify.get("/api/neon/grid/articles", widgetHandlers.neonGridDataHandler);
 
 /**
  *
