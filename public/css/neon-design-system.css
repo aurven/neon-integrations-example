@@ -1,0 +1,283 @@
+/* ============================================================
+   NEON — Eidos Media's design system + CMS
+   Foundations: color + typography
+   ============================================================ */
+
+/* ----- Fonts (Source Sans Pro is the primary font) --------- */
+@import url("https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,300;0,400;0,500;0,600;0,700;0,900;1,400&family=Nunito:wght@400;500;600;700;800&display=swap");
+/* Note: design files reference "Source Sans Pro". Google Fonts now ships
+   it as Source Sans 3 — same metrics, near-identical glyphs. */
+
+:root {
+  /* ============================================================
+     COLOR PRIMITIVES — copied from /Colors/primitive-NEON
+     ============================================================ */
+
+  /* Theme (blue) — the brand color. 500 = #0A2EE6 */
+  --theme-200: #c2cdff;
+  --theme-300: #829ce3;
+  --theme-400: #1a57ff;
+  --theme-500: #0a2ee6;   /* primary */
+  --theme-600: #171db5;
+  --theme-700: #0f0f61;
+
+  /* Grey ramp — neutral scale */
+  --grey-100: #f9f9fb;
+  --grey-200: #f1f0f4;
+  --grey-300: #d7d6e1;
+  --grey-400: #aaa8b8;
+  --grey-500: #87849a;
+  --grey-600: #605d74;
+  --grey-700: #3f3c4e;
+  --grey-800: #1d1930;
+
+  /* Tinted greys used heavily in current product (the "OLD" greys
+     in the figma — still in production and so still tokens). */
+  --grey-divider: #ddddce5; /* (kept for context; see --neutral-border) */
+  --neutral-bg: #f6f3f6;     /* secondary button + chip fill */
+  --neutral-border: #dddce5; /* card / input border */
+  --neutral-soft: #bfbfca;   /* dividers */
+
+  /* Semantic colors */
+  --red-50:    #fff0f0;
+  --red-500:   #d22d2d;   /* destructive / error */
+  --red-700:   #b1e1e8;   /* (placeholder per figma — dark variant) */
+
+  --green-50:  #e8f5e9;
+  --green-500: #367d38;   /* success label */
+  --green-bright: #27c92e; /* success dot / pill bg */
+  --green-700: #0f4212;
+
+  --yellow-50:  #fff8cc;
+  --yellow-500: #ffd11a;  /* warning */
+  --yellow-700: #806600;
+
+  --navy-50:  #ebf4fe;
+  --navy-500: #0f56bc;    /* info */
+  --navy-700: #06368b;
+
+  --teal-50:  #e0f5f5;
+  --teal-500: #007a7a;
+  --teal-700: #004040;
+
+  --purple-50:  #f9f0ff;
+  --purple-500: #8b2ecc;
+  --purple-700: #4b1472;
+  --purple-bright: #9747ff; /* annotation accent — dashed borders in docs */
+
+  --cyan-bright: #19fcfc;   /* AI accent (sparingly used) */
+
+  /* ============================================================
+     SEMANTIC ALIASES (use these in product code)
+     ============================================================ */
+
+  /* Surfaces & backgrounds */
+  --bg-app:        #f9f9fb;  /* root app background */
+  --bg-surface:    #ffffff;  /* cards, panels, sidebars */
+  --bg-subtle:     #f6f3f6;  /* hover/selected light, chip bg */
+  --bg-muted:      #f5f7fa;  /* alt panel */
+  --bg-inverse:    #1d1930;
+
+  /* Borders */
+  --border-default: #dddce5;
+  --border-strong:  #bfbfca;
+  --border-subtle:  #f1f0f4;
+
+  /* Text */
+  --fg-primary:   #3f3c4e;   /* default body text */
+  --fg-secondary: #69667f;   /* muted / labels */
+  --fg-tertiary:  #9d9aac;   /* disabled-ish */
+  --fg-inverse:   #ffffff;
+  --fg-on-brand:  #ffffff;
+  --fg-link:      #0a2ee6;
+  --fg-label:     #3f3c4e;   /* input labels (basic text color, per design feedback) */
+  --fg-error:     #d22d2d;
+
+  /* Brand */
+  --brand:           #0a2ee6;
+  --brand-hover:     #171db5;
+  --brand-active:    #131390;
+  --brand-soft:      #e5ecff;
+  --brand-soft-bg:   #f0f4ff;
+
+  /* Status */
+  --status-success: #27c92e;
+  --status-warning: #ffd11a;
+  --status-error:   #d22d2d;
+  --status-info:    #0f56bc;
+  --status-ai:      #9747ff;
+
+  /* ============================================================
+     RADIUS / SHADOW / SPACING
+     ============================================================ */
+  --radius-xs: 4px;   /* checkbox, tag */
+  --radius-sm: 5px;   /* small icon button */
+  --radius-md: 8px;   /* buttons, inputs */
+  --radius-lg: 10px;  /* cards, panels, sidebar */
+  --radius-pill: 999px;
+
+  /* Shadows (Figma uses very soft, low-elevation drops) */
+  --shadow-xs: 0 1px 0 rgba(63, 60, 78, 0.06);
+  --shadow-sm: 0 1px 2px rgba(63, 60, 78, 0.10);
+  --shadow-md: 0 4px 12px rgba(63, 60, 78, 0.10);
+  --shadow-lg: 0 12px 28px rgba(63, 60, 78, 0.14);
+  --shadow-focus: 0 0 0 2px var(--brand);
+
+  /* Spacing (5px base) */
+  --space-1: 5px;
+  --space-2: 10px;
+  --space-3: 15px;
+  --space-4: 20px;
+  --space-5: 30px;
+  --space-6: 40px;
+  --space-7: 60px;
+
+  /* ============================================================
+     TYPOGRAPHY
+     ============================================================ */
+  --font-sans:    "Source Sans 3", "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-display: "Nunito", "Source Sans 3", sans-serif;
+  --font-ui:      "Inter", "Source Sans 3", sans-serif;
+  --font-mono:    ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* Scale (px in production: 10/11/12/14/18/24/30/80 — small dense UI) */
+  --fs-xxs: 10px;
+  --fs-xs:  11px;
+  --fs-sm:  12px;
+  --fs-md:  14px;   /* DEFAULT body / button / label */
+  --fs-lg:  18px;
+  --fs-xl:  24px;
+  --fs-2xl: 30px;
+  --fs-3xl: 48px;
+  --fs-4xl: 80px;
+
+  --lh-tight: 1.0;
+  --lh-snug:  1.2;
+  --lh-base:  1.4;     /* DEFAULT */
+  --lh-relaxed: 1.5;
+
+  --fw-light:    300;
+  --fw-regular:  400;
+  --fw-medium:   500;
+  --fw-semibold: 600;
+  --fw-bold:     700;
+
+  --ls-default: 0;
+  --ls-display: 0.01em;
+}
+
+/* ============================================================
+   SEMANTIC TYPE STYLES — apply directly via element name.
+   These match the Figma usage observed across the system.
+   ============================================================ */
+
+html, body {
+  font-family: var(--font-sans);
+  font-size: var(--fs-md);
+  line-height: var(--lh-base);
+  color: var(--fg-primary);
+  background: var(--bg-app);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, .neon-h1 {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-light);
+  font-size: var(--fs-4xl);   /* hero / cover only */
+  line-height: var(--lh-tight);
+  letter-spacing: var(--ls-display);
+  color: var(--fg-primary);
+  margin: 0;
+}
+
+h2, .neon-h2 {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-2xl);
+  line-height: var(--lh-snug);
+  color: var(--fg-primary);
+  margin: 0;
+}
+
+h3, .neon-h3 {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-xl);
+  line-height: var(--lh-snug);
+  color: var(--fg-primary);
+  margin: 0;
+}
+
+h4, .neon-h4 {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-lg);
+  line-height: var(--lh-base);
+  color: var(--fg-primary);
+  margin: 0;
+}
+
+p, .neon-body {
+  font-family: var(--font-sans);
+  font-size: var(--fs-md);
+  line-height: var(--lh-base);
+  color: var(--fg-primary);
+  margin: 0;
+}
+
+.neon-body-sm {
+  font-size: var(--fs-sm);
+  line-height: var(--lh-base);
+  color: var(--fg-secondary);
+}
+
+.neon-caption {
+  font-size: var(--fs-xs);
+  line-height: var(--lh-base);
+  color: var(--fg-secondary);
+  letter-spacing: 0.01em;
+  text-transform: none;
+}
+
+.neon-label {
+  font-size: var(--fs-sm);
+  line-height: var(--lh-base);
+  color: var(--fg-label);
+  font-weight: var(--fw-regular);
+}
+
+.neon-button-text {
+  font-family: var(--font-sans);
+  font-size: var(--fs-md);
+  line-height: var(--lh-base);
+  font-weight: var(--fw-regular);
+}
+
+.neon-link {
+  color: var(--fg-link);
+  text-decoration: none;
+}
+.neon-link:hover { text-decoration: underline; }
+
+code, .neon-mono {
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+}
+
+/* Display (cover / hero / brand mark) */
+.neon-display {
+  font-family: var(--font-display);
+  font-weight: var(--fw-bold);
+  font-size: 124px;
+  line-height: var(--lh-tight);
+  letter-spacing: var(--ls-display);
+}
+
+/* Tiny dense labels seen in toolbars and binder */
+.neon-tag {
+  font-size: var(--fs-xxs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--fg-secondary);
+}

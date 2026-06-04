@@ -1,3 +1,18 @@
+function HeadlineCellRenderer({ data }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '100%', gap: '2px' }}>
+      <span style={{ fontSize: '13px', fontWeight: 600, color: '#3f3c4e', lineHeight: '1.3', whiteSpace: 'normal', wordBreak: 'break-word' }}>
+        {data?.headline || '—'}
+      </span>
+      {data?.summary && (
+        <span style={{ fontSize: '11px', color: '#69667f', lineHeight: '1.3', whiteSpace: 'normal', wordBreak: 'break-word' }}>
+          {data.summary}
+        </span>
+      )}
+    </div>
+  );
+}
+
 function StatusCellRenderer({ value, data }) {
   const bg = data?.statusColor ?? '#9ca3af';
   return (
@@ -28,21 +43,14 @@ function formatDate(params) {
 export const columnDefs = [
   {
     field: 'headline',
-    headerName: 'Headline',
-    flex: 2,
-    minWidth: 200,
+    headerName: 'Title',
+    flex: 5,
+    minWidth: 260,
     resizable: true,
     sortable: true,
-    filter: true
-  },
-  {
-    field: 'summary',
-    headerName: 'Summary',
-    flex: 3,
-    minWidth: 200,
-    resizable: true,
-    sortable: false,
-    filter: false
+    filter: true,
+    autoHeight: true,
+    cellRenderer: HeadlineCellRenderer
   },
   {
     field: 'date',
@@ -65,5 +73,10 @@ export const columnDefs = [
 
 export const defaultColDef = {
   suppressMovable: false,
-  cellStyle: { fontSize: '13px' }
+  cellStyle: {
+    fontSize: '13px',
+    fontFamily: '"Source Sans 3", "Source Sans Pro", -apple-system, sans-serif',
+    color: '#3f3c4e',
+    lineHeight: '1.4'
+  }
 };

@@ -1,16 +1,25 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import { columnDefs, defaultColDef } from './columns.jsx';
 import { fetchArticles } from './api.js';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
+import './neon-grid.css';
+
+const RefreshIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 14.016 14.002" fill="none">
+    <path d="M 11.96 2.059 C 10.87 0.965 9.448 0.262 7.917 0.06 C 6.386 -0.142 4.831 0.168 3.494 0.942 C 2.158 1.715 1.114 2.909 0.527 4.337 C -0.061 5.765 -0.16 7.348 0.245 8.838 C 0.65 10.328 1.537 11.643 2.767 12.577 C 3.997 13.511 5.501 14.012 7.046 14.002 C 8.59 13.993 10.088 13.472 11.306 12.523 C 12.524 11.573 13.394 10.248 13.78 8.752 L 11.96 8.752 C 11.639 9.659 11.074 10.46 10.329 11.068 C 9.583 11.676 8.684 12.067 7.731 12.198 C 6.778 12.33 5.808 12.197 4.925 11.814 C 4.043 11.431 3.282 10.813 2.727 10.027 C 2.172 9.241 1.844 8.318 1.778 7.358 C 1.713 6.399 1.912 5.439 2.355 4.585 C 2.797 3.731 3.466 3.015 4.288 2.516 C 5.111 2.016 6.054 1.752 7.016 1.752 C 7.704 1.754 8.385 1.892 9.019 2.159 C 9.653 2.427 10.228 2.818 10.709 3.31 L 7.891 6.127 L 14.016 6.127 L 14.016 0.002 L 11.96 2.059 Z" fill="currentColor" fillRule="nonzero" />
+  </svg>
+);
 
 export default function NeonGridWidget() {
   const [rowData, setRowData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
+  const loadArticles = useCallback(() => {
+    setLoading(true);
+    setError(null);
     fetchArticles()
       .then(data => {
         setRowData(data.articles ?? data);
@@ -22,34 +31,112 @@ export default function NeonGridWidget() {
       });
   }, []);
 
-  if (loading) {
-    return (
-      <div style={{ padding: '32px', textAlign: 'center', color: '#6b7280' }}>
-        Loading articles…
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div style={{ padding: '32px', textAlign: 'center', color: '#ef4444' }}>
-        Failed to load articles: {error}
-      </div>
-    );
-  }
+  useEffect(() => { loadArticles(); }, [loadArticles]);
 
   return (
-    <div
-      className="ag-theme-alpine"
-      style={{ height: 'calc(100vh - 48px)', width: '100%' }}
-    >
-      <AgGridReact
-        rowData={rowData}
-        columnDefs={columnDefs}
-        defaultColDef={defaultColDef}
-        pagination={true}
-        paginationPageSize={25}
-      />
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      height: '100vh',
+      background: '#f9f9fb',
+      fontFamily: '"Source Sans 3", "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+      WebkitFontSmoothing: 'antialiased'
+    }}>
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '10px',
+        padding: '0 16px',
+        height: '48px',
+        background: '#ffffff',
+        borderBottom: '1px solid #dddce5',
+        flexShrink: 0
+      }}>
+        <span style={{ fontSize: '14px', fontWeight: 600, color: '#3f3c4e' }}>Articles</span>
+        {!loading && !error && (
+          <span style={{
+            fontSize: '11px',
+            color: '#69667f',
+            background: '#f6f3f6',
+            padding: '1px 8px',
+            borderRadius: '999px'
+          }}>
+            {rowData.length}
+          </span>
+        )}
+        <div style={{ flex: 1 }} />
+        <button
+          onClick={loadArticles}
+          disabled={loading}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '5px',
+            padding: '5px 10px',
+            background: 'none',
+            border: '1px solid #dddce5',
+            borderRadius: '8px',
+            cursor: loading ? 'not-allowed' : 'pointer',
+            fontSize: '12px',
+            color: loading ? '#bfbfca' : '#3f3c4e',
+            fontFamily: 'inherit',
+            transition: 'background 120ms ease-out, color 120ms ease-out'
+          }}
+          onMouseEnter={e => { if (!loading) e.currentTarget.style.background = '#f6f3f6'; }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'none'; }}
+        >
+          <RefreshIcon />
+          Refresh
+        </button>
+      </div>
+
+      <div style={{ flex: 1, padding: '16px', overflow: 'hidden', minHeight: 0 }}>
+        {loading && (
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: '100%',
+            color: '#9d9aac',
+            fontSize: '14px'
+          }}>
+            Loading articles…
+          </div>
+        )}
+        {error && !loading && (
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: '100%',
+            color: '#d22d2d',
+            fontSize: '14px'
+          }}>
+            {error}
+          </div>
+        )}
+        {!loading && !error && (
+          <div
+            className="ag-theme-alpine"
+            style={{
+              height: '100%',
+              width: '100%',
+              border: '1px solid #dddce5',
+              borderRadius: '10px',
+              overflow: 'hidden',
+              boxShadow: 'none'
+            }}
+          >
+            <AgGridReact
+              rowData={rowData}
+              columnDefs={columnDefs}
+              defaultColDef={defaultColDef}
+              pagination={true}
+              paginationPageSize={25}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 }
