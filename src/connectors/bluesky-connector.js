@@ -347,12 +347,38 @@ function clearSession() {
   console.log('[Bluesky] Session cache cleared');
 }
 
+// Standard connector interface wrappers
+function getStatus() {
+  const missing = ['BLUESKY_HANDLE', 'BLUESKY_APP_PASSWORD'].filter(v => !process.env[v]);
+  if (missing.length > 0) return { configured: false, error: `Missing: ${missing.join(', ')}` };
+  return { configured: true, handle: process.env.BLUESKY_HANDLE };
+}
+
+async function publish(text, options = {}) {
+  const richText = parseRichText(text);
+  const result = await publishPost(richText.text, { facets: richText.facets, ...options });
+  return { success: result.success, postId: result.postUri, postUrl: result.postUrl, publishedAt: result.publishedAt };
+}
+
+async function getMetrics(postId) {
+  return await getPostMetrics(postId);
+}
+
 module.exports = {
+  // existing exports (keep for backward compatibility)
   authenticate,
   refreshSession,
   getSession,
   publishPost,
   getPostMetrics,
   parseRichText,
-  clearSession
+  clearSession,
+  // standard interface
+  platform: 'bluesky',
+  displayName: 'Bluesky',
+  maxLength: 300,
+  requiresImage: false,
+  getStatus,
+  publish,
+  getMetrics
 };
