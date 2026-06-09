@@ -17,16 +17,20 @@ test('getStatus returns not configured when env vars missing', () => {
 
 test('getStatus returns configured when all env vars present', () => {
   TWITTER_VARS.forEach(v => { process.env[v] = 'test-value'; });
-  const status = connector.getStatus();
-  assert.equal(status.configured, true);
-  TWITTER_VARS.forEach(v => { process.env[v] = saved[v]; if (!saved[v]) delete process.env[v]; });
+  try {
+    const status = connector.getStatus();
+    assert.equal(status.configured, true);
+  } finally {
+    TWITTER_VARS.forEach(v => { process.env[v] = saved[v]; if (!saved[v]) delete process.env[v]; });
+  }
 });
 
 test('connector has required interface', () => {
   assert.equal(connector.platform, 'twitter');
+  assert.equal(connector.displayName, 'Twitter / X');
+  assert.equal(connector.maxLength, 280);
+  assert.equal(connector.requiresImage, false);
   assert.equal(typeof connector.publish, 'function');
   assert.equal(typeof connector.getMetrics, 'function');
   assert.equal(typeof connector.getStatus, 'function');
-  assert.equal(typeof connector.maxLength, 'number');
-  assert.equal(typeof connector.requiresImage, 'boolean');
 });
