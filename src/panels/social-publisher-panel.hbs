@@ -1,0 +1,353 @@
+<!-- src/panels/social-publisher-panel.hbs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Social Publisher</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0d0d0d;color:#e0e0e0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.panel-header{padding:10px 16px;border-bottom:1px solid #222;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;background:#111}
+.panel-title{font-weight:600;font-size:14px}
+.hdr-actions{display:flex;gap:8px}
+.btn{padding:5px 12px;border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:500;font-family:inherit}
+.btn-ghost{background:#222;color:#ccc}.btn-ghost:hover{background:#2a2a2a}
+.tabs{display:flex;border-bottom:1px solid #222;flex-shrink:0;overflow-x:auto;background:#111}
+.tab{display:flex;align-items:center;gap:5px;padding:9px 14px;cursor:pointer;border-bottom:2px solid transparent;color:#555;font-size:12px;white-space:nowrap;user-select:none}
+.tab:hover{color:#aaa;background:#161616}
+.tab.active{color:#fff;border-bottom-color:var(--tab-color,#6c63ff)}
+.badge{font-size:9px;padding:1px 5px;border-radius:3px;font-weight:700;text-transform:uppercase}
+.badge-draft{background:#ffd166;color:#000}
+.badge-pub{background:#4caf50;color:#fff}
+.badge-warn{background:#ff6b35;color:#fff}
+.badge-off{background:#2a2a2a;color:#555}
+.tab-body{flex:1;overflow-y:auto;padding:14px}
+.plat-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.plat-name{font-size:14px;font-weight:600}
+.char-cnt{font-size:12px;color:#555}
+.char-cnt.warn{color:#ffd166}.char-cnt.err{color:#ef5350}
+textarea{width:100%;background:#1a1a1a;border:1px solid #333;border-radius:6px;color:#e0e0e0;font-size:13px;line-height:1.5;padding:10px;resize:vertical;min-height:90px;font-family:inherit}
+textarea:focus{outline:none;border-color:#555}
+.img-row{display:flex;gap:8px;align-items:flex-end;margin:8px 0}
+.img-col{display:flex;flex-direction:column;align-items:center;gap:3px}
+.img-thumb{width:60px;height:60px;border:2px solid #333;border-radius:6px;cursor:pointer;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#1a1a1a}
+.img-thumb:hover{border-color:#555}
+.img-thumb.sel{border-color:#6c63ff}
+.img-thumb img{width:100%;height:100%;object-fit:cover}
+.img-thumb .noimg{color:#444;font-size:18px}
+.img-lbl{font-size:10px;color:#555}
+.hashtag-inp{width:100%;background:#1a1a1a;border:1px solid #333;border-radius:6px;color:#e0e0e0;font-size:12px;padding:7px 10px;margin:6px 0;font-family:inherit}
+.hashtag-inp:focus{outline:none;border-color:#555}
+.warn-banner{background:#2a1400;border:1px solid #ff6b3550;border-radius:6px;padding:7px 12px;font-size:12px;color:#ff6b35;margin-bottom:8px}
+.draft-actions{display:flex;gap:8px;align-items:center;margin-top:6px}
+.btn-gen{background:#1a1a2a;border:1px solid #6c63ff50;color:#6c63ff}.btn-gen:hover{border-color:#6c63ff;background:#1e1e35}
+.btn-pub{color:#fff;margin-left:auto}.btn-pub:hover{opacity:.9}.btn-pub:disabled{opacity:.35;cursor:not-allowed}
+.pub-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.pub-meta{font-size:11px;color:#555;margin-top:3px}
+.view-link{font-size:11px;color:#6c63ff;text-decoration:none;border:1px solid #6c63ff40;border-radius:4px;padding:3px 9px}
+.view-link:hover{background:#6c63ff15}
+.post-preview{border-left:3px solid var(--tab-color,#6c63ff);background:#1a1a1a;border-radius:0 6px 6px 0;padding:9px 13px;font-size:13px;line-height:1.5;color:#ccc;margin-bottom:12px;word-break:break-word}
+.metrics-lbl{font-size:10px;color:#555;letter-spacing:1px;text-transform:uppercase;margin-bottom:7px}
+.metrics-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.metric-card{background:#1a1a1a;border-radius:6px;padding:10px;text-align:center}
+.metric-emoji{font-size:18px}
+.metric-val{font-size:18px;font-weight:700;margin-top:3px;color:#fff}
+.metric-name{font-size:10px;color:#555;margin-top:2px}
+.post-id{font-size:10px;color:#333;word-break:break-all;margin-top:8px}
+.actions-bar{padding:10px 16px;border-top:1px solid #222;display:flex;gap:8px;flex-shrink:0;background:#111}
+.uncfg-notice{background:#1a1a1a;border:1px solid #333;border-radius:8px;padding:20px;text-align:center;color:#555;font-size:13px}
+</style>
+</head>
+<body>
+<div class="panel-header">
+  <span class="panel-title">Social Publisher</span>
+  <div class="hdr-actions">
+    <button class="btn btn-ghost" onclick="handleGenerateAll()">✨ Generate All</button>
+    <button class="btn btn-ghost" onclick="handleSaveAll()">💾 Save Drafts</button>
+  </div>
+</div>
+<div class="tabs" id="tabs"></div>
+<div class="tab-body" id="tab-body"></div>
+
+<script>
+'use strict';
+
+const PLATFORMS = {
+  twitter:   { displayName:'Twitter / X', icon:'𝕏',  color:'#1d9bf0', maxLength:280,   requiresImage:false,
+               metrics:[{k:'likes',e:'❤️',l:'Likes'},{k:'reposts',e:'🔁',l:'Reposts'},{k:'replies',e:'💬',l:'Replies'},{k:'impressions',e:'👁',l:'Impressions'}] },
+  facebook:  { displayName:'Facebook',    icon:'f',   color:'#1877f2', maxLength:63206, requiresImage:false,
+               metrics:[{k:'likes',e:'❤️',l:'Likes'},{k:'shares',e:'🔁',l:'Shares'},{k:'comments',e:'💬',l:'Comments'},{k:'reach',e:'👁',l:'Reach'}] },
+  instagram: { displayName:'Instagram',   icon:'📷',  color:'#e1306c', maxLength:2200,  requiresImage:true,
+               metrics:[{k:'likes',e:'❤️',l:'Likes'},{k:'comments',e:'💬',l:'Comments'},{k:'saves',e:'🔖',l:'Saves'},{k:'reach',e:'👁',l:'Reach'}] },
+  threads:   { displayName:'Threads',     icon:'◎',   color:'#e0e0e0', maxLength:500,   requiresImage:false,
+               metrics:[{k:'likes',e:'❤️',l:'Likes'},{k:'reposts',e:'🔁',l:'Reposts'},{k:'replies',e:'💬',l:'Replies'},{k:'quotes',e:'📝',l:'Quotes'}] },
+  bluesky:   { displayName:'Bluesky',     icon:'🦋',  color:'#0085ff', maxLength:300,   requiresImage:false,
+               metrics:[{k:'likes',e:'❤️',l:'Likes'},{k:'reposts',e:'🔁',l:'Reposts'},{k:'replies',e:'💬',l:'Replies'},{k:'quotes',e:'📝',l:'Quotes'}] }
+};
+
+const state = {
+  apiKey: '{{apiKey}}',
+  neonAppUrl: '{{neonAppUrl}}',
+  neonContext: null,
+  active: 'twitter',
+  status: {},
+  drafts: Object.fromEntries(Object.keys(PLATFORMS).map(p => [p, { enabled:true, text:'', hashtags:[], selectedImage:'none' }])),
+  writebacks: {},
+  images: { main:null, teaser:null },
+  metricsIntervals: {},
+  generating: {},
+  publishing: {}
+};
+
+// --- API ---
+async function api(endpoint, method='GET', body=null) {
+  const opts = { method, headers:{ 'Content-Type':'application/json', apikey:state.apiKey } };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(`/panels/social-publisher/api/${endpoint}`, opts);
+  if (!res.ok) { const err = await res.json().catch(()=>({})); throw new Error(err.error || res.statusText); }
+  return res.json();
+}
+
+// --- PostMessage ---
+window.addEventListener('message', e => {
+  if (!e.data) return;
+  if (e.data.key === 'getInfo') { state.neonContext = e.data.info; loadFromContext(); render(); }
+});
+
+function loadFromContext() {
+  if (!state.neonContext) return;
+  const node = state.neonContext.originalNode || {};
+  const saved = node.metadata?.socialMediaDraft || {};
+  Object.keys(PLATFORMS).forEach(p => { if (saved[p]) Object.assign(state.drafts[p], saved[p]); });
+  Object.values(state.neonContext.publishInfos || {}).forEach(site => {
+    Object.assign(state.writebacks, site?.webhookData?.socialMediaHook || {});
+  });
+  const refs = node.linkedNodeRefs || {};
+  state.images.main   = refs.system?.mainPicture?.[0]?.ref || null;
+  state.images.teaser = refs.hyperlink?.image?.[0]?.ref || null;
+}
+
+function imgUrl(type) {
+  const ref = state.images[type];
+  return ref?.startsWith('http') ? ref : null;
+}
+
+// --- Status ---
+async function loadStatuses() {
+  await Promise.all(Object.keys(PLATFORMS).map(async p => {
+    try { state.status[p] = await api(`${p}/status`); }
+    catch (e) { state.status[p] = { configured:false, error:e.message }; }
+  }));
+  render();
+}
+
+// --- Render ---
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function fmtMetric(v) { if (v==null) return '—'; return v>=1000 ? (v/1000).toFixed(1)+'k' : String(v); }
+function fmtDate(iso) { return iso ? new Date(iso).toLocaleString(undefined,{dateStyle:'medium',timeStyle:'short'}) : ''; }
+
+function badge(p) {
+  if (state.writebacks[p]) return `<span class="badge badge-pub">✓ live</span>`;
+  if (state.status[p] && !state.status[p].configured) return `<span class="badge badge-off">no config</span>`;
+  if (PLATFORMS[p].requiresImage && state.drafts[p].selectedImage==='none') return `<span class="badge badge-warn">img req</span>`;
+  if (state.drafts[p].text) return `<span class="badge badge-draft">draft</span>`;
+  return '';
+}
+
+function render() {
+  const tabsEl = document.getElementById('tabs');
+  tabsEl.innerHTML = Object.entries(PLATFORMS).map(([p,cfg]) =>
+    `<div class="tab${state.active===p?' active':''}" style="--tab-color:${cfg.color}" onclick="switchTab('${p}')">
+       <span>${cfg.icon}</span><span>${cfg.displayName}</span>${badge(p)}</div>`
+  ).join('');
+  renderBody();
+}
+
+function renderBody() {
+  const p = state.active, cfg = PLATFORMS[p];
+  const el = document.getElementById('tab-body');
+  el.style.setProperty('--tab-color', cfg.color);
+  if (state.writebacks[p]) { renderPublished(el, p, cfg); startMetricsPoll(p); }
+  else renderDraft(el, p, cfg);
+}
+
+function renderDraft(el, p, cfg) {
+  const d = state.drafts[p];
+  const configured = !state.status[p] || state.status[p].configured;
+  const charCls = (cfg.maxLength - d.text.length) < 20 ? 'err' : (cfg.maxLength - d.text.length) < 50 ? 'warn' : '';
+  const needsImg = cfg.requiresImage && d.selectedImage==='none';
+  const pubDisabled = !configured || needsImg || !!state.publishing[p];
+
+  const imgOptions = ['main','teaser','none'].map(t => {
+    const url = t!=='none' ? imgUrl(t) : null;
+    return `<div class="img-col">
+      <div class="img-thumb${d.selectedImage===t?' sel':''}" onclick="selImg('${p}','${t}')">
+        ${url ? `<img src="${esc(url)}" alt="${t}">` : `<span class="noimg">${t==='none'?'✕':'?'}</span>`}
+      </div><div class="img-lbl">${t}</div></div>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div class="plat-hdr">
+      <span class="plat-name" style="color:${cfg.color}">${cfg.icon} ${cfg.displayName}</span>
+      <span class="char-cnt ${charCls}">${d.text.length} / ${cfg.maxLength}</span>
+    </div>
+    ${needsImg ? '<div class="warn-banner">⚠ Instagram requires an image to publish.</div>' : ''}
+    ${!configured ? '<div class="warn-banner">⚠ Connector not configured. Add env vars and restart.</div>' : ''}
+    <textarea oninput="onText('${p}',this.value)" placeholder="Write your ${esc(cfg.displayName)} post...">${esc(d.text)}</textarea>
+    <div class="img-row"><span style="font-size:11px;color:#555;margin-right:2px;align-self:center">Image:</span>${imgOptions}</div>
+    <input class="hashtag-inp" placeholder="Hashtags (comma-separated, no #)"
+      value="${esc(d.hashtags.join(', '))}" oninput="onTags('${p}',this.value)">
+    <div class="draft-actions">
+      <button class="btn btn-gen" onclick="handleGenerate('${p}')" ${state.generating[p]?'disabled':''}>
+        ${state.generating[p]?'Generating…':'✨ Generate'}</button>
+      <button class="btn btn-pub" style="background:${cfg.color}" onclick="handlePublish('${p}')" ${pubDisabled?'disabled':''}>
+        ${state.publishing[p]?'Publishing…':'Publish →'}</button>
+    </div>`;
+}
+
+function renderPublished(el, p, cfg) {
+  const wb = state.writebacks[p];
+  const metricsCards = cfg.metrics.map(m =>
+    `<div class="metric-card">
+       <div class="metric-emoji">${m.e}</div>
+       <div class="metric-val" id="m-${p}-${m.k}">${fmtMetric(wb.metrics?.[m.k])}</div>
+       <div class="metric-name">${m.l}</div></div>`
+  ).join('');
+
+  el.innerHTML = `
+    <div class="pub-hdr">
+      <div>
+        <div style="font-size:14px;font-weight:600;color:${cfg.color}">${cfg.icon} ${cfg.displayName}</div>
+        <div class="pub-meta">Published ${fmtDate(wb.publishedAt)} · ${esc(wb.publishedBy||'system')}</div>
+      </div>
+      <a class="view-link" href="${esc(wb.url)}" target="_blank">↗ View post</a>
+    </div>
+    <div class="post-preview">${esc(wb.text||'')}</div>
+    <div class="metrics-lbl">METRICS <span style="font-size:9px;color:#444">· every 30s</span></div>
+    <div class="metrics-grid">${metricsCards}</div>
+    <div class="post-id">Post ID: ${esc(wb.postId)}</div>`;
+}
+
+function updateMetricCards(p, metrics) {
+  const cfg = PLATFORMS[p];
+  cfg.metrics.forEach(m => {
+    const el = document.getElementById(`m-${p}-${m.k}`);
+    if (el) el.textContent = fmtMetric(metrics[m.k]);
+  });
+}
+
+// --- Actions ---
+function switchTab(p) { state.active = p; render(); }
+function selImg(p, t) { state.drafts[p].selectedImage = t; renderBody(); }
+
+function onText(p, v) {
+  state.drafts[p].text = v;
+  const cfg = PLATFORMS[p];
+  const rem = cfg.maxLength - v.length;
+  const cls = rem < 20 ? 'err' : rem < 50 ? 'warn' : '';
+  const el = document.querySelector('.char-cnt');
+  if (el) { el.className = `char-cnt ${cls}`; el.textContent = `${v.length} / ${cfg.maxLength}`; }
+  // Update tab badge
+  const tabs = document.getElementById('tabs');
+  if (tabs) {
+    const tabEl = tabs.querySelector(`.tab:nth-child(${Object.keys(PLATFORMS).indexOf(p)+1})`);
+    if (tabEl) { const b = tabEl.querySelector('.badge'); if (b) b.outerHTML = badge(p); else if (badge(p)) tabEl.insertAdjacentHTML('beforeend', badge(p)); }
+  }
+}
+
+function onTags(p, v) {
+  state.drafts[p].hashtags = v.split(',').map(t => t.trim().replace(/^#/,'')).filter(Boolean);
+}
+
+async function handleGenerate(p) {
+  if (!state.neonContext) return;
+  state.generating[p] = true; renderBody();
+  try {
+    const result = await api('generate-post', 'POST', { platform:p, neonContext:state.neonContext });
+    if (result.text) {
+      state.drafts[p].text = result.text;
+      if (result.hashtags?.length) state.drafts[p].hashtags = result.hashtags;
+    }
+  } catch(e) { console.error('Generate failed:', e); }
+  finally { state.generating[p] = false; renderBody(); }
+}
+
+async function handleGenerateAll() {
+  for (const p of Object.keys(PLATFORMS)) {
+    if (!state.writebacks[p]) await handleGenerate(p);
+  }
+}
+
+async function handlePublish(p) {
+  const d = state.drafts[p];
+  state.publishing[p] = true; renderBody();
+  try {
+    const tags = d.hashtags.map(t => `#${t}`).join(' ');
+    const text = tags ? `${d.text}\n\n${tags}` : d.text;
+    const imageUrl = d.selectedImage !== 'none' ? imgUrl(d.selectedImage) : null;
+    const articleUrl = buildArticleUrl();
+    const result = await api(`${p}/publish`, 'POST', { text, options:{ imageUrl, articleUrl } });
+    if (result.success) { state.writebacks[p] = { ...result, text }; render(); }
+  } catch(e) { alert(`Publish to ${PLATFORMS[p].displayName} failed: ${e.message}`); }
+  finally { state.publishing[p] = false; }
+}
+
+function handleSaveAll() {
+  if (window.self === window.top) return;
+  // Resolve and persist imageUrl so the Neon webhook can publish images without re-resolving
+  const draftsWithImageUrl = {};
+  Object.keys(PLATFORMS).forEach(p => {
+    const d = state.drafts[p];
+    draftsWithImageUrl[p] = { ...d, imageUrl: d.selectedImage !== 'none' ? imgUrl(d.selectedImage) : null };
+  });
+  window.parent.postMessage({ type:'metadata-update', info:{ socialMediaDraft:draftsWithImageUrl } }, state.neonAppUrl||'*');
+}
+
+// --- Metrics polling ---
+function startMetricsPoll(p) {
+  if (state.metricsIntervals[p]) return;
+  const postId = state.writebacks[p]?.postId;
+  if (!postId) return;
+  const poll = async () => {
+    if (document.hidden) return;
+    try {
+      const res = await api(`${p}/metrics/${encodeURIComponent(postId)}`);
+      if (res.success && state.writebacks[p]) {
+        state.writebacks[p].metrics = res.metrics;
+        if (state.active === p) updateMetricCards(p, res.metrics);
+      }
+    } catch(_) {}
+  };
+  poll();
+  state.metricsIntervals[p] = setInterval(poll, 30000);
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) {
+    Object.keys(PLATFORMS).forEach(p => { if (state.metricsIntervals[p] && state.writebacks[p]) startMetricsPoll(p); });
+  }
+});
+
+// --- Helpers ---
+function buildArticleUrl() {
+  const ch = state.neonContext?.channel || {};
+  const base = ch.frontofficeUrls?.[0] || ch.frontofficeUrl || '';
+  const node = state.neonContext?.originalNode || {};
+  const slug = node.slug || node.name || node.uuid || '';
+  return base && slug ? `${base}/${slug}` : null;
+}
+
+// --- Init ---
+async function init() {
+  render();
+  if (window.self !== window.top) {
+    window.parent.postMessage({ type:'panel-ready', info:{ op:'getInfo' } }, '*');
+  }
+  await loadStatuses();
+}
+init();
+</script>
+</body>
+</html>
