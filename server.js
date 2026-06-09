@@ -142,8 +142,8 @@ fastify.get("/services", function (request, reply) {
       { name: "Méthode Panel", endpoint: "GET /panels/methode", demoUrl: "/panels/methode", description: "Méthode object management panel with PDF preview, workflow status, and Swing integration" },
       { name: "Méthode API Proxy", endpoint: "ALL /panels/methode/api/*", description: "Proxy for Méthode Editorial API calls with authentication and object retrieval" },
       { name: "QuickChart Panel", endpoint: "GET /panels/quickchart", demoUrl: "/panels/quickchart", description: "QuickChart.io gallery panel for browsing and importing chart examples as PNG assets into Neon CMS" },
-      { name: "Social Media Panel", endpoint: "GET /panels/social-media", demoUrl: "/panels/social-media", description: "Social media publishing panel with AI-powered content generation for Facebook, X, Instagram, Threads, and Bluesky" },
-      { name: "Social Media API Proxy", endpoint: "ALL /panels/social-media/api/*", description: "Proxy for social media API calls (AI generation, Bluesky metrics) with authentication" },
+      { name: "Social Publisher Panel", endpoint: "GET /panels/social-publisher", demoUrl: "/panels/social-publisher", description: "Unified social publishing panel for Twitter/X, Facebook, Instagram, Threads, Bluesky — with AI content generation, publication, and live metrics." },
+      { name: "Social Publisher API", endpoint: "ALL /panels/social-publisher/api/*", description: "Connector registry API: /{platform}/status, /{platform}/publish, /{platform}/metrics/{id}, /generate-post" },
       { name: "Family Audit Panel", endpoint: "GET /panels/family-audit", demoUrl: "/panels/family-audit?demo=true", description: "Vertical audit timeline for any Neon object — standard and advanced verbosity levels" },
       { name: "Family Audit API Proxy", endpoint: "GET /panels/family-audit/api/events", description: "Proxy for Neon metrics family_audit API with familyRef authentication" }
     ],
@@ -296,15 +296,7 @@ fastify.register(async function (fastify) {
     handler: panelHandlers.methodeApiProxyHandler
   });
 });
-fastify.get("/panels/social-media", panelHandlers.socialMediaPanelHandler);
-fastify.register(async function (fastify) {
-  fastify.route({
-    method: ['GET', 'POST', 'PUT', 'DELETE'],
-    url: '/panels/social-media/api/*',
-    handler: panelHandlers.socialMediaApiProxyHandler
-  });
-});
-// Social Publisher (replaces Social Media panel)
+// Social Publisher (replaces legacy Social Media panel)
 fastify.get("/panels/social-publisher", panelHandlers.socialPublisherPanelHandler);
 fastify.register(async function (fastify) {
   fastify.route({
