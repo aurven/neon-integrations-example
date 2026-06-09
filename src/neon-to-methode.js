@@ -320,9 +320,9 @@ async function processNeonStoryV2 (model) {
     await methodeClient.sendMessage({
       subject: `New update for Story from Digital (${loid})`,
       body: 'There are new updates on the Master copy of a story already linked to a page. Please review the changes and update the channel copy if necessary.',
-      recipients: ['aureliano.ventrella'], // Méthode principal names (users or groups)
+      recipients: ['aureliano.ventrella', 'Emmanuel'], // Méthode principal names (users or groups)
       priority: '1',       // optional, defaults to '1'
-      attachments: []      // optional, defaults to []
+      attachments: [loid]      // optional, defaults to []
     });
 
     await methodeClient.logout();
