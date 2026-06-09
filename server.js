@@ -304,6 +304,15 @@ fastify.register(async function (fastify) {
     handler: panelHandlers.socialMediaApiProxyHandler
   });
 });
+// Social Publisher (replaces Social Media panel)
+fastify.get("/panels/social-publisher", panelHandlers.socialPublisherPanelHandler);
+fastify.register(async function (fastify) {
+  fastify.route({
+    method: ['GET', 'POST', 'PUT', 'DELETE'],
+    url: '/panels/social-publisher/api/*',
+    handler: panelHandlers.socialPublisherApiProxyHandler
+  });
+});
 fastify.get("/panels/family-audit", panelHandlers.familyAuditPanelV2Handler);
 fastify.register(async function (fastify) {
   fastify.route({
