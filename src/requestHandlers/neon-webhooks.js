@@ -419,108 +419,59 @@ async function postNeonWebhookTest(request, reply) {
   }
 }
 
-/**
- * Handle Social Media publishing from Neon webhook
- * Called when article is published and has socialMediaDraft metadata
- * @param {Object} neonModel - Neon webhook model
- * @returns {Promise<Object>} Writeback data with social post IDs
- */
 async function handleSocialMediaPublish(neonModel) {
-  console.log('[Social Media Webhook] Processing social media publish request');
-
-  const blueskyConnector = require('../connectors/bluesky-connector');
+  console.log('[Social Publisher Webhook] Processing social media publish request');
+  const registry = require('../connectors/connector-registry');
 
   try {
-    // Extract article metadata
     const modelData = neonModel.data || neonModel;
-    const metadata = modelData.metadata || {};
-    const socialMediaDraft = metadata.socialMediaDraft;
+    const socialMediaDraft = (modelData.metadata || {}).socialMediaDraft;
 
     if (!socialMediaDraft) {
-      console.log('[Social Media Webhook] No socialMediaDraft found in metadata');
+      console.log('[Social Publisher Webhook] No socialMediaDraft in metadata — skipping');
       return { status: 'skipped', message: 'No social media draft data' };
     }
 
-    console.log('[Social Media Webhook] Found social media draft:', socialMediaDraft);
-
-    // Extract user info (who triggered the publish)
     const publishedBy = neonModel.user || neonModel.publisher || 'system@neon.com';
-
-    // Writeback object (only platforms that were successfully published)
     const socialMediaHook = {};
 
-    // Process each enabled platform
     for (const [platform, draft] of Object.entries(socialMediaDraft)) {
       if (!draft.enabled) {
-        console.log(`[Social Media Webhook] ${platform} not enabled, skipping`);
+        console.log(`[Social Publisher Webhook] ${platform} disabled — skipping`);
         continue;
       }
-
-      console.log(`[Social Media Webhook] Publishing to ${platform}...`);
-
       try {
-        if (platform === 'bluesky') {
-          // Publish to Bluesky
-          const postText = draft.text || '';
-          const hashtags = draft.hashtags || [];
+        const connector = registry.getConnector(platform);
+        const tags = (draft.hashtags || []).map(h => `#${h.replace(/^#/, '')}`).join(' ');
+        const text = tags ? `${draft.text || ''}\n\n${tags}` : (draft.text || '');
+        const imageUrl = draft.imageUrl || null;
 
-          // Combine text with hashtags
-          const hashtagString = hashtags.map(h => `#${h.replace(/^#/, '')}`).join(' ');
-          const fullText = hashtagString ? `${postText}\n\n${hashtagString}` : postText;
+        console.log(`[Social Publisher Webhook] Publishing to ${platform}...`);
+        const result = await connector.publish(text, { imageUrl });
 
-          // Parse rich text for facets
-          const richText = blueskyConnector.parseRichText(fullText);
-
-          const result = await blueskyConnector.publishPost(richText.text, {
-            facets: richText.facets
-          });
-
-          if (result.success) {
-            socialMediaHook.bluesky = {
-              postId: result.postUri,
-              url: result.postUrl,
-              publishedAt: result.publishedAt,
-              publishedBy: publishedBy
-            };
-
-            console.log(`[Social Media Webhook] ✓ Published to Bluesky: ${result.postUrl}`);
-          }
-        } else {
-          // Other platforms not implemented yet
-          console.log(`[Social Media Webhook] ${platform} publishing not implemented yet`);
+        if (result.success) {
+          socialMediaHook[platform] = {
+            postId: result.postId,
+            url: result.postUrl,
+            publishedAt: result.publishedAt,
+            publishedBy
+          };
+          console.log(`[Social Publisher Webhook] ✓ ${platform}: ${result.postUrl}`);
         }
-      } catch (error) {
-        console.error(`[Social Media Webhook] Failed to publish to ${platform}:`, error.message);
-        // Continue with other platforms even if one fails
+      } catch (err) {
+        console.error(`[Social Publisher Webhook] ✗ ${platform}:`, err.message);
+        // Continue with other platforms
       }
     }
 
-    // Return writeback data
     if (Object.keys(socialMediaHook).length > 0) {
-      console.log('[Social Media Webhook] Social media publish successful:', socialMediaHook);
-
-      return {
-        status: 'success',
-        action: 'Social media posts published',
-        writeback: {
-          socialMediaHook: socialMediaHook
-        }
-      };
-    } else {
-      console.log('[Social Media Webhook] No platforms were successfully published');
-      return {
-        status: 'warning',
-        message: 'No platforms were successfully published'
-      };
+      return { status: 'success', action: 'Social media posts published', writeback: { socialMediaHook } };
     }
+    return { status: 'warning', message: 'No platforms were successfully published' };
 
   } catch (error) {
-    console.error('[Social Media Webhook] Error processing social media publish:', error);
-    return {
-      status: 'error',
-      message: 'Failed to publish to social media',
-      error: error.message
-    };
+    console.error('[Social Publisher Webhook] Error:', error);
+    return { status: 'error', message: 'Failed to publish to social media', error: error.message };
   }
 }
 
