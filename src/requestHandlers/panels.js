@@ -819,6 +819,75 @@ async function familyAuditApiProxyHandler(request, reply) {
   }
 }
 
+function socialPublisherPanelHandler(request, reply) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) {
+    return reply.status(401).send({ error: 'Unauthorized' });
+  }
+  return reply.view('/src/panels/social-publisher-panel.hbs', {
+    seo: seo,
+    apiKey: auth.apikey,
+    neonAppUrl: process.env.NEON_APP_URL || 'http://localhost:3000'
+  });
+}
+
+async function socialPublisherApiProxyHandler(request, reply) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) {
+    return reply.status(401).send({ error: 'Unauthorized' });
+  }
+
+  try {
+    const registry = require('../connectors/connector-registry');
+    const endpoint = request.url.replace('/panels/social-publisher/api/', '');
+
+    // POST /generate-post — delegates to existing AI helper
+    if (endpoint === 'generate-post' && request.method === 'POST') {
+      const { generatePostContent, buildArticleUrl, extractArticleData } = require('../helpers/social-media-helper');
+      const { platform, neonContext } = request.body;
+      if (!platform || !neonContext) {
+        return reply.status(400).send({ error: 'Missing platform or neonContext' });
+      }
+      const articleData = extractArticleData(neonContext);
+      const articleUrl = buildArticleUrl(neonContext) || 'https://example.com/article';
+      const result = await generatePostContent(platform, articleData, articleUrl);
+      return reply.send(result);
+    }
+
+    // GET /{platform}/status
+    const statusMatch = endpoint.match(/^([^/]+)\/status$/);
+    if (statusMatch && request.method === 'GET') {
+      const connector = registry.getConnector(statusMatch[1]);
+      return reply.send(connector.getStatus());
+    }
+
+    // POST /{platform}/publish
+    const publishMatch = endpoint.match(/^([^/]+)\/publish$/);
+    if (publishMatch && request.method === 'POST') {
+      const connector = registry.getConnector(publishMatch[1]);
+      const { text, options } = request.body;
+      if (!text) return reply.status(400).send({ error: 'Missing text' });
+      const result = await connector.publish(text, options || {});
+      return reply.send(result);
+    }
+
+    // GET /{platform}/metrics/{postId}
+    const metricsMatch = endpoint.match(/^([^/]+)\/metrics\/(.+)$/);
+    if (metricsMatch && request.method === 'GET') {
+      const connector = registry.getConnector(metricsMatch[1]);
+      const postId = decodeURIComponent(metricsMatch[2]);
+      const result = await connector.getMetrics(postId);
+      return reply.send(result);
+    }
+
+    return reply.status(404).send({ error: 'Endpoint not found' });
+
+  } catch (error) {
+    console.error('[Social Publisher API] Error:', error);
+    return reply.status(500).send({ error: 'API request failed', details: error.message });
+  }
+}
+
 module.exports = {
   trelloPanelHandler,
   trelloApiProxyHandler,
@@ -838,5 +907,7 @@ module.exports = {
   socialMediaPanelHandler,
   socialMediaApiProxyHandler,
   familyAuditPanelV2Handler,
-  familyAuditApiProxyHandler
+  familyAuditApiProxyHandler,
+  socialPublisherPanelHandler,
+  socialPublisherApiProxyHandler
 };
