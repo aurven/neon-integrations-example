@@ -156,7 +156,7 @@ async function dispatchImageItem(item, job, importer = imagesImporter) {
     workspace: resolveWorkfolder(item, job),
     metadata: item.metadata || {},
   });
-  return { familyRef: node?.familyRef || null };
+  return { familyRef: node?.node?.familyRef || node?.familyRef || null };
 }
 
 /**

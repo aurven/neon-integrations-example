@@ -276,7 +276,7 @@ test('dispatchImageItem maps item to uploadImage options with workspace fallback
   const fakeImporter = {
     uploadImage: async (options) => {
       received = options;
-      return { familyRef: 'img-1' };
+      return { node: { familyRef: 'img-1' } };
     },
   };
   const job = { site: 's', workspace: 'Demo Workspace', workfolder: null, publish: false };
