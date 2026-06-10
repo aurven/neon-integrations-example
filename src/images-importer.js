@@ -60,6 +60,30 @@ async function imageToBase64(url) {
     }
 }
 
+function escapeXml(value) {
+  return String(value).replace(/[<>&'"]/g, (c) => ({
+    '<': '&lt;',
+    '>': '&gt;',
+    '&': '&amp;',
+    "'": '&apos;',
+    '"': '&quot;',
+  }[c]));
+}
+
+function buildImageMetadataXml(metadata = {}) {
+  const caption = metadata.caption ? `<caption>${escapeXml(metadata.caption)}</caption>` : '';
+  const credit = `<credit>${metadata.credit ? escapeXml(metadata.credit) : ''}</credit>`;
+  return `<?xml version="1.0" encoding="UTF-8"?>` +
+         `<!DOCTYPE ObjectMetadata SYSTEM "/common/rules/image.dtd">` +
+         `<ObjectMetadata>` +
+         `<iptc>` +
+         caption +
+         credit +
+         `</iptc>` +
+         `<WebDesign><WebType>Image</WebType></WebDesign>` +
+         `</ObjectMetadata>`;
+}
+
 async function uploadImage(options = {
     imageName: '',
     imageUrl: '',
@@ -103,14 +127,7 @@ async function uploadImage(options = {
                           `Content-Type: application/json\r\n\r\n` +
                           `${JSON.stringify(objectModel)}\r\n`;
 
-  const xmlMetadata = `<?xml version="1.0" encoding="UTF-8"?>` +
-                      `<!DOCTYPE ObjectMetadata SYSTEM "/common/rules/image.dtd">` +
-                      `<ObjectMetadata>` +
-                      `<iptc>` +
-                      `<credit></credit>` +  // Add the credit from description here
-                      `</iptc>` +
-                      `<WebDesign><WebType>Image</WebType></WebDesign>` +
-                      `</ObjectMetadata>`;
+  const xmlMetadata = buildImageMetadataXml(options.metadata);
   
   const attributesPart = `--${boundary}\r\n` +
                          `Content-Disposition: form-data; name="attributes"; filename="blob"\r\n` +
@@ -264,6 +281,7 @@ async function uploadImageToMethode(methodeClient, options = {
 
 module.exports = {
     mainImageReferenceGenerator,
+    buildImageMetadataXml,
     uploadImage,
     uploadImageFromStory,
     uploadImageToMethode,
