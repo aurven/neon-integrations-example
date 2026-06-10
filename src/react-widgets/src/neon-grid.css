@@ -19,8 +19,13 @@
   --ag-checkbox-checked-color: #0a2ee6;
   --ag-disabled-foreground-color: #bfbfca;
   --ag-header-height: 36px;
-  --ag-row-height: 52px;
+  --ag-row-height: 58px;
   --ag-cell-horizontal-padding: 12px;
+}
+
+.ag-theme-alpine .ag-cell {
+  padding-top: 6px;
+  box-sizing: border-box;
 }
 
 .ag-theme-alpine .ag-header-cell-label {

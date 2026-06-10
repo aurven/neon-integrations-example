@@ -16,3 +16,9 @@ export function fetchArticles() {
   const url = demo ? '/api/neon/grid/articles?demo=true' : '/api/neon/grid/articles';
   return apiFetch(url);
 }
+
+export function fetchStories() {
+  const demo = window.CONFIG?.demo;
+  const url = demo ? '/api/print-query-board/stories?demo=true' : '/api/print-query-board/stories';
+  return apiFetch(url);
+}

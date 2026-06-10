@@ -16,8 +16,20 @@ const CONFIGS = {
     workflows: {
         label:     'Workflow Definitions',
         cacheFile: 'workflows.json'
+    },
+    contentTypes: {
+        label:     'Content Types',
+        cacheFile: 'content-types.json'
     }
 };
+
+// Fallback labels used until contentTypes config is cached (or for types missing from it)
+const DEFAULT_TYPE_LABELS = {
+    'article': 'Article',
+    'article/gallery': 'Gallery'
+};
+
+let typeLabels = null;
 
 // ── File I/O ──────────────────────────────────────────────────────────────────
 
@@ -47,6 +59,34 @@ async function cacheExists(type) {
     } catch {
         return false;
     }
+}
+
+/**
+ * Flatten the hierarchical /contents/types tree into a flat list.
+ * Each node in the tree carries its own composedTypeName (the full
+ * dot-path-free hierarchy, e.g. "article/gallery"), which is what
+ * shows up as a node's typeName in search results.
+ */
+function flattenContentTypes(node, list = []) {
+    if (!node) return list;
+
+    if (node.typeInfo) {
+        list.push({
+            typeName: node.typeInfo.typeName,
+            typeId: node.typeInfo.typeId,
+            contentType: node.typeInfo.contentType ?? node.contentType ?? null,
+            typeMeta: node.typeInfo.typeMeta ?? null,
+            composedTypeName: node.composedTypeName ?? node.typeInfo.typeName
+        });
+    }
+
+    if (node.hierarchicalSubTypes) {
+        for (const sub of Object.values(node.hierarchicalSubTypes)) {
+            flattenContentTypes(sub, list);
+        }
+    }
+
+    return list;
 }
 
 // ── Neon BO fetching ──────────────────────────────────────────────────────────
@@ -85,6 +125,16 @@ async function fetchFromNeon(type) {
             lastUpdated: new Date().toISOString(),
             source: 'neon-bo',
             workflows: workflowsResult?.workflows || (Array.isArray(workflowsResult) ? workflowsResult : [])
+        };
+    }
+
+    if (type === 'contentTypes') {
+        const typesResult = await client.getContentTypesConfig();
+
+        return {
+            lastUpdated: new Date().toISOString(),
+            source: 'neon-bo',
+            types: flattenContentTypes(typesResult)
         };
     }
 }
@@ -165,6 +215,35 @@ async function refreshConfig(type) {
     return true;
 }
 
+/**
+ * Load (cache or fetch) the contentTypes config and build the in-memory
+ * composedTypeName -> label lookup used by getTypeLabel().
+ */
+async function loadContentTypesConfig() {
+    try {
+        const config = await getConfig('contentTypes');
+        const types = config?.types || [];
+        typeLabels = types.reduce((acc, t) => {
+            if (t?.composedTypeName) acc[t.composedTypeName] = t.typeMeta?.label || t.typeName;
+            return acc;
+        }, { ...DEFAULT_TYPE_LABELS });
+    } catch (error) {
+        console.warn(`⚠️ loadContentTypesConfig(): failed to load, keeping defaults (${error.message})`);
+    }
+    return typeLabels || DEFAULT_TYPE_LABELS;
+}
+
+/**
+ * Translate a node's typeName (= composedTypeName, e.g. "article/gallery")
+ * into a display label using the cached contentTypes config (falls back to
+ * defaults / the raw composedTypeName).
+ */
+function getTypeLabel(composedTypeName) {
+    if (!composedTypeName) return null;
+    const labels = typeLabels || DEFAULT_TYPE_LABELS;
+    return labels[composedTypeName] || composedTypeName;
+}
+
 function getAvailableConfigs() {
     return Object.entries(CONFIGS).reduce((acc, [type, config]) => {
         acc[type] = { label: config.label, cacheFile: config.cacheFile };
@@ -182,5 +261,7 @@ module.exports = {
     refreshAll,
     refreshConfig,
     getAvailableConfigs,
+    loadContentTypesConfig,
+    getTypeLabel,
     CONFIGS
 };

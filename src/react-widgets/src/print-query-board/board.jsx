@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { C, CoverageBar, StatusBadge, PaywallBadge, VisibilityDot, IconCalendar } from './components.jsx';
-import { PRI, DESK_COLOR, deskOf, covStatus, fmtDateShort, TODAY } from './data.js';
+import { C, CoverageBar, StatusBadge, IconCalendar } from './components.jsx';
+import { PRI, PAYWALL_BORDER, covStatus, fmtDateShort, TODAY } from './data.js';
 
 function PopBackdrop({ onClose }) {
   return <div onClick={e => { e.stopPropagation(); onClose(); }} style={{ position: 'fixed', inset: 0, zIndex: 90 }} />;
@@ -24,7 +24,7 @@ export function PriorityChip({ value, onChange }) {
         <>
           <PopBackdrop onClose={() => setOpen(false)} />
           <div style={{ position: 'absolute', top: 'calc(100% + 5px)', left: 0, zIndex: 100, background: C.white, border: `1px solid ${C.border}`, borderRadius: 9, boxShadow: '0 8px 24px rgba(63,60,78,.18)', padding: 4, width: 152 }}>
-            {['high', 'med', 'low'].map(k => {
+            {[1, 2, 3, 4, 5].map(k => {
               const on = k === value;
               return (
                 <button key={k} onClick={e => { e.stopPropagation(); onChange(k); setOpen(false); }} style={{
@@ -87,7 +87,7 @@ export function DateChip({ offset, onChange }) {
 }
 
 export function StoryCard({ story, dragging, onDragStart, onDragEnd, onPriority, onDate }) {
-  const desk = deskOf(story.workspace);
+  const borderColor = PAYWALL_BORDER[story.paywallLevel] || C.border;
   return (
     <div
       draggable
@@ -95,47 +95,31 @@ export function StoryCard({ story, dragging, onDragStart, onDragEnd, onPriority,
       onDragEnd={onDragEnd}
       style={{
         background: C.white, border: `1px solid ${dragging ? C.blue : C.border}`,
-        borderLeft: `3px solid ${PRI[story.priority].color}`,
+        borderLeft: `3px solid ${dragging ? C.blue : borderColor}`,
         borderRadius: 8, padding: '9px 10px', cursor: 'grab', userSelect: 'none',
         opacity: dragging ? 0.5 : 1, boxShadow: '0 1px 2px rgba(63,60,78,.06)',
         display: 'flex', flexDirection: 'column', gap: 7, transition: 'opacity .1s, border-color .1s',
       }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        <span style={{
-          display: 'inline-flex', alignItems: 'center', gap: 4,
-          fontSize: 10, fontWeight: 700, color: DESK_COLOR[desk] || C.mid,
-          background: (DESK_COLOR[desk] || C.mid) + '14',
-          padding: '1px 7px', borderRadius: 999,
-        }}>
-          <span style={{ width: 5, height: 5, borderRadius: '50%', background: DESK_COLOR[desk] || C.mid }} />
-          {desk}
-        </span>
-        <VisibilityDot publishedAt={story.publishedAt} expiresAt={story.expiresAt} />
-        <div style={{ flex: 1 }} />
-        <PaywallBadge paywall={story.paywall} />
-        <svg width="13" height="13" viewBox="0 0 24 24" fill={C.muted} style={{ opacity: 0.4 }}>
-          <circle cx="9" cy="6" r="1.5"/><circle cx="15" cy="6" r="1.5"/>
-          <circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/>
-          <circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="18" r="1.5"/>
-        </svg>
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 6 }}>
+        <span style={{ width: 8, height: 8, borderRadius: '50%', background: story.statusColor || C.muted, flexShrink: 0, marginTop: 4 }} title={story.status} />
+        <p style={{ fontSize: 12.5, fontWeight: 700, color: C.dark, lineHeight: 1.32, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', margin: 0, flex: 1 }}>
+          {story.title}
+        </p>
       </div>
-      <p style={{ fontSize: 12.5, fontWeight: 700, color: C.dark, lineHeight: 1.32, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', margin: 0 }}>
-        {story.title}
-      </p>
       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        <PriorityChip value={story.priority} onChange={onPriority} />
+        <PriorityChip value={story.printPriority} onChange={onPriority} />
         <DateChip offset={story.offset} onChange={onDate} />
         <div style={{ flex: 1 }} />
-        <span style={{ fontSize: 10, color: C.muted, fontWeight: 600 }}>{story.chars.toLocaleString()} ch</span>
+        <span style={{ fontSize: 10, color: C.muted, fontWeight: 600 }}>{(story.wordCount || 0).toLocaleString()} words</span>
       </div>
     </div>
   );
 }
 
 export function BoardColumn({ col, stories, budgeted, dragOver, onDragOver, onDragLeave, onDrop, cardProps }) {
-  const chars = stories.reduce((s, st) => s + st.chars, 0);
-  const status = budgeted ? covStatus(chars, col.target) : null;
-  const pct = budgeted ? chars / col.target : null;
+  const wordCount = stories.reduce((s, st) => s + (st.wordCount || 0), 0);
+  const status = budgeted ? covStatus(wordCount, col.target) : null;
+  const pct = budgeted ? wordCount / col.target : null;
   return (
     <div
       onDragOver={e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; onDragOver(col.key); }}
@@ -158,14 +142,14 @@ export function BoardColumn({ col, stories, budgeted, dragOver, onDragOver, onDr
             ? <StatusBadge status={status} pct={pct} />
             : <div style={{ textAlign: 'right' }}>
                 <div style={{ fontSize: 13, fontWeight: 700, color: C.dark }}>{stories.length}</div>
-                <div style={{ fontSize: 9, color: C.muted }}>{(chars / 1000).toFixed(1)}k ch</div>
+                <div style={{ fontSize: 9, color: C.muted }}>{(wordCount / 1000).toFixed(1)}k words</div>
               </div>
           }
         </div>
         {budgeted && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 7 }}>
             <CoverageBar pct={pct} status={status} height={5} style={{ flex: 1 }} />
-            <span style={{ fontSize: 10, color: C.mid, fontWeight: 600, whiteSpace: 'nowrap' }}>{chars.toLocaleString()} / {col.target.toLocaleString()}</span>
+            <span style={{ fontSize: 10, color: C.mid, fontWeight: 600, whiteSpace: 'nowrap' }}>{wordCount.toLocaleString()} / {col.target.toLocaleString()}</span>
             <span style={{ fontSize: 10, color: C.muted }}>· {stories.length}</span>
           </div>
         )}
@@ -192,8 +176,6 @@ export function SegmentPicker({ facets, active, onPick }) {
   const ICON = {
     section:  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>,
     priority: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><path d="M4 14a4 4 0 0 0 8 0V8a4 4 0 0 1 8 0"/></svg>,
-    desk:     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>,
-    paywall:  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>,
   };
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
@@ -231,10 +213,10 @@ export function Distribution({ facet, stories }) {
         const inCol = stories.filter(s => facet.value(s) === col.key);
         const n = inCol.length;
         const metric = facet.budgeted
-          ? Math.round(inCol.reduce((a, s) => a + s.chars, 0) / col.target * 100) + '%'
+          ? Math.round(inCol.reduce((a, s) => a + (s.wordCount || 0), 0) / col.target * 100) + '%'
           : n;
         const barPct = facet.budgeted
-          ? Math.min(inCol.reduce((a, s) => a + s.chars, 0) / col.target, 1) * 100
+          ? Math.min(inCol.reduce((a, s) => a + (s.wordCount || 0), 0) / col.target, 1) * 100
           : (n / total) * 100;
         return (
           <div key={col.key} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

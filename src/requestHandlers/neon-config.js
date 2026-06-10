@@ -6,7 +6,7 @@ const {
     refreshConfig
 } = require('../connectors/neon-config-connector');
 
-const VALID_TYPES = ['usersGroups', 'workflows'];
+const VALID_TYPES = ['usersGroups', 'workflows', 'contentTypes'];
 
 function buildStats(type, data) {
     if (type === 'usersGroups') {
@@ -17,6 +17,9 @@ function buildStats(type, data) {
     }
     if (type === 'workflows') {
         return { workflowCount: Array.isArray(data.workflows) ? data.workflows.length : 0 };
+    }
+    if (type === 'contentTypes') {
+        return { typeCount: Array.isArray(data.types) ? data.types.length : 0 };
     }
     return {};
 }

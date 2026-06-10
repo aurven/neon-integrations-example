@@ -1,15 +1,19 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import './print-query-board.css';
 import {
-  ISSUE_ARTICLES, OFFSET_SEED, SECTION_SEED, SECTIONS, SECTIONS_TOTAL,
-  buildFacets, applyPatch, covStatus, dayLabel, fmtDate, dayDiffFromToday,
+  PRI, buildFacets, applyPatch, covStatus, sectionsTotal, dayLabel, fmtDate, dayDiffFromToday,
   TOMORROW, TODAY, fmtDateShort,
 } from './data.js';
 import { C, CoverageBar, StatusBadge, NeonPanel, NeonInput, IconSearch, IconFilter, IconCalendar, IconSection } from './components.jsx';
 import { BoardColumn, SegmentPicker, Distribution, Toast } from './board.jsx';
+import { fetchStories } from '../api.js';
 
 const esc = (s) => (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const trunc = (s, n = 46) => s.length > n ? s.slice(0, n - 1) + '…' : s;
+
+function logMetadataUpdate(story, field, value) {
+  console.log(`[Print Query Board] Would update node ${story.id} -> ${field} = ${JSON.stringify(value)} (no Neon connection wired yet)`);
+}
 
 function IssueStepper({ issueDate, setIssueDate }) {
   const inputRef = useRef(null);
@@ -103,7 +107,7 @@ function LeftRail({ issueDate, setIssueDate, facets, facetKey, setFacetKey, stor
   );
 }
 
-function Board({ facet, columns, grouped, budget, sectionsCovered, dragId, dragOverCol, setDragOverCol, cardProps, onDrop }) {
+function Board({ facet, columns, grouped, budget, sectionsCovered, totalBudgetedSections, dragId, dragOverCol, setDragOverCol, cardProps, onDrop }) {
   return (
     <NeonPanel
       title={<span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 7 }}><span>Segmented by {facet.label.toLowerCase()}</span></span>}
@@ -123,10 +127,10 @@ function Board({ facet, columns, grouped, budget, sectionsCovered, dragId, dragO
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <span style={{ fontSize: 11, fontWeight: 700, color: C.mid, flexShrink: 0, textTransform: 'uppercase', letterSpacing: '.04em' }}>Issue budget</span>
           <CoverageBar pct={budget.pct} status={budget.status} height={7} style={{ flex: 1, borderRadius: 4 }} />
-          <span style={{ fontSize: 11, color: C.mid, flexShrink: 0 }}>{budget.filled.toLocaleString()} / {budget.target.toLocaleString()} ch</span>
+          <span style={{ fontSize: 11, color: C.mid, flexShrink: 0 }}>{budget.filled.toLocaleString()} / {budget.target.toLocaleString()} words</span>
           <StatusBadge status={budget.status} pct={budget.pct} />
-          <span style={{ fontSize: 11, fontWeight: 700, flexShrink: 0, color: sectionsCovered === SECTIONS.length ? 'rgb(20,110,25)' : C.muted }}>
-            {sectionsCovered}/{SECTIONS.length} sections on target
+          <span style={{ fontSize: 11, fontWeight: 700, flexShrink: 0, color: sectionsCovered === totalBudgetedSections ? 'rgb(20,110,25)' : C.muted }}>
+            {sectionsCovered}/{totalBudgetedSections} sections on target
           </span>
         </div>
       }>
@@ -145,17 +149,32 @@ function Board({ facet, columns, grouped, budget, sectionsCovered, dragId, dragO
 }
 
 export default function PrintQueryBoard() {
-  const facets = useMemo(() => buildFacets(), []);
-  const [stories, setStories] = useState(() =>
-    ISSUE_ARTICLES.map(a => ({ ...a, offset: OFFSET_SEED[a.id] ?? 1, section: SECTION_SEED[a.id] || 'World' }))
-  );
+  const printConfig = window.CONFIG?.printConfig || {};
+  const facets = useMemo(() => buildFacets(printConfig), [printConfig]);
+
+  const [stories, setStories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [facetKey, setFacetKey] = useState('section');
   const [search, setSearch] = useState('');
   const [dragId, setDragId] = useState(null);
   const [dragOverCol, setDragOverCol] = useState(null);
   const [toast, setToast] = useState(null);
-  const [issueDate, setIssueDate] = useState(TOMORROW);
+  const [issueDate, setIssueDate] = useState(printConfig.issueDate ? new Date(printConfig.issueDate) : TOMORROW);
   const toastTimer = useRef(null);
+
+  useEffect(() => {
+    fetchStories()
+      .then(data => {
+        const fallback = printConfig.issueDate ? new Date(printConfig.issueDate) : TOMORROW;
+        setStories((data.stories || []).map(s => ({
+          ...s,
+          offset: dayDiffFromToday(s.issueDate ? new Date(s.issueDate) : fallback),
+        })));
+        setLoading(false);
+      })
+      .catch(err => { setError(err.message); setLoading(false); });
+  }, []);
 
   const showToast = useCallback((html) => {
     setToast({ html, t: Date.now() });
@@ -169,20 +188,24 @@ export default function PrintQueryBoard() {
   const visible = useMemo(() => {
     const q = search.trim().toLowerCase();
     let v = stories.filter(s => s.offset === issueOffset);
-    if (q) v = v.filter(s => s.title.toLowerCase().includes(q) || s.author.toLowerCase().includes(q));
+    if (q) v = v.filter(s => s.title.toLowerCase().includes(q));
     return v;
   }, [stories, search, issueOffset]);
 
-  const budget = useMemo(() => {
-    const filled = visible.reduce((s, x) => s + x.chars, 0);
-    return { filled, target: SECTIONS_TOTAL, pct: filled / SECTIONS_TOTAL, status: covStatus(filled, SECTIONS_TOTAL) };
-  }, [visible]);
+  const budgetTarget = useMemo(() => sectionsTotal(facets.section.columns), [facets]);
 
-  const sectionsCovered = useMemo(() => SECTIONS.filter(sec => {
-    const f = visible.filter(s => s.section === sec.key).reduce((a, s) => a + s.chars, 0);
+  const budget = useMemo(() => {
+    const filled = visible.filter(s => s.section !== 'Unassigned').reduce((s, x) => s + (x.wordCount || 0), 0);
+    return { filled, target: budgetTarget, pct: filled / budgetTarget, status: covStatus(filled, budgetTarget) };
+  }, [visible, budgetTarget]);
+
+  const budgetedSections = useMemo(() => facets.section.columns.filter(c => c.target > 0), [facets]);
+
+  const sectionsCovered = useMemo(() => budgetedSections.filter(sec => {
+    const f = visible.filter(s => s.section === sec.key).reduce((a, s) => a + (s.wordCount || 0), 0);
     const st = covStatus(f, sec.target);
     return st === 'ok' || st === 'over';
-  }).length, [visible]);
+  }).length, [visible, budgetedSections]);
 
   const grouped = useMemo(() => {
     const g = {};
@@ -198,15 +221,21 @@ export default function PrintQueryBoard() {
     const s = storyById[storyId];
     if (!s || facet.value(s) === colKey) return;
     setStories(prev => prev.map(x => x.id === storyId ? applyPatch(x, facet.patch(colKey)) : x));
+    if (facet.key === 'section') {
+      logMetadataUpdate(s, 'nodeMeta.printSection', colKey);
+    } else if (facet.key === 'priority') {
+      logMetadataUpdate(s, 'nodeMeta.printPriority', colKey);
+    }
     showToast(`Reclassified <b>"${esc(trunc(s.title))}"</b> → <b>${esc(facet.colLabel(colKey))}</b>`);
   }, [storyById, facet, showToast]);
 
   const handlePriority = useCallback((storyId, k) => {
     const s = storyById[storyId];
-    if (!s || s.priority === k) return;
-    setStories(prev => prev.map(x => x.id === storyId ? { ...x, priority: k } : x));
+    if (!s || s.printPriority === k) return;
+    setStories(prev => prev.map(x => x.id === storyId ? { ...x, printPriority: k } : x));
+    logMetadataUpdate(s, 'nodeMeta.printPriority', k);
     const moved = facetKey === 'priority';
-    showToast(`${moved ? 'Reclassified' : 'Priority'} <b>"${esc(trunc(s.title, 38))}"</b> → <b>${k === 'high' ? 'P1 · Breaking' : k === 'med' ? 'P2 · Standard' : 'P3 · Low'}</b>`);
+    showToast(`${moved ? 'Reclassified' : 'Priority'} <b>"${esc(trunc(s.title, 38))}"</b> → <b>${PRI[k].label} · ${PRI[k].name}</b>`);
   }, [storyById, facetKey, showToast]);
 
   const handleDate = useCallback((storyId, off) => {
@@ -214,6 +243,8 @@ export default function PrintQueryBoard() {
     if (!s || s.offset === off) return;
     setStories(prev => prev.map(x => x.id === storyId ? { ...x, offset: off } : x));
     const d = new Date(TODAY); d.setDate(d.getDate() + off);
+    const iso = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    logMetadataUpdate(s, 'nodeMeta.printIssueDate', iso);
     const lbl = off === 0 ? 'Today' : off === 1 ? 'Tomorrow' : fmtDateShort(d);
     if (off === issueOffset) showToast(`Pulled <b>"${esc(trunc(s.title, 34))}"</b> into <b>${lbl}</b>`);
     else showToast(`Moved <b>"${esc(trunc(s.title, 34))}"</b> to the <b>${lbl}</b> issue`);
@@ -232,7 +263,9 @@ export default function PrintQueryBoard() {
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0, padding: '0 2px' }}>
         <div style={{ width: 4, height: 18, background: C.blue, borderRadius: 2 }} />
         <span style={{ fontSize: 14, fontWeight: 700, color: C.dark, letterSpacing: '-.01em' }}>Print Query Board</span>
-        <span style={{ fontSize: 10, background: C.zone, color: C.mid, padding: '1px 7px', borderRadius: 6, fontWeight: 600, opacity: 0.7 }}>NEON Widget</span>
+        {printConfig.printProduct && (
+          <span style={{ fontSize: 10, background: C.zone, color: C.mid, padding: '1px 7px', borderRadius: 6, fontWeight: 600, opacity: 0.7 }}>{printConfig.printProduct}</span>
+        )}
         <div style={{ flex: 1 }} />
         <span style={{ fontSize: 11, color: C.muted }}>{visible.length} stories on this issue</span>
         <div style={{ width: 1, height: 14, background: C.border }} />
@@ -240,18 +273,30 @@ export default function PrintQueryBoard() {
         <span style={{ fontSize: 11, color: C.muted }}>{fmtDate(issueDate)}</span>
       </div>
 
-      {/* Body */}
-      <div style={{ flex: 1, display: 'flex', gap: 8, minHeight: 0 }}>
-        <LeftRail
-          issueDate={issueDate} setIssueDate={setIssueDate}
-          facets={facets} facetKey={facetKey} setFacetKey={setFacetKey}
-          stories={visible} search={search} setSearch={setSearch} />
-        <Board
-          facet={facet} columns={facet.columns} grouped={grouped}
-          budget={budget} sectionsCovered={sectionsCovered}
-          dragId={dragId} dragOverCol={dragOverCol} setDragOverCol={setDragOverCol}
-          cardProps={cardProps} onDrop={handleDrop} />
-      </div>
+      {loading && (
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: C.muted, fontSize: 14 }}>
+          Loading stories…
+        </div>
+      )}
+      {error && !loading && (
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: C.red, fontSize: 14 }}>
+          {error}
+        </div>
+      )}
+
+      {!loading && !error && (
+        <div style={{ flex: 1, display: 'flex', gap: 8, minHeight: 0 }}>
+          <LeftRail
+            issueDate={issueDate} setIssueDate={setIssueDate}
+            facets={facets} facetKey={facetKey} setFacetKey={setFacetKey}
+            stories={visible} search={search} setSearch={setSearch} />
+          <Board
+            facet={facet} columns={facet.columns} grouped={grouped}
+            budget={budget} sectionsCovered={sectionsCovered} totalBudgetedSections={budgetedSections.length}
+            dragId={dragId} dragOverCol={dragOverCol} setDragOverCol={setDragOverCol}
+            cardProps={cardProps} onDrop={handleDrop} />
+        </div>
+      )}
 
       <Toast toast={toast} />
     </div>

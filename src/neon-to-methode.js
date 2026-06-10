@@ -300,6 +300,7 @@ async function processNeonStoryV2 (model) {
     }
 
     const imageReferences = await images.modelImagesToMethode(
+      methodeClient,
       model, {
         channel: CHANNEL,
         workFolder: WORKFOLDER,

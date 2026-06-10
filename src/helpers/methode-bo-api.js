@@ -234,7 +234,8 @@ class MethodeClient {
      * Story Management
      */
     async createStory({ name, issueDate, channel, template, workFolder, attributes = null }) {
-        if (!name || !issueDate || !channel || !template || !workFolder) {
+        if (!name || !issueDate || !template || !workFolder) {
+            console.log('Missing parameters:', { name, issueDate, channel, template, workFolder });
             throw new Error('Missing required parameters: name, issueDate, channel, template, workFolder');
         }
 

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { STATUS_STYLE, PAYWALL_STYLE, fmtDateTime } from './data.js';
+import { STATUS_STYLE, fmtDateTime } from './data.js';
 
 export const C = {
   bg:        'rgb(246,243,246)',
@@ -38,20 +38,6 @@ export function StatusBadge({ status, pct }) {
       fontSize: 10, fontWeight: 700, whiteSpace: 'nowrap',
       background: st.bg, color: st.text,
     }}>{label}</span>
-  );
-}
-
-export function PaywallBadge({ paywall }) {
-  const s = PAYWALL_STYLE[paywall] || PAYWALL_STYLE.free;
-  return (
-    <span style={{
-      display: 'inline-flex', alignItems: 'center',
-      padding: '2px 7px', borderRadius: 999,
-      fontSize: 10, fontWeight: 700,
-      background: s.bg, color: s.color,
-      border: `1px solid ${s.border}`,
-      whiteSpace: 'nowrap',
-    }}>{s.label}</span>
   );
 }
 

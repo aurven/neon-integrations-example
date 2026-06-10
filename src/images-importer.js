@@ -2,7 +2,6 @@ const querystring = require('querystring');
 const axios = require('axios');
 const FormData = require('form-data');
 const neon = require('./helpers/neon-bo-api-v3.js');
-const edapi = require('./helpers/edapi-utils.js');
 const utils = require('./helpers/utils.js');
 const siteshelpers = require('./helpers/sites-helpers.js');
 const { findAllElementsByNodeType, findElementByNodeType, extractTextFromElements } = require('./helpers/neon-content-parser.js');
@@ -179,7 +178,7 @@ function extractImageCaptions(model) {
   });
 }
 
-async function modelImagesToMethode(model, {workFolder, channel, issueDate}) {
+async function modelImagesToMethode(methodeClient,model, {workFolder, channel, issueDate}) {
 
   const siteName = model.pubInfo.siteName;
   const captions = extractImageCaptions(model);
@@ -194,7 +193,7 @@ async function modelImagesToMethode(model, {workFolder, channel, issueDate}) {
       console.warn(`⚠️ WARNING: Could not retrieve image ${targetId} from Neon (site: ${siteName}). Skipping image.`);
       continue;
     }
-    const methodeData = await uploadImageToMethode({ neonImage, workFolder, channel, issueDate });
+    const methodeData = await uploadImageToMethode(methodeClient, { neonImage, workFolder, channel, issueDate });
     if (!methodeData) {
       console.warn(`⚠️ WARNING: Could not upload image ${targetId} to Methode. Skipping image.`);
       continue;
@@ -214,7 +213,7 @@ async function modelImagesToMethode(model, {workFolder, channel, issueDate}) {
   return methodeImages;
 }
 
-async function uploadImageToMethode(options = {
+async function uploadImageToMethode(methodeClient, options = {
     neonImage: null,
     workFolder: '',
     channel: '',
@@ -255,7 +254,7 @@ async function uploadImageToMethode(options = {
       contentDisposition: 'form-data'
     });
     
-    return edapi.createObject(form);
+    return methodeClient.createObject(form);
 
   } catch (error) {
     console.error('Error preparing image upload:', error.message);

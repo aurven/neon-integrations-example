@@ -1,0 +1,14 @@
+{
+  "issueDate": "2026-06-11",
+  "printProduct": "TheGlobe Print",
+  "editions": ["UK", "International", "US"],
+  "sectionsAndBooks": [
+    { "key": "Front",    "label": "Front Page", "color": "#0A2EE6", "wordTarget": 1500 },
+    { "key": "World",    "label": "World",      "color": "#2563eb", "wordTarget": 2000 },
+    { "key": "Politics", "label": "Politics",   "color": "#7c3aed", "wordTarget": 1300 },
+    { "key": "Business", "label": "Business",   "color": "#d97706", "wordTarget": 1500 },
+    { "key": "Comment",  "label": "Comment",    "color": "#64748b", "wordTarget": 1000 },
+    { "key": "Culture",  "label": "Culture",    "color": "#9333ea", "wordTarget": 1200 },
+    { "key": "Sport",    "label": "Sport",      "color": "#16a34a", "wordTarget": 1500 }
+  ]
+}

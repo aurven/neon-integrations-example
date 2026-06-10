@@ -1,4 +1,52 @@
 const axios = require('axios');
+const fs = require('fs');
+const path = require('path');
+
+const NEON_CALLS_LOG_DIR = path.join(process.cwd(), 'logs', 'neon-calls');
+
+// Caller name = first NeonClient.* frame above makeRequest in the stack
+function getCallerName() {
+    const stack = new Error().stack?.split('\n') || [];
+    const frame = stack.find(line => line.includes('NeonClient.') && !line.includes('makeRequest') && !line.includes('getCallerName'));
+    const match = frame?.match(/NeonClient\.(\w+)/);
+    return match ? match[1] : 'unknown';
+}
+
+function logNeonCall({ callerName, requestConfig, response, error }) {
+    if (process.env.NEON_EXT_LOCATION !== 'Local') return;
+
+    try {
+        fs.mkdirSync(NEON_CALLS_LOG_DIR, { recursive: true });
+
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const filename = `${timestamp}_${callerName}.json`;
+
+        const entry = {
+            caller: callerName,
+            timestamp: new Date().toISOString(),
+            request: {
+                method: requestConfig.method,
+                url: requestConfig.url,
+                baseURL: requestConfig.baseURL,
+                params: requestConfig.params,
+                data: requestConfig.data
+            },
+            response: response ? {
+                status: response.status,
+                data: response.data
+            } : null,
+            error: error ? {
+                status: error.response?.status,
+                code: error.code,
+                data: error.response?.data
+            } : null
+        };
+
+        fs.writeFileSync(path.join(NEON_CALLS_LOG_DIR, filename), JSON.stringify(entry, null, 2));
+    } catch (logError) {
+        console.warn(`⚠️ Failed to write Neon call log: ${logError.message}`);
+    }
+}
 
 class NeonClient {
     constructor(options = {}) {
@@ -28,11 +76,14 @@ class NeonClient {
             }
         };
 
+        const callerName = getCallerName();
+
         try {
             const response = await this.client.request(requestConfig);
             if (successMessage) {
                 console.log(`✅ ${successMessage}`);
             }
+            logNeonCall({ callerName, requestConfig, response });
             return returnData ? response.data : response;
         } catch (error) {
             const errorMsg = `❌ ${config.method?.toUpperCase() || 'REQUEST'} ${config.url} failed: ${error.response?.status || error.code}`;
@@ -40,6 +91,7 @@ class NeonClient {
             if (error.response?.data) {
                 console.error('Error details:', JSON.stringify(error.response.data, null, 2));
             }
+            logNeonCall({ callerName, requestConfig, error });
             throw error;
         }
     }
@@ -277,6 +329,35 @@ class NeonClient {
         }
     }
 
+    async getContentTypesConfig() {
+        try {
+            return await this.makeRequest({
+                method: 'get',
+                url: '/contents/types'
+            }, 'Content types config retrieved', true);
+        } catch (error) {
+            console.warn(`⚠️ getContentTypesConfig(): endpoint unavailable (${error.response?.status || error.code}), returning stub`);
+            // TODO: remove stub when the real content-types-config endpoint is confirmed on this Neon BO version
+            return {
+                typeInfo: { typeId: 4096, typeName: 'content', typeMeta: { label: 'Content' } },
+                hierarchicalSubTypes: {
+                    4098: {
+                        typeInfo: { typeId: 4098, typeName: 'article', contentType: 'story', typeMeta: { label: 'Article' } },
+                        composedTypeName: 'article',
+                        contentType: 'story',
+                        hierarchicalSubTypes: {
+                            4100: {
+                                typeInfo: { typeId: 4100, typeName: 'gallery', contentType: 'gallery', typeMeta: { label: 'Gallery' } },
+                                composedTypeName: 'article/gallery',
+                                contentType: 'gallery'
+                            }
+                        }
+                    }
+                }
+            };
+        }
+    }
+
     async promoteNode(familyRef, { targetSite, targetSection, mode = 'PREVIEW' }) {
         if (!familyRef) return null;
         const siteDetails = [{ siteName: targetSite, sitePath: targetSection }];
@@ -353,6 +434,7 @@ module.exports = {
     getNextSteps: (familyRef) => defaultClient.getNextSteps(familyRef),
     nextStepAssignment: (familyRef, options) => defaultClient.nextStepAssignment(familyRef, options),
     getWorkflowDefinitions: () => defaultClient.getWorkflowDefinitions(),
+    getContentTypesConfig: () => defaultClient.getContentTypesConfig(),
     promoteNode: (familyRef, params) => defaultClient.promoteNode(familyRef, params),
     promoteNodeEverywhere: (familyRef, params) => defaultClient.promoteNodeEverywhere(familyRef, params),
     discoveryServices: () => defaultClient.discoveryServices(),

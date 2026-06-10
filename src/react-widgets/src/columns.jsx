@@ -40,6 +40,76 @@ function formatDate(params) {
   });
 }
 
+const PRINT_PRIORITY_COLORS = {
+  1: '#d6362f',
+  2: '#cf5a6e',
+  3: '#b072c7',
+  4: '#7a93dd',
+  5: '#5fb3e6'
+};
+
+function PrintPriorityCellRenderer({ value }) {
+  if (!value) return '—';
+  const bg = PRINT_PRIORITY_COLORS[value] ?? '#9ca3af';
+  return (
+    <span style={{
+      display: 'inline-block',
+      padding: '2px 10px',
+      borderRadius: '9999px',
+      fontSize: '11px',
+      fontWeight: 600,
+      color: '#fff',
+      background: bg,
+      whiteSpace: 'nowrap'
+    }}>
+      {`P${value}`}
+    </span>
+  );
+}
+
+function TypeCellRenderer({ value }) {
+  if (!value) return '—';
+  return (
+    <span style={{
+      display: 'inline-block',
+      padding: '2px 10px',
+      borderRadius: '9999px',
+      fontSize: '11px',
+      fontWeight: 600,
+      color: '#69667f',
+      background: '#e7e6ed',
+      whiteSpace: 'nowrap'
+    }}>
+      {value}
+    </span>
+  );
+}
+
+function formatIssueDate(params) {
+  if (!params.value) return '—';
+  const [year, month, day] = params.value.split('-');
+  if (!year || !month || !day) return '—';
+  return `${day}/${month}/${year}`;
+}
+
+function PrintDiffusionCellRenderer({ value }) {
+  const isYes = String(value).toLowerCase() === 'yes';
+  return (
+    <span style={{
+      display: 'inline-block',
+      padding: '2px 10px',
+      borderRadius: '9999px',
+      fontSize: '11px',
+      fontWeight: 600,
+      color: '#fff',
+      background: isYes ? '#3aa76d' : '#9ca3af',
+      whiteSpace: 'nowrap'
+    }}>
+      {isYes ? 'Yes' : 'No'}
+    </span>
+  );
+}
+
 export const columnDefs = [
   {
     field: 'headline',
@@ -51,6 +121,15 @@ export const columnDefs = [
     filter: true,
     autoHeight: true,
     cellRenderer: HeadlineCellRenderer
+  },
+  {
+    field: 'type',
+    headerName: 'Type',
+    width: 130,
+    resizable: false,
+    sortable: true,
+    filter: true,
+    cellRenderer: TypeCellRenderer
   },
   {
     field: 'date',
@@ -68,6 +147,51 @@ export const columnDefs = [
     sortable: true,
     filter: true,
     cellRenderer: StatusCellRenderer
+  },
+  {
+    field: 'printPriority',
+    headerName: 'Print Priority',
+    width: 140,
+    resizable: false,
+    sortable: true,
+    filter: true,
+    editable: true,
+    cellRenderer: PrintPriorityCellRenderer,
+    cellEditor: 'agSelectCellEditor',
+    cellEditorParams: { values: [1, 2, 3, 4, 5] }
+  },
+  {
+    field: 'issueDate',
+    headerName: 'Issue Date',
+    width: 140,
+    resizable: true,
+    sortable: true,
+    filter: true,
+    editable: true,
+    valueFormatter: formatIssueDate,
+    cellEditor: 'agDateStringCellEditor'
+  },
+  {
+    field: 'printSection',
+    headerName: 'Print Section',
+    width: 160,
+    resizable: true,
+    sortable: true,
+    filter: true,
+    editable: true,
+    valueFormatter: (params) => params.value || '—'
+  },
+  {
+    field: 'printDiffusion',
+    headerName: 'Print Diffusion',
+    width: 140,
+    resizable: false,
+    sortable: true,
+    filter: true,
+    editable: true,
+    cellRenderer: PrintDiffusionCellRenderer,
+    cellEditor: 'agSelectCellEditor',
+    cellEditorParams: { values: ['yes', 'no'] }
   }
 ];
 
