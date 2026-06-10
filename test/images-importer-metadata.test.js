@@ -23,6 +23,7 @@ test('credit and caption are injected', () => {
   const xml = buildImageMetadataXml({ caption: 'A sunset', credit: 'Jane Doe' });
   assert.ok(xml.includes('<caption>A sunset</caption>'));
   assert.ok(xml.includes('<credit>Jane Doe</credit>'));
+  assert.ok(xml.indexOf('<credit>') < xml.indexOf('<caption>'), 'DTD requires credit before caption');
 });
 
 test('values are XML-escaped', () => {

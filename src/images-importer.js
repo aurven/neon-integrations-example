@@ -71,14 +71,16 @@ function escapeXml(value) {
 }
 
 function buildImageMetadataXml(metadata = {}) {
+  // credit is always emitted (empty when absent) to keep legacy output byte-identical;
+  // caption is only emitted when present; image.dtd requires credit before caption.
   const caption = metadata.caption ? `<caption>${escapeXml(metadata.caption)}</caption>` : '';
   const credit = `<credit>${metadata.credit ? escapeXml(metadata.credit) : ''}</credit>`;
   return `<?xml version="1.0" encoding="UTF-8"?>` +
          `<!DOCTYPE ObjectMetadata SYSTEM "/common/rules/image.dtd">` +
          `<ObjectMetadata>` +
          `<iptc>` +
-         caption +
          credit +
+         caption +
          `</iptc>` +
          `<WebDesign><WebType>Image</WebType></WebDesign>` +
          `</ObjectMetadata>`;
