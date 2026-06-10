@@ -367,6 +367,17 @@ fastify.post("/in/binary", neonImportHandlers.importBinaryHandler);
 
 /**
  *
+ * Delayed simulated import to Neon
+ *
+ */
+const delayedImportHandlers = require("./src/requestHandlers/neon-delayed-import.js");
+fastify.post("/in/delayed-import", delayedImportHandlers.submitJobHandler);
+fastify.get("/in/delayed-import", delayedImportHandlers.listJobsHandler);
+fastify.get("/in/delayed-import/:jobId", delayedImportHandlers.getJobHandler);
+fastify.delete("/in/delayed-import/:jobId", delayedImportHandlers.cancelJobHandler);
+
+/**
+ *
  * Trello to Neon
  *
  */
