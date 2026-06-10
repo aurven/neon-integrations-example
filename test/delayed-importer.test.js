@@ -76,3 +76,148 @@ test('validatePayload enforces per-type required fields', () => {
     /items\[0\].*url/
   );
 });
+
+const flush = () => new Promise((resolve) => setImmediate(resolve));
+
+test('createJob fires first item immediately, then one per interval, then completes', async (t) => {
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  t.after(() => delayedImporter._reset());
+
+  const calls = [];
+  const deps = {
+    dispatchStory: async (item) => {
+      calls.push(item.title);
+      return { familyRef: 'ref-' + item.title };
+    },
+  };
+
+  const submitted = delayedImporter.createJob(basePayload(), deps);
+  assert.match(submitted.jobId, /^dlyimp-\d{8}-[0-9a-f]{6}$/);
+  assert.equal(submitted.itemCount, 3);
+  assert.equal(submitted.intervalMs, 20000); // 1 min / 3 items
+  assert.ok(submitted.estimatedEndAt);
+
+  t.mock.timers.tick(0);
+  await flush();
+  assert.deepEqual(calls, ['A']);
+
+  const running = delayedImporter.getJob(submitted.jobId);
+  assert.equal(running.state, 'running');
+  assert.equal(running.done, 1);
+  assert.equal(running.total, 3);
+  assert.ok(running.nextFireAt);
+  assert.equal(running.results[0].status, 'ok');
+  assert.equal(running.results[0].familyRef, 'ref-A');
+
+  t.mock.timers.tick(20000);
+  await flush();
+  t.mock.timers.tick(20000);
+  await flush();
+
+  assert.deepEqual(calls, ['A', 'B', 'C']);
+  const finished = delayedImporter.getJob(submitted.jobId);
+  assert.equal(finished.state, 'completed');
+  assert.equal(finished.done, 3);
+  assert.equal(finished.nextFireAt, null);
+});
+
+test('per-item errors are recorded and the job continues', async (t) => {
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  t.after(() => delayedImporter._reset());
+
+  const deps = {
+    dispatchStory: async (item) => {
+      if (item.title === 'B') throw new Error('neon exploded');
+      return { familyRef: 'ref-' + item.title };
+    },
+  };
+
+  const submitted = delayedImporter.createJob(basePayload(), deps);
+  t.mock.timers.tick(0);
+  await flush();
+  t.mock.timers.tick(20000);
+  await flush();
+  t.mock.timers.tick(20000);
+  await flush();
+
+  const job = delayedImporter.getJob(submitted.jobId);
+  assert.equal(job.state, 'completed');
+  assert.equal(job.done, 3);
+  assert.equal(job.errors, 1);
+  assert.equal(job.results[1].status, 'error');
+  assert.equal(job.results[1].error, 'neon exploded');
+});
+
+test('cancelJob stops pending ticks and keeps completed results', async (t) => {
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  t.after(() => delayedImporter._reset());
+
+  const calls = [];
+  const deps = {
+    dispatchStory: async (item) => {
+      calls.push(item.title);
+      return { familyRef: 'ref-' + item.title };
+    },
+  };
+
+  const submitted = delayedImporter.createJob(basePayload(), deps);
+  t.mock.timers.tick(0);
+  await flush();
+
+  const snapshot = delayedImporter.cancelJob(submitted.jobId);
+  assert.equal(snapshot.state, 'cancelled');
+  assert.equal(snapshot.done, 1);
+
+  t.mock.timers.tick(60000);
+  await flush();
+  assert.deepEqual(calls, ['A']); // no further dispatches
+
+  // cancelling again -> already finished
+  assert.deepEqual(delayedImporter.cancelJob(submitted.jobId), { error: 'Job already finished' });
+});
+
+test('cancelJob and getJob return null for unknown job', () => {
+  assert.equal(delayedImporter.getJob('nope'), null);
+  assert.equal(delayedImporter.cancelJob('nope'), null);
+});
+
+test('listJobs returns summaries without results array', async (t) => {
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  t.after(() => delayedImporter._reset());
+
+  const deps = { dispatchStory: async () => ({ familyRef: 'x' }) };
+  const submitted = delayedImporter.createJob(basePayload(), deps);
+  t.mock.timers.tick(0);
+  await flush();
+
+  const list = delayedImporter.listJobs();
+  assert.equal(list.length, 1);
+  assert.equal(list[0].jobId, submitted.jobId);
+  assert.equal(list[0].state, 'running');
+  assert.equal(list[0].done, 1);
+  assert.equal(list[0].total, 3);
+  assert.equal(list[0].results, undefined);
+});
+
+test('image items route to dispatchImage', async (t) => {
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  t.after(() => delayedImporter._reset());
+
+  const types = [];
+  const deps = {
+    dispatchStory: async () => { types.push('story'); return { familyRef: 's' }; },
+    dispatchImage: async () => { types.push('image'); return { familyRef: 'i' }; },
+  };
+  const payload = basePayload({
+    items: [
+      { type: 'image', url: 'https://example.com/a.jpg' },
+      { type: 'story', title: 'A', content: '<p>a</p>' },
+    ],
+  });
+  delayedImporter.createJob(payload, deps);
+  t.mock.timers.tick(0);
+  await flush();
+  t.mock.timers.tick(30000);
+  await flush();
+  assert.deepEqual(types, ['image', 'story']);
+});
