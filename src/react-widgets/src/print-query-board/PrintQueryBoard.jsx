@@ -100,7 +100,7 @@ function LeftRail({ issueDate, setIssueDate, facets, facetKey, setFacetKey, stor
         </div>
         <div style={{ marginTop: 'auto', padding: '10px 11px', background: C.white, border: `1px solid ${C.border}`, borderRadius: 8, display: 'flex', gap: 8, alignItems: 'flex-start' }}>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={C.blue} strokeWidth="2" strokeLinecap="round" style={{ flexShrink: 0, marginTop: 1 }}><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-          <p style={{ fontSize: 11, color: C.mid, lineHeight: 1.5, margin: 0 }}>Columns are live query segments. <b style={{ color: C.dark }}>Drag a card</b> to another column — or edit its priority / issue date — to reclassify it.</p>
+          <p style={{ fontSize: 11, color: C.mid, lineHeight: 1.5, margin: 0 }}><b style={{ color: C.dark }}>Drag a card</b> to another column — or edit its priority / issue date — to reclassify it.</p>
         </div>
       </div>
     </NeonPanel>

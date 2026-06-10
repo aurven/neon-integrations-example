@@ -212,10 +212,15 @@ export function Distribution({ facet, stories }) {
       {facet.columns.map(col => {
         const inCol = stories.filter(s => facet.value(s) === col.key);
         const n = inCol.length;
-        const metric = facet.budgeted
+        const unbudgetedCol = facet.budgeted && !col.target;
+        const metric = unbudgetedCol
+          ? n
+          : facet.budgeted
           ? Math.round(inCol.reduce((a, s) => a + (s.wordCount || 0), 0) / col.target * 100) + '%'
           : n;
-        const barPct = facet.budgeted
+        const barPct = unbudgetedCol
+          ? 0
+          : facet.budgeted
           ? Math.min(inCol.reduce((a, s) => a + (s.wordCount || 0), 0) / col.target, 1) * 100
           : (n / total) * 100;
         return (

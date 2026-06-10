@@ -241,6 +241,8 @@ async function processNeonStoryV2 (model) {
 
     await methodeClient.login({ username: USERNAME, password: PASSWORD });
 
+    let isLinkedToPage = false;
+
     // Check if this Neon object was already sent to Méthode via methodeHook writeback
     const existingStoryId = info.pubInfo?.webhookData?.methodeHook?.storyId;
     let loid;
@@ -268,7 +270,7 @@ async function processNeonStoryV2 (model) {
           console.warn(`⚠️ Could not check PrintPageLinked for ${existingStoryId}: ${err.message}`);
         }
 
-        const isLinkedToPage = linkedObjects?.roles?.length > 0;
+        isLinkedToPage = linkedObjects?.roles?.length > 0;
         if (isLinkedToPage) {
           console.log(`📄 Story ${existingStoryId} is linked to a page — checking for Tabloid channel copy...`);
 
@@ -318,13 +320,18 @@ async function processNeonStoryV2 (model) {
     const cleanedContent = utils.stripAllCData(content);
     loid && (await methodeClient.putContentToStory(loid, cleanedContent));
 
-    await methodeClient.sendMessage({
-      subject: `New update for Story from Digital (${loid})`,
-      body: 'There are new updates on the Master copy of a story already linked to a page. Please review the changes and update the channel copy if necessary.',
-      recipients: ['aureliano.ventrella', 'Emmanuel'], // Méthode principal names (users or groups)
-      priority: '1',       // optional, defaults to '1'
-      attachments: [loid]      // optional, defaults to []
-    });
+    if (isLinkedToPage) {
+      console.log(`⚠️ Story ${loid} is linked to a page — sending notification to Méthode users...`);
+      const messageResult = await methodeClient.sendMessage({
+        subject: `New update for Story from Digital (${loid})`,
+        body: `There are new updates on the Master copy of ${loid}, already linked to a page. Please review the changes and update the channel copy if necessary.`,
+        recipients: ['aureliano.ventrella', 'Emmanuel'], // Méthode principal names (users or groups)
+        priority: '1',       // optional, defaults to '1'
+        attachments: []      // optional, defaults to []
+      });
+
+      console.log(`Message sent to Méthode users: ${JSON.stringify(messageResult)}`);
+    }
 
     await methodeClient.logout();
 
