@@ -88,14 +88,14 @@ async function newNodeFromStory(story, publishStory = true) {
                   await neonUtils.workflowTransitionTo({ familyRef, targetWorkflowName: 'Story', targetStateName: 'Revision' });  
                 }
               
-                resolve();
+                resolve(familyRef);
             } else {
                 console.warn(`Error during content Update, deletion of ${familyRef} in progress...`);
                 await neon.deleteNode(familyRef, true);
-                resolve();
+                resolve(null);
             }
         } else {
-            reject();
+            reject(new Error(`Story node creation failed for "${story.title || story.id}"`));
         }
     });
 }
