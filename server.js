@@ -245,6 +245,7 @@ fastify.get("/widgets/planning-board", widgetHandlers.planningBoardWidgetHandler
 fastify.get("/widgets/neon-grid", widgetHandlers.neonGridWidgetHandler);
 fastify.get("/api/neon/grid/articles", widgetHandlers.neonGridDataHandler);
 fastify.get("/widgets/print-query-board", widgetHandlers.printQueryBoardHandler);
+fastify.get("/api/print-query-board/stories", widgetHandlers.printQueryBoardDataHandler);
 
 /**
  *

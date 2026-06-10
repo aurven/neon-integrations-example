@@ -230,6 +230,25 @@ class MethodeClient {
         }
     }
 
+    async changeObjectFields(updateFields) {
+
+        const body = JSON.stringify({ "updateFields": updateFields });
+        console.log(`🔄 [${this.sessionId}] Changing object fields with payload:`, JSON.stringify(body, null, 2));
+
+        try {
+            const response = await this.makeRequest({
+                method: 'post',
+                url: '/v3/object/metadata/change/fields',
+                data: body
+            }, `Changed fields for ${updateFields.length} update group(s)`, true);
+
+            return response.result || [];
+        } catch (error) {
+            console.error('Change object fields failed:', error.message);
+            throw error;
+        }
+    }
+
     /**
      * Story Management
      */
@@ -589,6 +608,7 @@ module.exports = {
     getObjectLinked: (id, roleType) => defaultClient.getObjectLinked(id, roleType),
     createStory: (options) => defaultClient.createStory(options),
     createObject: (form) => defaultClient.createObject(form),
+    changeObjectFields: (items) => defaultClient.changeObjectFields(items),
     readContent: (token, loid) => defaultClient.readContent(token, loid),
     getBinaryContent: (loid, format, maxSize) => defaultClient.getBinaryContent(loid, format, maxSize),
     putContentToStory: (loid, content) => defaultClient.putContentToStory(loid, content),

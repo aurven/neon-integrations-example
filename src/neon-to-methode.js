@@ -7,6 +7,7 @@ const cheerio = require('cheerio');
 const edapi = require('./helpers/edapi-utils.js');
 const dayjs = require('dayjs');
 const images = require('./images-importer.js');
+const { buildPrintFieldOperators, buildUpdateField } = require('./helpers/methode-metadata-utils.js');
 const { findElementByNodeType, extractTextFromElements } = require('./helpers/neon-content-parser.js');
 
 const USERNAME = process.env.EDAPI_USERNAME;
@@ -25,6 +26,16 @@ const DEFAULT_CHANNEL_RULES = {
 const getChannelRules = (customRules = {}) => {
   return { ...DEFAULT_CHANNEL_RULES, ...customRules };
 };
+
+// Resolve print-related fields from Neon node attributes, falling back to defaults.
+function resolvePrintFields(attributes = {}) {
+  const workFolder = attributes?.printSection || WORKFOLDER;
+  const issueDate = attributes?.printIssueDate
+    ? dayjs(attributes.printIssueDate).format('YYYYMMDD')
+    : dayjs().add(1, 'day').format('YYYYMMDD');
+  const printDiffusion = attributes?.printDiffusion;
+  return { workFolder, issueDate, printDiffusion };
+}
 
 // Process webhook data
 const processWebhookData = async (model) => {
@@ -84,7 +95,8 @@ const processWebhookData = async (model) => {
       excludeTags: [
         "style",
         "teaser",
-        "oembedblock"
+        "oembedblock",
+        "video-component"
       ],
       channelRules: getChannelRules(),
     });
@@ -237,7 +249,12 @@ async function processNeonStoryV2 (model) {
   try {
     const { info, name, xmlDeclarations, $doc } = await processWebhookData(model);
 
-    const issueDate = dayjs().add(1, 'day').format('YYYYMMDD');
+    const { workFolder, issueDate, printDiffusion } = resolvePrintFields(info.attributes);
+
+    if (printDiffusion === 'No') {
+      console.log(`⏭️ Story ${info.id} has printDiffusion="No" — skipping Méthode export.`);
+      return { source: info, skipped: true, reason: 'printDiffusion=No' };
+    }
 
     await methodeClient.login({ username: USERNAME, password: PASSWORD });
 
@@ -296,7 +313,7 @@ async function processNeonStoryV2 (model) {
         issueDate,
         template: TEMPLATE,
         channel: CHANNEL,
-        workFolder: WORKFOLDER,
+        workFolder,
         attributes: null
       });
     }
@@ -305,7 +322,7 @@ async function processNeonStoryV2 (model) {
       methodeClient,
       model, {
         channel: CHANNEL,
-        workFolder: WORKFOLDER,
+        workFolder,
         issueDate
       }
     );
@@ -319,6 +336,19 @@ async function processNeonStoryV2 (model) {
     const content = xmlDeclarations + $doc.html();
     const cleanedContent = utils.stripAllCData(content);
     loid && (await methodeClient.putContentToStory(loid, cleanedContent));
+
+    // if (loid) {
+    //   const printFieldOperators = buildPrintFieldOperators(info.attributes);
+    //   console.log(`Print field operators for ${loid}: ${JSON.stringify(printFieldOperators)}`);
+
+    //   const printFieldsBody = { sourceIds: [ loid ], operators: printFieldOperators };
+    //   console.log(`Built print fields body for ${loid}: ${JSON.stringify(printFieldsBody)}`);
+    //   const updateFields = buildUpdateField(printFieldsBody);
+    //   console.log(`Update fields for ${loid}: ${JSON.stringify(updateFields)}`);
+
+    //   const changeResult = await methodeClient.changeObjectFields(updateFields);
+    //   console.log(`Change object fields result for ${loid}: ${JSON.stringify(changeResult)}`);
+    // }
 
     if (isLinkedToPage) {
       console.log(`⚠️ Story ${loid} is linked to a page — sending notification to Méthode users...`);
