@@ -221,3 +221,90 @@ test('image items route to dispatchImage', async (t) => {
   await flush();
   assert.deepEqual(types, ['image', 'story']);
 });
+
+test('dispatchStoryItem maps item fields to populator story shape', async () => {
+  let received;
+  const fakePopulator = {
+    newNodeFromStory: async (story, publish) => {
+      received = { story, publish };
+      return 'fam-1';
+    },
+  };
+  const job = { site: 'demo-site', workspace: 'Demo Workspace', workfolder: '/Demo/Imports', publish: false };
+  const item = {
+    type: 'story',
+    title: 'Headline',
+    content: '<p>body</p>',
+    summary: 'Standfirst',
+    byline: 'Jane Doe',
+    metadata: { seoTitle: 'seo' },
+  };
+
+  const out = await delayedImporter.dispatchStoryItem(item, job, fakePopulator);
+
+  assert.equal(out.familyRef, 'fam-1');
+  assert.equal(received.publish, false);
+  assert.equal(received.story.title, 'Headline');
+  assert.equal(received.story.headline, 'Headline');
+  assert.equal(received.story.mainContentHtml, '<p>body</p>');
+  assert.equal(received.story.summary, 'Standfirst');
+  assert.equal(received.story.byline, 'Jane Doe');
+  assert.deepEqual(received.story.metadata, { seoTitle: 'seo' });
+  assert.equal(received.story.tgtSite, 'demo-site');
+  assert.equal(received.story.tgtWorkspace, '/Demo/Imports');
+  // must NOT leak item.type: getCreationOptions would use it as the Neon node type
+  assert.equal(received.story.type, undefined);
+  // no figureUrl: uploadImageFromStory must no-op
+  assert.equal(received.story.figureUrl, undefined);
+});
+
+test('dispatchStoryItem: item workfolder overrides job workfolder', async () => {
+  let received;
+  const fakePopulator = { newNodeFromStory: async (story) => { received = story; return 'x'; } };
+  const job = { site: 's', workspace: 'ws', workfolder: '/job-wf', publish: false };
+
+  await delayedImporter.dispatchStoryItem(
+    { type: 'story', title: 'T', content: 'c', workfolder: '/item-wf' },
+    job,
+    fakePopulator
+  );
+  assert.equal(received.tgtWorkspace, '/item-wf');
+});
+
+test('dispatchImageItem maps item to uploadImage options with workspace fallback', async () => {
+  let received;
+  const fakeImporter = {
+    uploadImage: async (options) => {
+      received = options;
+      return { familyRef: 'img-1' };
+    },
+  };
+  const job = { site: 's', workspace: 'Demo Workspace', workfolder: null, publish: false };
+  const item = {
+    type: 'image',
+    url: 'https://example.com/photos/sunset.jpg',
+    metadata: { caption: 'A sunset', credit: 'Jane' },
+  };
+
+  const out = await delayedImporter.dispatchImageItem(item, job, fakeImporter);
+
+  assert.equal(out.familyRef, 'img-1');
+  assert.equal(received.imageUrl, 'https://example.com/photos/sunset.jpg');
+  assert.equal(received.workspace, 'Demo Workspace'); // job.workfolder null -> workspace fallback
+  assert.equal(received.imageName, 'sunset.jpg'); // derived via utils.getImageNameFromUrl
+  assert.deepEqual(received.metadata, { caption: 'A sunset', credit: 'Jane' });
+});
+
+test('dispatchImageItem: explicit name wins over derived name', async () => {
+  let received;
+  const fakeImporter = { uploadImage: async (options) => { received = options; return {}; } };
+  const job = { site: 's', workspace: 'ws', workfolder: null, publish: false };
+
+  const out = await delayedImporter.dispatchImageItem(
+    { type: 'image', url: 'https://example.com/a.jpg', name: 'custom-name' },
+    job,
+    fakeImporter
+  );
+  assert.equal(received.imageName, 'custom-name');
+  assert.equal(out.familyRef, null); // uploadImage returned no familyRef
+});

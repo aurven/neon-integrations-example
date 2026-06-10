@@ -126,12 +126,37 @@ async function runTick(job, index, deps) {
   job.timer = setTimeout(() => runTick(job, next, deps), job.intervalMs);
 }
 
-async function dispatchStoryItem(item, job) {
-  throw new Error('not implemented yet — Task 4');
+/**
+ * Story item -> storiesPopulator.newNodeFromStory.
+ * Deliberately does NOT copy item.type onto the story: getCreationOptions
+ * uses story.type as the Neon node type and must default to 'article'.
+ * No figureUrl / language / translate: image upload no-ops, translation skipped.
+ */
+async function dispatchStoryItem(item, job, populator = storiesPopulator) {
+  const story = {
+    title: item.title,
+    headline: item.title,
+    summary: item.summary || '',
+    byline: item.byline || '',
+    mainContentHtml: item.content,
+    metadata: item.metadata || {},
+    tgtSite: job.site,
+    tgtWorkspace: resolveWorkfolder(item, job),
+  };
+  const familyRef = await populator.newNodeFromStory(story, job.publish);
+  return { familyRef: familyRef || null };
 }
 
-async function dispatchImageItem(item, job) {
-  throw new Error('not implemented yet — Task 4');
+/** Image item -> imagesImporter.uploadImage. Image fetched live at tick time. */
+async function dispatchImageItem(item, job, importer = imagesImporter) {
+  const imageName = item.name || utils.getImageNameFromUrl(item.url) || `image-${Date.now()}`;
+  const node = await importer.uploadImage({
+    imageName,
+    imageUrl: item.url,
+    workspace: resolveWorkfolder(item, job),
+    metadata: item.metadata || {},
+  });
+  return { familyRef: node?.familyRef || null };
 }
 
 /**
