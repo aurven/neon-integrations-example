@@ -36,6 +36,8 @@ async function updateMetadataHandler(request, reply) {
 
   try {
     let updatedXml = await neon.getNodeMetadata(familyRef);
+    // Applied one change at a time, each in its own try/catch, so a single
+    // bad xpath (e.g. an attribute path) doesn't abort the rest of the batch.
     for (const change of changes) {
       try {
         updatedXml = applyMetadataChanges(updatedXml, [change]);
