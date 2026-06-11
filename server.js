@@ -100,7 +100,8 @@ fastify.get("/services", function (request, reply) {
       { name: "RSS Feeds", endpoint: "POST /in/neon/from/rss", description: "Import articles from RSS feeds (ANSA, TGcom24)" },
       { name: "Google Docs", endpoint: "GET /in/googledocs", description: "Import content from Google Docs" },
       { name: "Binary Upload", endpoint: "POST /in/binary", description: "Upload binary files to Neon" },
-      { name: "Trello Integration", endpoint: "GET /in/trello", description: "Import Trello cards to Neon with web interface" }
+      { name: "Trello Integration", endpoint: "GET /in/trello", description: "Import Trello cards to Neon with web interface" },
+      { name: "Delayed Import", endpoint: "POST /in/delayed-import", description: "Simulate a content feed: import a batch of stories/images into a workfolder one item at a time over a timespan (status: GET /in/delayed-import/:jobId, cancel: DELETE)" }
     ],
     outbound: [
       { name: "Méthode CMS", endpoint: "POST /out/methode", description: "Export Neon content to Méthode CMS" },

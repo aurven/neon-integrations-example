@@ -126,6 +126,30 @@ The application will now be available at:
 - `POST /in/neon/from/rss` - Import from RSS feeds
 - `POST /in/binary` - Upload binary files
 
+#### Delayed Import (Feed Simulation)
+- `POST /in/delayed-import` - Submit a batch of stories/images imported one at a time, spread evenly over a timespan, into a target workfolder
+- `GET /in/delayed-import` - List jobs (running + recently finished)
+- `GET /in/delayed-import/:jobId` - Job status with per-item results
+- `DELETE /in/delayed-import/:jobId` - Cancel pending imports (already-imported items are kept)
+
+Example request body:
+
+```json
+{
+  "duration": 30,
+  "site": "demo-site",
+  "workspace": "Demo Workspace",
+  "workfolder": "/Demo/Imports",
+  "publish": false,
+  "items": [
+    { "type": "story", "title": "Headline", "content": "<p>Body HTML</p>" },
+    { "type": "image", "url": "https://example.com/pic.jpg", "metadata": { "caption": "…", "credit": "…" } }
+  ]
+}
+```
+
+`duration` is in minutes; the interval between items is `duration / items.length`, first item fires immediately. Per-item `workfolder` overrides the job default. Jobs are in-memory only (lost on restart). Full design: `docs/superpowers/specs/2026-06-10-delayed-importer-design.md`.
+
 #### Content Export (Outbound)
 - `POST /out/methode` - Export to Méthode CMS
 - `POST /out/imagesToMethode` - Export images to Méthode
