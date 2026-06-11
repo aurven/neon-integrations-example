@@ -103,6 +103,16 @@ class NeonClient {
         }, `Node ${familyRef} retrieved`, true);
     }
 
+    async getNodeMetadata(familyRef) {
+        return await this.makeRequest({
+            method: 'get',
+            url: `/contents/nodes/${familyRef}/metadata`,
+            headers: {
+                'Accept': 'text/xml'
+            }
+        }, `Node metadata for ${familyRef} retrieved`, true);
+    }
+
     async deleteNode(familyRef, force = false) {
         return await this.makeRequest({
             method: 'delete',
@@ -412,6 +422,7 @@ module.exports = {
 
     // Flat API delegating to default client
     getNode: (familyRef) => defaultClient.getNode(familyRef),
+    getNodeMetadata: (familyRef) => defaultClient.getNodeMetadata(familyRef),
     deleteNode: (familyRef, force) => defaultClient.deleteNode(familyRef, force),
     lockNode: (familyRef) => defaultClient.lockNode(familyRef),
     unlockNode: (familyRef, unlockMode) => defaultClient.unlockNode(familyRef, unlockMode),
