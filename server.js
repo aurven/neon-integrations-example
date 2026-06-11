@@ -512,6 +512,16 @@ const port = process.env.PORT || 3000;
 const host = process.env.HOST || "0.0.0.0";
 const projectDomain = process.env.PROJECT_DOMAIN || "http://localhost:" + port;
 
+// Release the port promptly on nodemon restarts (SIGTERM/SIGUSR2) and Ctrl+C (SIGINT).
+// Without this, fastify's server can stay bound briefly, causing EADDRINUSE on the next start.
+function shutdown(signal) {
+  console.log(`\n${signal} received, closing server...`);
+  fastify.close(() => process.exit(0));
+}
+process.once("SIGTERM", () => shutdown("SIGTERM"));
+process.once("SIGINT", () => shutdown("SIGINT"));
+process.once("SIGUSR2", () => shutdown("SIGUSR2"));
+
 fastify.listen(
   { port: port, host: host },
   function (err, address) {
