@@ -405,7 +405,7 @@ async function withNeonSession(operation, options = {}) {
 
 /**
  * Normalizes a workflow assignee into the `principals` array expected by
- * neonUtils.workflowTransitionTo (e.g. ["aureliano.ventrella"]).
+ * neonUtils.workflowTransitionTo (e.g. ["62038d84-f161-3579-a5f1-7aba053f999a"]).
  */
 function normalizePrincipals(assignTo) {
   if (!assignTo) return [];

@@ -63,8 +63,8 @@ test('validatePayload rejects invalid item type with index in message', () => {
 });
 
 test('validatePayload accepts assignTo as string or array, job-level and per-item', () => {
-  assert.deepEqual(delayedImporter.validatePayload(basePayload({ assignTo: 'aureliano.ventrella' })), { valid: true });
-  assert.deepEqual(delayedImporter.validatePayload(basePayload({ assignTo: ['aureliano.ventrella', 'jane.doe'] })), { valid: true });
+  assert.deepEqual(delayedImporter.validatePayload(basePayload({ assignTo: '62038d84-f161-3579-a5f1-7aba053f999a' })), { valid: true });
+  assert.deepEqual(delayedImporter.validatePayload(basePayload({ assignTo: ['62038d84-f161-3579-a5f1-7aba053f999a', 'jane.doe'] })), { valid: true });
   assert.deepEqual(
     delayedImporter.validatePayload(
       basePayload({ items: [{ type: 'story', title: 'A', content: '<p>a</p>', assignTo: 'jane.doe' }] })
@@ -297,16 +297,16 @@ test('dispatchStoryItem: item workfolder overrides job workfolder', async () => 
 test('dispatchStoryItem: job-level assignTo passed through to populator', async () => {
   let received;
   const fakePopulator = { newNodeFromStory: async (story) => { received = story; return 'x'; } };
-  const job = { site: 's', workspace: 'ws', workfolder: null, assignTo: 'aureliano.ventrella', publish: false };
+  const job = { site: 's', workspace: 'ws', workfolder: null, assignTo: '62038d84-f161-3579-a5f1-7aba053f999a', publish: false };
 
   await delayedImporter.dispatchStoryItem({ type: 'story', title: 'T', content: 'c' }, job, fakePopulator);
-  assert.equal(received.assignTo, 'aureliano.ventrella');
+  assert.equal(received.assignTo, '62038d84-f161-3579-a5f1-7aba053f999a');
 });
 
 test('dispatchStoryItem: item assignTo overrides job assignTo', async () => {
   let received;
   const fakePopulator = { newNodeFromStory: async (story) => { received = story; return 'x'; } };
-  const job = { site: 's', workspace: 'ws', workfolder: null, assignTo: 'aureliano.ventrella', publish: false };
+  const job = { site: 's', workspace: 'ws', workfolder: null, assignTo: '62038d84-f161-3579-a5f1-7aba053f999a', publish: false };
 
   await delayedImporter.dispatchStoryItem(
     { type: 'story', title: 'T', content: 'c', assignTo: 'jane.doe' },
