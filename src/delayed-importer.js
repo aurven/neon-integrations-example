@@ -30,6 +30,9 @@ function validatePayload(body) {
   if (!Array.isArray(body.items) || body.items.length === 0) {
     return { valid: false, error: 'items must be a non-empty array' };
   }
+  if (body.assignTo !== undefined && !isValidAssignTo(body.assignTo)) {
+    return { valid: false, error: 'assignTo must be a string or an array of strings' };
+  }
 
   for (let i = 0; i < body.items.length; i++) {
     const item = body.items[i];
@@ -38,6 +41,9 @@ function validatePayload(body) {
     }
     if (!ITEM_TYPES.includes(item.type)) {
       return { valid: false, error: `items[${i}]: type must be one of ${ITEM_TYPES.join(', ')}` };
+    }
+    if (item.assignTo !== undefined && !isValidAssignTo(item.assignTo)) {
+      return { valid: false, error: `items[${i}]: assignTo must be a string or an array of strings` };
     }
     if (item.type === 'story') {
       if (!item.title || typeof item.title !== 'string') {
@@ -56,12 +62,21 @@ function validatePayload(body) {
   return { valid: true };
 }
 
+function isValidAssignTo(value) {
+  if (typeof value === 'string') return value.length > 0;
+  return Array.isArray(value) && value.length > 0 && value.every((v) => typeof v === 'string' && v.length > 0);
+}
+
 const EVICTION_MS = 60 * 60 * 1000; // finished jobs evicted after 1 hour
 
 const jobs = new Map();
 
 function resolveWorkfolder(item, job) {
   return item.workfolder || job.workfolder || job.workspace;
+}
+
+function resolveAssignTo(item, job) {
+  return item.assignTo || job.assignTo || undefined;
 }
 
 function publicJob(job) {
@@ -142,6 +157,7 @@ async function dispatchStoryItem(item, job, populator = storiesPopulator) {
     metadata: item.metadata || {},
     tgtSite: job.site,
     tgtWorkspace: resolveWorkfolder(item, job),
+    assignTo: resolveAssignTo(item, job),
   };
   const familyRef = await populator.newNodeFromStory(story, job.publish);
   return { familyRef: familyRef || null };
@@ -181,6 +197,7 @@ function createJob(body, deps = {}) {
     site: body.site,
     workspace: body.workspace,
     workfolder: body.workfolder || null,
+    assignTo: body.assignTo || null,
     publish: body.publish === true,
     items: body.items,
     intervalMs,

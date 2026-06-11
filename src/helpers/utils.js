@@ -403,6 +403,15 @@ async function withNeonSession(operation, options = {}) {
   return await operation(client);
 }
 
+/**
+ * Normalizes a workflow assignee into the `principals` array expected by
+ * neonUtils.workflowTransitionTo (e.g. ["aureliano.ventrella"]).
+ */
+function normalizePrincipals(assignTo) {
+  if (!assignTo) return [];
+  return Array.isArray(assignTo) ? assignTo.filter(Boolean) : [assignTo];
+}
+
 module.exports = {
   polyfills,
   removeNonAlphanumeric,
@@ -416,5 +425,6 @@ module.exports = {
   metadataGenerator,
   getLargestSrcFromPicture,
   safeLogRequest,
-  withNeonSession
+  withNeonSession,
+  normalizePrincipals
 };

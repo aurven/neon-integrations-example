@@ -141,6 +141,7 @@ Example request body:
   "workspace": "Demo Workspace",
   "workfolder": "/Demo/Imports",
   "publish": false,
+  "assignTo": "aureliano.ventrella",
   "items": [
     { "type": "story", "title": "Headline", "content": "<p>Body HTML</p>" },
     { "type": "image", "url": "https://example.com/pic.jpg", "metadata": { "caption": "…", "credit": "…" } }
@@ -148,7 +149,7 @@ Example request body:
 }
 ```
 
-`duration` is in minutes; the interval between items is `duration / items.length`, first item fires immediately. Per-item `workfolder` overrides the job default. Jobs are in-memory only (lost on restart). Full design: `docs/superpowers/specs/2026-06-10-delayed-importer-design.md`.
+`duration` is in minutes; the interval between items is `duration / items.length`, first item fires immediately. Per-item `workfolder` overrides the job default. `assignTo` (a username/alias, or array of them) sets the workflow assignee for story items during their workflow transitions; per-item `assignTo` overrides the job default. Jobs are in-memory only (lost on restart). Full design: `docs/superpowers/specs/2026-06-10-delayed-importer-design.md`.
 
 #### Content Export (Outbound)
 - `POST /out/methode` - Export to Méthode CMS

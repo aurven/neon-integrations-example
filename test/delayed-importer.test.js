@@ -62,6 +62,29 @@ test('validatePayload rejects invalid item type with index in message', () => {
   assert.match(result.error, /items\[1\]/);
 });
 
+test('validatePayload accepts assignTo as string or array, job-level and per-item', () => {
+  assert.deepEqual(delayedImporter.validatePayload(basePayload({ assignTo: 'aureliano.ventrella' })), { valid: true });
+  assert.deepEqual(delayedImporter.validatePayload(basePayload({ assignTo: ['aureliano.ventrella', 'jane.doe'] })), { valid: true });
+  assert.deepEqual(
+    delayedImporter.validatePayload(
+      basePayload({ items: [{ type: 'story', title: 'A', content: '<p>a</p>', assignTo: 'jane.doe' }] })
+    ),
+    { valid: true }
+  );
+});
+
+test('validatePayload rejects invalid assignTo', () => {
+  assert.match(delayedImporter.validatePayload(basePayload({ assignTo: '' })).error, /assignTo/);
+  assert.match(delayedImporter.validatePayload(basePayload({ assignTo: [] })).error, /assignTo/);
+  assert.match(delayedImporter.validatePayload(basePayload({ assignTo: 123 })).error, /assignTo/);
+  assert.match(
+    delayedImporter.validatePayload(
+      basePayload({ items: [{ type: 'story', title: 'A', content: '<p>a</p>', assignTo: 5 }] })
+    ).error,
+    /items\[0\]: assignTo/
+  );
+});
+
 test('validatePayload enforces per-type required fields', () => {
   assert.match(
     delayedImporter.validatePayload(basePayload({ items: [{ type: 'story', content: '<p>a</p>' }] })).error,
@@ -269,6 +292,28 @@ test('dispatchStoryItem: item workfolder overrides job workfolder', async () => 
     fakePopulator
   );
   assert.equal(received.tgtWorkspace, '/item-wf');
+});
+
+test('dispatchStoryItem: job-level assignTo passed through to populator', async () => {
+  let received;
+  const fakePopulator = { newNodeFromStory: async (story) => { received = story; return 'x'; } };
+  const job = { site: 's', workspace: 'ws', workfolder: null, assignTo: 'aureliano.ventrella', publish: false };
+
+  await delayedImporter.dispatchStoryItem({ type: 'story', title: 'T', content: 'c' }, job, fakePopulator);
+  assert.equal(received.assignTo, 'aureliano.ventrella');
+});
+
+test('dispatchStoryItem: item assignTo overrides job assignTo', async () => {
+  let received;
+  const fakePopulator = { newNodeFromStory: async (story) => { received = story; return 'x'; } };
+  const job = { site: 's', workspace: 'ws', workfolder: null, assignTo: 'aureliano.ventrella', publish: false };
+
+  await delayedImporter.dispatchStoryItem(
+    { type: 'story', title: 'T', content: 'c', assignTo: 'jane.doe' },
+    job,
+    fakePopulator
+  );
+  assert.equal(received.assignTo, 'jane.doe');
 });
 
 test('dispatchImageItem maps item to uploadImage options with workspace fallback', async () => {

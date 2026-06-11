@@ -68,24 +68,25 @@ async function newNodeFromStory(story, publishStory = true) {
         const mainImageReference = imageUpload.node ? images.mainImageReferenceGenerator(imageUpload.node) : null;
         story.mainImageReference = mainImageReference ? mainImageReference : null;
         const bodyOptions = story.translate ? await translateStory(story) : getOptionsFromData(story);
-      
+        const principals = utils.normalizePrincipals(story.assignTo);
+
         if (familyRef) {
             console.log(`Created new node with ID ${familyRef}`);
             createdIds.push(familyRef);
             const updateStatus = await neon.updateNodeContent(familyRef, utils.bodyGenerator(bodyOptions));
             const metaUpdateStatus = await neon.updateNodeMetadata(familyRef, utils.metadataGenerator(story.metadata));
-          
+
             if (updateStatus) {
                 await neon.unlockNode(familyRef);
-                await neonUtils.workflowTransitionTo({ familyRef, targetWorkflowName: 'Story', targetStateName: 'Edit' });
-              
+                await neonUtils.workflowTransitionTo({ familyRef, targetWorkflowName: 'Story', targetStateName: 'Edit', principals });
+
                 if (publishStory) {
-                  await neonUtils.workflowTransitionTo({ familyRef, targetWorkflowName: 'Story', targetStateName: 'Ready' });
+                  await neonUtils.workflowTransitionTo({ familyRef, targetWorkflowName: 'Story', targetStateName: 'Ready', principals });
                   console.log(`${familyRef} updated successfully!`);
                   const promotionResponse = await neon.promoteNode(familyRef, { targetSite: story.tgtSite, targetSection: story.tgtSection, mode: 'LIVE' });
                   await neon.promoteNodeEverywhere(familyRef, { mode: 'LIVE' });
                 } else {
-                  await neonUtils.workflowTransitionTo({ familyRef, targetWorkflowName: 'Story', targetStateName: 'Revision' });  
+                  await neonUtils.workflowTransitionTo({ familyRef, targetWorkflowName: 'Story', targetStateName: 'Revision', principals });
                 }
               
                 resolve(familyRef);
