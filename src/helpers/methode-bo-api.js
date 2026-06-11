@@ -233,7 +233,8 @@ class MethodeClient {
     async changeObjectFields(updateFields) {
 
         const body = JSON.stringify({ "updateFields": updateFields });
-        console.log(`🔄 [${this.sessionId}] Changing object fields with payload:`, JSON.stringify(body, null, 2));
+
+        console.log(`🔄 [${this.sessionId}] Changing object fields with payload: ${body}`);
 
         try {
             const response = await this.makeRequest({

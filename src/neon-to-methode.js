@@ -337,18 +337,15 @@ async function processNeonStoryV2 (model) {
     const cleanedContent = utils.stripAllCData(content);
     loid && (await methodeClient.putContentToStory(loid, cleanedContent));
 
-    // if (loid) {
-    //   const printFieldOperators = buildPrintFieldOperators(info.attributes);
-    //   console.log(`Print field operators for ${loid}: ${JSON.stringify(printFieldOperators)}`);
+    if (loid) {
+      const printFieldOperators = buildPrintFieldOperators(info.attributes); 
 
-    //   const printFieldsBody = { sourceIds: [ loid ], operators: printFieldOperators };
-    //   console.log(`Built print fields body for ${loid}: ${JSON.stringify(printFieldsBody)}`);
-    //   const updateFields = buildUpdateField(printFieldsBody);
-    //   console.log(`Update fields for ${loid}: ${JSON.stringify(updateFields)}`);
+      const printFieldsBody = { sourceIds: [ loid ], operators: printFieldOperators }; 
+      const updateFields = buildUpdateField(printFieldsBody);
 
-    //   const changeResult = await methodeClient.changeObjectFields(updateFields);
-    //   console.log(`Change object fields result for ${loid}: ${JSON.stringify(changeResult)}`);
-    // }
+      const changeResult = await methodeClient.changeObjectFields([updateFields]);
+      console.log(`Change object fields result for ${loid}: ${JSON.stringify(changeResult)}`);
+    }
 
     if (isLinkedToPage) {
       console.log(`⚠️ Story ${loid} is linked to a page — sending notification to Méthode users...`);

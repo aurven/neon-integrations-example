@@ -1,0 +1,41 @@
+{
+  "duration": 3,
+  "site": "NextFrontier",
+  "workspace": "/Science/Space",
+  "publish": false,
+  "items": [
+    {
+      "type": "story",
+      "title": "ESA Greenlights Ramses Mission to Asteroid Apophis Ahead of 2029 Flyby",
+      "summary": "The European Space Agency has approved full development of the Ramses spacecraft, which will rendezvous with asteroid Apophis before its historic close approach to Earth in April 2029.",
+      "byline": "Elena Marchetti",
+      "content": "<p>The European Space Agency has formally approved the Ramses mission, committing to launch a spacecraft toward asteroid 99942 Apophis in time to observe the 375-metre body before it passes within 32,000 kilometres of Earth — closer than geostationary satellites.</p><p>Mission planners at ESOC in Darmstadt say the probe must depart by spring 2028 to reach the asteroid ahead of the flyby. Ramses will carry a suite of cameras, spectrometers and a small lander to measure how Earth's gravity deforms the asteroid during the encounter.</p><p>\"Apophis gives us a natural experiment we could never afford to build,\" said the mission's lead scientist. \"Watching a planetary tide reshape an asteroid in real time will teach us more about rubble-pile bodies than a decade of remote observation.\"</p><p>The April 2029 passage will be visible to the naked eye across Europe, Africa and western Asia — the closest approach by an asteroid of this size in recorded history.</p>",
+      "metadata": {
+        "seoTitle": "ESA approves Ramses mission to asteroid Apophis",
+        "keywords": "ESA, Apophis, Ramses, asteroid, planetary defence"
+      }
+    },
+    {
+      "type": "story",
+      "title": "Ariane 6 Upper Stage Upgrade Promises Double Payload to Lunar Orbit",
+      "summary": "ArianeGroup unveils the Astris kick stage for Ariane 6, targeting direct injections to lunar orbit and a European answer to the growing cislunar logistics market.",
+      "byline": "Tomas Lindqvist",
+      "content": "<p>ArianeGroup has presented the long-awaited Astris kick stage for the Ariane 6 launcher, an upgrade the company says will double the rocket's payload capacity to lunar transfer orbit and open a European route to the rapidly growing cislunar market.</p><p>The restartable stage, powered by the storable-propellant Berta engine, sits atop the existing upper stage and handles the final injection burn — freeing the core vehicle for heavier initial lifts. First flight is pencilled in for late 2027 with a navigation-satellite deployment.</p><p>European officials frame the upgrade as strategic autonomy: \"If Europe wants a seat at the lunar table, it cannot rent the chair,\" an ESA transportation director told reporters at the Paris Air Show.</p><p>Analysts note the move positions Ariane 6 against a crowded field of commercial heavy-lift providers competing for Gateway resupply and lunar lander contracts into the 2030s.</p>",
+      "metadata": {
+        "seoTitle": "Ariane 6 Astris kick stage doubles lunar payload",
+        "keywords": "Ariane 6, ESA, Astris, lunar orbit, launcher"
+      }
+    },
+    {
+      "type": "story",
+      "title": "JUICE Probe Confirms Subsurface Ocean Signature During Second Ganymede Pass",
+      "summary": "Data from ESA's JUICE spacecraft strengthens the case for a salty ocean beneath Ganymede's icy crust, with magnetometer readings matching decade-old predictions to within a few percent.",
+      "byline": "Priya Raghavan",
+      "content": "<p>ESA's Jupiter Icy Moons Explorer has returned magnetometer data from its second close pass of Ganymede that scientists say is the strongest evidence yet for a conductive, salty ocean tens of kilometres beneath the moon's frozen surface.</p><p>The induced magnetic field measured during the 400-kilometre flyby matched models of a subsurface ocean to within a few percent — a result the instrument team called \"almost uncomfortably clean\" at this week's European Planetary Science Congress.</p><p>Ganymede is the only moon in the Solar System that generates its own magnetic field, which makes separating the internal dynamo from the ocean's induced signal a delicate exercise. The new pass, timed to a different position in Jupiter's magnetospheric cycle, allowed the team to disentangle the two contributions.</p><p>JUICE will settle into orbit around Ganymede in 2034, the first time any spacecraft has orbited a moon other than our own.</p>",
+      "metadata": {
+        "seoTitle": "JUICE confirms Ganymede subsurface ocean signal",
+        "keywords": "JUICE, ESA, Ganymede, Jupiter, subsurface ocean"
+      }
+    }
+  ]
+}

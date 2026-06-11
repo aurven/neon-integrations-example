@@ -88,7 +88,7 @@ function mapLayoutPrio(printPriority) {
         ? null
         : Number(printPriority);
 
-    if (p === 3) return 'A';
+    if (p === 1 || p === 2 || p === 3) return 'A';
     if (p === 4 || p === null) return 'B';
     return 'C';
 }
@@ -127,13 +127,13 @@ function buildPrintFieldOperators({ printPriority, printIssueDate, printSection 
         ? setOp(attributePath('/metadata/AutoLayout/BoostPriority'), boostPriority)
         : unsetOp(attributePath('/metadata/AutoLayout/BoostPriority')));
 
-    operators.push(printIssueDate
-        ? setOp(sysAttributePath('/productInfo/issueDate'), dayjs(printIssueDate).format('YYYYMMDD'))
-        : unsetOp(sysAttributePath('/productInfo/issueDate')));
+    if (printIssueDate) {
+        operators.push(setOp(sysAttributePath('/productInfo/issueDate'), dayjs(printIssueDate).format('YYYYMMDD')));
+    }
 
-    operators.push(printSection
-        ? setOp(sysAttributePath('/workFolder'), printSection)
-        : unsetOp(sysAttributePath('/workFolder')));
+    if (printSection) {
+        operators.push(setOp(sysAttributePath('/workFolder'), printSection));
+    }
 
     return operators;
 }

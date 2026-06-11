@@ -177,5 +177,6 @@ async function testStoryTranslations(data, options = {site: null, workspace: nul
 
 module.exports = {
   populateNeonInstance,
-  testStoryTranslations
+  testStoryTranslations,
+  newNodeFromStory
 };
