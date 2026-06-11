@@ -3,6 +3,7 @@
   "site": "NextFrontier",
   "workspace": "/Science/Space",
   "publish": false,
+  "assignTo": "62038d84-f161-3579-a5f1-7aba053f999a",
   "items": [
     {
       "type": "story",
