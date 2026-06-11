@@ -9,7 +9,7 @@
     "watch:css": "npx tailwindcss -i ./src/styles/tailwind-source.css -o ./public/css/tailwind-panels.css --watch",
     "dev": "concurrently \"npm run watch:css\" \"nodemon --env-file=.env server.js\"",
     "dev:legacy": "node --env-file=.env server.js",
-    "test": "node --test test/connectors/twitter-connector.test.js test/connectors/facebook-connector.test.js test/connectors/instagram-connector.test.js test/connectors/threads-connector.test.js test/connectors/connector-registry.test.js test/delayed-importer.test.js test/images-importer-metadata.test.js"
+    "test": "node --test test/connectors/twitter-connector.test.js test/connectors/facebook-connector.test.js test/connectors/instagram-connector.test.js test/connectors/threads-connector.test.js test/connectors/connector-registry.test.js test/delayed-importer.test.js test/images-importer-metadata.test.js test/metadata-xpath-utils.test.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.70.1",
