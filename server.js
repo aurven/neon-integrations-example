@@ -111,6 +111,7 @@ fastify.get("/services", function (request, reply) {
     ],
     utilities: [
       { name: "Content Cleanup", endpoint: "POST /utilities/cleanup", description: "Clean up content references" },
+      { name: "Metadata Update", endpoint: "POST /utilities/metadata/update", description: "Apply xpath-based set/unset changes to a node's ObjectMetadata XML (familyRef, changes[])" },
       { name: "OpenAI Processing", endpoint: "POST /ai/openai", description: "Process content with OpenAI" },
       { name: "Pexels Photos", endpoint: "GET /sources/pexels", description: "Source photos from Pexels API" },
       { name: "Neon Discovery", endpoint: "GET /utilities/services", description: "Discover Neon services" },
@@ -221,6 +222,10 @@ fastify.post("/utilities/cleanup", utilitiesHandlers.cleanupHandler);
 fastify.post("/ai/openai", utilitiesHandlers.openAiHandler);
 fastify.get("/sources/pexels", utilitiesHandlers.pexelsPhotosHandler);
 fastify.get("/utilities/services", utilitiesHandlers.neonDiscoveryHandler);
+
+// Metadata
+const metadataHandlers = require("./src/requestHandlers/metadata.js");
+fastify.post("/utilities/metadata/update", metadataHandlers.updateMetadataHandler);
 
 // Neon Metrics API
 const neonMetricsHandlers = require("./src/requestHandlers/neon-metrics.js");
