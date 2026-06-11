@@ -22,3 +22,16 @@ export function fetchStories() {
   const url = demo ? '/api/print-query-board/stories?demo=true' : '/api/print-query-board/stories';
   return apiFetch(url);
 }
+
+export async function updateMetadata(familyRef, changes) {
+  const apiKey = window.CONFIG?.apiKey ?? '';
+  const response = await fetch(`${BASE_URL}/utilities/metadata/update`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', apikey: apiKey },
+    body: JSON.stringify({ familyRef, changes })
+  });
+  if (!response.ok) {
+    throw new Error(`API error ${response.status}: /utilities/metadata/update`);
+  }
+  return response.json();
+}

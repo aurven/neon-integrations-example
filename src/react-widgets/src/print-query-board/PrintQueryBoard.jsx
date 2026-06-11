@@ -6,13 +6,24 @@ import {
 } from './data.js';
 import { C, CoverageBar, StatusBadge, NeonPanel, NeonInput, IconSearch, IconFilter, IconCalendar, IconSection } from './components.jsx';
 import { BoardColumn, SegmentPicker, Distribution, Toast } from './board.jsx';
-import { fetchStories } from '../api.js';
+import { fetchStories, updateMetadata } from '../api.js';
+import { buildMetadataChange } from '../metadata.js';
 
 const esc = (s) => (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const trunc = (s, n = 46) => s.length > n ? s.slice(0, n - 1) + '…' : s;
 
-function logMetadataUpdate(story, field, value) {
-  console.log(`[Print Query Board] Would update node ${story.id} -> ${field} = ${JSON.stringify(value)} (no Neon connection wired yet)`);
+function pushMetadataUpdate(story, field, value) {
+  const change = buildMetadataChange(field, value);
+  if (!change) return;
+
+  if (window.CONFIG?.demo) {
+    console.log(`[Print Query Board] Would update ${story.id} -> ${change.xpath} = ${change.value ?? '(unset)'}`);
+    return;
+  }
+
+  updateMetadata(story.id, [change]).catch(err => {
+    console.error(`[Print Query Board] Metadata update failed for ${story.id}:`, err.message);
+  });
 }
 
 function IssueStepper({ issueDate, setIssueDate }) {
@@ -222,9 +233,10 @@ export default function PrintQueryBoard() {
     if (!s || facet.value(s) === colKey) return;
     setStories(prev => prev.map(x => x.id === storyId ? applyPatch(x, facet.patch(colKey)) : x));
     if (facet.key === 'section') {
-      logMetadataUpdate(s, 'nodeMeta.printSection', colKey);
+      const col = facet.columns.find(c => c.key === colKey);
+      pushMetadataUpdate(s, 'printSection', col?.printSection ?? null);
     } else if (facet.key === 'priority') {
-      logMetadataUpdate(s, 'nodeMeta.printPriority', colKey);
+      pushMetadataUpdate(s, 'printPriority', colKey);
     }
     showToast(`Reclassified <b>"${esc(trunc(s.title))}"</b> → <b>${esc(facet.colLabel(colKey))}</b>`);
   }, [storyById, facet, showToast]);
@@ -233,7 +245,7 @@ export default function PrintQueryBoard() {
     const s = storyById[storyId];
     if (!s || s.printPriority === k) return;
     setStories(prev => prev.map(x => x.id === storyId ? { ...x, printPriority: k } : x));
-    logMetadataUpdate(s, 'nodeMeta.printPriority', k);
+    pushMetadataUpdate(s, 'printPriority', k);
     const moved = facetKey === 'priority';
     showToast(`${moved ? 'Reclassified' : 'Priority'} <b>"${esc(trunc(s.title, 38))}"</b> → <b>${PRI[k].label} · ${PRI[k].name}</b>`);
   }, [storyById, facetKey, showToast]);
@@ -244,7 +256,7 @@ export default function PrintQueryBoard() {
     setStories(prev => prev.map(x => x.id === storyId ? { ...x, offset: off } : x));
     const d = new Date(TODAY); d.setDate(d.getDate() + off);
     const iso = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-    logMetadataUpdate(s, 'nodeMeta.printIssueDate', iso);
+    pushMetadataUpdate(s, 'issueDate', iso);
     const lbl = off === 0 ? 'Today' : off === 1 ? 'Tomorrow' : fmtDateShort(d);
     if (off === issueOffset) showToast(`Pulled <b>"${esc(trunc(s.title, 34))}"</b> into <b>${lbl}</b>`);
     else showToast(`Moved <b>"${esc(trunc(s.title, 34))}"</b> to the <b>${lbl}</b> issue`);

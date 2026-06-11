@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import { columnDefs, defaultColDef } from './columns.jsx';
-import { fetchArticles } from './api.js';
+import { fetchArticles, updateMetadata } from './api.js';
+import { buildMetadataChange } from './metadata.js';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import './neon-grid.css';
@@ -32,6 +33,21 @@ export default function NeonGridWidget() {
   }, []);
 
   useEffect(() => { loadArticles(); }, [loadArticles]);
+
+  const handleCellValueChanged = useCallback((params) => {
+    const familyRef = params.data?.id;
+    const change = buildMetadataChange(params.colDef.field, params.newValue);
+    if (!familyRef || !change) return;
+
+    if (window.CONFIG?.demo) {
+      console.log(`[Neon Grid] Would update ${familyRef} -> ${change.xpath} = ${change.value ?? '(unset)'}`);
+      return;
+    }
+
+    updateMetadata(familyRef, [change]).catch(err => {
+      console.error(`[Neon Grid] Metadata update failed for ${familyRef}:`, err.message);
+    });
+  }, []);
 
   return (
     <div style={{
@@ -133,6 +149,7 @@ export default function NeonGridWidget() {
               defaultColDef={defaultColDef}
               pagination={true}
               paginationPageSize={25}
+              onCellValueChanged={handleCellValueChanged}
             />
           </div>
         )}
