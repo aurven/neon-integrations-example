@@ -24,6 +24,8 @@ async function workflowTransitionTo({ familyRef, targetStateName, targetWorkflow
                 principals: principals,
                 comment: comment
             });
+            console.log(`Transitioning node ${familyRef} to state '${targetStateName}' of workflow '${targetWorkflowName}'...`);
+
             if (!nextStepBody) {
                 console.error(`Cannot generate next step body for ${familyRef}`);
                 return;
