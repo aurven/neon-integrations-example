@@ -244,7 +244,7 @@ export default function PrintQueryBoard() {
       const col = facet.columns.find(c => c.key === colKey);
       pushMetadataUpdate(s, 'printSection', col?.printSection ?? null);
     } else if (facet.key === 'priority') {
-      pushMetadataUpdate(s, 'printPriority', colKey);
+      pushMetadataUpdate(s, 'printPriority', facet.patch(colKey).printPriority);
     }
     showToast(`Reclassified <b>"${esc(trunc(s.title))}"</b> → <b>${esc(facet.colLabel(colKey))}</b>`);
   }, [storyById, facet, showToast]);
@@ -255,7 +255,8 @@ export default function PrintQueryBoard() {
     setStories(prev => prev.map(x => x.id === storyId ? { ...x, printPriority: k } : x));
     pushMetadataUpdate(s, 'printPriority', k);
     const moved = facetKey === 'priority';
-    showToast(`${moved ? 'Reclassified' : 'Priority'} <b>"${esc(trunc(s.title, 38))}"</b> → <b>${PRI[k].label} · ${PRI[k].name}</b>`);
+    const priLabel = k != null ? `${PRI[k].label} · ${PRI[k].name}` : 'No priority';
+    showToast(`${moved ? 'Reclassified' : 'Priority'} <b>"${esc(trunc(s.title, 38))}"</b> → <b>${priLabel}</b>`);
   }, [storyById, facetKey, showToast]);
 
   const handleDate = useCallback((storyId, off) => {
