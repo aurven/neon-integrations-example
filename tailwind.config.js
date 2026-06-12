@@ -26,6 +26,9 @@ module.exports = {
     },
     extend: {
       colors: {
+        gray: {
+          50: 'rgb(246 243 246)',
+        },
         primary: {
           50: '#eef2fe',
           100: '#dce5fd',
