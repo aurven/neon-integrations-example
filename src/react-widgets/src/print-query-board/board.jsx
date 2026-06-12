@@ -137,7 +137,7 @@ export function BoardColumn({ col, stories, budgeted, dragOver, onDragOver, onDr
       onDragLeave={e => { if (!e.currentTarget.contains(e.relatedTarget)) onDragLeave(); }}
       onDrop={e => { e.preventDefault(); onDrop(e.dataTransfer.getData('storyId'), col.key); }}
       style={{
-        width: binder ? 220 : 270, flexShrink: 0, display: 'flex', flexDirection: 'column', minHeight: 0,
+        width: 270, flexShrink: 0, display: 'flex', flexDirection: 'column', minHeight: 0,
         background: dragOver ? C.blueLight : (binder ? C.zone : C.panelBg),
         border: `1px ${binder ? 'dashed' : 'solid'} ${dragOver ? C.blue : C.border}`, borderRadius: 10,
         opacity: binder && !dragOver ? 0.85 : 1,
