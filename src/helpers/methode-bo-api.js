@@ -412,7 +412,7 @@ class MethodeClient {
         }
     }
 
-    async createChannelCopy(loid, channel = 'Tabloid', inheritFrom = 'Neutral') {
+    async createChannelCopy(loid, channel = 'Tabloid', inheritFrom = 'none') {
         if (!loid) {
             throw new Error('loid is required');
         }

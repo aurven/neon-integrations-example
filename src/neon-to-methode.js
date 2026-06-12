@@ -297,7 +297,7 @@ async function processNeonStoryV2 (model) {
 
           if (!hasTabloidCopy) {
             console.log(`📋 No Tabloid channel copy found — creating one...`);
-            await methodeClient.createChannelCopy(existingStoryId, 'Tabloid', 'Neutral');
+            await methodeClient.createChannelCopy(existingStoryId, 'Tabloid', 'none');
           } else {
             console.log(`✅ Tabloid channel copy already exists — skipping creation.`);
           }
