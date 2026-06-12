@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { AgGridReact } from 'ag-grid-react';
-import { columnDefs, defaultColDef } from './columns.jsx';
+import { buildColumnDefs, defaultColDef } from './columns.jsx';
 import { fetchArticles, updateMetadata } from './api.js';
-import { buildMetadataChange } from './metadata.js';
+import { buildMetadataChangeFromXpath } from './metadata.js';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import './neon-grid.css';
@@ -14,6 +14,9 @@ const RefreshIcon = () => (
 );
 
 export default function NeonGridWidget() {
+  const gridConfig = window.CONFIG?.gridConfig ?? { columns: [] };
+  const columnDefs = useMemo(() => buildColumnDefs(gridConfig.columns), [gridConfig]);
+
   const [rowData, setRowData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -36,7 +39,8 @@ export default function NeonGridWidget() {
 
   const handleCellValueChanged = useCallback((params) => {
     const familyRef = params.data?.id;
-    const change = buildMetadataChange(params.colDef.field, params.newValue);
+    const colCfg = gridConfig.columns.find(c => c.field === params.colDef.field);
+    const change = buildMetadataChangeFromXpath(colCfg?.metadataXpath, params.newValue, { isDate: !!colCfg?.isDate });
     if (!familyRef || !change) return;
 
     if (window.CONFIG?.demo) {
@@ -47,7 +51,7 @@ export default function NeonGridWidget() {
     updateMetadata(familyRef, [change]).catch(err => {
       console.error(`[Neon Grid] Metadata update failed for ${familyRef}:`, err.message);
     });
-  }, []);
+  }, [gridConfig]);
 
   return (
     <div style={{

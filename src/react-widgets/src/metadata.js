@@ -29,3 +29,14 @@ export function buildMetadataChange(field, value) {
 
   return { xpath, action: 'set', value: String(value) };
 }
+
+export function buildMetadataChangeFromXpath(xpath, value, { isDate } = {}) {
+  if (!xpath) return null;
+  if (value === null || value === undefined || value === '') {
+    return { xpath, action: 'unset' };
+  }
+  if (isDate) {
+    return { xpath, action: 'set', value: isoDateToNeon(value) };
+  }
+  return { xpath, action: 'set', value: String(value) };
+}

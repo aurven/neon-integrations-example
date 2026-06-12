@@ -13,8 +13,12 @@ async function apiFetch(path) {
 
 export function fetchArticles() {
   const demo = window.CONFIG?.demo;
-  const url = demo ? '/api/neon/grid/articles?demo=true' : '/api/neon/grid/articles';
-  return apiFetch(url);
+  const config = window.CONFIG?.gridConfigName;
+  const params = new URLSearchParams();
+  if (demo) params.set('demo', 'true');
+  if (config) params.set('config', config);
+  const qs = params.toString();
+  return apiFetch(`/api/neon/grid/articles${qs ? `?${qs}` : ''}`);
 }
 
 export function fetchStories() {
