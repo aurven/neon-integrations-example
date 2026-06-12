@@ -1,4 +1,14 @@
-const BASE_URL = '';
+// Widgets run as iframes inside Neon. When embedded, API calls must be
+// proxied through the parent app's prefix; standalone, paths stay root-relative.
+function isEmbedded() {
+  try {
+    return window.self !== window.top;
+  } catch {
+    return true;
+  }
+}
+
+const BASE_URL = isEmbedded() ? '/neon/api/demo-integration' : '';
 
 async function apiFetch(path) {
   const apiKey = window.CONFIG?.apiKey ?? '';
