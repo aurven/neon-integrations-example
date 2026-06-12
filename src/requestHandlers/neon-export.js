@@ -75,7 +75,17 @@ async function postMailjetHandler(request, reply) {
     
     // Check if this is a Neon model (newsletter) or direct Mailjet Messages format
     if (request.body.model || request.body.nodes || request.body.contentData) {
-      // This is a Neon model - convert to newsletter
+      // Only process webpage/newsletter content - skip everything else
+      const sys = request.body.contentData?.data?.sys || {};
+      if (sys.baseType !== "webpage" || sys.type !== "newsletter") {
+        console.log(`postMailjetHandler << SKIP: baseType="${sys.baseType}", type="${sys.type}" (expected webpage/newsletter)`);
+        return reply.status(200).send({
+          message: "Skipped - not a newsletter webpage",
+          baseType: sys.baseType,
+          type: sys.type
+        });
+      }
+      // This is a Neon newsletter model - convert to newsletter
       result = await mailjetService.sendNewsletter(request.body);
     } else if (request.body.Messages) {
       // This is direct Mailjet format

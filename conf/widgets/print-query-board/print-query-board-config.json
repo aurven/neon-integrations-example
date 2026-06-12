@@ -1,14 +1,14 @@
 {
-  "issueDate": "2026-06-13",
+  "issueDate": "2026-06-18",
   "printProduct": "Tabloid",
   "editions": ["EUROPE", "USA", "ASIA"],
   "sectionsAndBooks": [
-    { "key": "Front",    "label": "Front Page", "color": "#0A2EE6", "wordTarget": 1500, "printSection": "/Product/Front" },
-    { "key": "World",    "label": "World",      "color": "#2563eb", "wordTarget": 2000, "printSection": "/Product/World" },
-    { "key": "Politics", "label": "Politics",   "color": "#7c3aed", "wordTarget": 2300, "printSection": "/Product/Politics" },
-    { "key": "Business", "label": "Business",   "color": "#d97706", "wordTarget": 1500, "printSection": "/Product/Business" },
-    { "key": "Comment",  "label": "Comment",    "color": "#64748b", "wordTarget": 1000, "printSection": "/Product/Comment" },
-    { "key": "Culture",  "label": "Culture",    "color": "#9333ea", "wordTarget": 1200, "printSection": "/Product/Culture" },
-    { "key": "Sport",    "label": "Sport",      "color": "#16a34a", "wordTarget": 1500, "printSection": "/Product/Sport" }
+    { "key": "Business", "label": "Business", "color": "#724659", "wordTarget": 1500, "printSection": "/Product/Business" },
+    { "key": "National", "label": "National", "color": "#FF3845", "wordTarget": 1500, "printSection": "/Product/National" },
+    { "key": "World",    "label": "World",    "color": "#0B60D8", "wordTarget": 2000, "printSection": "/Product/World" },
+    { "key": "Sport",    "label": "Sport",    "color": "#39CA40", "wordTarget": 1500, "printSection": "/Product/Sport" },
+    { "key": "Art",      "label": "Art",      "color": "#F6A745", "wordTarget": 1200, "printSection": "/Product/Art" },
+    { "key": "Politics", "label": "Politics", "color": "#235764", "wordTarget": 2300, "printSection": "/Product/Politics" },
+    { "key": "Specials", "label": "Specials", "color": "#A12EE6", "wordTarget": 1000, "printSection": "/Product/Specials" }
   ]
 }
