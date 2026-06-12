@@ -12,7 +12,7 @@ const NEON_COLORS = {
     textPrimary: '#1F2937',
     textSecondary: '#6B7280',
     gridLines: '#E5E7EB',
-    background: '#F9FAFB',
+    background: '#f6f3f6',
     success: '#10B981',
     warning: '#F59E0B',
     danger: '#EF4444'

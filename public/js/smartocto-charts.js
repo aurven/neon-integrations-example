@@ -20,7 +20,7 @@
         textSecondary: '#6B7280',
         border: '#E5E7EB',
         gridLines: '#F3F4F6',
-        background: '#F9FAFB'
+        background: '#f6f3f6'
     };
 
     /**

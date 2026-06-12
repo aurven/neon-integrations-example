@@ -31,7 +31,7 @@
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f9fafb;
+            background: #f6f3f6;
             color: #111827;
             margin: 0;
             padding: 1rem;
@@ -139,7 +139,7 @@ Panels use the same token vocabulary as widgets. Use these values directly (Tail
 
 | Token | Value | Usage |
 |---|---|---|
-| Background | `#f9fafb` | Panel body background |
+| Background | `#f6f3f6` | Panel body background |
 | Card surface | `#ffffff` | Cards, input areas |
 | Accent | `#2847E2` | Buttons, active states |
 | Accent light | `#eef2fe` | Active tab bg, selected chip |
