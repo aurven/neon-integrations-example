@@ -242,6 +242,79 @@ async function processNeonStory(model) {
   }
 };
 
+// Check if a Méthode story is linked to a print page, and ensure it has a Tabloid
+// channel copy if so. Returns whether the story is linked to a page.
+async function ensureTabloidChannelCopy(methodeClient, storyId) {
+  console.log(`[${storyId}] Checking print page link...`);
+
+  let linkedObjects = null;
+  try {
+    linkedObjects = await methodeClient.getObjectLinked(storyId, 'EOM::PrintPageLinked');
+  } catch (err) {
+    console.warn(`[${storyId}] Could not check PrintPageLinked: ${err.message}`);
+    return false;
+  }
+
+  const isLinkedToPage = linkedObjects?.roles?.length > 0;
+  if (!isLinkedToPage) {
+    console.log(`[${storyId}] Not linked to a print page.`);
+    return false;
+  }
+
+  console.log(`[${storyId}] Linked to a print page — checking for Tabloid channel copy...`);
+  const hasTabloidCopy = linkedObjects.roles.some(
+    role => role.bundleChildChannel === 'Tabloid' || role.channel === 'Tabloid'
+  );
+
+  if (hasTabloidCopy) {
+    console.log(`[${storyId}] Tabloid channel copy already exists.`);
+  } else {
+    console.log(`[${storyId}] No Tabloid channel copy found — creating one...`);
+    await methodeClient.createChannelCopy(storyId, 'Tabloid', 'none');
+  }
+
+  return true;
+}
+
+// Resolve the Méthode story to write to: reuse the one from a prior methodeHook
+// writeback if it still exists, otherwise create a new story.
+// Always returns isLinkedToPage so the caller's notification logic is consistent
+// for both existing and newly created stories.
+async function resolveMethodeStory(methodeClient, { info, name, issueDate, workFolder }) {
+  const existingStoryId = info.pubInfo?.webhookData?.methodeHook?.storyId;
+
+  if (existingStoryId) {
+    console.log(`[${existingStoryId}] methodeHook found — checking story exists in Méthode...`);
+
+    let existingStory = null;
+    try {
+      existingStory = await methodeClient.getObject(existingStoryId);
+    } catch (err) {
+      console.warn(`[${existingStoryId}] Could not fetch from Méthode: ${err.message}. Will create a new story instead.`);
+    }
+
+    if (existingStory) {
+      console.log(`[${existingStoryId}] Story exists — will update.`);
+      const isLinkedToPage = await ensureTabloidChannelCopy(methodeClient, existingStoryId);
+      return { loid: existingStoryId, isLinkedToPage };
+    }
+
+    console.log(`[${existingStoryId}] Story not found in Méthode — creating a new story.`);
+  }
+
+  const loid = await methodeClient.createStory({
+    name,
+    issueDate,
+    template: TEMPLATE,
+    channel: CHANNEL,
+    workFolder,
+    attributes: null
+  });
+  console.log(`[${loid}] New story created in Méthode.`);
+
+  return { loid, isLinkedToPage: false };
+}
+
 async function processNeonStoryV2 (model) {
   const { MethodeClient } = require('./helpers/methode-bo-api.js');
   const methodeClient = new MethodeClient();
@@ -252,71 +325,13 @@ async function processNeonStoryV2 (model) {
     const { workFolder, issueDate, printDiffusion } = resolvePrintFields(info.attributes);
 
     if (printDiffusion === 'No') {
-      console.log(`⏭️ Story ${info.id} has printDiffusion="No" — skipping Méthode export.`);
+      console.log(`[${info.id}] printDiffusion="No" — skipping Méthode export.`);
       return { source: info, skipped: true, reason: 'printDiffusion=No' };
     }
 
     await methodeClient.login({ username: USERNAME, password: PASSWORD });
 
-    let isLinkedToPage = false;
-
-    // Check if this Neon object was already sent to Méthode via methodeHook writeback
-    const existingStoryId = info.pubInfo?.webhookData?.methodeHook?.storyId;
-    let loid;
-
-    if (existingStoryId) {
-      console.log(`🔍 methodeHook found — checking if story ${existingStoryId} exists in Méthode...`);
-      let existingStory = null;
-      try {
-        existingStory = await methodeClient.getObject(existingStoryId);
-      } catch (err) {
-        console.warn(`⚠️ Could not fetch story ${existingStoryId} from Méthode: ${err.message}. Will create a new one.`);
-      }
-
-      if (existingStory) {
-        console.log(`✅ Story ${existingStoryId} exists in Méthode — will update instead of creating.`);
-        loid = existingStoryId;
-
-        // Check if this story is linked to a page (PrintPageLinked role)
-        console.log(`Checking if story ${existingStoryId} is linked to a page...`);
-        let linkedObjects = null;
-        try {
-          linkedObjects = await methodeClient.getObjectLinked(existingStoryId, 'EOM::PrintPageLinked');
-          console.log(`Linked objects for ${existingStoryId}: ${JSON.stringify(linkedObjects, null, 2)}`);
-        } catch (err) {
-          console.warn(`⚠️ Could not check PrintPageLinked for ${existingStoryId}: ${err.message}`);
-        }
-
-        isLinkedToPage = linkedObjects?.roles?.length > 0;
-        if (isLinkedToPage) {
-          console.log(`📄 Story ${existingStoryId} is linked to a page — checking for Tabloid channel copy...`);
-
-          const hasTabloidCopy = linkedObjects.roles.some(
-            role => role.bundleChildChannel === 'Tabloid' || role.channel === 'Tabloid'
-          );
-
-          if (!hasTabloidCopy) {
-            console.log(`📋 No Tabloid channel copy found — creating one...`);
-            await methodeClient.createChannelCopy(existingStoryId, 'Tabloid', 'none');
-          } else {
-            console.log(`✅ Tabloid channel copy already exists — skipping creation.`);
-          }
-        }
-      } else {
-        console.log(`⚠️ Story ${existingStoryId} not found in Méthode — creating a new story.`);
-      }
-    }
-
-    if (!loid) {
-      loid = await methodeClient.createStory({
-        name,
-        issueDate,
-        template: TEMPLATE,
-        channel: CHANNEL,
-        workFolder,
-        attributes: null
-      });
-    }
+    const { loid, isLinkedToPage } = await resolveMethodeStory(methodeClient, { info, name, issueDate, workFolder });
 
     const imageReferences = await images.modelImagesToMethode(
       methodeClient,
@@ -335,20 +350,18 @@ async function processNeonStoryV2 (model) {
 
     const content = xmlDeclarations + $doc.html();
     const cleanedContent = utils.stripAllCData(content);
-    loid && (await methodeClient.putContentToStory(loid, cleanedContent));
+    await methodeClient.putContentToStory(loid, cleanedContent);
+    console.log(`[${loid}] Content updated.`);
 
-    if (loid) {
-      const printFieldOperators = buildPrintFieldOperators(info.attributes); 
+    const printFieldOperators = buildPrintFieldOperators(info.attributes);
+    const printFieldsBody = { sourceIds: [ loid ], operators: printFieldOperators };
+    const updateFields = buildUpdateField(printFieldsBody);
 
-      const printFieldsBody = { sourceIds: [ loid ], operators: printFieldOperators }; 
-      const updateFields = buildUpdateField(printFieldsBody);
-
-      const changeResult = await methodeClient.changeObjectFields([updateFields]);
-      console.log(`Change object fields result for ${loid}: ${JSON.stringify(changeResult)}`);
-    }
+    const changeResult = await methodeClient.changeObjectFields([updateFields]);
+    console.log(`[${loid}] Print fields updated: ${JSON.stringify(changeResult)}`);
 
     if (isLinkedToPage) {
-      console.log(`⚠️ Story ${loid} is linked to a page — sending notification to Méthode users...`);
+      console.log(`[${loid}] Linked to a print page — notifying Méthode users...`);
       const messageResult = await methodeClient.sendMessage({
         subject: `New update for Story from Digital (${loid})`,
         body: `There are new updates on the Master copy of ${loid}, already linked to a page. Please review the changes and update the channel copy if necessary.`,
@@ -356,13 +369,11 @@ async function processNeonStoryV2 (model) {
         priority: '1',       // optional, defaults to '1'
         attachments: []      // optional, defaults to []
       });
-
-      console.log(`Message sent to Méthode users: ${JSON.stringify(messageResult)}`);
+      console.log(`[${loid}] Notification sent: ${JSON.stringify(messageResult)}`);
     }
 
     await methodeClient.logout();
-
-    console.log('Neon item imported successfully!');
+    console.log(`[${loid}] Neon item imported successfully.`);
 
     return {
       source: info,
