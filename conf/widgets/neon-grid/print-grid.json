@@ -32,13 +32,13 @@
     { "field": "printSection", "headerName": "Print Section", "type": "select", "width": 160, "editable": true, "sortable": true, "filter": true,
       "metadataXpath": "/ObjectMetadata/DistributionChannels/Print/PrintSection",
       "options": [
-        { "value": "Front",    "label": "Front Page", "color": "#0A2EE6" },
-        { "value": "World",    "label": "World",      "color": "#2563eb" },
-        { "value": "Politics", "label": "Politics",   "color": "#7c3aed" },
-        { "value": "Business", "label": "Business",   "color": "#d97706" },
-        { "value": "Comment",  "label": "Comment",    "color": "#64748b" },
-        { "value": "Culture",  "label": "Culture",    "color": "#9333ea" },
-        { "value": "Sport",    "label": "Sport",      "color": "#16a34a" }
+        { "value": "/Product/Front",    "label": "Front Page", "color": "#0A2EE6" },
+        { "value": "/Product/World",    "label": "World",      "color": "#2563eb" },
+        { "value": "/Product/Politics", "label": "Politics",   "color": "#7c3aed" },
+        { "value": "/Product/Business", "label": "Business",   "color": "#d97706" },
+        { "value": "/Product/Comment",  "label": "Comment",    "color": "#64748b" },
+        { "value": "/Product/Culture",  "label": "Culture",    "color": "#9333ea" },
+        { "value": "/Product/Sport",    "label": "Sport",      "color": "#16a34a" }
       ] },
     { "field": "printDiffusion", "headerName": "Print Diffusion", "type": "select", "width": 140, "editable": true, "sortable": true, "filter": true,
       "metadataXpath": "/ObjectMetadata/Diffusion/Diff_Print",

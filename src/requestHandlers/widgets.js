@@ -45,7 +45,7 @@ function loadGridConfig(name) {
   const path = require('path');
   const safe = /^[a-zA-Z0-9_-]+$/.test(name || '') ? name : 'default';
   const tryFile = (n) => {
-    try { return JSON.parse(fs.readFileSync(path.join(__dirname, '../../examples/grid-configs', `${n}.json`), 'utf8')); }
+    try { return JSON.parse(fs.readFileSync(path.join(__dirname, '../../conf/widgets/neon-grid', `${n}.json`), 'utf8')); }
     catch { return null; }
   };
   return tryFile(safe) || tryFile('default') || { fields: [], columns: [] };
@@ -606,7 +606,7 @@ function printQueryBoardHandler(request, reply) {
   const path = require('path');
   let printConfig = {};
   try {
-    printConfig = JSON.parse(fs.readFileSync(path.join(__dirname, '../../examples/print-query-board-config.json'), 'utf8'));
+    printConfig = JSON.parse(fs.readFileSync(path.join(__dirname, '../../conf/widgets/print-query-board/print-query-board-config.json'), 'utf8'));
   } catch (error) {
     console.error('printQueryBoardHandler config error:', error);
   }

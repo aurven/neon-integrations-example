@@ -1,7 +1,7 @@
 {
   "issueDate": "2026-06-13",
-  "printProduct": "TheGlobe Print",
-  "editions": ["UK", "International", "US"],
+  "printProduct": "Tabloid",
+  "editions": ["EUROPE", "USA", "ASIA"],
   "sectionsAndBooks": [
     { "key": "Front",    "label": "Front Page", "color": "#0A2EE6", "wordTarget": 1500, "printSection": "/Product/Front" },
     { "key": "World",    "label": "World",      "color": "#2563eb", "wordTarget": 2000, "printSection": "/Product/World" },
