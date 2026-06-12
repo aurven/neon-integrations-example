@@ -1,0 +1,18 @@
+{
+  "title": "Articles Grid",
+  "demoData": "search-results.json",
+  "fields": [
+    { "key": "headline", "source": "title" },
+    { "key": "summary", "source": "summary" },
+    { "key": "type", "derived": "typeLabel" },
+    { "key": "date", "source": "updateTs" },
+    { "key": "status", "derived": "status" },
+    { "key": "statusColor", "derived": "statusColor" }
+  ],
+  "columns": [
+    { "field": "headline", "headerName": "Title", "type": "headline", "flex": 5, "minWidth": 260, "sortable": true, "filter": true },
+    { "field": "type", "headerName": "Type", "type": "badge", "width": 130, "sortable": true, "filter": true, "options": [] },
+    { "field": "date", "headerName": "Date", "type": "date", "width": 180, "sortable": true },
+    { "field": "status", "headerName": "Status", "type": "status", "width": 130, "sortable": true, "filter": true }
+  ]
+}

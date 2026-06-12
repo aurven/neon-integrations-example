@@ -39,6 +39,23 @@ function derivePrintFields(node) {
   return { printPriority, issueDate };
 }
 
+// Load a grid config JSON by name (sanitized), falling back to 'default'.
+function loadGridConfig(name) {
+  const fs = require('fs');
+  const path = require('path');
+  const safe = /^[a-zA-Z0-9_-]+$/.test(name || '') ? name : 'default';
+  const tryFile = (n) => {
+    try { return JSON.parse(fs.readFileSync(path.join(__dirname, '../../examples/grid-configs', `${n}.json`), 'utf8')); }
+    catch { return null; }
+  };
+  return tryFile(safe) || tryFile('default') || { fields: [], columns: [] };
+}
+
+// Resolve a dotted path (e.g. "nodeMeta.printSection") against an object.
+function getByPath(obj, pathStr) {
+  return pathStr.split('.').reduce((o, k) => (o == null ? o : o[k]), obj);
+}
+
 function testWidgetHandler(request, reply) {
   const auth = authenticate(request, reply);
   if (!auth.authenticated) {
@@ -359,6 +376,9 @@ function neonGridWidgetHandler(request, reply) {
     return reply.status(401).send({ error: "Unauthorized" });
   }
 
+  const configName = /^[a-zA-Z0-9_-]+$/.test(request.query.config || '') ? request.query.config : 'default';
+  const gridConfig = loadGridConfig(configName);
+
   let params = {
     seo: {
       title: "Neon Articles Grid",
@@ -366,7 +386,9 @@ function neonGridWidgetHandler(request, reply) {
     },
     neonAppUrl: process.env.NEON_APP_URL,
     apiKey: auth.apikey,
-    demo: request.query.demo === 'true'
+    demo: request.query.demo === 'true',
+    gridConfig: JSON.stringify(gridConfig),
+    gridConfigName: configName
   };
   return reply.view("/src/widgets/neon-grid.hbs", params);
 }
@@ -378,32 +400,32 @@ async function neonGridDataHandler(request, reply) {
   }
 
   const demoMode = request.query.demo === 'true';
+  const configName = /^[a-zA-Z0-9_-]+$/.test(request.query.config || '') ? request.query.config : 'default';
+  const gridConfig = loadGridConfig(configName);
 
   await neonConfigConnector.loadContentTypesConfig();
 
   const mapNodes = (nodes) => nodes.map(node => {
-    const { printPriority, issueDate } = derivePrintFields(node);
-
-    return {
-      id: node.familyRef,
-      headline: node.title || '',
-      type: neonConfigConnector.getTypeLabel(node.typeName),
-      summary: node.summary|| '',
-      date: node.updateTs || null,
+    const derived = derivePrintFields(node); // { printPriority, issueDate }
+    const derivedMap = {
+      printPriority: derived.printPriority,
+      issueDate: derived.issueDate,
+      typeLabel: neonConfigConnector.getTypeLabel(node.typeName),
       status: node.versionInfo?.workflowInfo?.workflow || 'Unknown',
       statusColor: node.versionInfo?.workflowInfo?.color || null,
-      printPriority,
-      issueDate,
-      printSection: node.nodeMeta?.printSection || null,
-      printDiffusion: node.nodeMeta?.printDiffusion || null
     };
+    const row = { id: node.familyRef };
+    for (const f of gridConfig.fields) {
+      row[f.key] = f.derived ? (derivedMap[f.derived] ?? null) : (getByPath(node, f.source) ?? null);
+    }
+    return row;
   });
 
   if (demoMode) {
     try {
       const fs = require('fs');
       const path = require('path');
-      const demoData = JSON.parse(fs.readFileSync(path.join(__dirname, '../../examples/search-results.json'), 'utf8'));
+      const demoData = JSON.parse(fs.readFileSync(path.join(__dirname, '../../examples', gridConfig.demoData || 'search-results.json'), 'utf8'));
       return reply.status(200).send({ articles: mapNodes(demoData.nodes || []) });
     } catch (error) {
       console.error('neonGridDataHandler demo error:', error);
@@ -561,6 +583,10 @@ async function neonGridDataHandler(request, reply) {
       "showSystemAttributes": true
     }
   };
+
+  if (gridConfig.queryOverrides?.variables) {
+    Object.assign(queryPayload.variables, gridConfig.queryOverrides.variables);
+  }
 
   try {
     const searchResults = await neonBoApi.searchContents(queryPayload, 50, 50);
