@@ -1,14 +1,14 @@
 {
-  "issueDate": "2026-06-11",
+  "issueDate": "2026-06-13",
   "printProduct": "TheGlobe Print",
   "editions": ["UK", "International", "US"],
   "sectionsAndBooks": [
-    { "key": "Front",    "label": "Front Page", "color": "#0A2EE6", "wordTarget": 1500, "printSection": "/TheGlobe/Front" },
-    { "key": "World",    "label": "World",      "color": "#2563eb", "wordTarget": 2000, "printSection": "/TheGlobe/World" },
-    { "key": "Politics", "label": "Politics",   "color": "#7c3aed", "wordTarget": 1300, "printSection": "/TheGlobe/Politics" },
-    { "key": "Business", "label": "Business",   "color": "#d97706", "wordTarget": 1500, "printSection": "/TheGlobe/Business" },
-    { "key": "Comment",  "label": "Comment",    "color": "#64748b", "wordTarget": 1000, "printSection": "/TheGlobe/Comment" },
-    { "key": "Culture",  "label": "Culture",    "color": "#9333ea", "wordTarget": 1200, "printSection": "/TheGlobe/Culture" },
-    { "key": "Sport",    "label": "Sport",      "color": "#16a34a", "wordTarget": 1500, "printSection": "/TheGlobe/Sport" }
+    { "key": "Front",    "label": "Front Page", "color": "#0A2EE6", "wordTarget": 1500, "printSection": "/Product/Front" },
+    { "key": "World",    "label": "World",      "color": "#2563eb", "wordTarget": 2000, "printSection": "/Product/World" },
+    { "key": "Politics", "label": "Politics",   "color": "#7c3aed", "wordTarget": 2300, "printSection": "/Product/Politics" },
+    { "key": "Business", "label": "Business",   "color": "#d97706", "wordTarget": 1500, "printSection": "/Product/Business" },
+    { "key": "Comment",  "label": "Comment",    "color": "#64748b", "wordTarget": 1000, "printSection": "/Product/Comment" },
+    { "key": "Culture",  "label": "Culture",    "color": "#9333ea", "wordTarget": 1200, "printSection": "/Product/Culture" },
+    { "key": "Sport",    "label": "Sport",      "color": "#16a34a", "wordTarget": 1500, "printSection": "/Product/Sport" }
   ]
 }

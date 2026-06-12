@@ -107,9 +107,6 @@ class NeonClient {
         return await this.makeRequest({
             method: 'get',
             url: `/contents/nodes/${familyRef}/metadata`,
-            headers: {
-                'Accept': 'text/xml'
-            }
         }, `Node metadata for ${familyRef} retrieved`, true);
     }
 
