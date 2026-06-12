@@ -50,11 +50,11 @@ export const STATUS_STYLE = {
 };
 
 export function buildSections(printConfig) {
-  return [
-    ...(printConfig.sectionsAndBooks || []).map(s => ({ ...s, target: s.wordTarget })),
-    { key: 'Unassigned', label: 'Unassigned', sub: null, color: '#9ca3af', target: 0 },
-  ];
+  return (printConfig.sectionsAndBooks || []).map(s => ({ ...s, target: s.wordTarget }));
 }
+
+export const UNASSIGNED_SECTION = { key: 'Unassigned', label: 'Unassigned', sub: 'Not in this issue’s plan', color: '#9ca3af', target: 0 };
+export const NO_PRIORITY = { key: 'NoPriority', label: 'No priority', sub: 'Not yet prioritized', color: '#9ca3af' };
 
 export function sectionsTotal(sections) {
   return sections.reduce((s, x) => s + (x.target > 0 ? x.target : 0), 0);
@@ -77,16 +77,18 @@ export function buildFacets(printConfig) {
     section: {
       key: 'section', label: 'Section', budgeted: true,
       columns: sections,
+      outside: UNASSIGNED_SECTION,
       value: (s) => s.section,
       patch: (k) => ({ section: k }),
-      colLabel: (k) => (sections.find(x => x.key === k) || {}).label || k,
+      colLabel: (k) => [...sections, UNASSIGNED_SECTION].find(x => x.key === k)?.label || k,
     },
     priority: {
       key: 'priority', label: 'Priority',
       columns: [1, 2, 3, 4, 5].map(k => ({ key: k, label: `${PRI[k].label} · ${PRI[k].name}`, color: PRI[k].color })),
-      value: (s) => s.printPriority,
-      patch: (k) => ({ printPriority: k }),
-      colLabel: (k) => `${PRI[k].label} · ${PRI[k].name}`,
+      outside: NO_PRIORITY,
+      value: (s) => s.printPriority ?? 'NoPriority',
+      patch: (k) => (k === 'NoPriority' ? { printPriority: null } : { printPriority: k }),
+      colLabel: (k) => k === 'NoPriority' ? NO_PRIORITY.label : `${PRI[k].label} · ${PRI[k].name}`,
     },
   };
 }

@@ -6,9 +6,11 @@ function PopBackdrop({ onClose }) {
   return <div onClick={e => { e.stopPropagation(); onClose(); }} style={{ position: 'fixed', inset: 0, zIndex: 90 }} />;
 }
 
+const NO_PRI_DISPLAY = { label: '—', name: 'No priority', color: C.muted };
+
 export function PriorityChip({ value, onChange }) {
   const [open, setOpen] = useState(false);
-  const p = PRI[value];
+  const p = value ? PRI[value] : NO_PRI_DISPLAY;
   return (
     <span style={{ position: 'relative', display: 'inline-flex' }}>
       <button onClick={e => { e.stopPropagation(); setOpen(o => !o); }} style={{
@@ -38,6 +40,15 @@ export function PriorityChip({ value, onChange }) {
                 </button>
               );
             })}
+            <div style={{ height: 1, background: C.border, margin: '4px 2px' }} />
+            <button onClick={e => { e.stopPropagation(); onChange(null); setOpen(false); }} style={{
+              width: '100%', display: 'flex', alignItems: 'center', gap: 8, padding: '6px 8px', borderRadius: 6, border: 'none', cursor: 'pointer',
+              background: !value ? C.blueLight : 'transparent', color: C.dark, fontSize: 11.5, fontWeight: 600, fontFamily: 'inherit', textAlign: 'left',
+            }}>
+              <span style={{ width: 8, height: 8, borderRadius: '50%', background: C.muted }} />
+              <span style={{ color: C.muted }}>No priority</span>
+              {!value && <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={C.blue} strokeWidth="2.5" strokeLinecap="round" style={{ marginLeft: 'auto' }}><polyline points="20 6 9 17 4 12" /></svg>}
+            </button>
           </div>
         </>
       )}
@@ -116,7 +127,7 @@ export function StoryCard({ story, dragging, onDragStart, onDragEnd, onPriority,
   );
 }
 
-export function BoardColumn({ col, stories, budgeted, dragOver, onDragOver, onDragLeave, onDrop, cardProps }) {
+export function BoardColumn({ col, stories, budgeted, dragOver, onDragOver, onDragLeave, onDrop, cardProps, binder }) {
   const wordCount = stories.reduce((s, st) => s + (st.wordCount || 0), 0);
   const status = budgeted ? covStatus(wordCount, col.target) : null;
   const pct = budgeted ? wordCount / col.target : null;
@@ -126,9 +137,10 @@ export function BoardColumn({ col, stories, budgeted, dragOver, onDragOver, onDr
       onDragLeave={e => { if (!e.currentTarget.contains(e.relatedTarget)) onDragLeave(); }}
       onDrop={e => { e.preventDefault(); onDrop(e.dataTransfer.getData('storyId'), col.key); }}
       style={{
-        width: 270, flexShrink: 0, display: 'flex', flexDirection: 'column', minHeight: 0,
-        background: dragOver ? C.blueLight : C.panelBg,
-        border: `1px solid ${dragOver ? C.blue : C.border}`, borderRadius: 10,
+        width: binder ? 220 : 270, flexShrink: 0, display: 'flex', flexDirection: 'column', minHeight: 0,
+        background: dragOver ? C.blueLight : (binder ? C.zone : C.panelBg),
+        border: `1px ${binder ? 'dashed' : 'solid'} ${dragOver ? C.blue : C.border}`, borderRadius: 10,
+        opacity: binder && !dragOver ? 0.85 : 1,
         transition: 'background .12s, border-color .12s',
       }}>
       <div style={{ padding: '9px 12px', borderBottom: `1px solid ${C.border}`, flexShrink: 0 }}>
@@ -209,7 +221,7 @@ export function Distribution({ facet, stories }) {
   const total = stories.length || 1;
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
-      {facet.columns.map(col => {
+      {[...facet.columns, facet.outside].map(col => {
         const inCol = stories.filter(s => facet.value(s) === col.key);
         const n = inCol.length;
         const unbudgetedCol = facet.budgeted && !col.target;

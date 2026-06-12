@@ -620,7 +620,7 @@ async function printQueryBoardDataHandler(request, reply) {
       type: neonConfigConnector.getTypeLabel(node.typeName),
       status: node.versionInfo?.workflowInfo?.workflow || 'Unknown',
       statusColor: node.versionInfo?.workflowInfo?.color || null,
-      printPriority: printPriority || 3,
+      printPriority,
       issueDate,
       printSection: printSectionRaw,
       section,

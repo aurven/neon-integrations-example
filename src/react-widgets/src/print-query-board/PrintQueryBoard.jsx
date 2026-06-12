@@ -145,15 +145,22 @@ function Board({ facet, columns, grouped, budget, sectionsCovered, totalBudgeted
           </span>
         </div>
       }>
-      <div className="pqb-board-scroll" style={{ flex: 1, minHeight: 0, padding: 12, overflowX: 'auto', overflowY: 'hidden' }}>
-        <div style={{ display: 'flex', gap: 10, height: '100%', alignItems: 'stretch' }}>
-          {columns.map(col => (
-            <BoardColumn key={col.key} col={col} stories={grouped[col.key] || []} budgeted={!!facet.budgeted}
-              dragOver={dragOverCol === col.key}
-              onDragOver={setDragOverCol} onDragLeave={() => setDragOverCol(null)} onDrop={onDrop}
-              cardProps={cardProps} />
-          ))}
+      <div style={{ flex: 1, minHeight: 0, padding: 12, display: 'flex', gap: 10, overflow: 'hidden' }}>
+        <div className="pqb-board-scroll" style={{ flex: 1, minWidth: 0, overflowX: 'auto', overflowY: 'hidden' }}>
+          <div style={{ display: 'flex', gap: 10, height: '100%', alignItems: 'stretch' }}>
+            {columns.map(col => (
+              <BoardColumn key={col.key} col={col} stories={grouped[col.key] || []} budgeted={!!facet.budgeted}
+                dragOver={dragOverCol === col.key}
+                onDragOver={setDragOverCol} onDragLeave={() => setDragOverCol(null)} onDrop={onDrop}
+                cardProps={cardProps} />
+            ))}
+          </div>
         </div>
+        <div style={{ width: 1, flexShrink: 0, background: C.border }} />
+        <BoardColumn col={facet.outside} stories={grouped[facet.outside.key] || []} budgeted={false}
+          dragOver={dragOverCol === facet.outside.key}
+          onDragOver={setDragOverCol} onDragLeave={() => setDragOverCol(null)} onDrop={onDrop}
+          cardProps={cardProps} binder />
       </div>
     </NeonPanel>
   );
@@ -221,6 +228,7 @@ export default function PrintQueryBoard() {
   const grouped = useMemo(() => {
     const g = {};
     facet.columns.forEach(c => { g[c.key] = []; });
+    g[facet.outside.key] = [];
     visible.forEach(s => { const k = facet.value(s); (g[k] = g[k] || []).push(s); });
     return g;
   }, [visible, facet]);
