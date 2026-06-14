@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { NextRequest } from 'next/server';
-import { middleware } from '../middleware';
+import { proxy } from '../proxy';
 
-describe('middleware', () => {
+describe('proxy', () => {
   const ORIGINAL_ENV = { ...process.env };
 
   beforeEach(() => {
@@ -16,7 +16,7 @@ describe('middleware', () => {
 
   it('returns 401 for /api/* without an apikey', async () => {
     const request = new NextRequest('https://example.com/api/health');
-    const response = middleware(request);
+    const response = proxy(request);
     expect(response.status).toBe(401);
     expect(await response.json()).toEqual({ error: 'Unauthorized' });
   });
@@ -25,7 +25,7 @@ describe('middleware', () => {
     const request = new NextRequest('https://example.com/api/health', {
       headers: { apikey: 'admin-key' },
     });
-    const response = middleware(request);
+    const response = proxy(request);
     expect(response.status).toBe(200);
     const cookie = response.cookies.get('apikey');
     expect(cookie?.value).toBe('admin-key');
@@ -33,7 +33,7 @@ describe('middleware', () => {
 
   it('authenticates via the apikey query param', () => {
     const request = new NextRequest('https://example.com/api/health?apikey=admin-key');
-    const response = middleware(request);
+    const response = proxy(request);
     expect(response.status).toBe(200);
     expect(response.cookies.get('apikey')?.value).toBe('admin-key');
   });
@@ -42,7 +42,7 @@ describe('middleware', () => {
     const request = new NextRequest('https://example.com/api/health', {
       headers: { cookie: 'apikey=limited-key' },
     });
-    const response = middleware(request);
+    const response = proxy(request);
     expect(response.status).toBe(200);
     expect(response.cookies.get('apikey')?.value).toBe('limited-key');
   });
@@ -51,7 +51,7 @@ describe('middleware', () => {
     const request = new NextRequest('https://example.com/neon/api/demo-integration/api/health', {
       headers: { apikey: 'admin-key' },
     });
-    const response = middleware(request);
+    const response = proxy(request);
     expect(response.status).toBe(200);
     const rewriteUrl = response.headers.get('x-middleware-rewrite');
     expect(rewriteUrl).toBeTruthy();
@@ -60,14 +60,14 @@ describe('middleware', () => {
 
   it('returns 401 for the rewritten iframe-proxy path without an apikey', async () => {
     const request = new NextRequest('https://example.com/neon/api/demo-integration/api/health');
-    const response = middleware(request);
+    const response = proxy(request);
     expect(response.status).toBe(401);
     expect(await response.json()).toEqual({ error: 'Unauthorized' });
   });
 
   it('does not affect non-/api paths', () => {
     const request = new NextRequest('https://example.com/');
-    const response = middleware(request);
+    const response = proxy(request);
     expect(response.status).toBe(200);
     expect(response.headers.get('x-middleware-rewrite')).toBeNull();
     expect(response.cookies.get('apikey')).toBeUndefined();

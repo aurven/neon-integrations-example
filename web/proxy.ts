@@ -13,7 +13,7 @@ export const config = {
   matcher: ['/api/:path*', '/neon/api/demo-integration/:path*'],
 };
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname, searchParams } = request.nextUrl;
 
   // Resolve the iframe-proxy convention: /neon/api/demo-integration/* -> /api/*
