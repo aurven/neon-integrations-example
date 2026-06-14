@@ -16,6 +16,17 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* NOTE on cascade layers: neon-design-system.css (imported above) declares
+   --font-sans, --font-mono, --radius-*, and --shadow-* as plain, unlayered
+   :root custom properties. Tailwind v4 compiles @theme/@theme inline blocks
+   (including the --font-sans/--font-mono mappings above) into @layer theme.
+   Per CSS cascade-layer rules, unlayered declarations always win over
+   @layer theme declarations regardless of source order, so the
+   neon-design-system.css values take precedence for the font-sans,
+   font-mono, rounded-*, and shadow-* utilities (overriding the Geist font
+   wiring and Tailwind's defaults). This is intentional: Neon design tokens
+   should drive these utilities app-wide. */
+
 /* Custom design-system tokens ported from the root tailwind.config.js (v3).
    Tailwind v4 generates utility classes from @theme variables:
    --color-<name>-<shade> -> bg-<name>-<shade>, text-<name>-<shade>, etc.
