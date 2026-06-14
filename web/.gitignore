@@ -17,6 +17,9 @@
 /.next/
 /out/
 
+# runtime caches
+/data/
+
 # production
 /build
 
