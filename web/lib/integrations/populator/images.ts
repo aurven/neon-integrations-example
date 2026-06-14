@@ -31,8 +31,8 @@ export async function imageToBase64(url: string): Promise<{ mimeType: string; ba
   const queryParams = queryString ? querystring.parse(queryString) : {};
 
   try {
-    const response = await axios.get(baseUrl, { responseType: 'arraybuffer', params: queryParams });
-    const base64 = Buffer.from(response.data as Buffer, 'binary').toString('base64');
+    const response = await axios.get<ArrayBuffer>(baseUrl, { responseType: 'arraybuffer', params: queryParams });
+    const base64 = Buffer.from(response.data).toString('base64');
     const mimeType = response.headers['content-type'] as string;
     return { mimeType, base64 };
   } catch (error) {
