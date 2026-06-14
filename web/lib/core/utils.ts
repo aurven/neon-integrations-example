@@ -1,10 +1,10 @@
 /**
  * Common utilities, ported from src/helpers/utils.js.
  *
- * NOTE: `withNeonSession` is NOT ported here. It depends on
- * `./neon-bo-api-v3.js` (NeonClient), which is deferred to Phase 2 along
- * with the rest of the neon-bo-api port. Re-introduce it alongside that
- * port.
+ * NOTE: `withNeonSession` is NOT ported here. It is a thin
+ * `new NeonClient(options)` wrapper only used by the metrics integration
+ * (src/requestHandlers/neon-metrics.js, not yet ported). Re-introduce it
+ * alongside that integration's port.
  */
 
 /**
@@ -491,9 +491,8 @@ export function safeLogRequest(
   };
 }
 
-// NOTE: `withNeonSession` is intentionally NOT ported. It wraps a
-// `NeonClient` from `./neon-bo-api-v3.js` (login/operation/logout), which is
-// part of the Phase 2 neon-bo-api port. Re-add it alongside that port.
+// `withNeonSession` (thin `new NeonClient(options)` wrapper) is still not
+// ported - only the metrics integration needs it. Re-add alongside that port.
 
 /**
  * Normalizes a workflow assignee into the `principals` array expected by
