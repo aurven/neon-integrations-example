@@ -1,0 +1,446 @@
+/* ── Root & Layout ───────────────────────────────────── */
+:root {
+    --famaud-bg:            #f6f3f6;   /* GREY-200 */
+    --famaud-surface:       #FFFFFF;
+    --famaud-border:        #DDDCE5;   /* GREY-300 */
+    --famaud-accent:        #1A57FF;   /* THEME-400 */
+    --famaud-accent-light:  #E5ECFF;   /* THEME-100 */
+    --famaud-text:          #0F0F61;   /* THEME-700 */
+    --famaud-text-secondary:#69667F;   /* GREY-600 */
+    --famaud-sub:           #9D9AAC;   /* GREY-500 */
+    --famaud-rail:          #BFBFCA;   /* GREY-400 */
+    --famaud-error:         #C62828;
+    --famaud-error-bg:      #FFEBEE;
+    --famaud-dot-size:      2rem;
+    --famaud-card-radius:   6px;
+    --famaud-elevation-1:   0 1px 2px rgba(15,15,97,.06), 0 1px 3px rgba(15,15,97,.08);
+    --famaud-elevation-2:   0 3px 8px rgba(15,15,97,.10), 0 2px 4px rgba(15,15,97,.08);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: Roboto, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--famaud-bg);
+    color: var(--famaud-text);
+    font-size: 14px;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+#famaud-root {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* ── Header ──────────────────────────────────────────── */
+.famaud-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 0.75rem;
+    height: 3rem;
+    /* background: var(--famaud-surface); */
+    border-bottom: 1px solid var(--famaud-border);
+    flex-shrink: 0;
+    z-index: 1;
+    gap: 0.5rem;
+}
+
+/* ── Filter row ──────────────────────────────────────── */
+.famaud-filter-row {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.famaud-filter-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.875rem;
+    height: 1.875rem;
+    border-radius: 4px;
+    border: 1px solid var(--famaud-border);
+    background: var(--famaud-bg);
+    color: var(--famaud-sub);
+    cursor: pointer;
+    font-size: 0.75rem;
+    flex-shrink: 0;
+    transition: background 0.15s, color 0.15s, border-color 0.15s, opacity 0.15s;
+    opacity: 0.45;
+}
+
+.famaud-filter-btn:hover {
+    background: #EBEBF0;
+    color: var(--famaud-text-secondary);
+    opacity: 1;
+}
+
+.famaud-filter-btn.active {
+    background: var(--famaud-accent-light);
+    border-color: var(--famaud-accent);
+    color: var(--famaud-accent);
+    opacity: 1;
+}
+
+.famaud-view-pill {
+    display: flex;
+    background: var(--famaud-bg);
+    border: 1px solid var(--famaud-border);
+    border-radius: 4px;
+    padding: 2px;
+    gap: 2px;
+}
+
+.famaud-view-toggle {
+    padding: 0.2rem 0.75rem;
+    border-radius: 3px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    border: none;
+    background: transparent;
+    color: var(--famaud-text-secondary);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.famaud-view-toggle.active {
+    background: var(--famaud-accent);
+    color: #fff;
+}
+
+/* ── Scroll container ────────────────────────────────── */
+#famaud-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem 1rem 1.5rem 1rem;
+}
+
+/* ── Timeline rail ───────────────────────────────────── */
+.famaud-timeline {
+    position: relative;
+    padding-left: calc(var(--famaud-dot-size) + 1rem);
+    max-width: 660px;
+}
+
+.famaud-timeline::before {
+    content: '';
+    position: absolute;
+    left: calc(var(--famaud-dot-size) / 2);
+    top: 0.5rem;
+    bottom: 1rem;
+    width: 2px;
+    background: var(--famaud-rail);
+    border-radius: 1px;
+}
+
+/* ── Date separator ──────────────────────────────────── */
+.famaud-date-sep {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.875rem 0 0.5rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--famaud-sub);
+    margin-left: calc(-1 * var(--famaud-dot-size) - 1rem);
+    padding-left: calc(var(--famaud-dot-size) + 1rem);
+}
+
+.famaud-date-sep::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--famaud-border);
+}
+
+/* ── Event row ───────────────────────────────────────── */
+.famaud-event {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0.5rem;
+}
+
+/* Dot on the rail */
+.famaud-dot {
+    position: absolute;
+    left: calc(-1 * var(--famaud-dot-size) - 1rem);
+    top: 50%;
+    transform: translateY(-50%);
+    width: var(--famaud-dot-size);
+    height: var(--famaud-dot-size);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: #9D9AAC;
+    box-shadow: 0 0 0 3px var(--famaud-bg), var(--famaud-elevation-1);
+}
+
+.famaud-dot-icon {
+    font-size: 0.8rem;
+    color: #fff;
+    line-height: 1;
+}
+
+/* ── Card ────────────────────────────────────────────── */
+.famaud-card {
+    background: var(--famaud-surface);
+    border-radius: var(--famaud-card-radius);
+    border: 1px solid var(--famaud-border);
+    box-shadow: var(--famaud-elevation-1);
+    overflow: hidden;
+    transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.famaud-card:hover {
+    box-shadow: var(--famaud-elevation-2);
+    border-color: #BFBFCA;
+}
+
+.famaud-event-err .famaud-card {
+    border-left: 3px solid var(--famaud-error);
+}
+
+/* Left color strip */
+.famaud-card-strip {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    bottom: 0;
+    border-radius: var(--famaud-card-radius) 0 0 var(--famaud-card-radius);
+}
+
+.famaud-card-inner {
+    position: relative;
+    padding: 0.5rem 0.75rem 0.5rem 0.875rem;
+}
+
+/* ── Card header row ─────────────────────────────────── */
+.famaud-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.3rem;
+}
+
+.famaud-card-title-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.famaud-label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    color: var(--famaud-text);
+    line-height: 1.3;
+}
+
+.famaud-event-err .famaud-label {
+    color: var(--famaud-error);
+}
+
+.famaud-time-chip {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-shrink: 0;
+    gap: 0.3rem;
+}
+
+.famaud-time-rel {
+    font-size: 0.6875rem;
+    font-weight: 500;
+    color: var(--famaud-text-secondary);
+    white-space: nowrap;
+}
+
+.famaud-time-rel::after {
+    content: '·';
+    margin-left: 0.3rem;
+    color: var(--famaud-sub);
+}
+
+.famaud-time-abs {
+    font-size: 0.6875rem;
+    color: var(--famaud-sub);
+    white-space: nowrap;
+}
+
+/* ── Card actor row ──────────────────────────────────── */
+.famaud-card-actor {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.3rem;
+}
+
+.famaud-card-actor-spacer {
+    flex: 1;
+}
+
+.famaud-avatar {
+    width: 1.375rem;
+    height: 1.375rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.55rem;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+    letter-spacing: 0;
+}
+
+.famaud-avatar-img {
+    width: 1.375rem;
+    height: 1.375rem;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.famaud-actor-name {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--famaud-text-secondary);
+}
+
+/* ── Card chips row ──────────────────────────────────── */
+.famaud-card-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+}
+
+/* ── Chips / Badges ──────────────────────────────────── */
+.famaud-badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.625rem;
+    font-weight: 600;
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+    white-space: nowrap;
+    letter-spacing: 0.03em;
+}
+
+/* Workflow: neutral grey, colored dot inside */
+.famaud-badge-workflow {
+    background: #EBEBF0;
+    color: #3D3A52;
+    gap: 0.3rem;
+}
+
+.famaud-badge-workflow-dot {
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: var(--famaud-sub);
+}
+
+.famaud-badge-err {
+    background: var(--famaud-error-bg);
+    color: var(--famaud-error);
+}
+
+/* Site: THEME-100 bg / THEME-400 text */
+.famaud-badge-site {
+    background: var(--famaud-accent-light);
+    color: var(--famaud-accent);
+}
+
+/* ── Advanced block ──────────────────────────────────── */
+.famaud-advanced {
+    margin-top: 0.4rem;
+    padding: 0.4rem 0.5rem;
+    background: #F6F3F6;
+    border: 1px solid var(--famaud-border);
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.famaud-code {
+    font-family: 'Roboto Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 0.6875rem;
+    color: #171DB5;   /* THEME-600 */
+    word-break: break-all;
+}
+
+.famaud-code-dim {
+    color: var(--famaud-sub);
+}
+
+.famaud-meta-row {
+    font-size: 0.6875rem;
+    color: var(--famaud-sub);
+}
+
+.famaud-ref {
+    font-family: 'Roboto Mono', 'SFMono-Regular', Consolas, monospace;
+    font-size: 0.6875rem;
+    color: var(--famaud-text-secondary);
+    word-break: break-all;
+}
+
+/* ── States: loading / empty / error ─────────────────── */
+.famaud-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    min-height: 12rem;
+    color: var(--famaud-text-secondary);
+    text-align: center;
+    padding: 2rem;
+}
+
+.famaud-state-icon {
+    font-size: 2rem;
+    color: var(--famaud-sub);
+}
+
+.famaud-state-text {
+    font-size: 0.875rem;
+    color: var(--famaud-text-secondary);
+}
+
+.famaud-spinner {
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 2px solid var(--famaud-border);
+    border-top-color: var(--famaud-accent);
+    border-radius: 50%;
+    animation: famaud-spin 0.7s linear infinite;
+}
+
+@keyframes famaud-spin {
+    to { transform: rotate(360deg); }
+}

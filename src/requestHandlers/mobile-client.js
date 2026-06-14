@@ -1,35 +1,57 @@
-const neonBoApi = require("../helpers/neon-bo-api.js");
+const neonBoApi = require("../helpers/neon-bo-api-v3.js");
 
-async function getMobileClientHandler(request, reply) {
-  try {
-    // TODO: Replace with actual Neon API call to get articles
-    const mockArticles = [
-      {
-        uuid: "article-001",
-        title: "Breaking: Major Tech Announcement",
-        summary: "A revolutionary new technology has been unveiled that promises to change the industry landscape.",
-        lastModified: "2024-01-15T10:30:00Z",
-        status: "published"
+/**
+ * Fetch and prepare articles from Neon CMS
+ * This is the single source of truth for article data
+ * @param {number} limit - Number of articles to fetch (default: 10)
+ */
+async function fetchArticles(limit = 10) {
+  // Build search query to fetch articles
+  const queryPayload = {
+    queryStatement: {
+      bool: {
+        and: [
+          { type: "match", path: "typeName", match: "article*" }
+        ]
       },
-      {
-        uuid: "article-002", 
-        title: "Sports Update: Championship Results",
-        summary: "The final results from yesterday's championship game with detailed analysis and player statistics.",
-        lastModified: "2024-01-14T18:45:00Z",
-        status: "draft"
-      },
-      {
-        uuid: "article-003",
-        title: "Weather Alert: Storm Warning",
-        summary: "Severe weather conditions expected in the region with safety recommendations for residents.",
-        lastModified: "2024-01-14T14:20:00Z", 
-        status: "published"
+      sort: {
+        type: "fields",
+        sorts: [
+          { path: "versionInfo.createFamilyTime", order: "DESC" }
+        ]
       }
-    ];
+    },
+    variables: {
+      domain: ["editorial"]
+    },
+    options: {
+      showLoadPublishInfo: true,
+      showSystemAttributes: true
+    }
+  };
+
+  // Fetch articles from Neon using search API
+  // Parameters: searchContents(queryPayload, numberOfNodes, numberOfIds)
+  // numberOfNodes: number of full node objects to return
+  // numberOfIds: number of IDs to return
+  // Note: Neon API seems to require both parameters to be set to return nodes
+  const searchResults = await neonBoApi.searchContents(queryPayload, limit, limit);
+
+  // Return the complete node data with all properties
+  return {
+    articles: searchResults.nodes || [],
+    count: searchResults.count || 0
+  };
+}
+
+async function getMobileClientHandler(_request, reply) {
+  try {
+    // Fetch articles using the centralized function
+    const { articles } = await fetchArticles(10);
 
     const params = {
       seo: { title: "Mobile Client - Article Manager" },
-      articles: mockArticles
+      articles: articles
     };
 
     return reply.view("/src/pages/mobile-client/index.hbs", params);
@@ -102,43 +124,23 @@ async function postMobileClientSaveHandler(request, reply) {
   }
 }
 
-async function getMobileClientApiArticlesHandler(request, reply) {
+async function getMobileClientApiArticlesHandler(_request, reply) {
   try {
-    // TODO: Replace with actual Neon API call
-    const mockArticles = [
-      {
-        uuid: "article-001",
-        title: "Breaking: Major Tech Announcement", 
-        summary: "A revolutionary new technology has been unveiled that promises to change the industry landscape.",
-        lastModified: "2024-01-15T10:30:00Z",
-        status: "published"
-      },
-      {
-        uuid: "article-002",
-        title: "Sports Update: Championship Results",
-        summary: "The final results from yesterday's championship game with detailed analysis and player statistics.", 
-        lastModified: "2024-01-14T18:45:00Z",
-        status: "draft"
-      },
-      {
-        uuid: "article-003", 
-        title: "Weather Alert: Storm Warning",
-        summary: "Severe weather conditions expected in the region with safety recommendations for residents.",
-        lastModified: "2024-01-14T14:20:00Z",
-        status: "published"
-      }
-    ];
+    // Fetch articles using the centralized function
+    const { articles, count } = await fetchArticles(10);
 
     return reply.status(200).send({
       success: true,
-      articles: mockArticles
+      articles: articles,
+      count: count
     });
 
   } catch (error) {
     console.error("Error fetching articles:", error);
     return reply.status(500).send({
       success: false,
-      error: "Failed to fetch articles"
+      error: "Failed to fetch articles",
+      details: error.message
     });
   }
 }
@@ -230,6 +232,7 @@ async function saveArticleToNeon(xmlContent, articleId = null) {
 }
 
 module.exports = {
+  fetchArticles,
   getMobileClientHandler,
   getMobileClientEditorHandler,
   postMobileClientSaveHandler,

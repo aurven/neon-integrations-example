@@ -1,23 +1,21 @@
 const neonToSendgrid = require("../sendgrid/sendgrid.js");
 const mailjetService = require("../mailjet/mailjet.js");
 const { safeLogRequest } = require("../helpers/utils.js");
+const { authenticate } = require("../helpers/auth.js");
 
 async function getSendgridHandler(request, reply) {
   return {"status":"success"};
 }
 
 async function postSendgridHandler(request, reply) {
-  const { apikey } = request.headers?.apikey
-    ? request.headers
-    : { apikey: null };
-
   console.log("postSendgridHandler << IN:");
   const safeRequest = safeLogRequest(request?.headers || {}, request?.body || {});
   console.log("Request Headers:", JSON.stringify(safeRequest.headers));
   console.log("Request Body:", JSON.stringify(safeRequest.body));
 
   // TODO - Restore when we can add ApiKeys to Webhooks headers
-  // if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
+  // const auth = authenticate(request, reply);
+  // if (!auth.authenticated) {
   //   console.log("Received call, but no API key was passed.");
   //   return reply.status(401).send({ error: "Unauthorized" });
   // }
@@ -53,16 +51,13 @@ async function getMailjetHandler(request, reply) {
 }
 
 async function postMailjetHandler(request, reply) {
-  const { apikey } = request.headers?.apikey
-    ? request.headers
-    : { apikey: null };
-
   console.log("postMailjetHandler << IN:");
   const safeRequest = safeLogRequest(request?.headers || {}, request?.body || {});
   console.log("Request Headers:", JSON.stringify(safeRequest.headers));
   console.log("Request Body:", JSON.stringify(safeRequest.body));
 
-  // if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
+  // const auth = authenticate(request, reply);
+  // if (!auth.authenticated) {
   //   console.log("Received call, but no API key was passed.");
   //   return reply.status(401).send({ error: "Unauthorized" });
   // }
@@ -80,7 +75,17 @@ async function postMailjetHandler(request, reply) {
     
     // Check if this is a Neon model (newsletter) or direct Mailjet Messages format
     if (request.body.model || request.body.nodes || request.body.contentData) {
-      // This is a Neon model - convert to newsletter
+      // Only process webpage/newsletter content - skip everything else
+      const sys = request.body.contentData?.data?.sys || {};
+      if (sys.baseType !== "webpage" || sys.type !== "newsletter") {
+        console.log(`postMailjetHandler << SKIP: baseType="${sys.baseType}", type="${sys.type}" (expected webpage/newsletter)`);
+        return reply.status(200).send({
+          message: "Skipped - not a newsletter webpage",
+          baseType: sys.baseType,
+          type: sys.type
+        });
+      }
+      // This is a Neon newsletter model - convert to newsletter
       result = await mailjetService.sendNewsletter(request.body);
     } else if (request.body.Messages) {
       // This is direct Mailjet format

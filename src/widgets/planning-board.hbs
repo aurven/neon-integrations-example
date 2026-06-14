@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{seo.title}}</title>
+    <script src="/js/panel-api-helper.js"></script>
+    <script src="/neon/api/demo-integration/js/panel-api-helper.js"></script>
+    <link rel="stylesheet" href="/css/tailwind-panels.css">
+    <link rel="stylesheet" href="/neon/api/demo-integration/css/tailwind-panels.css">
+    <link rel="stylesheet" href="/css/planning-board.css">
+    <link rel="stylesheet" href="/neon/api/demo-integration/css/planning-board.css">
+</head>
+<body>
+<div class="pb-root">
+    <!-- HEADER -->
+    <header class="pb-header">
+        <h1 class="pb-header-title">Planning Board</h1>
+        <div class="pb-view-pill">
+            <button class="pb-view-pill-btn active" data-view="kanban">Kanban</button>
+            <button class="pb-view-pill-btn" data-view="calendar">Calendar</button>
+        </div>
+        <div class="pb-header-spacer"></div>
+        <div class="pb-header-actions">
+            <button class="pb-my-tasks-toggle" id="myTasksBtn">My Tasks</button>
+            <button class="btn-primary" id="addTaskBtn">+ Add Task</button>
+        </div>
+    </header>
+
+    <!-- QUERY SWITCHER ROW -->
+    <div class="pb-query-row">
+        <button class="pb-query-tab active" data-query="all">All Tasks</button>
+        <button class="pb-query-tab" data-query="morning">Morning Shift</button>
+        <button class="pb-query-tab" data-query="night">Night Shift</button>
+        <button class="pb-query-tab" data-query="urgent">Urgent</button>
+        <button class="pb-query-tab" data-query="overdue">Overdue</button>
+        <button class="pb-query-tab placeholder" data-query="add" title="Custom queries coming soon">+</button>
+    </div>
+
+    <!-- MAIN CONTENT (Kanban or Calendar rendered by JS) -->
+    <div id="pbMainContent"></div>
+
+    <!-- DETAIL PANEL OVERLAY -->
+    <div class="pb-detail-overlay" id="detailOverlay"></div>
+
+    <!-- DETAIL PANEL -->
+    <div class="pb-detail-panel" id="detailPanel"></div>
+</div>
+
+<!-- MODAL CONTAINER -->
+<div id="modalContainer"></div>
+
+<!-- Handlebars config — read by planning-board.js -->
+<script>
+const CONFIG = {
+    neonAppUrl: '{{neonAppUrl}}',
+    apiKey:     '{{{apiKey}}}'
+};
+</script>
+
+<!-- Planning board logic (dual-load: standalone + embedded) -->
+<script src="/js/planning-board.js"></script>
+<script src="/neon/api/demo-integration/js/planning-board.js"></script>
+</body>
+</html>

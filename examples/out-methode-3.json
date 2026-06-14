@@ -1,0 +1,2119 @@
+{
+    "userRef": {
+        "userId": "62038d84-f161-3579-a5f1-7aba053f999a",
+        "alias": "Aureliano"
+    },
+    "publicationTimestamp": "2026-05-22T14:44:56.817Z",
+    "eventType": "updated",
+    "rootData": {
+        "id": "02a5-20ad774f194d-039932bedf88-1000",
+        "version": "02a5-20ad774f194d-039932bedf88-1000-359390696817",
+        "timestamp": "2026-05-22T14:44:56.817Z",
+        "title": "Shockwaves in Frankfurt: ECB Cuts Rates Amidst Economic Eurozone Downturn??",
+        "summary": "The European Central Bank has unexpectedly reduced its key interest rates by 50 basis points in response to a deteriorating eurozone economy, marking its first emergency action since March 2020, as new data confirmed a technical recession across the region.",
+        "authors": [
+            "Aureliano"
+        ],
+        "sys": {
+            "kind": "content",
+            "baseType": "article",
+            "type": "article",
+            "creationTime": "2026-05-21T11:53:51.033Z",
+            "createdBy": {
+                "userId": "62038d84-f161-3579-a5f1-7aba053f999a",
+                "userName": "Aureliano"
+            },
+            "updateTime": "2026-05-22T14:44:56.817Z",
+            "updatedBy": {
+                "userId": "62038d84-f161-3579-a5f1-7aba053f999a",
+                "userName": "Aureliano"
+            }
+        },
+        "pubInfo": {
+            "siteName": "TheGlobe",
+            "status": "LIVE",
+            "publicationTime": "2026-05-22T14:44:56.817Z",
+            "publishedBy": {
+                "userId": "62038d84-f161-3579-a5f1-7aba053f999a",
+                "userName": "Aureliano"
+            },
+            "sectionPath": "/news/",
+            "webhookData": {
+                "methodeHook": {
+                    "storyId": "33$1.0.82361993",
+                    "imageReferences": {
+                        "02a5-20ad7856010e-4fa8926a0dea-1000": {
+                            "loid": "33$1.0.82357561",
+                            "uuid": "62beee46-550c-11f1-b00b-63b602d2a801"
+                        }
+                    },
+                    "lastSend": "2026-05-21T12:48:22.541Z"
+                }
+            },
+            "importance": 5,
+            "paywallLevel": "FREE",
+            "visible": true
+        },
+        "attributes": {
+            "tags": [],
+            "teaser": {},
+            "contentIds": {
+                "teaserTitle": "QJwwwy22V9nSNnH",
+                "teaserSummary": "QrCbcOJdkrQ0dH7",
+                "title": "Qgiee2Wr0xLVMlK",
+                "summary": "Q2J7REO3QrjWpKX"
+            },
+            "overhead": "Breaking News",
+            "byline": "the newsroom",
+            "title": "Shockwaves in Frankfurt: ECB Cuts Rates Amidst Economic Eurozone Downturn??",
+            "general": {
+                "comment": ""
+            },
+            "seo": {
+                "openGraph": {},
+                "sem": {
+                    "googleAds": {},
+                    "utmParameters": {}
+                }
+            },
+            "paywall": {},
+            "ads": {
+                "adsDensity": 0
+            },
+            "modifiable": true
+        },
+        "files": {
+            "content": {
+                "fileName": "BREAKING: ECB Cuts Rates by 50 Basis Points in Emergency Move, Citing Eurozone Slowdown",
+                "mimeType": "application/json",
+                "updatedBy": {
+                    "userId": "62038d84-f161-3579-a5f1-7aba053f999a",
+                    "userName": "Aureliano"
+                },
+                "updateTime": "2026-05-22T14:44:35.645Z",
+                "size": 9620,
+                "data": {
+                    "elements": [
+                        {
+                            "nodeType": "story",
+                            "attributes": {
+                                "id": "QGS8tPfWWwG75LI"
+                            },
+                            "elements": [
+                                {
+                                    "nodeType": "web-image-group",
+                                    "attributes": {
+                                        "enabledcropslist": "Wide,Square,Portrait,Ultrawide",
+                                        "id": "QaJH5JLjtkzRMR0"
+                                    },
+                                    "elements": [
+                                        {
+                                            "nodeType": "image",
+                                            "attributes": {
+                                                "src": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/:1200x675:dHJhbnNsYXRlKC0xMjMuMjA0MzQgLTExMjcuNjUyNjgpIHNjYWxlKDAuNDIwMzU3IDAuNDIwMzU3KQ==/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.jpeg?s=yDeN-jNjW57AsWPjEsFXfSLnbgquRAD-tixbsx3NOhA",
+                                                "id": "Qxvq6MY0uvfMImF",
+                                                "softCrop": "Wide",
+                                                "softcropenabled": "enabled",
+                                                "tmx": "3213 5712 1200 675",
+                                                "xtransform": "translate(-123.20434 -1127.65268) scale(0.420357 0.420357)",
+                                                "targetId": "02a5-20ad7856010e-4fa8926a0dea-1000"
+                                            },
+                                            "elements": []
+                                        },
+                                        {
+                                            "nodeType": "image",
+                                            "attributes": {
+                                                "src": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/:490x490:dHJhbnNsYXRlKC0yNzkuOTk5MzUgLTgxOC41OTI0Mikgc2NhbGUoMC4zMDUxNTMgMC4zMDUxNDgp/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.jpeg?s=x2tHlBBFYqsFkoEEDy3Ucgx1FA1a1xRoLNboMbehh1I",
+                                                "id": "QXIvxaLLNb74Cp0",
+                                                "softCrop": "Square",
+                                                "softcropenabled": "enabled",
+                                                "tmx": "3213 5712 490 490",
+                                                "xtransform": "translate(-279.99935 -818.59242) scale(0.305153 0.305148)",
+                                                "targetId": "02a5-20ad7856010e-4fa8926a0dea-1000"
+                                            },
+                                            "elements": []
+                                        },
+                                        {
+                                            "nodeType": "image",
+                                            "attributes": {
+                                                "src": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/:556x988:dHJhbnNsYXRlKC03ODAuNDgxOTEgLTE2NTAuNTQ5NDkpIHNjYWxlKDAuNjE1MjM1IDAuNjE1Mjgp/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.jpeg?s=y03E3PhIKxFR_NKPzqpjdsFeXKisptYMcmKX3ZLQR-U",
+                                                "id": "QzEgigcKlaVw7QF",
+                                                "softCrop": "Portrait",
+                                                "softcropenabled": "enabled",
+                                                "tmx": "3213 5712 556 988",
+                                                "xtransform": "translate(-780.48191 -1650.54949) scale(0.615235 0.61528)",
+                                                "targetId": "02a5-20ad7856010e-4fa8926a0dea-1000"
+                                            },
+                                            "elements": []
+                                        },
+                                        {
+                                            "nodeType": "image",
+                                            "attributes": {
+                                                "src": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/:2048x800:dHJhbnNsYXRlKC0yMTAuMjY4NzMgLTIxMDAuNDk0Nykgc2NhbGUoMC43MTc0MSAwLjcxNzQp/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.jpeg?s=w1hePTIemaZYCAitmjxZOIZyrN0VFxIwMSi6sAhCaRc",
+                                                "id": "Q7zoZJtEaXHk9Ia",
+                                                "softCrop": "Ultrawide",
+                                                "softcropenabled": "enabled",
+                                                "tmx": "3213 5712 2048 800",
+                                                "xtransform": "translate(-210.26873 -2100.4947) scale(0.71741 0.7174)",
+                                                "targetId": "02a5-20ad7856010e-4fa8926a0dea-1000"
+                                            },
+                                            "elements": []
+                                        },
+                                        {
+                                            "nodeType": "web-image-caption",
+                                            "attributes": {
+                                                "id": "QkNcvZyBbZJnZPn"
+                                            },
+                                            "elements": [
+                                                {
+                                                    "nodeType": "caption",
+                                                    "attributes": {
+                                                        "emxed-trx-captiongroup": "web-image-caption",
+                                                        "emxed-trx-captionsequence": "0",
+                                                        "emxed-trx-captiontitle": "Caption",
+                                                        "emxed-trx-captiontype": "caption",
+                                                        "emxed-trx-iscaption": "true",
+                                                        "id": "QajDyJwisG0jDZG"
+                                                    },
+                                                    "elements": [
+                                                        {
+                                                            "nodeType": "p",
+                                                            "attributes": {
+                                                                "id": "QdHoZ1WHmiV00zN"
+                                                            },
+                                                            "elements": [
+                                                                {
+                                                                    "nodeType": "plainText",
+                                                                    "value": "Euro symbol with skyscrapers in Frankfurt, Germany, showcasing urban architecture. "
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "nodeType": "credit",
+                                                    "attributes": {
+                                                        "emxed-trx-captiongroup": "web-image-caption",
+                                                        "emxed-trx-captionsequence": "0",
+                                                        "emxed-trx-captiontitle": "Credit",
+                                                        "emxed-trx-captiontype": "credit",
+                                                        "emxed-trx-iscaption": "true",
+                                                        "id": "Q0VH8CKrfUIo2tQ"
+                                                    },
+                                                    "elements": [
+                                                        {
+                                                            "nodeType": "p",
+                                                            "attributes": {
+                                                                "id": "QlcOeb5sETHkZin"
+                                                            },
+                                                            "elements": [
+                                                                {
+                                                                    "nodeType": "plainText",
+                                                                    "value": "Pexels® Image"
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "nodeType": "grouphead",
+                                    "attributes": {},
+                                    "elements": [
+                                        {
+                                            "nodeType": "overhead",
+                                            "attributes": {
+                                                "id": "QrvBpfASFIMiPFr"
+                                            },
+                                            "elements": [
+                                                {
+                                                    "nodeType": "p",
+                                                    "attributes": {
+                                                        "id": "QjFdd5ktZzfYg0I"
+                                                    },
+                                                    "elements": [
+                                                        {
+                                                            "nodeType": "plainText",
+                                                            "value": "Breaking News"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "nodeType": "headline",
+                                            "attributes": {
+                                                "id": "Qgiee2Wr0xLVMlK"
+                                            },
+                                            "elements": [
+                                                {
+                                                    "nodeType": "p",
+                                                    "attributes": {
+                                                        "id": "U51552568634NBg"
+                                                    },
+                                                    "elements": [
+                                                        {
+                                                            "nodeType": "plainText",
+                                                            "value": "Shockwaves in Frankfurt: ECB Cuts Rates Amidst Economic Eurozone Downturn??"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "nodeType": "summary",
+                                    "attributes": {
+                                        "id": "Q2J7REO3QrjWpKX"
+                                    },
+                                    "elements": [
+                                        {
+                                            "nodeType": "p",
+                                            "attributes": {
+                                                "id": "U41478560024OJc"
+                                            },
+                                            "elements": [
+                                                {
+                                                    "nodeType": "plainText",
+                                                    "value": "The European Central Bank has unexpectedly reduced its key interest rates by 50 basis points in response to a deteriorating eurozone economy, marking its first emergency action since March 2020, as new data confirmed a technical recession across the region."
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "nodeType": "byline",
+                                    "attributes": {
+                                        "id": "QZ6GJoFWbAE061E"
+                                    },
+                                    "elements": [
+                                        {
+                                            "nodeType": "p",
+                                            "attributes": {
+                                                "id": "QGkw2hSAS45TyCD"
+                                            },
+                                            "elements": [
+                                                {
+                                                    "nodeType": "plainText",
+                                                    "value": "the newsroom"
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "nodeType": "text",
+                                    "attributes": {
+                                        "id": "QQad6BxXMv160CM"
+                                    },
+                                    "elements": [
+                                        {
+                                            "nodeType": "p",
+                                            "attributes": {
+                                                "id": "U30042835462oSR"
+                                            },
+                                            "elements": [
+                                                {
+                                                    "nodeType": "plainText",
+                                                    "value": "The European Central Bank cut its three key interest rates by 50 basis points on Wednesday in a surprise off-cycle decision, bringing the deposit facility rate to 1.50%, as policymakers moved to counter a sharper-than-expected economic downturn across the 20-nation bloc."
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "nodeType": "p",
+                                            "attributes": {
+                                                "id": "U66657458217Cyd"
+                                            },
+                                            "elements": [
+                                                {
+                                                    "nodeType": "plainText",
+                                                    "value": "The move — the first emergency rate action since March 2020 — came hours after Eurostat published revised first-quarter GDP figures showing a 0.4% contraction, following a 0.2% decline in the final quarter of 2025, formally tipping the eurozone into a technical recession."
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "nodeType": "p",
+                                            "attributes": {
+                                                "id": "U00128116733BTs"
+                                            },
+                                            "elements": [
+                                                {
+                                                    "nodeType": "plainText",
+                                                    "value": "“The Governing Council stands ready to use all instruments within its mandate,” the ECB said in a terse two-paragraph statement released at 13:45 CET, adding that the decision was unanimous."
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "nodeType": "p",
+                                            "attributes": {
+                                                "id": "U86551424283lbn"
+                                            },
+                                            "elements": [
+                                                {
+                                                    "nodeType": "plainText",
+                                                    "value": "Markets reacted swiftly: the euro fell 0.9% against the dollar to $1.0640, while European equities reversed earlier losses, with the Euro Stoxx 50 climbing 1.8% in afternoon trading. German 10-year Bund yields dropped nine basis points to 1.87%."
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "nodeType": "p",
+                                            "attributes": {
+                                                "id": "U38868667455gFb"
+                                            },
+                                            "elements": [
+                                                {
+                                                    "nodeType": "plainText",
+                                                    "value": "The European Central Bank delivered a surprise 50 basis-point interest rate cut on Wednesday in its first unscheduled policy action in six years, slashing its deposit facility rate to 1.50% after official data confirmed the eurozone had tipped into recession for the first time since the pandemic."
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "nodeType": "p",
+                                            "attributes": {
+                                                "id": "U46485754011GFO"
+                                            },
+                                            "elements": [
+                                                {
+                                                    "nodeType": "plainText",
+                                                    "value": "The decision, taken unanimously by the Governing Council in an emergency teleconference, marks a dramatic pivot for an institution that has spent the better part of two years carefully unwinding a historic tightening cycle. As recently as March, ECB President Christine Lagarde had publicly cautioned against reading too much into soft survey data, insisting that the disinflation process remained “on track” and that the Bank would proceed “data-dependent, meeting by meeting.”"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "nodeType": "blockquote",
+                                            "attributes": {
+                                                "id": "U07422726816uJb"
+                                            },
+                                            "elements": [
+                                                {
+                                                    "nodeType": "plainText",
+                                                    "value": "Wednesday’s data changed everything."
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "nodeType": "h3",
+                                            "attributes": {
+                                                "id": "U04718061816xnZ"
+                                            },
+                                            "elements": [
+                                                {
+                                                    "nodeType": "plainText",
+                                                    "value": "A Recession the Bank Could No Longer Ignore"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "nodeType": "table",
+                                            "attributes": {
+                                                "emxed-trx-component-type": "table",
+                                                "emxed-trx-table": "true",
+                                                "id": "U43302282377jUl",
+                                                "width": "100%"
+                                            },
+                                            "elements": [
+                                                {
+                                                    "nodeType": "tr",
+                                                    "attributes": {},
+                                                    "elements": [
+                                                        {
+                                                            "nodeType": "td",
+                                                            "attributes": {},
+                                                            "elements": [
+                                                                {
+                                                                    "nodeType": "b",
+                                                                    "attributes": {},
+                                                                    "elements": [
+                                                                        {
+                                                                            "nodeType": "plainText",
+                                                                            "value": "Indicator"
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "nodeType": "td",
+                                                            "attributes": {},
+                                                            "elements": [
+                                                                {
+                                                                    "nodeType": "b",
+                                                                    "attributes": {},
+                                                                    "elements": [
+                                                                        {
+                                                                            "nodeType": "plainText",
+                                                                            "value": "Value"
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "nodeType": "td",
+                                                            "attributes": {},
+                                                            "elements": [
+                                                                {
+                                                                    "nodeType": "b",
+                                                                    "attributes": {},
+                                                                    "elements": [
+                                                                        {
+                                                                            "nodeType": "plainText",
+                                                                            "value": "Period"
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "nodeType": "tr",
+                                                    "attributes": {},
+                                                    "elements": [
+                                                        {
+                                                            "nodeType": "td",
+                                                            "attributes": {},
+                                                            "elements": [
+                                                                {
+                                                                    "nodeType": "plainText",
+                                                                    "value": "Eurozone GDP Growth"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "nodeType": "td",
+                                                            "attributes": {},
+                                                            "elements": [
+                                                                {
+                                                                    "nodeType": "plainText",
+                                                                    "value": "-0.4%"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "nodeType": "td",
+                                                            "attributes": {},
+                                                            "elements": [
+                                                                {
+                                                                    "nodeType": "plainText",
+                                                                    "value": "Q1 2026"
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "nodeType": "tr",
+                                                    "attributes": {},
+                                                    "elements": [
+                                                        {
+                                                            "nodeType": "td",
+                                                            "attributes": {},
+                                                            "elements": [
+                                                                {
+                                                                    "nodeType": "plainText",
+                                                                    "value": "Initial Estimate"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "nodeType": "td",
+                                                            "attributes": {},
+                                                            "elements": [
+                                                                {
+                                                                    "nodeType": "plainText",
+                                                                    "value": "-0.1%"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "nodeType": "td",
+                                                            "attributes": {},
+                                                            "elements": [
+                                                                {
+                                                                    "nodeType": "plainText",
+                                                                    "value": "Q1 2026"
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "nodeType": "tr",
+                                                    "attributes": {},
+                                                    "elements": [
+                                                        {
+                                                            "nodeType": "td",
+                                                            "attributes": {},
+                                                            "elements": [
+                                                                {
+                                                                    "nodeType": "plainText",
+                                                                    "value": "Previous Quarter Growth"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "nodeType": "td",
+                                                            "attributes": {},
+                                                            "elements": [
+                                                                {
+                                                                    "nodeType": "plainText",
+                                                                    "value": "-0.2%"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "nodeType": "td",
+                                                            "attributes": {},
+                                                            "elements": [
+                                                                {
+                                                                    "nodeType": "plainText",
+                                                                    "value": "Q4 2025"
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "nodeType": "tr",
+                                                    "attributes": {},
+                                                    "elements": [
+                                                        {
+                                                            "nodeType": "td",
+                                                            "attributes": {},
+                                                            "elements": [
+                                                                {
+                                                                    "nodeType": "plainText",
+                                                                    "value": "Germany GDP Growth"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "nodeType": "td",
+                                                            "attributes": {},
+                                                            "elements": [
+                                                                {
+                                                                    "nodeType": "plainText",
+                                                                    "value": "-0.7%"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "nodeType": "td",
+                                                            "attributes": {},
+                                                            "elements": [
+                                                                {
+                                                                    "nodeType": "plainText",
+                                                                    "value": "Q1 2026"
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "nodeType": "tr",
+                                                    "attributes": {},
+                                                    "elements": [
+                                                        {
+                                                            "nodeType": "td",
+                                                            "attributes": {},
+                                                            "elements": [
+                                                                {
+                                                                    "nodeType": "plainText",
+                                                                    "value": "France GDP Growth"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "nodeType": "td",
+                                                            "attributes": {},
+                                                            "elements": [
+                                                                {
+                                                                    "nodeType": "plainText",
+                                                                    "value": "-0.4%"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "nodeType": "td",
+                                                            "attributes": {},
+                                                            "elements": [
+                                                                {
+                                                                    "nodeType": "plainText",
+                                                                    "value": "Q1 2026"
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "nodeType": "tr",
+                                                    "attributes": {},
+                                                    "elements": [
+                                                        {
+                                                            "nodeType": "td",
+                                                            "attributes": {},
+                                                            "elements": [
+                                                                {
+                                                                    "nodeType": "plainText",
+                                                                    "value": "Italy GDP Growth"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "nodeType": "td",
+                                                            "attributes": {},
+                                                            "elements": [
+                                                                {
+                                                                    "nodeType": "plainText",
+                                                                    "value": "-0.5%"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "nodeType": "td",
+                                                            "attributes": {},
+                                                            "elements": [
+                                                                {
+                                                                    "nodeType": "plainText",
+                                                                    "value": "Q1 2026"
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "nodeType": "tr",
+                                                    "attributes": {},
+                                                    "elements": [
+                                                        {
+                                                            "nodeType": "td",
+                                                            "attributes": {},
+                                                            "elements": [
+                                                                {
+                                                                    "nodeType": "plainText",
+                                                                    "value": "Spain GDP Growth"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "nodeType": "td",
+                                                            "attributes": {},
+                                                            "elements": [
+                                                                {
+                                                                    "nodeType": "plainText",
+                                                                    "value": "0.2%"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "nodeType": "td",
+                                                            "attributes": {},
+                                                            "elements": [
+                                                                {
+                                                                    "nodeType": "plainText",
+                                                                    "value": "Q1 2026"
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "nodeType": "tr",
+                                                    "attributes": {},
+                                                    "elements": [
+                                                        {
+                                                            "nodeType": "td",
+                                                            "attributes": {},
+                                                            "elements": [
+                                                                {
+                                                                    "nodeType": "plainText",
+                                                                    "value": "Headline Inflation"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "nodeType": "td",
+                                                            "attributes": {},
+                                                            "elements": [
+                                                                {
+                                                                    "nodeType": "plainText",
+                                                                    "value": "1.6%"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "nodeType": "td",
+                                                            "attributes": {},
+                                                            "elements": [
+                                                                {
+                                                                    "nodeType": "plainText",
+                                                                    "value": "April 2026"
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "nodeType": "p",
+                                            "attributes": {
+                                                "id": "U75441513282YcE"
+                                            },
+                                            "elements": [
+                                                {
+                                                    "nodeType": "plainText",
+                                                    "value": "Eurostat’s revised GDP figures, released at 10:00 CET, showed the eurozone economy contracted 0.4% in the first quarter of 2026 — considerably worse than the initial estimate of -0.1% — following a 0.2% decline in the fourth quarter of last year. The two consecutive quarters of negative growth met the technical definition of a recession, triggering what one senior ECB official, speaking on condition of anonymity, called “a fundamentally different policy calculus.”"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "nodeType": "p",
+                                            "attributes": {
+                                                "id": "U13312146866wNP"
+                                            },
+                                            "elements": [
+                                                {
+                                                    "nodeType": "plainText",
+                                                    "value": "Germany remained the bloc’s principal drag, with Europe’s largest economy posting a 0.7% quarterly contraction as its industrial sector continued to suffer from weak Chinese demand and the lingering effects of higher energy costs. France and Italy also contracted by 0,4% and 0,5%, while Spain offered the only meaningful bright spot among the major economies, eking out 0.2% growth."
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "nodeType": "p",
+                                            "attributes": {
+                                                "id": "U63008578807rIP"
+                                            },
+                                            "elements": [
+                                                {
+                                                    "nodeType": "plainText",
+                                                    "value": "Headline inflation for April, also published this week, fell to 1.6% — the first time the ECB’s preferred measure has come in below the 2% target in over four years."
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "nodeType": "p",
+                                            "attributes": {
+                                                "id": "U30512833351YUN"
+                                            },
+                                            "elements": [
+                                                {
+                                                    "nodeType": "plainText",
+                                                    "value": "“When both legs of our assessment — growth and inflation — move in the same direction simultaneously, the case for action becomes compelling,” Lagarde said at a press conference at ECB headquarters in Frankfurt. “The Governing Council acted today because the data demanded it.”"
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "nodeType": "teaser",
+                            "attributes": {
+                                "id": "QaTM5CQq8Q6Z4om"
+                            },
+                            "elements": [
+                                {
+                                    "nodeType": "web-image-group",
+                                    "attributes": {
+                                        "id": "Qyitj3hPppazYd7"
+                                    },
+                                    "elements": [
+                                        {
+                                            "nodeType": "image",
+                                            "attributes": {
+                                                "id": "QqOsUY1aG7CYyHz",
+                                                "softCrop": "Wide"
+                                            },
+                                            "elements": []
+                                        },
+                                        {
+                                            "nodeType": "image",
+                                            "attributes": {
+                                                "id": "QQ2pQwpOXBi90Bd",
+                                                "softCrop": "Square"
+                                            },
+                                            "elements": []
+                                        },
+                                        {
+                                            "nodeType": "image",
+                                            "attributes": {
+                                                "id": "QWcqIGF2CQVIT0G",
+                                                "softCrop": "Portrait"
+                                            },
+                                            "elements": []
+                                        },
+                                        {
+                                            "nodeType": "image",
+                                            "attributes": {
+                                                "id": "Q8ySiKFr5ReyvVR",
+                                                "softCrop": "Ultrawide"
+                                            },
+                                            "elements": []
+                                        }
+                                    ]
+                                },
+                                {
+                                    "nodeType": "grouphead",
+                                    "attributes": {},
+                                    "elements": [
+                                        {
+                                            "nodeType": "headline",
+                                            "attributes": {
+                                                "id": "QJwwwy22V9nSNnH"
+                                            },
+                                            "elements": [
+                                                {
+                                                    "nodeType": "p",
+                                                    "attributes": {
+                                                        "id": "QapYwo0ooXRYvz9"
+                                                    },
+                                                    "elements": []
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "nodeType": "summary",
+                                    "attributes": {
+                                        "id": "QrCbcOJdkrQ0dH7"
+                                    },
+                                    "elements": [
+                                        {
+                                            "nodeType": "p",
+                                            "attributes": {
+                                                "id": "QUizIrmkPFh7kKb"
+                                            },
+                                            "elements": []
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "nodeType": "style",
+                            "attributes": {
+                                "id": "U40204871081ALH",
+                                "type": "text/css"
+                            },
+                            "elements": [
+                                {
+                                    "nodeType": "plainText",
+                                    "value": "{}\n#U40204871081ALH {\ndisplay: none;\n}\n"
+                                }
+                            ]
+                        }
+                    ],
+                    "attributes": {
+                        "id": "QEmI7a4IJ6uw3hQ"
+                    },
+                    "nodeType": "doc"
+                },
+                "jsonFileEmbeddedNoImage": true
+            }
+        },
+        "links": {
+            "hyperlink": {
+                "image": [
+                    {
+                        "targetId": "02a5-20ad7856010e-4fa8926a0dea-1000",
+                        "metadata": {
+                            "baseType": "image",
+                            "type": "pexelsimage",
+                            "metadataType": "generic",
+                            "softCrops": {
+                                "Ultrawide": {
+                                    "id": "Q7zoZJtEaXHk9Ia",
+                                    "tmx": "3213 5712 2048 800",
+                                    "xtransform": "translate(-210.26873 -2100.4947) scale(0.71741 0.7174)"
+                                },
+                                "Wide": {
+                                    "id": "Qxvq6MY0uvfMImF",
+                                    "tmx": "3213 5712 1200 675",
+                                    "xtransform": "translate(-123.20434 -1127.65268) scale(0.420357 0.420357)"
+                                },
+                                "Square": {
+                                    "id": "QXIvxaLLNb74Cp0",
+                                    "tmx": "3213 5712 490 490",
+                                    "xtransform": "translate(-279.99935 -818.59242) scale(0.305153 0.305148)"
+                                },
+                                "Portrait": {
+                                    "id": "QzEgigcKlaVw7QF",
+                                    "tmx": "3213 5712 556 988",
+                                    "xtransform": "translate(-780.48191 -1650.54949) scale(0.615235 0.61528)"
+                                }
+                            },
+                            "groupId": "QaJH5JLjtkzRMR0",
+                            "caption": "Euro symbol with skyscrapers in Frankfurt, Germany, showcasing urban architecture.",
+                            "credit": "Pexels® Image"
+                        },
+                        "key": 1537228672809129000,
+                        "dynamicCropsResourceUrls": {
+                            "Square_thumb": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/thumb:490x490:dHJhbnNsYXRlKC0yNzkuOTk5MzUgLTgxOC41OTI0Mikgc2NhbGUoMC4zMDUxNTMgMC4zMDUxNDgp/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=z7E65G5aLu-5EGwRVMSWdLbZN46SAyq6lOTimHMsofM",
+                            "Ultrawide_large": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/large:2048x800:dHJhbnNsYXRlKC0yMTAuMjY4NzMgLTIxMDAuNDk0Nykgc2NhbGUoMC43MTc0MSAwLjcxNzQp/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=92aRLPn6Dy72mfOT0wIfI23jEG6iRLcJh7ivEHJPm7Q",
+                            "Wide_large": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/large:1200x675:dHJhbnNsYXRlKC0xMjMuMjA0MzQgLTExMjcuNjUyNjgpIHNjYWxlKDAuNDIwMzU3IDAuNDIwMzU3KQ==/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=UeFN3Zq9Aeggt_WgO6Ljal7iblNoeERmLeqlu1PuCvQ",
+                            "Portrait_small": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/small:556x988:dHJhbnNsYXRlKC03ODAuNDgxOTEgLTE2NTAuNTQ5NDkpIHNjYWxlKDAuNjE1MjM1IDAuNjE1Mjgp/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=gPCBrg9ZcVWxwriZnWhYS7wH09WNcjXplhxzboIvSJQ",
+                            "Ultrawide_small": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/small:2048x800:dHJhbnNsYXRlKC0yMTAuMjY4NzMgLTIxMDAuNDk0Nykgc2NhbGUoMC43MTc0MSAwLjcxNzQp/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=sLmeZZ76zr4taIPRsRvrzFX7zKBA0-MkDWWH8ELFWQY",
+                            "Square_large": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/large:490x490:dHJhbnNsYXRlKC0yNzkuOTk5MzUgLTgxOC41OTI0Mikgc2NhbGUoMC4zMDUxNTMgMC4zMDUxNDgp/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=RFkjlYhBz_N1rmXUrAcLGeo74mcGiG06Nrn3BXAw4vc",
+                            "Ultrawide_thumb": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/thumb:2048x800:dHJhbnNsYXRlKC0yMTAuMjY4NzMgLTIxMDAuNDk0Nykgc2NhbGUoMC43MTc0MSAwLjcxNzQp/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=7NVlzGFlQuwGMvm6SuqAWHN07OMmIFaq34oscglYYQ0",
+                            "Wide_thumb": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/thumb:1200x675:dHJhbnNsYXRlKC0xMjMuMjA0MzQgLTExMjcuNjUyNjgpIHNjYWxlKDAuNDIwMzU3IDAuNDIwMzU3KQ==/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=qrS1p499Q5S6ZKStB2ZiWK66P_glriaduEVxITXIRi8",
+                            "Square_small": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/small:490x490:dHJhbnNsYXRlKC0yNzkuOTk5MzUgLTgxOC41OTI0Mikgc2NhbGUoMC4zMDUxNTMgMC4zMDUxNDgp/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=G-amJlGCqLNq-IqIOxix8mOFzGmlVZ8-Gr_N91flKwE",
+                            "Wide_small": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/small:1200x675:dHJhbnNsYXRlKC0xMjMuMjA0MzQgLTExMjcuNjUyNjgpIHNjYWxlKDAuNDIwMzU3IDAuNDIwMzU3KQ==/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=ShcE_63CjaFphgv10glqniB0V0WUzipxP7CaOsE0QOc",
+                            "Portrait_thumb": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/thumb:556x988:dHJhbnNsYXRlKC03ODAuNDgxOTEgLTE2NTAuNTQ5NDkpIHNjYWxlKDAuNjE1MjM1IDAuNjE1Mjgp/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=zjJ5SX93KfLbv6BGlNounnQTm7mJXm20VUVPKKn8kxE",
+                            "Portrait_large": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/large:556x988:dHJhbnNsYXRlKC03ODAuNDgxOTEgLTE2NTAuNTQ5NDkpIHNjYWxlKDAuNjE1MjM1IDAuNjE1Mjgp/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=Nu6RaVXNem70FLzB1j-og38yJYLYUiWkRrHQDWTzfUg"
+                        }
+                    }
+                ]
+            },
+            "system": {
+                "mainPicture": [
+                    {
+                        "targetId": "02a5-20ad7856010e-4fa8926a0dea-1000",
+                        "metadata": {
+                            "baseType": "image",
+                            "type": "pexelsimage",
+                            "metadataType": "generic",
+                            "softCrops": {
+                                "Ultrawide": {
+                                    "id": "Q7zoZJtEaXHk9Ia",
+                                    "tmx": "3213 5712 2048 800",
+                                    "xtransform": "translate(-210.26873 -2100.4947) scale(0.71741 0.7174)"
+                                },
+                                "Wide": {
+                                    "id": "Qxvq6MY0uvfMImF",
+                                    "tmx": "3213 5712 1200 675",
+                                    "xtransform": "translate(-123.20434 -1127.65268) scale(0.420357 0.420357)"
+                                },
+                                "Square": {
+                                    "id": "QXIvxaLLNb74Cp0",
+                                    "tmx": "3213 5712 490 490",
+                                    "xtransform": "translate(-279.99935 -818.59242) scale(0.305153 0.305148)"
+                                },
+                                "Portrait": {
+                                    "id": "QzEgigcKlaVw7QF",
+                                    "tmx": "3213 5712 556 988",
+                                    "xtransform": "translate(-780.48191 -1650.54949) scale(0.615235 0.61528)"
+                                }
+                            },
+                            "groupId": "QaJH5JLjtkzRMR0",
+                            "caption": "Euro symbol with skyscrapers in Frankfurt, Germany, showcasing urban architecture.",
+                            "credit": "Pexels® Image"
+                        },
+                        "key": 1537228672809129000,
+                        "dynamicCropsResourceUrls": {
+                            "Square_thumb": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/thumb:490x490:dHJhbnNsYXRlKC0yNzkuOTk5MzUgLTgxOC41OTI0Mikgc2NhbGUoMC4zMDUxNTMgMC4zMDUxNDgp/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=z7E65G5aLu-5EGwRVMSWdLbZN46SAyq6lOTimHMsofM",
+                            "Ultrawide_large": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/large:2048x800:dHJhbnNsYXRlKC0yMTAuMjY4NzMgLTIxMDAuNDk0Nykgc2NhbGUoMC43MTc0MSAwLjcxNzQp/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=92aRLPn6Dy72mfOT0wIfI23jEG6iRLcJh7ivEHJPm7Q",
+                            "Wide_large": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/large:1200x675:dHJhbnNsYXRlKC0xMjMuMjA0MzQgLTExMjcuNjUyNjgpIHNjYWxlKDAuNDIwMzU3IDAuNDIwMzU3KQ==/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=UeFN3Zq9Aeggt_WgO6Ljal7iblNoeERmLeqlu1PuCvQ",
+                            "Portrait_small": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/small:556x988:dHJhbnNsYXRlKC03ODAuNDgxOTEgLTE2NTAuNTQ5NDkpIHNjYWxlKDAuNjE1MjM1IDAuNjE1Mjgp/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=gPCBrg9ZcVWxwriZnWhYS7wH09WNcjXplhxzboIvSJQ",
+                            "Ultrawide_small": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/small:2048x800:dHJhbnNsYXRlKC0yMTAuMjY4NzMgLTIxMDAuNDk0Nykgc2NhbGUoMC43MTc0MSAwLjcxNzQp/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=sLmeZZ76zr4taIPRsRvrzFX7zKBA0-MkDWWH8ELFWQY",
+                            "Square_large": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/large:490x490:dHJhbnNsYXRlKC0yNzkuOTk5MzUgLTgxOC41OTI0Mikgc2NhbGUoMC4zMDUxNTMgMC4zMDUxNDgp/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=RFkjlYhBz_N1rmXUrAcLGeo74mcGiG06Nrn3BXAw4vc",
+                            "Ultrawide_thumb": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/thumb:2048x800:dHJhbnNsYXRlKC0yMTAuMjY4NzMgLTIxMDAuNDk0Nykgc2NhbGUoMC43MTc0MSAwLjcxNzQp/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=7NVlzGFlQuwGMvm6SuqAWHN07OMmIFaq34oscglYYQ0",
+                            "Wide_thumb": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/thumb:1200x675:dHJhbnNsYXRlKC0xMjMuMjA0MzQgLTExMjcuNjUyNjgpIHNjYWxlKDAuNDIwMzU3IDAuNDIwMzU3KQ==/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=qrS1p499Q5S6ZKStB2ZiWK66P_glriaduEVxITXIRi8",
+                            "Square_small": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/small:490x490:dHJhbnNsYXRlKC0yNzkuOTk5MzUgLTgxOC41OTI0Mikgc2NhbGUoMC4zMDUxNTMgMC4zMDUxNDgp/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=G-amJlGCqLNq-IqIOxix8mOFzGmlVZ8-Gr_N91flKwE",
+                            "Wide_small": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/small:1200x675:dHJhbnNsYXRlKC0xMjMuMjA0MzQgLTExMjcuNjUyNjgpIHNjYWxlKDAuNDIwMzU3IDAuNDIwMzU3KQ==/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=ShcE_63CjaFphgv10glqniB0V0WUzipxP7CaOsE0QOc",
+                            "Portrait_thumb": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/thumb:556x988:dHJhbnNsYXRlKC03ODAuNDgxOTEgLTE2NTAuNTQ5NDkpIHNjYWxlKDAuNjE1MjM1IDAuNjE1Mjgp/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=zjJ5SX93KfLbv6BGlNounnQTm7mJXm20VUVPKKn8kxE",
+                            "Portrait_large": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/large:556x988:dHJhbnNsYXRlKC03ODAuNDgxOTEgLTE2NTAuNTQ5NDkpIHNjYWxlKDAuNjE1MjM1IDAuNjE1Mjgp/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=Nu6RaVXNem70FLzB1j-og38yJYLYUiWkRrHQDWTzfUg"
+                        }
+                    }
+                ],
+                "source": [
+                    {
+                        "targetId": "02a5-20ababb48a66-a1356055c4ba-1000",
+                        "metadata": {
+                            "metadataType": "generic",
+                            "userId": "62038d84-f161-3579-a5f1-7aba053f999a",
+                            "alias": "Aureliano"
+                        },
+                        "key": 1537228672809129000
+                    }
+                ]
+            }
+        },
+        "pubInfoEx": {
+            "TheGlobe": {
+                "siteName": "TheGlobe",
+                "status": "LIVE",
+                "publicationTime": "2026-05-22T14:44:56.817Z",
+                "publishedBy": {
+                    "userId": "62038d84-f161-3579-a5f1-7aba053f999a",
+                    "userName": "Aureliano"
+                },
+                "liveInfo": {
+                    "version": "02a5-20ad774f194d-039932bedf88-1000-359390696817",
+                    "sourceVersion": "02a5-20ad774f194d-039932bedf88-1000-n359390676148",
+                    "publicationTime": "2026-05-22T14:44:56.817Z",
+                    "publishedBy": {
+                        "userId": "62038d84-f161-3579-a5f1-7aba053f999a",
+                        "userName": "Aureliano"
+                    }
+                },
+                "stageInfo": {
+                    "version": "02a5-20ad774f194d-039932bedf88-1000-n359390676148",
+                    "publicationTime": "2026-05-22T14:44:36.148Z",
+                    "publishedBy": {
+                        "userId": "62038d84-f161-3579-a5f1-7aba053f999a",
+                        "userName": "Aureliano"
+                    }
+                },
+                "previewInfo": {
+                    "version": "02a5-20ad774f194d-039932bedf88-1000-n359390676148",
+                    "publicationTime": "2026-05-22T14:44:36.148Z",
+                    "publishedBy": {
+                        "userId": "62038d84-f161-3579-a5f1-7aba053f999a",
+                        "userName": "Aureliano"
+                    }
+                },
+                "sectionPath": "/news/",
+                "webhookData": {
+                    "methodeHook": {
+                        "storyId": "33$1.0.82361993",
+                        "imageReferences": {
+                            "02a5-20ad7856010e-4fa8926a0dea-1000": {
+                                "loid": "33$1.0.82357561",
+                                "uuid": "62beee46-550c-11f1-b00b-63b602d2a801"
+                            }
+                        },
+                        "lastSend": "2026-05-21T12:48:22.541Z"
+                    }
+                },
+                "importance": 5,
+                "paywallLevel": "FREE",
+                "visible": true
+            }
+        },
+        "url": "/news/02a5-20ad774f194d-039932bedf88-1000/index.html",
+        "resourceUrl": "/resources/02a5-20ad774f194d-039932bedf88-1000/shockwaves_in_frankfurt_ecb_cuts_rates_amidst_economic_eurozone_downturn_.json",
+        "picture": "02a5-20ad7856010e-4fa8926a0dea-1000",
+        "lastModified": 1779461096817,
+        "dataType": "node",
+        "etag": "02a5-20ad774f194d-039932bedf88-1000-359390696817"
+    },
+    "contentData": {
+        "id": "model://02a5-20ad774f194d-039932bedf88-1000/1/null/NE",
+        "data": {
+            "id": "02a5-20ad774f194d-039932bedf88-1000",
+            "version": "02a5-20ad774f194d-039932bedf88-1000-359390696817",
+            "title": "Shockwaves in Frankfurt: ECB Cuts Rates Amidst Economic Eurozone Downturn??",
+            "summary": "The European Central Bank has unexpectedly reduced its key interest rates by 50 basis points in response to a deteriorating eurozone economy, marking its first emergency action since March 2020, as new data confirmed a technical recession across the region.",
+            "authors": [
+                "Aureliano"
+            ],
+            "sys": {
+                "baseType": "article",
+                "type": "article"
+            },
+            "pubInfo": {
+                "publicationTime": "2026-05-22T14:44:56.817Z",
+                "publishedBy": {
+                    "userName": "Aureliano"
+                },
+                "importance": 5,
+                "paywallLevel": "FREE",
+                "visible": true
+            },
+            "attributes": {
+                "tags": [],
+                "teaser": {},
+                "contentIds": {
+                    "teaserTitle": "QJwwwy22V9nSNnH",
+                    "teaserSummary": "QrCbcOJdkrQ0dH7",
+                    "title": "Qgiee2Wr0xLVMlK",
+                    "summary": "Q2J7REO3QrjWpKX"
+                },
+                "overhead": "Breaking News",
+                "byline": "the newsroom",
+                "title": "Shockwaves in Frankfurt: ECB Cuts Rates Amidst Economic Eurozone Downturn??",
+                "general": {
+                    "comment": ""
+                },
+                "seo": {
+                    "openGraph": {},
+                    "sem": {
+                        "googleAds": {},
+                        "utmParameters": {}
+                    }
+                },
+                "paywall": {},
+                "ads": {
+                    "adsDensity": 0
+                },
+                "modifiable": true
+            },
+            "files": {
+                "content": {
+                    "mimeType": "application/json",
+                    "data": {
+                        "elements": [
+                            {
+                                "nodeType": "story",
+                                "attributes": {
+                                    "id": "QGS8tPfWWwG75LI"
+                                },
+                                "elements": [
+                                    {
+                                        "nodeType": "web-image-group",
+                                        "attributes": {
+                                            "enabledcropslist": "Wide,Square,Portrait,Ultrawide",
+                                            "id": "QaJH5JLjtkzRMR0"
+                                        },
+                                        "elements": [
+                                            {
+                                                "nodeType": "image",
+                                                "attributes": {
+                                                    "src": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/:1200x675:dHJhbnNsYXRlKC0xMjMuMjA0MzQgLTExMjcuNjUyNjgpIHNjYWxlKDAuNDIwMzU3IDAuNDIwMzU3KQ==/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.jpeg?s=yDeN-jNjW57AsWPjEsFXfSLnbgquRAD-tixbsx3NOhA",
+                                                    "id": "Qxvq6MY0uvfMImF",
+                                                    "softCrop": "Wide",
+                                                    "softcropenabled": "enabled",
+                                                    "tmx": "3213 5712 1200 675",
+                                                    "xtransform": "translate(-123.20434 -1127.65268) scale(0.420357 0.420357)",
+                                                    "targetId": "02a5-20ad7856010e-4fa8926a0dea-1000"
+                                                },
+                                                "elements": []
+                                            },
+                                            {
+                                                "nodeType": "image",
+                                                "attributes": {
+                                                    "src": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/:490x490:dHJhbnNsYXRlKC0yNzkuOTk5MzUgLTgxOC41OTI0Mikgc2NhbGUoMC4zMDUxNTMgMC4zMDUxNDgp/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.jpeg?s=x2tHlBBFYqsFkoEEDy3Ucgx1FA1a1xRoLNboMbehh1I",
+                                                    "id": "QXIvxaLLNb74Cp0",
+                                                    "softCrop": "Square",
+                                                    "softcropenabled": "enabled",
+                                                    "tmx": "3213 5712 490 490",
+                                                    "xtransform": "translate(-279.99935 -818.59242) scale(0.305153 0.305148)",
+                                                    "targetId": "02a5-20ad7856010e-4fa8926a0dea-1000"
+                                                },
+                                                "elements": []
+                                            },
+                                            {
+                                                "nodeType": "image",
+                                                "attributes": {
+                                                    "src": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/:556x988:dHJhbnNsYXRlKC03ODAuNDgxOTEgLTE2NTAuNTQ5NDkpIHNjYWxlKDAuNjE1MjM1IDAuNjE1Mjgp/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.jpeg?s=y03E3PhIKxFR_NKPzqpjdsFeXKisptYMcmKX3ZLQR-U",
+                                                    "id": "QzEgigcKlaVw7QF",
+                                                    "softCrop": "Portrait",
+                                                    "softcropenabled": "enabled",
+                                                    "tmx": "3213 5712 556 988",
+                                                    "xtransform": "translate(-780.48191 -1650.54949) scale(0.615235 0.61528)",
+                                                    "targetId": "02a5-20ad7856010e-4fa8926a0dea-1000"
+                                                },
+                                                "elements": []
+                                            },
+                                            {
+                                                "nodeType": "image",
+                                                "attributes": {
+                                                    "src": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/:2048x800:dHJhbnNsYXRlKC0yMTAuMjY4NzMgLTIxMDAuNDk0Nykgc2NhbGUoMC43MTc0MSAwLjcxNzQp/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.jpeg?s=w1hePTIemaZYCAitmjxZOIZyrN0VFxIwMSi6sAhCaRc",
+                                                    "id": "Q7zoZJtEaXHk9Ia",
+                                                    "softCrop": "Ultrawide",
+                                                    "softcropenabled": "enabled",
+                                                    "tmx": "3213 5712 2048 800",
+                                                    "xtransform": "translate(-210.26873 -2100.4947) scale(0.71741 0.7174)",
+                                                    "targetId": "02a5-20ad7856010e-4fa8926a0dea-1000"
+                                                },
+                                                "elements": []
+                                            },
+                                            {
+                                                "nodeType": "web-image-caption",
+                                                "attributes": {
+                                                    "id": "QkNcvZyBbZJnZPn"
+                                                },
+                                                "elements": [
+                                                    {
+                                                        "nodeType": "caption",
+                                                        "attributes": {
+                                                            "emxed-trx-captiongroup": "web-image-caption",
+                                                            "emxed-trx-captionsequence": "0",
+                                                            "emxed-trx-captiontitle": "Caption",
+                                                            "emxed-trx-captiontype": "caption",
+                                                            "emxed-trx-iscaption": "true",
+                                                            "id": "QajDyJwisG0jDZG"
+                                                        },
+                                                        "elements": [
+                                                            {
+                                                                "nodeType": "p",
+                                                                "attributes": {
+                                                                    "id": "QdHoZ1WHmiV00zN"
+                                                                },
+                                                                "elements": [
+                                                                    {
+                                                                        "nodeType": "plainText",
+                                                                        "value": "Euro symbol with skyscrapers in Frankfurt, Germany, showcasing urban architecture. "
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    },
+                                                    {
+                                                        "nodeType": "credit",
+                                                        "attributes": {
+                                                            "emxed-trx-captiongroup": "web-image-caption",
+                                                            "emxed-trx-captionsequence": "0",
+                                                            "emxed-trx-captiontitle": "Credit",
+                                                            "emxed-trx-captiontype": "credit",
+                                                            "emxed-trx-iscaption": "true",
+                                                            "id": "Q0VH8CKrfUIo2tQ"
+                                                        },
+                                                        "elements": [
+                                                            {
+                                                                "nodeType": "p",
+                                                                "attributes": {
+                                                                    "id": "QlcOeb5sETHkZin"
+                                                                },
+                                                                "elements": [
+                                                                    {
+                                                                        "nodeType": "plainText",
+                                                                        "value": "Pexels® Image"
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "nodeType": "grouphead",
+                                        "attributes": {},
+                                        "elements": [
+                                            {
+                                                "nodeType": "overhead",
+                                                "attributes": {
+                                                    "id": "QrvBpfASFIMiPFr"
+                                                },
+                                                "elements": [
+                                                    {
+                                                        "nodeType": "p",
+                                                        "attributes": {
+                                                            "id": "QjFdd5ktZzfYg0I"
+                                                        },
+                                                        "elements": [
+                                                            {
+                                                                "nodeType": "plainText",
+                                                                "value": "Breaking News"
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "nodeType": "headline",
+                                                "attributes": {
+                                                    "id": "Qgiee2Wr0xLVMlK"
+                                                },
+                                                "elements": [
+                                                    {
+                                                        "nodeType": "p",
+                                                        "attributes": {
+                                                            "id": "U51552568634NBg"
+                                                        },
+                                                        "elements": [
+                                                            {
+                                                                "nodeType": "plainText",
+                                                                "value": "Shockwaves in Frankfurt: ECB Cuts Rates Amidst Economic Eurozone Downturn??"
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "nodeType": "summary",
+                                        "attributes": {
+                                            "id": "Q2J7REO3QrjWpKX"
+                                        },
+                                        "elements": [
+                                            {
+                                                "nodeType": "p",
+                                                "attributes": {
+                                                    "id": "U41478560024OJc"
+                                                },
+                                                "elements": [
+                                                    {
+                                                        "nodeType": "plainText",
+                                                        "value": "The European Central Bank has unexpectedly reduced its key interest rates by 50 basis points in response to a deteriorating eurozone economy, marking its first emergency action since March 2020, as new data confirmed a technical recession across the region."
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "nodeType": "byline",
+                                        "attributes": {
+                                            "id": "QZ6GJoFWbAE061E"
+                                        },
+                                        "elements": [
+                                            {
+                                                "nodeType": "p",
+                                                "attributes": {
+                                                    "id": "QGkw2hSAS45TyCD"
+                                                },
+                                                "elements": [
+                                                    {
+                                                        "nodeType": "plainText",
+                                                        "value": "the newsroom"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "nodeType": "text",
+                                        "attributes": {
+                                            "id": "QQad6BxXMv160CM"
+                                        },
+                                        "elements": [
+                                            {
+                                                "nodeType": "p",
+                                                "attributes": {
+                                                    "id": "U30042835462oSR"
+                                                },
+                                                "elements": [
+                                                    {
+                                                        "nodeType": "plainText",
+                                                        "value": "The European Central Bank cut its three key interest rates by 50 basis points on Wednesday in a surprise off-cycle decision, bringing the deposit facility rate to 1.50%, as policymakers moved to counter a sharper-than-expected economic downturn across the 20-nation bloc."
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "nodeType": "p",
+                                                "attributes": {
+                                                    "id": "U66657458217Cyd"
+                                                },
+                                                "elements": [
+                                                    {
+                                                        "nodeType": "plainText",
+                                                        "value": "The move — the first emergency rate action since March 2020 — came hours after Eurostat published revised first-quarter GDP figures showing a 0.4% contraction, following a 0.2% decline in the final quarter of 2025, formally tipping the eurozone into a technical recession."
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "nodeType": "p",
+                                                "attributes": {
+                                                    "id": "U00128116733BTs"
+                                                },
+                                                "elements": [
+                                                    {
+                                                        "nodeType": "plainText",
+                                                        "value": "“The Governing Council stands ready to use all instruments within its mandate,” the ECB said in a terse two-paragraph statement released at 13:45 CET, adding that the decision was unanimous."
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "nodeType": "p",
+                                                "attributes": {
+                                                    "id": "U86551424283lbn"
+                                                },
+                                                "elements": [
+                                                    {
+                                                        "nodeType": "plainText",
+                                                        "value": "Markets reacted swiftly: the euro fell 0.9% against the dollar to $1.0640, while European equities reversed earlier losses, with the Euro Stoxx 50 climbing 1.8% in afternoon trading. German 10-year Bund yields dropped nine basis points to 1.87%."
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "nodeType": "p",
+                                                "attributes": {
+                                                    "id": "U38868667455gFb"
+                                                },
+                                                "elements": [
+                                                    {
+                                                        "nodeType": "plainText",
+                                                        "value": "The European Central Bank delivered a surprise 50 basis-point interest rate cut on Wednesday in its first unscheduled policy action in six years, slashing its deposit facility rate to 1.50% after official data confirmed the eurozone had tipped into recession for the first time since the pandemic."
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "nodeType": "p",
+                                                "attributes": {
+                                                    "id": "U46485754011GFO"
+                                                },
+                                                "elements": [
+                                                    {
+                                                        "nodeType": "plainText",
+                                                        "value": "The decision, taken unanimously by the Governing Council in an emergency teleconference, marks a dramatic pivot for an institution that has spent the better part of two years carefully unwinding a historic tightening cycle. As recently as March, ECB President Christine Lagarde had publicly cautioned against reading too much into soft survey data, insisting that the disinflation process remained “on track” and that the Bank would proceed “data-dependent, meeting by meeting.”"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "nodeType": "blockquote",
+                                                "attributes": {
+                                                    "id": "U07422726816uJb"
+                                                },
+                                                "elements": [
+                                                    {
+                                                        "nodeType": "plainText",
+                                                        "value": "Wednesday’s data changed everything."
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "nodeType": "h3",
+                                                "attributes": {
+                                                    "id": "U04718061816xnZ"
+                                                },
+                                                "elements": [
+                                                    {
+                                                        "nodeType": "plainText",
+                                                        "value": "A Recession the Bank Could No Longer Ignore"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "nodeType": "table",
+                                                "attributes": {
+                                                    "emxed-trx-component-type": "table",
+                                                    "emxed-trx-table": "true",
+                                                    "id": "U43302282377jUl",
+                                                    "width": "100%"
+                                                },
+                                                "elements": [
+                                                    {
+                                                        "nodeType": "tr",
+                                                        "attributes": {},
+                                                        "elements": [
+                                                            {
+                                                                "nodeType": "td",
+                                                                "attributes": {},
+                                                                "elements": [
+                                                                    {
+                                                                        "nodeType": "b",
+                                                                        "attributes": {},
+                                                                        "elements": [
+                                                                            {
+                                                                                "nodeType": "plainText",
+                                                                                "value": "Indicator"
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                ]
+                                                            },
+                                                            {
+                                                                "nodeType": "td",
+                                                                "attributes": {},
+                                                                "elements": [
+                                                                    {
+                                                                        "nodeType": "b",
+                                                                        "attributes": {},
+                                                                        "elements": [
+                                                                            {
+                                                                                "nodeType": "plainText",
+                                                                                "value": "Value"
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                ]
+                                                            },
+                                                            {
+                                                                "nodeType": "td",
+                                                                "attributes": {},
+                                                                "elements": [
+                                                                    {
+                                                                        "nodeType": "b",
+                                                                        "attributes": {},
+                                                                        "elements": [
+                                                                            {
+                                                                                "nodeType": "plainText",
+                                                                                "value": "Period"
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    },
+                                                    {
+                                                        "nodeType": "tr",
+                                                        "attributes": {},
+                                                        "elements": [
+                                                            {
+                                                                "nodeType": "td",
+                                                                "attributes": {},
+                                                                "elements": [
+                                                                    {
+                                                                        "nodeType": "plainText",
+                                                                        "value": "Eurozone GDP Growth"
+                                                                    }
+                                                                ]
+                                                            },
+                                                            {
+                                                                "nodeType": "td",
+                                                                "attributes": {},
+                                                                "elements": [
+                                                                    {
+                                                                        "nodeType": "plainText",
+                                                                        "value": "-0.4%"
+                                                                    }
+                                                                ]
+                                                            },
+                                                            {
+                                                                "nodeType": "td",
+                                                                "attributes": {},
+                                                                "elements": [
+                                                                    {
+                                                                        "nodeType": "plainText",
+                                                                        "value": "Q1 2026"
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    },
+                                                    {
+                                                        "nodeType": "tr",
+                                                        "attributes": {},
+                                                        "elements": [
+                                                            {
+                                                                "nodeType": "td",
+                                                                "attributes": {},
+                                                                "elements": [
+                                                                    {
+                                                                        "nodeType": "plainText",
+                                                                        "value": "Initial Estimate"
+                                                                    }
+                                                                ]
+                                                            },
+                                                            {
+                                                                "nodeType": "td",
+                                                                "attributes": {},
+                                                                "elements": [
+                                                                    {
+                                                                        "nodeType": "plainText",
+                                                                        "value": "-0.1%"
+                                                                    }
+                                                                ]
+                                                            },
+                                                            {
+                                                                "nodeType": "td",
+                                                                "attributes": {},
+                                                                "elements": [
+                                                                    {
+                                                                        "nodeType": "plainText",
+                                                                        "value": "Q1 2026"
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    },
+                                                    {
+                                                        "nodeType": "tr",
+                                                        "attributes": {},
+                                                        "elements": [
+                                                            {
+                                                                "nodeType": "td",
+                                                                "attributes": {},
+                                                                "elements": [
+                                                                    {
+                                                                        "nodeType": "plainText",
+                                                                        "value": "Previous Quarter Growth"
+                                                                    }
+                                                                ]
+                                                            },
+                                                            {
+                                                                "nodeType": "td",
+                                                                "attributes": {},
+                                                                "elements": [
+                                                                    {
+                                                                        "nodeType": "plainText",
+                                                                        "value": "-0.2%"
+                                                                    }
+                                                                ]
+                                                            },
+                                                            {
+                                                                "nodeType": "td",
+                                                                "attributes": {},
+                                                                "elements": [
+                                                                    {
+                                                                        "nodeType": "plainText",
+                                                                        "value": "Q4 2025"
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    },
+                                                    {
+                                                        "nodeType": "tr",
+                                                        "attributes": {},
+                                                        "elements": [
+                                                            {
+                                                                "nodeType": "td",
+                                                                "attributes": {},
+                                                                "elements": [
+                                                                    {
+                                                                        "nodeType": "plainText",
+                                                                        "value": "Germany GDP Growth"
+                                                                    }
+                                                                ]
+                                                            },
+                                                            {
+                                                                "nodeType": "td",
+                                                                "attributes": {},
+                                                                "elements": [
+                                                                    {
+                                                                        "nodeType": "plainText",
+                                                                        "value": "-0.7%"
+                                                                    }
+                                                                ]
+                                                            },
+                                                            {
+                                                                "nodeType": "td",
+                                                                "attributes": {},
+                                                                "elements": [
+                                                                    {
+                                                                        "nodeType": "plainText",
+                                                                        "value": "Q1 2026"
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    },
+                                                    {
+                                                        "nodeType": "tr",
+                                                        "attributes": {},
+                                                        "elements": [
+                                                            {
+                                                                "nodeType": "td",
+                                                                "attributes": {},
+                                                                "elements": [
+                                                                    {
+                                                                        "nodeType": "plainText",
+                                                                        "value": "France GDP Growth"
+                                                                    }
+                                                                ]
+                                                            },
+                                                            {
+                                                                "nodeType": "td",
+                                                                "attributes": {},
+                                                                "elements": [
+                                                                    {
+                                                                        "nodeType": "plainText",
+                                                                        "value": "-0.4%"
+                                                                    }
+                                                                ]
+                                                            },
+                                                            {
+                                                                "nodeType": "td",
+                                                                "attributes": {},
+                                                                "elements": [
+                                                                    {
+                                                                        "nodeType": "plainText",
+                                                                        "value": "Q1 2026"
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    },
+                                                    {
+                                                        "nodeType": "tr",
+                                                        "attributes": {},
+                                                        "elements": [
+                                                            {
+                                                                "nodeType": "td",
+                                                                "attributes": {},
+                                                                "elements": [
+                                                                    {
+                                                                        "nodeType": "plainText",
+                                                                        "value": "Italy GDP Growth"
+                                                                    }
+                                                                ]
+                                                            },
+                                                            {
+                                                                "nodeType": "td",
+                                                                "attributes": {},
+                                                                "elements": [
+                                                                    {
+                                                                        "nodeType": "plainText",
+                                                                        "value": "-0.5%"
+                                                                    }
+                                                                ]
+                                                            },
+                                                            {
+                                                                "nodeType": "td",
+                                                                "attributes": {},
+                                                                "elements": [
+                                                                    {
+                                                                        "nodeType": "plainText",
+                                                                        "value": "Q1 2026"
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    },
+                                                    {
+                                                        "nodeType": "tr",
+                                                        "attributes": {},
+                                                        "elements": [
+                                                            {
+                                                                "nodeType": "td",
+                                                                "attributes": {},
+                                                                "elements": [
+                                                                    {
+                                                                        "nodeType": "plainText",
+                                                                        "value": "Spain GDP Growth"
+                                                                    }
+                                                                ]
+                                                            },
+                                                            {
+                                                                "nodeType": "td",
+                                                                "attributes": {},
+                                                                "elements": [
+                                                                    {
+                                                                        "nodeType": "plainText",
+                                                                        "value": "0.2%"
+                                                                    }
+                                                                ]
+                                                            },
+                                                            {
+                                                                "nodeType": "td",
+                                                                "attributes": {},
+                                                                "elements": [
+                                                                    {
+                                                                        "nodeType": "plainText",
+                                                                        "value": "Q1 2026"
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    },
+                                                    {
+                                                        "nodeType": "tr",
+                                                        "attributes": {},
+                                                        "elements": [
+                                                            {
+                                                                "nodeType": "td",
+                                                                "attributes": {},
+                                                                "elements": [
+                                                                    {
+                                                                        "nodeType": "plainText",
+                                                                        "value": "Headline Inflation"
+                                                                    }
+                                                                ]
+                                                            },
+                                                            {
+                                                                "nodeType": "td",
+                                                                "attributes": {},
+                                                                "elements": [
+                                                                    {
+                                                                        "nodeType": "plainText",
+                                                                        "value": "1.6%"
+                                                                    }
+                                                                ]
+                                                            },
+                                                            {
+                                                                "nodeType": "td",
+                                                                "attributes": {},
+                                                                "elements": [
+                                                                    {
+                                                                        "nodeType": "plainText",
+                                                                        "value": "April 2026"
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "nodeType": "p",
+                                                "attributes": {
+                                                    "id": "U75441513282YcE"
+                                                },
+                                                "elements": [
+                                                    {
+                                                        "nodeType": "plainText",
+                                                        "value": "Eurostat’s revised GDP figures, released at 10:00 CET, showed the eurozone economy contracted 0.4% in the first quarter of 2026 — considerably worse than the initial estimate of -0.1% — following a 0.2% decline in the fourth quarter of last year. The two consecutive quarters of negative growth met the technical definition of a recession, triggering what one senior ECB official, speaking on condition of anonymity, called “a fundamentally different policy calculus.”"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "nodeType": "p",
+                                                "attributes": {
+                                                    "id": "U13312146866wNP"
+                                                },
+                                                "elements": [
+                                                    {
+                                                        "nodeType": "plainText",
+                                                        "value": "Germany remained the bloc’s principal drag, with Europe’s largest economy posting a 0.7% quarterly contraction as its industrial sector continued to suffer from weak Chinese demand and the lingering effects of higher energy costs. France and Italy also contracted by 0,4% and 0,5%, while Spain offered the only meaningful bright spot among the major economies, eking out 0.2% growth."
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "nodeType": "p",
+                                                "attributes": {
+                                                    "id": "U63008578807rIP"
+                                                },
+                                                "elements": [
+                                                    {
+                                                        "nodeType": "plainText",
+                                                        "value": "Headline inflation for April, also published this week, fell to 1.6% — the first time the ECB’s preferred measure has come in below the 2% target in over four years."
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "nodeType": "p",
+                                                "attributes": {
+                                                    "id": "U30512833351YUN"
+                                                },
+                                                "elements": [
+                                                    {
+                                                        "nodeType": "plainText",
+                                                        "value": "“When both legs of our assessment — growth and inflation — move in the same direction simultaneously, the case for action becomes compelling,” Lagarde said at a press conference at ECB headquarters in Frankfurt. “The Governing Council acted today because the data demanded it.”"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "nodeType": "teaser",
+                                "attributes": {
+                                    "id": "QaTM5CQq8Q6Z4om"
+                                },
+                                "elements": [
+                                    {
+                                        "nodeType": "web-image-group",
+                                        "attributes": {
+                                            "id": "Qyitj3hPppazYd7"
+                                        },
+                                        "elements": [
+                                            {
+                                                "nodeType": "image",
+                                                "attributes": {
+                                                    "id": "QqOsUY1aG7CYyHz",
+                                                    "softCrop": "Wide"
+                                                },
+                                                "elements": []
+                                            },
+                                            {
+                                                "nodeType": "image",
+                                                "attributes": {
+                                                    "id": "QQ2pQwpOXBi90Bd",
+                                                    "softCrop": "Square"
+                                                },
+                                                "elements": []
+                                            },
+                                            {
+                                                "nodeType": "image",
+                                                "attributes": {
+                                                    "id": "QWcqIGF2CQVIT0G",
+                                                    "softCrop": "Portrait"
+                                                },
+                                                "elements": []
+                                            },
+                                            {
+                                                "nodeType": "image",
+                                                "attributes": {
+                                                    "id": "Q8ySiKFr5ReyvVR",
+                                                    "softCrop": "Ultrawide"
+                                                },
+                                                "elements": []
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "nodeType": "grouphead",
+                                        "attributes": {},
+                                        "elements": [
+                                            {
+                                                "nodeType": "headline",
+                                                "attributes": {
+                                                    "id": "QJwwwy22V9nSNnH"
+                                                },
+                                                "elements": [
+                                                    {
+                                                        "nodeType": "p",
+                                                        "attributes": {
+                                                            "id": "QapYwo0ooXRYvz9"
+                                                        },
+                                                        "elements": []
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "nodeType": "summary",
+                                        "attributes": {
+                                            "id": "QrCbcOJdkrQ0dH7"
+                                        },
+                                        "elements": [
+                                            {
+                                                "nodeType": "p",
+                                                "attributes": {
+                                                    "id": "QUizIrmkPFh7kKb"
+                                                },
+                                                "elements": []
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "nodeType": "style",
+                                "attributes": {
+                                    "id": "U40204871081ALH",
+                                    "type": "text/css"
+                                },
+                                "elements": [
+                                    {
+                                        "nodeType": "plainText",
+                                        "value": "{}\n#U40204871081ALH {\ndisplay: none;\n}\n"
+                                    }
+                                ]
+                            }
+                        ],
+                        "attributes": {
+                            "id": "QEmI7a4IJ6uw3hQ"
+                        },
+                        "nodeType": "doc"
+                    },
+                    "jsonFileEmbeddedNoImage": true
+                }
+            },
+            "links": {
+                "hyperlink": {
+                    "image": [
+                        {
+                            "targetId": "02a5-20ad7856010e-4fa8926a0dea-1000",
+                            "metadata": {
+                                "metadataType": "generic",
+                                "softCrops": {
+                                    "Ultrawide": {
+                                        "id": "Q7zoZJtEaXHk9Ia",
+                                        "tmx": "3213 5712 2048 800",
+                                        "xtransform": "translate(-210.26873 -2100.4947) scale(0.71741 0.7174)"
+                                    },
+                                    "Wide": {
+                                        "id": "Qxvq6MY0uvfMImF",
+                                        "tmx": "3213 5712 1200 675",
+                                        "xtransform": "translate(-123.20434 -1127.65268) scale(0.420357 0.420357)"
+                                    },
+                                    "Square": {
+                                        "id": "QXIvxaLLNb74Cp0",
+                                        "tmx": "3213 5712 490 490",
+                                        "xtransform": "translate(-279.99935 -818.59242) scale(0.305153 0.305148)"
+                                    },
+                                    "Portrait": {
+                                        "id": "QzEgigcKlaVw7QF",
+                                        "tmx": "3213 5712 556 988",
+                                        "xtransform": "translate(-780.48191 -1650.54949) scale(0.615235 0.61528)"
+                                    }
+                                },
+                                "groupId": "QaJH5JLjtkzRMR0"
+                            },
+                            "dynamicCropsResourceUrls": {
+                                "Square_thumb": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/thumb:490x490:dHJhbnNsYXRlKC0yNzkuOTk5MzUgLTgxOC41OTI0Mikgc2NhbGUoMC4zMDUxNTMgMC4zMDUxNDgp/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=z7E65G5aLu-5EGwRVMSWdLbZN46SAyq6lOTimHMsofM",
+                                "Ultrawide_large": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/large:2048x800:dHJhbnNsYXRlKC0yMTAuMjY4NzMgLTIxMDAuNDk0Nykgc2NhbGUoMC43MTc0MSAwLjcxNzQp/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=92aRLPn6Dy72mfOT0wIfI23jEG6iRLcJh7ivEHJPm7Q",
+                                "Wide_large": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/large:1200x675:dHJhbnNsYXRlKC0xMjMuMjA0MzQgLTExMjcuNjUyNjgpIHNjYWxlKDAuNDIwMzU3IDAuNDIwMzU3KQ==/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=UeFN3Zq9Aeggt_WgO6Ljal7iblNoeERmLeqlu1PuCvQ",
+                                "Portrait_small": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/small:556x988:dHJhbnNsYXRlKC03ODAuNDgxOTEgLTE2NTAuNTQ5NDkpIHNjYWxlKDAuNjE1MjM1IDAuNjE1Mjgp/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=gPCBrg9ZcVWxwriZnWhYS7wH09WNcjXplhxzboIvSJQ",
+                                "Ultrawide_small": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/small:2048x800:dHJhbnNsYXRlKC0yMTAuMjY4NzMgLTIxMDAuNDk0Nykgc2NhbGUoMC43MTc0MSAwLjcxNzQp/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=sLmeZZ76zr4taIPRsRvrzFX7zKBA0-MkDWWH8ELFWQY",
+                                "Square_large": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/large:490x490:dHJhbnNsYXRlKC0yNzkuOTk5MzUgLTgxOC41OTI0Mikgc2NhbGUoMC4zMDUxNTMgMC4zMDUxNDgp/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=RFkjlYhBz_N1rmXUrAcLGeo74mcGiG06Nrn3BXAw4vc",
+                                "Ultrawide_thumb": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/thumb:2048x800:dHJhbnNsYXRlKC0yMTAuMjY4NzMgLTIxMDAuNDk0Nykgc2NhbGUoMC43MTc0MSAwLjcxNzQp/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=7NVlzGFlQuwGMvm6SuqAWHN07OMmIFaq34oscglYYQ0",
+                                "Wide_thumb": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/thumb:1200x675:dHJhbnNsYXRlKC0xMjMuMjA0MzQgLTExMjcuNjUyNjgpIHNjYWxlKDAuNDIwMzU3IDAuNDIwMzU3KQ==/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=qrS1p499Q5S6ZKStB2ZiWK66P_glriaduEVxITXIRi8",
+                                "Square_small": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/small:490x490:dHJhbnNsYXRlKC0yNzkuOTk5MzUgLTgxOC41OTI0Mikgc2NhbGUoMC4zMDUxNTMgMC4zMDUxNDgp/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=G-amJlGCqLNq-IqIOxix8mOFzGmlVZ8-Gr_N91flKwE",
+                                "Wide_small": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/small:1200x675:dHJhbnNsYXRlKC0xMjMuMjA0MzQgLTExMjcuNjUyNjgpIHNjYWxlKDAuNDIwMzU3IDAuNDIwMzU3KQ==/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=ShcE_63CjaFphgv10glqniB0V0WUzipxP7CaOsE0QOc",
+                                "Portrait_thumb": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/thumb:556x988:dHJhbnNsYXRlKC03ODAuNDgxOTEgLTE2NTAuNTQ5NDkpIHNjYWxlKDAuNjE1MjM1IDAuNjE1Mjgp/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=zjJ5SX93KfLbv6BGlNounnQTm7mJXm20VUVPKKn8kxE",
+                                "Portrait_large": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/large:556x988:dHJhbnNsYXRlKC03ODAuNDgxOTEgLTE2NTAuNTQ5NDkpIHNjYWxlKDAuNjE1MjM1IDAuNjE1Mjgp/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=Nu6RaVXNem70FLzB1j-og38yJYLYUiWkRrHQDWTzfUg"
+                            }
+                        }
+                    ]
+                },
+                "system": {
+                    "mainPicture": [
+                        {
+                            "targetId": "02a5-20ad7856010e-4fa8926a0dea-1000",
+                            "metadata": {
+                                "metadataType": "generic",
+                                "softCrops": {
+                                    "Ultrawide": {
+                                        "id": "Q7zoZJtEaXHk9Ia",
+                                        "tmx": "3213 5712 2048 800",
+                                        "xtransform": "translate(-210.26873 -2100.4947) scale(0.71741 0.7174)"
+                                    },
+                                    "Wide": {
+                                        "id": "Qxvq6MY0uvfMImF",
+                                        "tmx": "3213 5712 1200 675",
+                                        "xtransform": "translate(-123.20434 -1127.65268) scale(0.420357 0.420357)"
+                                    },
+                                    "Square": {
+                                        "id": "QXIvxaLLNb74Cp0",
+                                        "tmx": "3213 5712 490 490",
+                                        "xtransform": "translate(-279.99935 -818.59242) scale(0.305153 0.305148)"
+                                    },
+                                    "Portrait": {
+                                        "id": "QzEgigcKlaVw7QF",
+                                        "tmx": "3213 5712 556 988",
+                                        "xtransform": "translate(-780.48191 -1650.54949) scale(0.615235 0.61528)"
+                                    }
+                                },
+                                "groupId": "QaJH5JLjtkzRMR0",
+                                "caption": "Euro symbol with skyscrapers in Frankfurt, Germany, showcasing urban architecture.",
+                                "credit": "Pexels® Image"
+                            },
+                            "dynamicCropsResourceUrls": {
+                                "Square_thumb": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/thumb:490x490:dHJhbnNsYXRlKC0yNzkuOTk5MzUgLTgxOC41OTI0Mikgc2NhbGUoMC4zMDUxNTMgMC4zMDUxNDgp/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=z7E65G5aLu-5EGwRVMSWdLbZN46SAyq6lOTimHMsofM",
+                                "Ultrawide_large": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/large:2048x800:dHJhbnNsYXRlKC0yMTAuMjY4NzMgLTIxMDAuNDk0Nykgc2NhbGUoMC43MTc0MSAwLjcxNzQp/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=92aRLPn6Dy72mfOT0wIfI23jEG6iRLcJh7ivEHJPm7Q",
+                                "Wide_large": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/large:1200x675:dHJhbnNsYXRlKC0xMjMuMjA0MzQgLTExMjcuNjUyNjgpIHNjYWxlKDAuNDIwMzU3IDAuNDIwMzU3KQ==/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=UeFN3Zq9Aeggt_WgO6Ljal7iblNoeERmLeqlu1PuCvQ",
+                                "Portrait_small": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/small:556x988:dHJhbnNsYXRlKC03ODAuNDgxOTEgLTE2NTAuNTQ5NDkpIHNjYWxlKDAuNjE1MjM1IDAuNjE1Mjgp/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=gPCBrg9ZcVWxwriZnWhYS7wH09WNcjXplhxzboIvSJQ",
+                                "Ultrawide_small": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/small:2048x800:dHJhbnNsYXRlKC0yMTAuMjY4NzMgLTIxMDAuNDk0Nykgc2NhbGUoMC43MTc0MSAwLjcxNzQp/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=sLmeZZ76zr4taIPRsRvrzFX7zKBA0-MkDWWH8ELFWQY",
+                                "Square_large": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/large:490x490:dHJhbnNsYXRlKC0yNzkuOTk5MzUgLTgxOC41OTI0Mikgc2NhbGUoMC4zMDUxNTMgMC4zMDUxNDgp/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=RFkjlYhBz_N1rmXUrAcLGeo74mcGiG06Nrn3BXAw4vc",
+                                "Ultrawide_thumb": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/thumb:2048x800:dHJhbnNsYXRlKC0yMTAuMjY4NzMgLTIxMDAuNDk0Nykgc2NhbGUoMC43MTc0MSAwLjcxNzQp/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=7NVlzGFlQuwGMvm6SuqAWHN07OMmIFaq34oscglYYQ0",
+                                "Wide_thumb": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/thumb:1200x675:dHJhbnNsYXRlKC0xMjMuMjA0MzQgLTExMjcuNjUyNjgpIHNjYWxlKDAuNDIwMzU3IDAuNDIwMzU3KQ==/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=qrS1p499Q5S6ZKStB2ZiWK66P_glriaduEVxITXIRi8",
+                                "Square_small": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/small:490x490:dHJhbnNsYXRlKC0yNzkuOTk5MzUgLTgxOC41OTI0Mikgc2NhbGUoMC4zMDUxNTMgMC4zMDUxNDgp/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=G-amJlGCqLNq-IqIOxix8mOFzGmlVZ8-Gr_N91flKwE",
+                                "Wide_small": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/small:1200x675:dHJhbnNsYXRlKC0xMjMuMjA0MzQgLTExMjcuNjUyNjgpIHNjYWxlKDAuNDIwMzU3IDAuNDIwMzU3KQ==/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=ShcE_63CjaFphgv10glqniB0V0WUzipxP7CaOsE0QOc",
+                                "Portrait_thumb": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/thumb:556x988:dHJhbnNsYXRlKC03ODAuNDgxOTEgLTE2NTAuNTQ5NDkpIHNjYWxlKDAuNjE1MjM1IDAuNjE1Mjgp/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=zjJ5SX93KfLbv6BGlNounnQTm7mJXm20VUVPKKn8kxE",
+                                "Portrait_large": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/format/large:556x988:dHJhbnNsYXRlKC03ODAuNDgxOTEgLTE2NTAuNTQ5NDkpIHNjYWxlKDAuNjE1MjM1IDAuNjE1Mjgp/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.webp?s=Nu6RaVXNem70FLzB1j-og38yJYLYUiWkRrHQDWTzfUg"
+                            }
+                        }
+                    ]
+                }
+            },
+            "url": "/news/02a5-20ad774f194d-039932bedf88-1000/index.html",
+            "resourceUrl": "/resources/02a5-20ad774f194d-039932bedf88-1000/shockwaves_in_frankfurt_ecb_cuts_rates_amidst_economic_eurozone_downturn_.json",
+            "picture": "02a5-20ad7856010e-4fa8926a0dea-1000",
+            "dataType": "node",
+            "etag": "02a5-20ad774f194d-039932bedf88-1000-359390696817"
+        },
+        "dataType": "node",
+        "nodes": {
+            "02a5-20ad7856010e-4fa8926a0dea-1000": {
+                "id": "02a5-20ad7856010e-4fa8926a0dea-1000",
+                "pubInfo": {
+                    "publicationTime": "2026-05-21T11:58:27.387Z",
+                    "visible": true
+                },
+                "attributes": {
+                    "tags": []
+                },
+                "files": {
+                    "content": {
+                        "mimeType": "image/jpeg",
+                        "data": null,
+                        "jsonFileEmbeddedNoImage": false
+                    }
+                },
+                "resourceUrl": "/resources/02a5-20ad7856010e-4fa8926a0dea-1000/euro_symbol_with_skyscrapers_in_frankfurt_germany_showcasing_urban_architecture._originalwidthxoriginalheigth.jpeg",
+                "dataType": "node"
+            }
+        },
+        "defaultContent": false,
+        "lastModified": 1779461096817,
+        "etag": "02a5-20ad7856010e-4fa8926a0dea-1000-359294307387/1779461096817/-994040497",
+        "contentLength": 0,
+        "children": [],
+        "errors": [],
+        "totalPages": 0,
+        "builder": "cfg:F1BD9C7DAE0BB13FAEF4A38A56DA223E:2026-05-22T06:13:10.269Z",
+        "buildDate": "2026-05-22T14:44:57.484Z",
+        "modelSourceClass": "com.eidosmedia.portal.impl.content.aggregation.ConfigBasedModelBuilder",
+        "invalidationPriority": 4,
+        "page": 1,
+        "aggregators": [],
+        "builtByConfigModelBuilder": true
+    },
+    "writebackMetadataMaxSize": 4096
+}

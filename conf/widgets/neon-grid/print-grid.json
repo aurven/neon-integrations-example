@@ -1,0 +1,50 @@
+{
+  "title": "Print Articles Grid",
+  "demoData": "search-results.json",
+  "fields": [
+    { "key": "headline", "source": "title" },
+    { "key": "summary", "source": "summary" },
+    { "key": "type", "derived": "typeLabel" },
+    { "key": "date", "source": "updateTs" },
+    { "key": "status", "derived": "status" },
+    { "key": "statusColor", "derived": "statusColor" },
+    { "key": "printSection", "source": "nodeMeta.printSection" },
+    { "key": "printPriority", "derived": "printPriority" },
+    { "key": "issueDate", "derived": "issueDate" },
+    { "key": "printDiffusion", "source": "nodeMeta.printDiffusion" }
+  ],
+  "columns": [
+    { "field": "headline", "headerName": "Title", "type": "headline", "flex": 5, "minWidth": 260, "sortable": true, "filter": true },
+    { "field": "type", "headerName": "Type", "type": "badge", "width": 130, "sortable": true, "filter": true, "options": [] },
+    { "field": "date", "headerName": "Date", "type": "date", "width": 180, "sortable": true },
+    { "field": "status", "headerName": "Status", "type": "status", "width": 130, "sortable": true, "filter": true },
+    { "field": "printPriority", "headerName": "Print Priority", "type": "select", "width": 140, "editable": true, "sortable": true, "filter": true,
+      "metadataXpath": "/ObjectMetadata/DistributionChannels/Print/PrintPriority",
+      "options": [
+        { "value": 1, "label": "P1", "color": "#d6362f" },
+        { "value": 2, "label": "P2", "color": "#cf5a6e" },
+        { "value": 3, "label": "P3", "color": "#b072c7" },
+        { "value": 4, "label": "P4", "color": "#7a93dd" },
+        { "value": 5, "label": "P5", "color": "#5fb3e6" }
+      ] },
+    { "field": "issueDate", "headerName": "Issue Date", "type": "date", "dateFormat": "ddmmyyyy", "width": 140, "editable": true, "sortable": true, "filter": true,
+      "metadataXpath": "/ObjectMetadata/DistributionChannels/Print/PrintIssueDate", "isDate": true },
+    { "field": "printSection", "headerName": "Print Section", "type": "select", "width": 160, "editable": true, "sortable": true, "filter": true,
+      "metadataXpath": "/ObjectMetadata/DistributionChannels/Print/PrintSection",
+      "options": [
+        { "value": "/Product/Front",    "label": "Front Page", "color": "#0A2EE6" },
+        { "value": "/Product/World",    "label": "World",      "color": "#2563eb" },
+        { "value": "/Product/Politics", "label": "Politics",   "color": "#7c3aed" },
+        { "value": "/Product/Business", "label": "Business",   "color": "#d97706" },
+        { "value": "/Product/Comment",  "label": "Comment",    "color": "#64748b" },
+        { "value": "/Product/Culture",  "label": "Culture",    "color": "#9333ea" },
+        { "value": "/Product/Sport",    "label": "Sport",      "color": "#16a34a" }
+      ] },
+    { "field": "printDiffusion", "headerName": "Print Diffusion", "type": "select", "width": 140, "editable": true, "sortable": true, "filter": true,
+      "metadataXpath": "/ObjectMetadata/Diffusion/Diff_Print",
+      "options": [
+        { "value": "yes", "label": "Yes", "color": "#3aa76d" },
+        { "value": "no",  "label": "No",  "color": "#9ca3af" }
+      ] }
+  ]
+}

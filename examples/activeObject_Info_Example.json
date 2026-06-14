@@ -1,0 +1,988 @@
+{
+    "channel": "neutral",
+    "channels": [
+        {
+            "attributes": {},
+            "name": "NextFrontier",
+            "calendar": {
+                "type": "DAILY",
+                "firstIssue": 1,
+                "midnightCorrection": -24
+            },
+            "displayName": "NextFrontier",
+            "editions": [
+                {
+                    "code": "English-US",
+                    "name": "English-US",
+                    "language": "en-us",
+                    "isDefault": false
+                },
+                {
+                    "code": "Chinese",
+                    "name": "Chinese",
+                    "language": "zh",
+                    "isDefault": false
+                },
+                {
+                    "code": "Japanese",
+                    "name": "Japanese",
+                    "language": "ja",
+                    "isDefault": false
+                }
+            ],
+            "stylesheets": [
+                {
+                    "href": "/common/styles/css/main.css",
+                    "defaultEntry": false,
+                    "isDefault": false
+                },
+                {
+                    "href": "/common/styles/css/shared/external-fonts.css",
+                    "defaultEntry": false,
+                    "isDefault": false
+                },
+                {
+                    "href": "/common/styles/css/shared/shared-elements.css",
+                    "defaultEntry": false,
+                    "isDefault": false
+                },
+                {
+                    "href": "/common/styles/css/web/neutral-channel.css",
+                    "defaultEntry": false,
+                    "isDefault": false
+                },
+                {
+                    "href": "/common/styles/css/web/alt-teaser-view.css",
+                    "defaultEntry": false,
+                    "title": "Teaser",
+                    "label": "Teaser",
+                    "isDefault": false
+                }
+            ],
+            "type": "site",
+            "cobaltSite": false
+        },
+        {
+            "attributes": {},
+            "name": "SportsArena",
+            "calendar": {
+                "type": "DAILY",
+                "firstIssue": 1,
+                "midnightCorrection": -24
+            },
+            "displayName": "SportsArena",
+            "editions": [
+                {
+                    "code": "French",
+                    "name": "French",
+                    "language": "fr",
+                    "isDefault": false
+                },
+                {
+                    "code": "English-US",
+                    "name": "English-US",
+                    "language": "en-us",
+                    "isDefault": false
+                },
+                {
+                    "code": "German",
+                    "name": "German",
+                    "language": "de",
+                    "isDefault": false
+                },
+                {
+                    "code": "English-UK",
+                    "name": "English-UK",
+                    "language": "en-uk",
+                    "isDefault": false
+                },
+                {
+                    "code": "Italian",
+                    "name": "Italian",
+                    "language": "it",
+                    "isDefault": false
+                },
+                {
+                    "code": "Spanish",
+                    "name": "Spanish",
+                    "language": "es",
+                    "isDefault": false
+                }
+            ],
+            "stylesheets": [
+                {
+                    "href": "/common/styles/css/main.css",
+                    "defaultEntry": false,
+                    "isDefault": false
+                },
+                {
+                    "href": "/common/styles/css/shared/external-fonts.css",
+                    "defaultEntry": false,
+                    "isDefault": false
+                },
+                {
+                    "href": "/common/styles/css/shared/shared-elements.css",
+                    "defaultEntry": false,
+                    "isDefault": false
+                },
+                {
+                    "href": "/common/styles/css/web/neutral-channel.css",
+                    "defaultEntry": false,
+                    "isDefault": false
+                },
+                {
+                    "href": "/common/styles/css/web/alt-teaser-view.css",
+                    "defaultEntry": false,
+                    "title": "Teaser",
+                    "label": "Teaser",
+                    "isDefault": false
+                }
+            ],
+            "type": "site",
+            "cobaltSite": false
+        },
+        {
+            "attributes": {},
+            "name": "TheGlobe",
+            "calendar": {
+                "type": "DAILY",
+                "firstIssue": 1,
+                "midnightCorrection": -24
+            },
+            "displayName": "TheGlobe",
+            "editions": [
+                {
+                    "code": "French",
+                    "name": "French",
+                    "language": "fr",
+                    "isDefault": false
+                },
+                {
+                    "code": "English-US",
+                    "name": "English-US",
+                    "language": "en-us",
+                    "isDefault": false
+                },
+                {
+                    "code": "Chinese",
+                    "name": "Chinese",
+                    "language": "zh",
+                    "isDefault": false
+                },
+                {
+                    "code": "German",
+                    "name": "German",
+                    "language": "de",
+                    "isDefault": false
+                },
+                {
+                    "code": "English-UK",
+                    "name": "English-UK",
+                    "language": "en-uk",
+                    "isDefault": false
+                },
+                {
+                    "code": "Japanese",
+                    "name": "Japanese",
+                    "language": "ja",
+                    "isDefault": false
+                },
+                {
+                    "code": "Italian",
+                    "name": "Italian",
+                    "language": "it",
+                    "isDefault": false
+                },
+                {
+                    "code": "Spanish",
+                    "name": "Spanish",
+                    "language": "es",
+                    "isDefault": false
+                }
+            ],
+            "stylesheets": [
+                {
+                    "href": "/common/styles/css/main.css",
+                    "defaultEntry": false,
+                    "isDefault": false
+                },
+                {
+                    "href": "/common/styles/css/shared/external-fonts.css",
+                    "defaultEntry": false,
+                    "isDefault": false
+                },
+                {
+                    "href": "/common/styles/css/shared/shared-elements.css",
+                    "defaultEntry": false,
+                    "isDefault": false
+                },
+                {
+                    "href": "/common/styles/css/web/neutral-channel.css",
+                    "defaultEntry": false,
+                    "isDefault": false
+                },
+                {
+                    "href": "/common/styles/css/web/alt-teaser-view.css",
+                    "defaultEntry": false,
+                    "title": "Teaser",
+                    "label": "Teaser",
+                    "isDefault": false
+                }
+            ],
+            "type": "site",
+            "cobaltSite": false
+        },
+        {
+            "attributes": {},
+            "name": "Neutral",
+            "calendar": {
+                "type": "DAILY",
+                "firstIssue": 1,
+                "midnightCorrection": -24
+            },
+            "displayName": "Neutral",
+            "editions": [
+                {
+                    "code": "English-US",
+                    "name": "English-US",
+                    "language": "en-us",
+                    "isDefault": true
+                },
+                {
+                    "code": "English-UK",
+                    "name": "English-UK",
+                    "language": "en-uk",
+                    "isDefault": false
+                },
+                {
+                    "code": "Italian",
+                    "name": "Italian",
+                    "language": "it",
+                    "isDefault": false
+                }
+            ],
+            "stylesheets": [
+                {
+                    "href": "/common/styles/css/main.css",
+                    "defaultEntry": false,
+                    "isDefault": false
+                },
+                {
+                    "href": "/common/styles/css/shared/external-fonts.css",
+                    "defaultEntry": false,
+                    "isDefault": false
+                },
+                {
+                    "href": "/common/styles/css/shared/shared-elements.css",
+                    "defaultEntry": false,
+                    "isDefault": false
+                },
+                {
+                    "href": "/common/styles/css/web/neutral-channel.css",
+                    "defaultEntry": false,
+                    "isDefault": false
+                },
+                {
+                    "href": "/common/styles/css/web/alt-teaser-view.css",
+                    "defaultEntry": false,
+                    "title": "Teaser",
+                    "label": "Teaser",
+                    "isDefault": false
+                }
+            ],
+            "type": "none",
+            "cobaltSite": false
+        }
+    ],
+    "id": "029d-1ebac56cd59b-f75238955afa-1000",
+    "nodeRef": "029d-1ebac56cd59b-f75238955afa-1000-n1",
+    "dbId": "cobalt",
+    "type": "article",
+    "pstate": {
+        "uuid": "029d-1ebac56cd59b-f75238955afa-1000"
+    },
+    "name": "SEC Unveils Bold Climate Disclosure Rules, Sparking Industry Debate and Legal Challenges",
+    "creator": "Aureliano",
+    "created": 1758026631,
+    "last_modifier": "Aureliano",
+    "modified": 1758026631,
+    "locked": 1758025102,
+    "status_info": {
+        "name": "Story/Ready",
+        "identifier": "rgb(112, 214, 255)",
+        "instanceId": "5e71248b-fe16-47d0-ae70-624aa0865d26",
+        "statusId": "Activity_0zi898t"
+    },
+    "path": "/Convergent/News/News Stories/2025/09/15/SECProposesNewClimateDisclosureRulesforPublicCompanies.xml",
+    "issueDate": "20250915",
+    "bundle": true,
+    "bundlechild": false,
+    "workspaceName": "Convergent",
+    "workspaceRootRef": "0800-ce83b8a34e5e-6e84ff0e1b81-2002",
+    "system_attributes": {
+        "templateName": "story.xml",
+        "workFolder": "/Convergent/News",
+        "productInfo": {
+            "name": "neutral",
+            "issueDate": "20250915"
+        },
+        "title": "SEC Unveils Bold Climate Disclosure Rules, Sparking Industry Debate and Legal Challenges",
+        "summary": "The SEC has proposed new climate disclosure regulations that would require public companies to report climate-related risks and emissions in their annual filings. These rules could significantly increase compliance costs for Fortune 500 companies, with a phased timeline for implementation beginning in 2024.",
+        "wordCount": 753,
+        "process": null,
+        "workfolder": "/Convergent/News",
+        "channel": "neutral"
+    },
+    "system_attributes_xml": "<props>\n\t<templateName>story.xml</templateName>\n<productInfo><name>neutral</name><issueDate>20250915</issueDate></productInfo><lang>en-us</lang><workFolder>/Convergent/News</workFolder><title>SEC Unveils Bold Climate Disclosure Rules, Sparking Industry Debate and Legal Challenges</title><summary>The SEC has proposed new climate disclosure regulations that would require public companies to report climate-related risks and emissions in their annual filings. These rules could significantly increase compliance costs for Fortune 500 companies, with a phased timeline for implementation beginning in 2024.</summary><wordCount>753</wordCount></props>",
+    "system_attributes_json": {
+        "props": {
+            "templateName": "story.xml",
+            "workFolder": "/Convergent/News",
+            "productInfo": {
+                "name": "neutral",
+                "issueDate": "20250915"
+            },
+            "title": "SEC Unveils Bold Climate Disclosure Rules, Sparking Industry Debate and Legal Challenges",
+            "summary": "The SEC has proposed new climate disclosure regulations that would require public companies to report climate-related risks and emissions in their annual filings. These rules could significantly increase compliance costs for Fortune 500 companies, with a phased timeline for implementation beginning in 2024.",
+            "wordCount": 753,
+            "process": null
+        }
+    },
+    "attributes": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE ObjectMetadata SYSTEM \"/common/rules/classify.dtd\">\n<ObjectMetadata>\n    <General>\n        <MainCategory>\n            <SuggestedSubjects>\n                <group/>\n                <SuggestedSubject/>\n            </SuggestedSubjects>\n            <SuggestedPeoples>\n                <group/>\n                <SuggestedPeople/>\n            </SuggestedPeoples>\n        </MainCategory>\n        <NewsCode/>\n        <IndustrySegment/>\n        <GeographicalPlaces>\n            <Address/>\n            <City/>\n            <State/>\n            <Zip/>\n            <Country/>\n            <Latitude/>\n            <Longitude/>\n        </GeographicalPlaces>\n        <ContentType>article</ContentType>\n        <Language/>\n        <Author/>\n        <Fee/>\n        <People/>\n        <Companies>\n            <Company/>\n            <Country/>\n        </Companies>\n        <coverage_type/>\n        <Keywords/>\n        <Comment/>\n        <Headline/>\n        <WordCount/>\n        <Priority/>\n    </General>\n    <DistributionChannels>\n        <OnLine>\n            <WebPage/>\n            <WebType/>\n            <WebPortalPath/>\n            <WebPortalCategory/>\n            <WebSections/>\n            <WebPriority/>\n            <WebObjectType/>\n            <WebDateTimePubStart/>\n            <WebDateTimePubEnd>20160908114300</WebDateTimePubEnd>\n            <AllowUserComments/>\n            <SpecialType/>\n            <StartDate/>\n            <EndDate/>\n        </OnLine>\n        <Radio>\n            <RadioBroadcastDateTime/>\n            <RadioProgram/>\n            <RadioObjectType/>\n        </Radio>\n        <TV>\n            <TVBroadcastDateTime/>\n            <TVProgram/>\n            <TVObjectType/>\n        </TV>\n        <Sms/>\n        <Mms/>\n        <Syndication/>\n        <Gallery/>\n        <Blog>\n            <BlogSection/>\n            <BlogDate/>\n        </Blog>\n        <Output>\n            <Queue/>\n            <PriorityQueue/>\n            <Embargo/>\n        </Output>\n    </DistributionChannels>\n    <Diffusion>\n        <Diff_Print/>\n        <Diff_Web/>\n        <Diff_Syndication/>\n    </Diffusion>\n</ObjectMetadata>",
+    "originalNode": {
+        "type": "node",
+        "nodeRef": "029d-1ebac56cd59b-f75238955afa-1000-n1",
+        "title": "SEC Unveils Bold Climate Disclosure Rules, Sparking Industry Debate and Legal Challenges",
+        "typeName": "article",
+        "nodeMeta": {
+            "teaser": {
+                "title": null,
+                "summary": null
+            },
+            "contentIds": {
+                "teaserTitle": "UqJO3h1qjbmlfZ",
+                "teaserSummary": "UI6mtGw84Zjhwa",
+                "title": "UpVXpuoUwOv85W",
+                "summary": "Ud6gz2fEeeXzLK"
+            }
+        },
+        "linkedNodeRefs": {
+            "hyperlink": {
+                "image": [
+                    {
+                        "ref": "029d-1ebac56e0f46-559a9d88ec1a-1000-n337875252510",
+                        "linkMeta": {
+                            "baseType": "image",
+                            "type": "image",
+                            "metadataType": "generic",
+                            "softCrops": {
+                                "Wide": {
+                                    "id": "UvUXPHF92a5IUk",
+                                    "tmx": "2560 1440 1200 675",
+                                    "xtransform": "scale(0.46875 0.46875)"
+                                },
+                                "Square": {
+                                    "id": "UI4QU2sogVa8Zl",
+                                    "tmx": "2560 1440 490 490",
+                                    "xtransform": "translate(-304.75354 -32.27565) scale(0.371835 0.37183)"
+                                },
+                                "Ultrawide": {
+                                    "id": "UMovEzZmdrNOhq",
+                                    "tmx": "2560 1440 2048 800",
+                                    "xtransform": "translate(0 -175.99265) scale(0.8 0.79999)"
+                                },
+                                "Portrait": {
+                                    "id": "UuCS2KtMRn9bWR",
+                                    "tmx": "2560 1440 556 988",
+                                    "xtransform": "translate(-716.95506 -24.07038) scale(0.727843 0.727895)"
+                                }
+                            },
+                            "groupId": "Ua8dWpyQFXmJVi"
+                        },
+                        "key": 1537228672809129000,
+                        "keyString": "1537228672809128960"
+                    },
+                    {
+                        "ref": "029d-1ebac6a525c5-5f069c8110b3-1000-n337875457327",
+                        "linkMeta": {
+                            "baseType": "image",
+                            "type": "image",
+                            "metadataType": "generic",
+                            "softCrops": {
+                                "Ultrawide": {
+                                    "id": "U78775067775vKK",
+                                    "tmx": "1900 1520 2048 800",
+                                    "xtransform": "scale(1.077895 1.077895)"
+                                },
+                                "Square": {
+                                    "id": "U82330823065pLR",
+                                    "tmx": "1900 1520 490 490",
+                                    "xtransform": "scale(0.322368 0.322368)"
+                                },
+                                "Portrait": {
+                                    "id": "U51422285475RLQ",
+                                    "tmx": "1900 1520 556 988",
+                                    "xtransform": "scale(0.65 0.65)"
+                                },
+                                "Wide": {
+                                    "id": "U15088216431Qtu",
+                                    "tmx": "1900 1520 1200 675",
+                                    "xtransform": "scale(0.63158 0.63158)"
+                                }
+                            },
+                            "groupId": "U23184414364XZJ"
+                        },
+                        "key": 2767011611056432600,
+                        "keyString": "2767011611056432640"
+                    },
+                    {
+                        "ref": "029d-1ebaaa26f4ae-383d3b7a5d82-1000-n337870675287",
+                        "linkMeta": {
+                            "baseType": "image",
+                            "type": "image",
+                            "metadataType": "generic",
+                            "softCrops": {
+                                "Ultrawide": {
+                                    "id": "U88184388785bKi",
+                                    "tmx": "1420.08 770.16 2048 800",
+                                    "xtransform": "scale(104.323254 104.323254)"
+                                },
+                                "Wide": {
+                                    "id": "U03654150144FMd",
+                                    "tmx": "1420.08 770.16 1200 675",
+                                    "xtransform": "scale(63.400283 63.399321)"
+                                },
+                                "Square": {
+                                    "id": "U72117643353nWl",
+                                    "tmx": "1420.08 770.16 490 490",
+                                    "xtransform": "scale(46.023725 46.023725)"
+                                },
+                                "Portrait": {
+                                    "id": "U57680350786Zkm",
+                                    "tmx": "1420.08 770.16 556 988",
+                                    "xtransform": "scale(92.798854 92.798854)"
+                                }
+                            },
+                            "groupId": "AUTOID00000003"
+                        },
+                        "key": 3504881374004815000,
+                        "keyString": "3504881374004814720"
+                    },
+                    {
+                        "ref": "029d-1eba8c1f87e2-fa64a7b7d3d0-1000-n337865637751",
+                        "linkMeta": {
+                            "baseType": "image",
+                            "type": "image",
+                            "metadataType": "generic",
+                            "softCrops": {
+                                "Wide": {
+                                    "id": "U42571666316Fgj",
+                                    "tmx": "633 421 1200 675",
+                                    "xtransform": "scale(1.895735 1.895735)"
+                                },
+                                "Portrait": {
+                                    "id": "U42284562474zbh",
+                                    "tmx": "633 421 556 988",
+                                    "xtransform": "scale(2.346796 2.346796)"
+                                },
+                                "Ultrawide": {
+                                    "id": "U52642171446FxU",
+                                    "tmx": "633 421 2048 800",
+                                    "xtransform": "scale(3.235388 3.235388)"
+                                },
+                                "Square": {
+                                    "id": "U80750417455gqK",
+                                    "tmx": "633 421 490 490",
+                                    "xtransform": "scale(1.163894 1.163894)"
+                                }
+                            },
+                            "groupId": "AUTOID00000003"
+                        },
+                        "key": 3947603231773844000,
+                        "keyString": "3947603231773843968"
+                    },
+                    {
+                        "ref": "029d-1ebac6a525c5-5f069c8110b3-1000-n337875457327",
+                        "linkMeta": {
+                            "baseType": "image",
+                            "type": "image",
+                            "metadataType": "generic",
+                            "softCrops": {
+                                "Wide": {
+                                    "id": "U12158350407OVb",
+                                    "tmx": "1900 1520 1200 675",
+                                    "xtransform": "scale(0.63158 0.63158)"
+                                },
+                                "Portrait": {
+                                    "id": "U02103244842ocP",
+                                    "tmx": "1900 1520 556 988",
+                                    "xtransform": "scale(0.65 0.65)"
+                                },
+                                "Ultrawide": {
+                                    "id": "U48761102356EPl",
+                                    "tmx": "1900 1520 2048 800",
+                                    "xtransform": "scale(1.077897 1.077897)"
+                                },
+                                "Square": {
+                                    "id": "U00063157567MbL",
+                                    "tmx": "1900 1520 490 490",
+                                    "xtransform": "scale(0.322368 0.322368)"
+                                }
+                            },
+                            "groupId": "AUTOID00000003"
+                        },
+                        "key": 4213236346435261400,
+                        "keyString": "4213236346435261536"
+                    },
+                    {
+                        "ref": "029d-1ebac56e0f46-559a9d88ec1a-1000-n337875252510",
+                        "linkMeta": {
+                            "baseType": "image",
+                            "type": "image",
+                            "metadataType": "generic",
+                            "softCrops": {
+                                "Ultrawide": {
+                                    "id": "U04486206447BIB",
+                                    "tmx": "2560 1440 2048 800",
+                                    "xtransform": "scale(0.8 0.8)"
+                                },
+                                "Wide": {
+                                    "id": "U56420540230PbO",
+                                    "tmx": "2560 1440 1200 675",
+                                    "xtransform": "scale(0.46875 0.46875)"
+                                },
+                                "Square": {
+                                    "id": "U15738883523wFk",
+                                    "tmx": "2560 1440 490 490",
+                                    "xtransform": "scale(0.340278 0.340278)"
+                                },
+                                "Portrait": {
+                                    "id": "U81842832326rxb",
+                                    "tmx": "2560 1440 556 988",
+                                    "xtransform": "scale(0.686111 0.686111)"
+                                }
+                            },
+                            "groupId": "AUTOID00000003"
+                        },
+                        "key": 4372616215232112000,
+                        "keyString": "4372616215232112064"
+                    },
+                    {
+                        "ref": "029d-1ebacfdf23a7-7a8adec0b2c4-1000-n337877004604",
+                        "linkMeta": {
+                            "baseType": "image",
+                            "type": "image/pexelsimage",
+                            "metadataType": "generic",
+                            "softCrops": {
+                                "Portrait": {
+                                    "id": "U16288024804pHF",
+                                    "tmx": "6000 4000 556 988",
+                                    "xtransform": "scale(0.247 0.247)"
+                                },
+                                "Square": {
+                                    "id": "U18831425047RRs",
+                                    "tmx": "6000 4000 490 490",
+                                    "xtransform": "scale(0.1225 0.1225)"
+                                },
+                                "Ultrawide": {
+                                    "id": "U18356642841lzD",
+                                    "tmx": "6000 4000 2048 800",
+                                    "xtransform": "scale(0.341332 0.341332)"
+                                },
+                                "Wide": {
+                                    "id": "U86824731714ydm",
+                                    "tmx": "6000 4000 1200 675",
+                                    "xtransform": "scale(0.2 0.2)"
+                                }
+                            },
+                            "groupId": "U64001255880Sgj"
+                        },
+                        "key": 4468244136510222300,
+                        "keyString": "4468244136510222400"
+                    }
+                ],
+                "anchor": [
+                    {
+                        "ref": "029d-1eba8a8ab070-cbf86829e0e1-1000-n337866214248",
+                        "linkMeta": {
+                            "baseType": "article",
+                            "type": "article",
+                            "metadataType": "generic",
+                            "groupId": "U74836280721Gpz"
+                        },
+                        "key": 1537228672809129000,
+                        "keyString": "1537228672809128960"
+                    }
+                ]
+            },
+            "system": {
+                "mainPicture": [
+                    {
+                        "ref": "029d-1ebac56e0f46-559a9d88ec1a-1000-n337875252510",
+                        "linkMeta": {
+                            "baseType": "image",
+                            "type": "image",
+                            "metadataType": "generic",
+                            "softCrops": {
+                                "Wide": {
+                                    "id": "UvUXPHF92a5IUk",
+                                    "tmx": "2560 1440 1200 675",
+                                    "xtransform": "scale(0.46875 0.46875)"
+                                },
+                                "Square": {
+                                    "id": "UI4QU2sogVa8Zl",
+                                    "tmx": "2560 1440 490 490",
+                                    "xtransform": "translate(-304.75354 -32.27565) scale(0.371835 0.37183)"
+                                },
+                                "Ultrawide": {
+                                    "id": "UMovEzZmdrNOhq",
+                                    "tmx": "2560 1440 2048 800",
+                                    "xtransform": "translate(0 -175.99265) scale(0.8 0.79999)"
+                                },
+                                "Portrait": {
+                                    "id": "UuCS2KtMRn9bWR",
+                                    "tmx": "2560 1440 556 988",
+                                    "xtransform": "translate(-716.95506 -24.07038) scale(0.727843 0.727895)"
+                                }
+                            },
+                            "groupId": "Ua8dWpyQFXmJVi"
+                        },
+                        "key": 1537228672809129000,
+                        "keyString": "1537228672809128960"
+                    }
+                ]
+            }
+        },
+        "metadataGroups": {
+            "eom": {
+                "attributes": {
+                    "xml": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE ObjectMetadata SYSTEM \"/common/rules/classify.dtd\">\n<ObjectMetadata>\n    <General>\n        <MainCategory>\n            <SuggestedSubjects>\n                <group/>\n                <SuggestedSubject/>\n            </SuggestedSubjects>\n            <SuggestedPeoples>\n                <group/>\n                <SuggestedPeople/>\n            </SuggestedPeoples>\n        </MainCategory>\n        <NewsCode/>\n        <IndustrySegment/>\n        <GeographicalPlaces>\n            <Address/>\n            <City/>\n            <State/>\n            <Zip/>\n            <Country/>\n            <Latitude/>\n            <Longitude/>\n        </GeographicalPlaces>\n        <ContentType>article</ContentType>\n        <Language/>\n        <Author/>\n        <Fee/>\n        <People/>\n        <Companies>\n            <Company/>\n            <Country/>\n        </Companies>\n        <coverage_type/>\n        <Keywords/>\n        <Comment/>\n        <Headline/>\n        <WordCount/>\n        <Priority/>\n    </General>\n    <DistributionChannels>\n        <OnLine>\n            <WebPage/>\n            <WebType/>\n            <WebPortalPath/>\n            <WebPortalCategory/>\n            <WebSections/>\n            <WebPriority/>\n            <WebObjectType/>\n            <WebDateTimePubStart/>\n            <WebDateTimePubEnd>20160908114300</WebDateTimePubEnd>\n            <AllowUserComments/>\n            <SpecialType/>\n            <StartDate/>\n            <EndDate/>\n        </OnLine>\n        <Radio>\n            <RadioBroadcastDateTime/>\n            <RadioProgram/>\n            <RadioObjectType/>\n        </Radio>\n        <TV>\n            <TVBroadcastDateTime/>\n            <TVProgram/>\n            <TVObjectType/>\n        </TV>\n        <Sms/>\n        <Mms/>\n        <Syndication/>\n        <Gallery/>\n        <Blog>\n            <BlogSection/>\n            <BlogDate/>\n        </Blog>\n        <Output>\n            <Queue/>\n            <PriorityQueue/>\n            <Embargo/>\n        </Output>\n    </DistributionChannels>\n    <Diffusion>\n        <Diff_Print/>\n        <Diff_Web/>\n        <Diff_Syndication/>\n    </Diffusion>\n</ObjectMetadata>"
+                },
+                "sys_attributes": {
+                    "xml": "<props>\n\t<templateName>story.xml</templateName>\n<productInfo><name>neutral</name><issueDate>20250915</issueDate></productInfo><lang>en-us</lang><workFolder>/Convergent/News</workFolder><title>SEC Unveils Bold Climate Disclosure Rules, Sparking Industry Debate and Legal Challenges</title><summary>The SEC has proposed new climate disclosure regulations that would require public companies to report climate-related risks and emissions in their annual filings. These rules could significantly increase compliance costs for Fortune 500 companies, with a phased timeline for implementation beginning in 2024.</summary><wordCount>753</wordCount></props>"
+                },
+                "sys_attributes_json": {
+                    "templateName": "story.xml",
+                    "workFolder": "/Convergent/News",
+                    "productInfo": {
+                        "name": "neutral",
+                        "issueDate": "20250915"
+                    },
+                    "title": "SEC Unveils Bold Climate Disclosure Rules, Sparking Industry Debate and Legal Challenges",
+                    "summary": "The SEC has proposed new climate disclosure regulations that would require public companies to report climate-related risks and emissions in their annual filings. These rules could significantly increase compliance costs for Fortune 500 companies, with a phased timeline for implementation beginning in 2024.",
+                    "wordCount": 753,
+                    "process": null
+                }
+            }
+        },
+        "versionInfo": {
+            "prevTsVersion": -337956231538,
+            "taxonomiesUpdateTsVersion": "2025-09-15T14:14:09.944Z",
+            "metaUpdateTsVersion": "2025-09-16T12:43:51.531Z",
+            "metaGroupsUpdateTsVersion": "2025-09-16T12:43:51.531Z",
+            "filesUpdateTsVersion": "2025-09-16T12:43:51.095Z",
+            "linksUpdateTsVersion": "2025-09-16T12:18:35.394Z",
+            "createVersionUserRef": {
+                "userId": "62038d84-f161-3579-a5f1-7aba053f999a",
+                "alias": "Aureliano"
+            },
+            "createVersionTime": "2025-09-16T12:43:51.554Z",
+            "createFamilyUserRef": {
+                "userId": "62038d84-f161-3579-a5f1-7aba053f999a",
+                "alias": "Aureliano"
+            },
+            "createFamilyTime": "2025-09-15T14:14:09.944Z",
+            "updateVersionUserRef": {
+                "userId": "62038d84-f161-3579-a5f1-7aba053f999a",
+                "alias": "Aureliano"
+            },
+            "updateVersionTime": "2025-09-16T12:43:51.554Z",
+            "updateContextId": "neon-app:954ad5e0c199750bb9fdae5619c27b8b6d766095591be31b2f5a0c827d72add8",
+            "permissionInfo": {
+                "lastTsUpdate": "2025-09-15T14:14:10.019Z",
+                "lastUserUpdate": {
+                    "userId": "62038d84-f161-3579-a5f1-7aba053f999a",
+                    "alias": "Aureliano"
+                },
+                "owner": {
+                    "userId": "62038d84-f161-3579-a5f1-7aba053f999a",
+                    "alias": "Aureliano"
+                }
+            },
+            "versionNumber": {
+                "major": 8,
+                "minor": 3,
+                "live": false
+            },
+            "workflowInfo": {
+                "type": "WorkflowInfo",
+                "workflow": "Story/Ready",
+                "instanceId": "5e71248b-fe16-47d0-ae70-624aa0865d26",
+                "statusId": "Activity_0zi898t",
+                "color": "rgb(112, 214, 255)",
+                "description": "Stories ready to be published"
+            },
+            "versionStatus": 0
+        },
+        "publishInfos": {
+            "SportsArena": {
+                "type": "NodePublishInfo",
+                "siteId": "401c-ff374c9adf0f-95777f25901b-2000",
+                "siteName": "SportsArena",
+                "publishKey": {
+                    "publishKey": "029d-1ebac56cd59b-f75238955afa-1000"
+                },
+                "nodeFamilyRef": "029d-1ebac56cd59b-f75238955afa-1000",
+                "stageTs": "2025-09-16T12:18:40.846Z",
+                "stageTsVersion": -337954715420,
+                "liveSourceTsVersion": -337954715420,
+                "liveTsVersion": 337954720846,
+                "latestTsVersion": -337956231538,
+                "lastModified": "2025-09-16T12:43:51.540Z",
+                "liveFirstPublicationDate": "2025-09-15T14:23:26.387Z",
+                "externalRef": "trello:68a71b39030e98bd21e44678",
+                "externalSource": "Trello",
+                "sitePrimaryParentPath": "/news/",
+                "sitePrimaryParent": "401c-983208711bea-e82f4140f3b0-2001",
+                "liveUserRef": {
+                    "userId": "62038d84-f161-3579-a5f1-7aba053f999a",
+                    "alias": "Aureliano"
+                },
+                "stageUserRef": {
+                    "userId": "62038d84-f161-3579-a5f1-7aba053f999a",
+                    "alias": "Aureliano"
+                },
+                "latestUserRef": {
+                    "userId": "62038d84-f161-3579-a5f1-7aba053f999a",
+                    "alias": "Aureliano"
+                },
+                "priority": 4,
+                "paywallLevel": "FREE"
+            },
+            "NextFrontier": {
+                "type": "NodePublishInfo",
+                "siteId": "4081-5a4c9e3d0b22-9288ec8303bc-2000",
+                "siteName": "NextFrontier",
+                "publishKey": {
+                    "publishKey": "029d-1ebac56cd59b-f75238955afa-1000"
+                },
+                "nodeFamilyRef": "029d-1ebac56cd59b-f75238955afa-1000",
+                "stageTs": "2025-09-16T12:18:40.846Z",
+                "stageTsVersion": -337954715420,
+                "liveSourceTsVersion": -337954715420,
+                "liveTsVersion": 337954720846,
+                "latestTsVersion": -337956231538,
+                "lastModified": "2025-09-16T12:43:51.540Z",
+                "liveFirstPublicationDate": "2025-09-15T14:23:26.387Z",
+                "externalRef": "trello:68a71b39030e98bd21e44678",
+                "externalSource": "Trello",
+                "sitePrimaryParentPath": "/news/",
+                "sitePrimaryParent": "4081-d88e2ea79217-de123169735e-2001",
+                "liveUserRef": {
+                    "userId": "62038d84-f161-3579-a5f1-7aba053f999a",
+                    "alias": "Aureliano"
+                },
+                "stageUserRef": {
+                    "userId": "62038d84-f161-3579-a5f1-7aba053f999a",
+                    "alias": "Aureliano"
+                },
+                "latestUserRef": {
+                    "userId": "62038d84-f161-3579-a5f1-7aba053f999a",
+                    "alias": "Aureliano"
+                },
+                "priority": 4,
+                "paywallLevel": "FREE"
+            },
+            "TheGlobe": {
+                "type": "NodePublishInfo",
+                "siteId": "4081-6ae2db5a299f-683d6269f078-2000",
+                "siteName": "TheGlobe",
+                "publishKey": {
+                    "publishKey": "029d-1ebac56cd59b-f75238955afa-1000"
+                },
+                "nodeFamilyRef": "029d-1ebac56cd59b-f75238955afa-1000",
+                "stageTs": "2025-09-16T12:18:40.846Z",
+                "stageTsVersion": -337954715420,
+                "liveSourceTsVersion": -337954715420,
+                "liveTsVersion": 337954734609,
+                "latestTsVersion": -337956231538,
+                "lastModified": "2025-09-16T12:43:51.543Z",
+                "liveFirstPublicationDate": "2025-09-15T14:20:07.787Z",
+                "externalRef": "trello:68a71b39030e98bd21e44678",
+                "externalSource": "Trello",
+                "sitePrimaryParentPath": "/news/",
+                "sitePrimaryParent": "4081-ab90884aa751-cf0947743b46-2001",
+                "liveUserRef": {
+                    "userId": "62038d84-f161-3579-a5f1-7aba053f999a",
+                    "alias": "Aureliano"
+                },
+                "stageUserRef": {
+                    "userId": "62038d84-f161-3579-a5f1-7aba053f999a",
+                    "alias": "Aureliano"
+                },
+                "latestUserRef": {
+                    "userId": "62038d84-f161-3579-a5f1-7aba053f999a",
+                    "alias": "Aureliano"
+                },
+                "priority": 4,
+                "paywallLevel": "FREE",
+                "webhookData": {
+                    "methodeHook": {
+                        "storyId": "33$1.0.70944063",
+                        "imageReferences": {
+                            "029d-1ebac56e0f46-559a9d88ec1a-1000": {
+                                "loid": "33$1.0.71004254",
+                                "uuid": "55a4c04c-92d8-11f0-9239-013c86249785",
+                                "path": "/Production/Product/Pictures/2025-09/17/SEC-Building-iStock-155235616-scaled-1-e1690412051179_20250915141410.jpeg",
+                                "fileref": "/Production/Product/Pictures/2025-09/17/SEC-Building-iStock-155235616-scaled-1-e1690412051179_20250915141410.jpeg?uuid=55a4c04c-92d8-11f0-9239-013c86249785",
+                                "width": 2560,
+                                "height": 1440
+                            },
+                            "029d-1ebac6a525c5-5f069c8110b3-1000": {
+                                "loid": "33$1.0.71000104",
+                                "uuid": "5611145e-92d8-11f0-9239-013c86249785",
+                                "path": "/Production/Product/Pictures/2025-09/17/68b56c34c92950c3bddf9ede-7663_20250915141734.png",
+                                "fileref": "/Production/Product/Pictures/2025-09/17/68b56c34c92950c3bddf9ede-7663_20250915141734.png?uuid=5611145e-92d8-11f0-9239-013c86249785",
+                                "width": 1900,
+                                "height": 1520
+                            },
+                            "029d-1ebaaa26f4ae-383d3b7a5d82-1000": {
+                                "loid": "33$1.0.71007704",
+                                "uuid": "565eb402-92d8-11f0-9239-013c86249785",
+                                "path": "/Production/Product/Pictures/2025-09/17/GTS-eventcollection-webheaders-2025 (1)_20250915125754.png",
+                                "fileref": "/Production/Product/Pictures/2025-09/17/GTS-eventcollection-webheaders-2025 (1)_20250915125754.png?uuid=565eb402-92d8-11f0-9239-013c86249785",
+                                "width": 5917,
+                                "height": 3209
+                            },
+                            "029d-1eba8c1f87e2-fa64a7b7d3d0-1000": {
+                                "loid": "33$1.0.71007533",
+                                "uuid": "56c761d2-92d8-11f0-9239-013c86249785",
+                                "path": "/Production/Product/Pictures/2025-09/17/Lisa Cook FED 2025_20250915113356.jpeg",
+                                "fileref": "/Production/Product/Pictures/2025-09/17/Lisa Cook FED 2025_20250915113356.jpeg?uuid=56c761d2-92d8-11f0-9239-013c86249785",
+                                "width": 633,
+                                "height": 421
+                            },
+                            "029d-1ebacfdf23a7-7a8adec0b2c4-1000": {
+                                "loid": "33$1.0.71002264",
+                                "uuid": "5810a01c-92d8-11f0-9239-013c86249785",
+                                "path": "/Production/Product/Pictures/2025-09/17/pexels-photo-33866528-o-o.jpeg",
+                                "fileref": "/Production/Product/Pictures/2025-09/17/pexels-photo-33866528-o-o.jpeg?uuid=5810a01c-92d8-11f0-9239-013c86249785",
+                                "width": 6000,
+                                "height": 4000
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "fileItems": {
+            "story": {
+                "type": "fileItem",
+                "fileItemRef": {
+                    "name": "story",
+                    "mountPointId": 0,
+                    "folderingSchema": 8,
+                    "ownerTsVersion": -337956231538,
+                    "fileUpdateTs": 1758026631102
+                },
+                "versionNumber": {
+                    "major": 1,
+                    "minor": 14,
+                    "live": false
+                },
+                "fileName": "SECProposesNewClimateDisclosureRulesforPublicCompanies.xml",
+                "fileEncoding": "UTF-8",
+                "mimeType": "text/xml",
+                "contentLength": 26952,
+                "updateUser": {
+                    "userId": "62038d84-f161-3579-a5f1-7aba053f999a",
+                    "alias": "Aureliano"
+                },
+                "createUser": {
+                    "userId": "62038d84-f161-3579-a5f1-7aba053f999a",
+                    "alias": "Aureliano"
+                },
+                "creationDate": "2025-09-16T12:43:51.102Z",
+                "fileMeta": null
+            }
+        },
+        "categories": {
+            "primary_section": [
+                {
+                    "names": "/news/"
+                }
+            ]
+        },
+        "permissions": {
+            "permissionMap": {
+                "nodeKey:029d-1ebac56cd59b-f75238955afa-1000": {
+                    "permissionKey": "nodeKey:029d-1ebac56cd59b-f75238955afa-1000",
+                    "inherited": {
+                        "inheritable": {
+                            "editor": [
+                                "eeb5c72f-9b01-495f-9fd9-de51b9fcbe03"
+                            ]
+                        },
+                        "*": {
+                            "editor": [
+                                "eeb5c72f-9b01-495f-9fd9-de51b9fcbe03"
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "authors": [
+            "Aureliano"
+        ],
+        "externalRef": "trello:68a71b39030e98bd21e44678",
+        "externalSource": "Trello",
+        "summary": "The SEC has proposed new climate disclosure regulations that would require public companies to report climate-related risks and emissions in their annual filings. These rules could significantly increase compliance costs for Fortune 500 companies, with a phased timeline for implementation beginning in 2024.",
+        "workspaceLinkInfo": {
+            "workspaceName": "Convergent",
+            "workspaceRootRef": "0800-ce83b8a34e5e-6e84ff0e1b81-2002",
+            "workspaceUriPath": "/Convergent/News/News Stories/2025/09/15/SECProposesNewClimateDisclosureRulesforPublicCompanies.xml",
+            "workspaceFolderRef": "0800-dd38310f4ab8-6ba7e700230c-200a",
+            "workspaceFolderPath": "/Convergent/News/",
+            "workspaceBaseFolderRef": "0800-ab3689fef522-07180ffeda17-200b",
+            "workspaceBaseFolderPath": "/Convergent/News/News Stories/",
+            "name": "SECProposesNewClimateDisclosureRulesforPublicCompanies.xml",
+            "lastModifier": {
+                "userId": "62038d84-f161-3579-a5f1-7aba053f999a",
+                "alias": "Aureliano"
+            }
+        },
+        "updateTs": "2025-09-16T12:43:51.024Z",
+        "familyRef": "029d-1ebac56cd59b-f75238955afa-1000",
+        "lockInfos": {
+            "USER": {
+                "sourceTsVersion": -337956231538,
+                "userUpdateRef": {
+                    "userId": "62038d84-f161-3579-a5f1-7aba053f999a",
+                    "userName": "Aureliano",
+                    "updateContextId": "neon-app:954ad5e0c199750bb9fdae5619c27b8b6d766095591be31b2f5a0c827d72add8"
+                },
+                "locked": "2025-09-16T12:18:22.361Z"
+            }
+        }
+    },
+    "rootStoryId": "029d-1ebac56cd59b-f75238955afa-1000",
+    "documentId": "029d-1ebac56cd59b-f75238955afa-1000",
+    "storyId": "029d-1ebac56cd59b-f75238955afa-1000",
+    "trackChange": false,
+    "workfolder": "/Convergent/News",
+    "templateName": "story.xml",
+    "resetInfo": null,
+    "locker": {
+        "id": "62038d84-f161-3579-a5f1-7aba053f999a",
+        "fullName": "Aureliano",
+        "updateContextId": "neon-app:954ad5e0c199750bb9fdae5619c27b8b6d766095591be31b2f5a0c827d72add8"
+    },
+    "newtaskdocument": null,
+    "statusInfo": {
+        "name": "Story/Ready",
+        "identifier": "rgb(112, 214, 255)",
+        "instanceId": "5e71248b-fe16-47d0-ae70-624aa0865d26",
+        "statusId": "Activity_0zi898t"
+    }
+}

@@ -6,8 +6,16 @@ let currentArticleId = null;
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Mobile Client initialized');
-    loadArticles();
-    
+
+    // Only load articles if they weren't already rendered by the server
+    const articlesContainer = document.getElementById('articlesContainer');
+    const emptyState = document.getElementById('emptyState');
+
+    // If neither exists, the page was loaded without server-side rendering, so fetch articles
+    if (!articlesContainer && !emptyState) {
+        loadArticles();
+    }
+
     // Register handlebars helper if needed
     if (typeof Handlebars !== 'undefined') {
         Handlebars.registerHelper('formatDate', function(dateString) {
@@ -81,21 +89,27 @@ async function loadArticles() {
 }
 
 function displayArticles(articles) {
-    const container = document.getElementById('articlesContainer');
-    const emptyState = document.getElementById('emptyState');
-    
+    const mainContent = document.querySelector('.main-content');
+
     if (!articles || articles.length === 0) {
-        container.style.display = 'none';
-        emptyState.style.display = 'block';
+        // Show empty state
+        mainContent.innerHTML = `
+            <div class="empty-state" id="emptyState">
+                <i class="fas fa-file-alt"></i>
+                <h3>No Articles Found</h3>
+                <p>Create your first article to get started.</p>
+                <button class="btn btn-primary" onclick="createNewArticle()">
+                    <i class="fas fa-plus"></i> Create First Article
+                </button>
+            </div>
+        `;
         return;
     }
-    
-    container.style.display = 'flex';
-    emptyState.style.display = 'none';
-    
-    // Clear existing articles
-    container.innerHTML = '';
-    
+
+    // Create container for articles
+    mainContent.innerHTML = '<div class="articles-container" id="articlesContainer"></div>';
+    const container = document.getElementById('articlesContainer');
+
     // Add each article
     articles.forEach(article => {
         const articleCard = createArticleCard(article);
@@ -106,19 +120,28 @@ function displayArticles(articles) {
 function createArticleCard(article) {
     const card = document.createElement('div');
     card.className = 'article-card';
-    card.setAttribute('data-uuid', article.uuid);
-    
-    const formattedDate = formatDate(article.lastModified);
-    const statusClass = `status-${article.status}`;
-    
+
+    // Use familyRef as the main ID
+    const articleId = article.familyRef || article.uuid;
+    card.setAttribute('data-uuid', articleId);
+
+    const formattedDate = formatDate(article.updateTs);
+
+    // Extract workflow info
+    const workflowLabel = article.workflowInfo?.workflow || 'Unknown';
+    const workflowColor = article.workflowInfo?.color || 'rgb(150, 150, 150)';
+
     card.innerHTML = `
         <div class="article-header">
             <h3 class="article-title">${escapeHtml(article.title)}</h3>
-            <span class="article-status ${statusClass}">${article.status}</span>
+            <span class="article-status-chip">
+                <span class="status-dot" style="background-color: ${workflowColor};"></span>
+                ${escapeHtml(workflowLabel)}
+            </span>
         </div>
-        
-        <p class="article-summary">${escapeHtml(article.summary)}</p>
-        
+
+        <p class="article-summary">${escapeHtml(article.nodeMeta?.teaser?.title || article.title)}</p>
+
         <div class="article-meta">
             <span class="article-date">
                 <i class="fas fa-clock"></i>
@@ -126,23 +149,23 @@ function createArticleCard(article) {
             </span>
             <span class="article-uuid">
                 <i class="fas fa-fingerprint"></i>
-                ${article.uuid}
+                ${articleId}
             </span>
         </div>
-        
+
         <div class="article-actions">
-            <button class="btn btn-secondary" onclick="editArticle('${article.uuid}')">
+            <button class="btn btn-secondary" onclick="editArticle('${articleId}')">
                 <i class="fas fa-edit"></i> Edit
             </button>
-            <button class="btn btn-info" onclick="viewArticle('${article.uuid}')">
+            <button class="btn btn-info" onclick="viewArticle('${articleId}')">
                 <i class="fas fa-eye"></i> View
             </button>
-            <button class="btn btn-danger" onclick="deleteArticle('${article.uuid}')">
+            <button class="btn btn-danger" onclick="deleteArticle('${articleId}')">
                 <i class="fas fa-trash"></i> Delete
             </button>
         </div>
     `;
-    
+
     return card;
 }
 
@@ -186,36 +209,46 @@ function findArticleById(articleId) {
 
 function checkIfEmpty() {
     const container = document.getElementById('articlesContainer');
-    const emptyState = document.getElementById('emptyState');
-    
-    if (container.children.length === 0) {
-        container.style.display = 'none';
-        emptyState.style.display = 'block';
+    if (container && container.children.length === 0) {
+        const mainContent = document.querySelector('.main-content');
+        mainContent.innerHTML = `
+            <div class="empty-state" id="emptyState">
+                <i class="fas fa-file-alt"></i>
+                <h3>No Articles Found</h3>
+                <p>Create your first article to get started.</p>
+                <button class="btn btn-primary" onclick="createNewArticle()">
+                    <i class="fas fa-plus"></i> Create First Article
+                </button>
+            </div>
+        `;
     }
 }
 
 function showLoading(show) {
-    const loadingState = document.getElementById('loadingState');
-    const articlesContainer = document.getElementById('articlesContainer');
-    const emptyState = document.getElementById('emptyState');
-    
+    const mainContent = document.querySelector('.main-content');
+
     if (show) {
-        loadingState.style.display = 'block';
-        articlesContainer.style.display = 'none';
-        emptyState.style.display = 'none';
-    } else {
-        loadingState.style.display = 'none';
+        mainContent.innerHTML = `
+            <div class="loading-state" id="loadingState">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Loading articles...</p>
+            </div>
+        `;
     }
 }
 
 function showEmptyState() {
-    const loadingState = document.getElementById('loadingState');
-    const articlesContainer = document.getElementById('articlesContainer');
-    const emptyState = document.getElementById('emptyState');
-    
-    loadingState.style.display = 'none';
-    articlesContainer.style.display = 'none';
-    emptyState.style.display = 'block';
+    const mainContent = document.querySelector('.main-content');
+    mainContent.innerHTML = `
+        <div class="empty-state" id="emptyState">
+            <i class="fas fa-file-alt"></i>
+            <h3>No Articles Found</h3>
+            <p>Create your first article to get started.</p>
+            <button class="btn btn-primary" onclick="createNewArticle()">
+                <i class="fas fa-plus"></i> Create First Article
+            </button>
+        </div>
+    `;
 }
 
 function formatDate(dateString) {

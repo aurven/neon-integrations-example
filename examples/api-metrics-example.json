@@ -1,0 +1,133 @@
+[
+    {
+        "path": "/core/metrics/metrics/day_active_users",
+        "name": "Day Neon App active users",
+        "description": "Analyze the NeonApp active users in the day in the dimension of userNames. The day can be changed using 'date=2025-03-23T21:34:46%7C%7C' ",
+        "valid": true,
+        "defaultParameters": {
+            "date": "now",
+            "userNames": "*"
+        }
+    },
+    {
+        "path": "/core/metrics/metrics/day_creations",
+        "name": "Day Creations",
+        "description": "Analyze the day creations content in the dimension of types,workfloders, users and endpoints of the current day. The day can be changed using 'date=2025-03-23T21:34:46%7C%7C' ",
+        "valid": true,
+        "defaultParameters": {
+            "date": "now",
+            "endPoint": "*",
+            "types": "*",
+            "workFolderPaths": "*",
+            "userNames": "*"
+        }
+    },
+    {
+        "path": "/core/metrics/metrics/day_worked",
+        "name": "Day Worked",
+        "description": "Analyze the day worked content in the dimension of types,workfloders, users and endpoints of the current day. The day can be changed using 'date=2025-03-23T21:34:46%7C%7C' ",
+        "valid": true,
+        "defaultParameters": {
+            "date": "now",
+            "endPoint": "*",
+            "types": "*",
+            "workFolderPaths": "*",
+            "userNames": "*"
+        }
+    },
+    {
+        "path": "/core/metrics/metrics/month_active_users",
+        "name": "Month Neon App active users",
+        "description": "Analyze the NeonApp active users in the month in the dimension of userNames. The month can be changed using 'date=2025-03-23T21:34:46%7C%7C' ",
+        "valid": true,
+        "defaultParameters": {
+            "date": "now",
+            "userNames": "*"
+        }
+    },
+    {
+        "path": "/core/metrics/metrics/month_creations",
+        "name": "Month Creations",
+        "description": "Analyze the month creations content in the dimension of types,workfloders, users and endpoints of the current month. The day can be changed using 'date=2025-03-23T21:34:46%7C%7C' ",
+        "valid": true,
+        "defaultParameters": {
+            "date": "now",
+            "endPoint": "*",
+            "types": "*",
+            "workFolderPaths": "*",
+            "userNames": "*"
+        }
+    },
+    {
+        "path": "/core/metrics/metrics/month_worked",
+        "name": "Day Worked",
+        "description": "Analyze the day worked content in the dimension of types,workfloders, users and endpoints of the current day. The day can be changed using 'date=2025-03-23T21:34:46%7C%7C' ",
+        "valid": true,
+        "defaultParameters": {
+            "date": "now",
+            "endPoint": "*",
+            "types": "*",
+            "workFolderPaths": "*",
+            "userNames": "*"
+        }
+    },
+    {
+        "path": "/core/metrics/metrics/week_active_users",
+        "name": "Week Neon App active users",
+        "description": "Analyze the NeonApp active users in the week in the dimension of userNames. The week can be changed using 'date=2025-03-23T21:34:46%7C%7C' ",
+        "valid": true,
+        "defaultParameters": {
+            "date": "now",
+            "userNames": "*"
+        }
+    },
+    {
+        "path": "/core/metrics/metrics/week_creations",
+        "name": "Week Creations",
+        "description": "Analyze the week creations content in the dimension of types,workfloders, users and endpoints of the current week. The day can be changed using 'date=2025-03-23T21:34:46%7C%7C' ",
+        "valid": true,
+        "defaultParameters": {
+            "date": "now",
+            "endPoint": "*",
+            "types": "*",
+            "workFolderPaths": "*",
+            "userNames": "*"
+        }
+    },
+    {
+        "path": "/core/metrics/metrics/week_worked",
+        "name": "Week Worked",
+        "description": "Analyze the week worked content in the dimension of types,workfloders, users and endpoints of the current day. The week can be changed using 'date=2025-03-23T21:34:46%7C%7C' ",
+        "valid": true,
+        "defaultParameters": {
+            "date": "now",
+            "endPoint": "*",
+            "types": "*",
+            "workFolderPaths": "*",
+            "userNames": "*"
+        }
+    },
+    {
+        "path": "/core/metrics/modelBuild/modelcreation",
+        "name": "FE model requests for a content",
+        "description": "Analyze the content request from the FrontOffice for last 30 days' date=2025-03-23T21:34:46%7C%7C' ",
+        "valid": true,
+        "defaultParameters": {
+            "date": "now",
+            "familyRef": "*"
+        }
+    },
+    {
+        "path": "/core/metrics/outgoingcall/day_webhook_calls",
+        "name": "Day Webhooks outgoing calls",
+        "description": "Analyze the day webhook out going call in the dimension of webhookName, siteName, range of response code obtained. The day can be changed using 'date=2025-03-23T21:34:46%7C%7C' ",
+        "valid": true,
+        "defaultParameters": {
+            "date": "now",
+            "wekhookName": "*",
+            "siteName": "*",
+            "lowStatusCode": "0",
+            "highStatusCode": "999"
+        }
+    }
+]

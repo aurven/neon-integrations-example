@@ -1,0 +1,62 @@
+/* AG-Grid Neon theme override */
+.ag-theme-alpine {
+  --ag-font-family: "Source Sans 3", "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --ag-font-size: 13px;
+  --ag-background-color: #ffffff;
+  --ag-header-background-color: #f9f9fb;
+  --ag-odd-row-background-color: #ffffff;
+  --ag-row-hover-color: #f6f3f6;
+  --ag-selected-row-background-color: #e5ecff;
+  --ag-header-foreground-color: #69667f;
+  --ag-foreground-color: #3f3c4e;
+  --ag-border-color: #dddce5;
+  --ag-row-border-color: #f1f0f4;
+  --ag-header-column-separator-color: #dddce5;
+  --ag-input-border-color: #dddce5;
+  --ag-input-focus-border-color: #0a2ee6;
+  --ag-range-selection-border-color: #0a2ee6;
+  --ag-range-selection-background-color: rgba(10, 46, 230, 0.06);
+  --ag-checkbox-checked-color: #0a2ee6;
+  --ag-disabled-foreground-color: #bfbfca;
+  --ag-header-height: 36px;
+  --ag-row-height: 58px;
+  --ag-cell-horizontal-padding: 12px;
+}
+
+.ag-theme-alpine .ag-cell {
+  padding-top: 6px;
+  box-sizing: border-box;
+}
+
+.ag-theme-alpine .ag-header-cell-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+  color: #69667f;
+}
+
+.ag-theme-alpine .ag-header-cell {
+  border-right: 1px solid #dddce5;
+}
+
+.ag-theme-alpine .ag-paging-panel {
+  border-top: 1px solid #dddce5;
+  font-size: 12px;
+  color: #69667f;
+  height: 40px;
+}
+
+.ag-theme-alpine .ag-filter-toolpanel-header,
+.ag-theme-alpine .ag-filter-toolpanel-search,
+.ag-theme-alpine .ag-status-bar {
+  font-size: 12px;
+}
+
+.ag-theme-alpine .ag-paging-button button {
+  border-radius: 8px;
+}
+
+.ag-theme-alpine .ag-paging-button button:not(:disabled):hover {
+  background: #f6f3f6;
+}

@@ -1,0 +1,34 @@
+{
+  "packages": [
+    {
+      "id": "pkg-premium-sport",
+      "name": "Premium Sport",
+      "description": "Full sport content distribution for European markets",
+      "productIds": [
+        "prod-premium-sport"
+      ],
+      "createdAt": "2026-02-10T00:00:00.000Z"
+    },
+    {
+      "id": "pkg-breaking-news",
+      "name": "Breaking News Bundle",
+      "description": "All breaking news content worldwide",
+      "productIds": [
+        "prod-breaking-news"
+      ],
+      "createdAt": "2026-02-10T00:00:00.000Z"
+    },
+    {
+      "id": "pkg-full-europe",
+      "name": "Full Europe",
+      "description": "Complete European content package including sport and breaking news",
+      "productIds": [
+        "prod-full-europe",
+        "prod-premium-sport",
+        "prod-breaking-news"
+      ],
+      "createdAt": "2026-02-10T00:00:00.000Z"
+    }
+  ],
+  "lastUpdated": "2026-02-16T00:00:00.000Z"
+}

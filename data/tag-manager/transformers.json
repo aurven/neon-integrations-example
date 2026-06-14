@@ -1,0 +1,15 @@
+{
+  "transformers": [
+    { "id": "format-newsml", "name": "Format: NewsML-G2", "description": "Convert to NewsML-G2 format", "category": "format" },
+    { "id": "format-nitf", "name": "Format: NITF", "description": "Convert to NITF format", "category": "format" },
+    { "id": "format-json-ld", "name": "Format: JSON-LD", "description": "Convert to JSON-LD structured data", "category": "format" },
+    { "id": "strip-metadata", "name": "Strip Metadata", "description": "Remove internal metadata fields", "category": "cleanup" },
+    { "id": "enrich-seo", "name": "Enrich SEO", "description": "Add SEO metadata and keywords", "category": "enrichment" },
+    { "id": "compress-gzip", "name": "Compress (gzip)", "description": "Compress payload with gzip", "category": "delivery" },
+    { "id": "filter-embargo", "name": "Filter Embargo", "description": "Filter embargoed content", "category": "filter" },
+    { "id": "translate-en", "name": "Translate to English", "description": "Translate content to English", "category": "enrichment" },
+    { "id": "thumbnail-gen", "name": "Generate Thumbnails", "description": "Generate thumbnail images", "category": "media" },
+    { "id": "watermark", "name": "Add Watermark", "description": "Add watermark to images", "category": "media" }
+  ],
+  "lastUpdated": "2026-02-16T12:00:00.000Z"
+}

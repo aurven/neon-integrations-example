@@ -5,3 +5,8 @@ tmp
 .DS_Store
 logs
 npm-debug.log*
+.vscode
+ssl
+
+.claude
+.superpowers

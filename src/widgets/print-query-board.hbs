@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{seo.title}}</title>
+  <link rel="stylesheet" href="/css/neon-design-system.css">
+  <link rel="stylesheet" href="/neon/api/demo-integration/css/neon-design-system.css">
+  <link rel="stylesheet" href="/js/react/print-query-board.css">
+  <link rel="stylesheet" href="/neon/api/demo-integration/js/react/print-query-board.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body, #root { height: 100%; overflow: hidden; }
+    body { background: var(--bg-subtle, rgb(246,243,246)); }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script>
+    window.CONFIG = {
+      neonAppUrl: '{{neonAppUrl}}',
+      apiKey: '{{{apiKey}}}',
+      demo: {{demo}},
+      printConfig: {{{printConfig}}}
+    };
+  </script>
+  <script src="/js/react/print-query-board.js"></script>
+  <script src="/neon/api/demo-integration/js/react/print-query-board.js"></script>
+</body>
+</html>

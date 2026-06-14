@@ -1,0 +1,150 @@
+{
+  "customers": [
+    {
+      "id": "cust-acme-corp",
+      "name": "Acme Corp",
+      "contact": "editor@acme.com",
+      "packageIds": [
+        "pkg-premium-sport"
+      ],
+      "streams": [
+        {
+          "id": "stream-acme-sftp-sport",
+          "name": "Acme SFTP Sport Feed",
+          "type": "sftp",
+          "destination": {
+            "host": "sftp.acme-corp.com",
+            "path": "/incoming/sport/new/"
+          },
+          "secrets": {
+            "username": "acme_sftp_user",
+            "password": "Pr0totyp3!Pass"
+          },
+          "transformerIds": [
+            "format-newsml",
+            "strip-metadata"
+          ],
+          "description": "Primary sport content delivery via SFTP",
+          "createdAt": "2026-02-12T08:00:00.000Z"
+        },
+        {
+          "id": "stream-acme-s3-archive",
+          "name": "Acme S3 Archive",
+          "type": "s3",
+          "destination": {
+            "bucket": "acme-content-archive",
+            "path": "feeds/sport/",
+            "region": "us-east-1"
+          },
+          "secrets": {
+            "accessKeyId": "AKIAIOSFODNN7EXAMPLE",
+            "secretAccessKey": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+          },
+          "transformerIds": [
+            "compress-gzip"
+          ],
+          "description": "Long-term archive of all sport content",
+          "createdAt": "2026-02-12T08:30:00.000Z"
+        }
+      ],
+      "createdAt": "2026-02-10T00:00:00.000Z"
+    },
+    {
+      "id": "cust-globalnews",
+      "name": "GlobalNews Ltd",
+      "contact": "syndication@globalnews.com",
+      "packageIds": [
+        "pkg-full-europe",
+        "pkg-breaking-news"
+      ],
+      "streams": [
+        {
+          "id": "stream-globalnews-api-realtime",
+          "name": "GlobalNews Realtime API",
+          "type": "api",
+          "destination": {
+            "endpoint": "https://ingest.globalnews.com/v2/articles"
+          },
+          "secrets": {
+            "authMethod": "api-key",
+            "apiKey": "gn-live-sk-7f8a9b2c3d4e5f6071829a"
+          },
+          "transformerIds": [],
+          "description": "Real-time push of breaking news to GlobalNews ingestion API",
+          "createdAt": "2026-02-12T09:00:00.000Z"
+        },
+        {
+          "id": "stream-globalnews-sftp-europe",
+          "name": "GlobalNews SFTP Europe",
+          "type": "sftp",
+          "destination": {
+            "host": "transfer.globalnews.com",
+            "path": "/drops/europe-feed/"
+          },
+          "secrets": {
+            "username": "gn_europe_drop",
+            "password": "Eur0pe!F33d2026"
+          },
+          "transformerIds": [
+            "format-nitf",
+            "filter-embargo",
+            "compress-gzip"
+          ],
+          "description": "Batch delivery of European content packages overnight",
+          "createdAt": "2026-02-12T09:15:00.000Z"
+        }
+      ],
+      "createdAt": "2026-02-10T00:00:00.000Z"
+    },
+    {
+      "id": "cust-eidosmedia",
+      "name": "Eidosmedia",
+      "contact": "procurement@eidosmedia.com",
+      "packageIds": [
+        "pkg-premium-sport",
+        "pkg-breaking-news",
+        "pkg-full-europe"
+      ],
+      "streams": [
+        {
+          "id": "stream-eidosmedia-s3-production",
+          "name": "Eidosmedia S3 Production",
+          "type": "s3",
+          "destination": {
+            "bucket": "eidosmedia-content-prod",
+            "path": "syndication/neon/",
+            "region": "eu-central-1"
+          },
+          "secrets": {
+            "accessKeyId": "AKIAI44QH8DHBEXAMPLE",
+            "secretAccessKey": "je7MtGbClwBF/2Zp9Utk/h3yCo8nvbEXAMPLEKEY"
+          },
+          "transformerIds": [
+            "format-json-ld",
+            "enrich-seo",
+            "compress-gzip"
+          ],
+          "description": "Production content bucket for Eidosmedia CMS integration",
+          "createdAt": "2026-02-12T10:00:00.000Z"
+        },
+        {
+          "id": "stream-eidosmedia-api-methode",
+          "name": "Eidosmedia Methode Ingest",
+          "type": "api",
+          "destination": {
+            "endpoint": "https://methode.eidosmedia.io/api/import"
+          },
+          "secrets": {
+            "authMethod": "bearer-token",
+            "bearerToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJuZW9uLWludGVncmF0aW9uIn0.EXAMPLE"
+          },
+          "transformerIds": [],
+          "description": "Direct push to Methode editorial system",
+          "createdAt": "2026-02-12T10:30:00.000Z"
+        }
+      ],
+      "createdAt": "2026-02-11T09:23:29.514Z"
+    }
+  ],
+  "lastUpdated": "2026-02-16T15:55:15.412Z"
+}

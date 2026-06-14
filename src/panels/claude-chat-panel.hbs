@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Chat</title>
+    <script src="/js/panel-api-helper.js"></script>
+    <script src="/neon/api/demo-integration/js/panel-api-helper.js"></script>
+    <link rel="stylesheet" href="/css/tailwind-panels.css">
+    <link rel="stylesheet" href="/neon/api/demo-integration/css/tailwind-panels.css">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background: #f6f3f6;
+        }
+
+        .chat-header {
+            flex-shrink: 0;
+            padding: 0.75rem 1rem;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+        }
+
+        .chat-header-logo {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            background: linear-gradient(135deg, #cc785c 0%, #c96442 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .chat-header-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .chat-header-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #111827;
+            line-height: 1.25;
+        }
+
+        .chat-header-subtitle {
+            font-size: 0.75rem;
+            color: #6b7280;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .context-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.125rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.6875rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .context-badge.connected {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .context-badge.waiting {
+            background: #fef9c3;
+            color: #854d0e;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.875rem;
+        }
+
+        .message {
+            display: flex;
+            gap: 0.5rem;
+            max-width: 90%;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .message.assistant {
+            align-self: flex-start;
+        }
+
+        .message-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        .message.user .message-avatar {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .message.assistant .message-avatar {
+            background: linear-gradient(135deg, #cc785c 0%, #c96442 100%);
+            color: white;
+        }
+
+        .message-bubble {
+            padding: 0.625rem 0.875rem;
+            border-radius: 1rem;
+            font-size: 0.8125rem;
+            line-height: 1.5;
+            word-break: break-word;
+        }
+
+        .message.user .message-bubble {
+            background: #3b82f6;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.assistant .message-bubble {
+            background: white;
+            color: #111827;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+
+        /* Markdown-rendered content inside assistant bubbles */
+        .message.assistant .message-bubble p { margin: 0 0 0.5em; }
+        .message.assistant .message-bubble p:last-child { margin-bottom: 0; }
+        .message.assistant .message-bubble ul,
+        .message.assistant .message-bubble ol { margin: 0.25em 0 0.5em 1.25em; padding: 0; }
+        .message.assistant .message-bubble li { margin-bottom: 0.25em; }
+        .message.assistant .message-bubble code {
+            background: #f3f4f6;
+            padding: 0.1em 0.3em;
+            border-radius: 3px;
+            font-family: monospace;
+            font-size: 0.875em;
+        }
+        .message.assistant .message-bubble pre {
+            background: #f3f4f6;
+            padding: 0.5em 0.75em;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 0.5em 0;
+        }
+        .message.assistant .message-bubble pre code {
+            background: none;
+            padding: 0;
+        }
+        .message.assistant .message-bubble strong { font-weight: 600; }
+
+        .streaming-cursor::after {
+            content: '▋';
+            animation: blink 0.8s step-end infinite;
+            color: #6b7280;
+            font-size: 0.875em;
+        }
+
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+
+        .tool-indicator {
+            display: none;
+            align-self: flex-start;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.875rem;
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+
+        .tool-indicator.visible {
+            display: flex;
+        }
+
+        .tool-spinner {
+            width: 14px;
+            height: 14px;
+            border: 2px solid #d1d5db;
+            border-top-color: #6b7280;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            color: #9ca3af;
+        }
+
+        .empty-state-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #cc785c 0%, #c96442 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            opacity: 0.8;
+        }
+
+        .empty-state h3 {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: #4b5563;
+            margin: 0 0 0.5rem;
+        }
+
+        .empty-state p {
+            font-size: 0.8125rem;
+            margin: 0;
+        }
+
+        .suggestions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.375rem;
+            margin-top: 1.25rem;
+            width: 100%;
+            max-width: 320px;
+        }
+
+        .suggestion-btn {
+            padding: 0.5rem 0.875rem;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            font-size: 0.75rem;
+            color: #374151;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .suggestion-btn:hover {
+            background: #f6f3f6;
+            border-color: #d1d5db;
+        }
+
+        .chat-input-area {
+            flex-shrink: 0;
+            padding: 0.75rem 1rem;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 0.5rem;
+            align-items: flex-end;
+        }
+
+        .chat-textarea {
+            flex: 1;
+            resize: none;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 0.625rem 0.875rem;
+            font-size: 0.8125rem;
+            line-height: 1.5;
+            color: #111827;
+            background: #f6f3f6;
+            outline: none;
+            transition: border-color 0.15s;
+            min-height: 40px;
+            max-height: 120px;
+            overflow-y: auto;
+            font-family: inherit;
+        }
+
+        .chat-textarea:focus {
+            border-color: #cc785c;
+            background: white;
+        }
+
+        .chat-textarea:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .send-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #cc785c;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.15s;
+            color: white;
+        }
+
+        .send-btn:hover:not(:disabled) {
+            background: #b5674c;
+            transform: scale(1.05);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .send-btn.streaming {
+            background: #e5e7eb;
+        }
+
+        .input-hint {
+            font-size: 0.6875rem;
+            color: #9ca3af;
+            margin-top: 0.375rem;
+            text-align: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="chat-container">
+    <!-- Header -->
+    <div class="chat-header">
+        <div class="chat-header-logo">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M8 1.5C4.41 1.5 1.5 4.41 1.5 8s2.91 6.5 6.5 6.5 6.5-2.91 6.5-6.5S11.59 1.5 8 1.5zm0 1.5a5 5 0 110 10A5 5 0 018 3zm-.75 2.5v3.75l3.25 1.95-.5.83L6.5 9.75V5.5h.75z" fill="white"/>
+            </svg>
+        </div>
+        <div class="chat-header-info">
+            <div class="chat-header-title">Claude Chat</div>
+            <div class="chat-header-subtitle" id="story-subtitle">Waiting for story context…</div>
+        </div>
+        <span class="context-badge waiting" id="context-badge">
+            <svg width="8" height="8" viewBox="0 0 8 8" fill="currentColor"><circle cx="4" cy="4" r="4"/></svg>
+            Connecting
+        </span>
+    </div>
+
+    <!-- Message list -->
+    <div class="chat-messages" id="chat-messages">
+        <div class="empty-state" id="empty-state">
+            <div class="empty-state-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" fill="white"/>
+                </svg>
+            </div>
+            <h3>Ask Claude anything</h3>
+            <p>Claude can read and operate on your Neon stories.</p>
+            <div class="suggestions" id="suggestions">
+                <button class="suggestion-btn" onclick="sendSuggestion('What is this story about?')">What is this story about?</button>
+                <button class="suggestion-btn" onclick="sendSuggestion('Summarise this story in 3 bullet points.')">Summarise in 3 bullet points</button>
+                <button class="suggestion-btn" onclick="sendSuggestion('Search for related articles on this topic.')">Search for related articles</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tool running indicator -->
+    <div class="tool-indicator" id="tool-indicator">
+        <div class="tool-spinner"></div>
+        <span id="tool-indicator-text">Calling tool…</span>
+    </div>
+
+    <!-- Input area -->
+    <div class="chat-input-area">
+        <div class="input-row">
+            <textarea
+                id="chat-input"
+                class="chat-textarea"
+                placeholder="Ask Claude…"
+                rows="1"
+                disabled
+                onkeydown="handleKeyDown(event)"
+                oninput="autoResize(this)"
+            ></textarea>
+            <button class="send-btn" id="send-btn" disabled onclick="sendMessage()">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M14.5 8L1.5 1.5l2.5 6.5-2.5 6.5z" fill="currentColor"/>
+                </svg>
+            </button>
+        </div>
+        <div class="input-hint" id="input-hint">Waiting for Neon context…</div>
+    </div>
+</div>
+
+<script>
+    // ---------------------------------------------------------------------------
+    // State
+    // ---------------------------------------------------------------------------
+    const state = {
+        apiKey: '{{{apiKey}}}',
+        neonAppUrl: '{{{neonAppUrl}}}',
+        sessionId: '{{{sessionId}}}',
+        role: '{{{role}}}',
+        isDemoMode: {{{isDemoMode}}},
+        neonContext: null,
+        isStreaming: false,
+        contextReceived: false
+    };
+
+    // ---------------------------------------------------------------------------
+    // DOM helpers
+    // ---------------------------------------------------------------------------
+    const messagesEl = document.getElementById('chat-messages');
+    const inputEl = document.getElementById('chat-input');
+    const sendBtnEl = document.getElementById('send-btn');
+    const emptyStateEl = document.getElementById('empty-state');
+    const toolIndicatorEl = document.getElementById('tool-indicator');
+    const toolIndicatorText = document.getElementById('tool-indicator-text');
+    const contextBadgeEl = document.getElementById('context-badge');
+    const storySubtitleEl = document.getElementById('story-subtitle');
+    const inputHintEl = document.getElementById('input-hint');
+
+    function setContextConnected(label) {
+        contextBadgeEl.className = 'context-badge connected';
+        contextBadgeEl.innerHTML = '<svg width="8" height="8" viewBox="0 0 8 8" fill="currentColor"><circle cx="4" cy="4" r="4"/></svg> Connected';
+        storySubtitleEl.textContent = label || 'Story context loaded';
+        inputHintEl.textContent = 'Enter to send · Shift+Enter for newline';
+        inputEl.disabled = false;
+        sendBtnEl.disabled = false;
+        inputEl.placeholder = 'Ask Claude about this story…';
+        state.contextReceived = true;
+    }
+
+    function setContextWaiting() {
+        contextBadgeEl.className = 'context-badge waiting';
+        contextBadgeEl.innerHTML = '<svg width="8" height="8" viewBox="0 0 8 8" fill="currentColor"><circle cx="4" cy="4" r="4"/></svg> Connecting';
+        inputHintEl.textContent = 'Waiting for Neon context…';
+    }
+
+    function scrollToBottom() {
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    function hideEmptyState() {
+        if (emptyStateEl) emptyStateEl.style.display = 'none';
+    }
+
+    function autoResize(el) {
+        el.style.height = 'auto';
+        el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+    }
+
+    function handleKeyDown(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            if (!sendBtnEl.disabled) sendMessage();
+        }
+    }
+
+    // ---------------------------------------------------------------------------
+    // Markdown-lite renderer (supports bold, italic, code, lists, paragraphs)
+    // ---------------------------------------------------------------------------
+    function renderMarkdown(text) {
+        if (!text) return '';
+        // Escape HTML first
+        let html = text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+
+        // Code blocks (```)
+        html = html.replace(/```[\w]*\n?([\s\S]*?)```/g, (_, code) =>
+            `<pre><code>${code.trim()}</code></pre>`);
+
+        // Inline code
+        html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+        // Bold
+        html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+
+        // Italic
+        html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+
+        // Unordered list items
+        html = html.replace(/^[-*]\s+(.+)$/gm, '<li>$1</li>');
+        html = html.replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>');
+
+        // Ordered list items
+        html = html.replace(/^\d+\.\s+(.+)$/gm, '<li>$1</li>');
+
+        // Line breaks → paragraphs
+        const blocks = html.split(/\n{2,}/);
+        html = blocks
+            .map(b => b.trim())
+            .filter(Boolean)
+            .map(b => b.startsWith('<ul>') || b.startsWith('<ol>') || b.startsWith('<pre>') ? b : `<p>${b.replace(/\n/g, '<br>')}</p>`)
+            .join('');
+
+        return html;
+    }
+
+    // ---------------------------------------------------------------------------
+    // Message rendering
+    // ---------------------------------------------------------------------------
+    function appendMessage(role, text, id) {
+        hideEmptyState();
+
+        const msgEl = document.createElement('div');
+        msgEl.className = `message ${role}`;
+        if (id) msgEl.id = id;
+
+        const avatarEl = document.createElement('div');
+        avatarEl.className = 'message-avatar';
+        avatarEl.textContent = role === 'user' ? 'U' : 'C';
+
+        const bubbleEl = document.createElement('div');
+        bubbleEl.className = 'message-bubble';
+
+        if (role === 'assistant') {
+            bubbleEl.innerHTML = renderMarkdown(text);
+        } else {
+            bubbleEl.textContent = text;
+        }
+
+        msgEl.appendChild(avatarEl);
+        msgEl.appendChild(bubbleEl);
+        messagesEl.appendChild(msgEl);
+        scrollToBottom();
+        return bubbleEl;
+    }
+
+    function appendStreamingMessage() {
+        hideEmptyState();
+
+        const msgEl = document.createElement('div');
+        msgEl.className = 'message assistant';
+        msgEl.id = 'streaming-msg';
+
+        const avatarEl = document.createElement('div');
+        avatarEl.className = 'message-avatar';
+        avatarEl.textContent = 'C';
+
+        const bubbleEl = document.createElement('div');
+        bubbleEl.className = 'message-bubble streaming-cursor';
+        bubbleEl.dataset.raw = '';
+
+        msgEl.appendChild(avatarEl);
+        msgEl.appendChild(bubbleEl);
+        messagesEl.appendChild(msgEl);
+        scrollToBottom();
+        return bubbleEl;
+    }
+
+    function finaliseStreamingMessage(bubbleEl) {
+        bubbleEl.classList.remove('streaming-cursor');
+        const raw = bubbleEl.dataset.raw || '';
+        bubbleEl.innerHTML = renderMarkdown(raw) || bubbleEl.innerHTML;
+        scrollToBottom();
+    }
+
+    function appendTextDelta(bubbleEl, delta) {
+        bubbleEl.dataset.raw = (bubbleEl.dataset.raw || '') + delta;
+        // Live update — simple: just render accumulated markdown
+        bubbleEl.innerHTML = renderMarkdown(bubbleEl.dataset.raw);
+        scrollToBottom();
+    }
+
+    function showToolIndicator(toolName) {
+        toolIndicatorText.textContent = `Using tool: ${toolName}…`;
+        toolIndicatorEl.classList.add('visible');
+        scrollToBottom();
+    }
+
+    function hideToolIndicator() {
+        toolIndicatorEl.classList.remove('visible');
+    }
+
+    // ---------------------------------------------------------------------------
+    // API path helper (handles embedded vs standalone)
+    // ---------------------------------------------------------------------------
+    function chatApiPath() {
+        return PanelAPI.buildApiPath('/panels/claude-chat/api/chat');
+    }
+
+    // ---------------------------------------------------------------------------
+    // Send message
+    // ---------------------------------------------------------------------------
+    async function sendMessage() {
+        const text = inputEl.value.trim();
+        if (!text || state.isStreaming) return;
+
+        inputEl.value = '';
+        autoResize(inputEl);
+
+        appendMessage('user', text);
+        setStreaming(true);
+
+        const bubbleEl = appendStreamingMessage();
+
+        const body = {
+            sessionId: state.sessionId,
+            message: text
+        };
+
+        // Send neonContext only on first message (session initialisation)
+        if (state.neonContext && !state._contextSent) {
+            body.neonContext = state.neonContext;
+            state._contextSent = true;
+        }
+
+        try {
+            const response = await fetch(chatApiPath(), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apikey': state.apiKey
+                },
+                body: JSON.stringify(body)
+            });
+
+            if (!response.ok) {
+                const err = await response.json().catch(() => ({ error: 'Unknown error' }));
+                finaliseStreamingMessage(bubbleEl);
+                bubbleEl.dataset.raw = `Error: ${err.error || response.statusText}`;
+                bubbleEl.innerHTML = `<span style="color:#dc2626">${bubbleEl.dataset.raw}</span>`;
+                return;
+            }
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let buffer = '';
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                buffer += decoder.decode(value, { stream: true });
+                const lines = buffer.split('\n');
+                buffer = lines.pop(); // keep incomplete line
+
+                for (const line of lines) {
+                    if (!line.startsWith('data:')) continue;
+                    const raw = line.slice(5).trim();
+                    if (raw === '[DONE]') {
+                        finaliseStreamingMessage(bubbleEl);
+                        hideToolIndicator();
+                        break;
+                    }
+                    if (!raw || raw.startsWith(':')) continue; // keepalive comment
+
+                    try {
+                        const event = JSON.parse(raw);
+                        if (event.type === 'text') {
+                            appendTextDelta(bubbleEl, event.delta);
+                        } else if (event.type === 'tool_start') {
+                            showToolIndicator(event.name);
+                        } else if (event.type === 'tool_end') {
+                            hideToolIndicator();
+                        } else if (event.type === 'error') {
+                            bubbleEl.dataset.raw = `Error: ${event.message}`;
+                            bubbleEl.innerHTML = `<span style="color:#dc2626">${event.message}</span>`;
+                            finaliseStreamingMessage(bubbleEl);
+                        }
+                    } catch (_) {
+                        // ignore malformed events
+                    }
+                }
+            }
+        } catch (err) {
+            console.error('[Claude Chat] Fetch error:', err);
+            bubbleEl.dataset.raw = `Network error: ${err.message}`;
+            bubbleEl.innerHTML = `<span style="color:#dc2626">${err.message}</span>`;
+            finaliseStreamingMessage(bubbleEl);
+        } finally {
+            setStreaming(false);
+            hideToolIndicator();
+        }
+    }
+
+    function sendSuggestion(text) {
+        inputEl.value = text;
+        sendMessage();
+    }
+
+    function setStreaming(active) {
+        state.isStreaming = active;
+        inputEl.disabled = active || !state.contextReceived;
+        sendBtnEl.disabled = active || !state.contextReceived;
+        if (active) {
+            sendBtnEl.classList.add('streaming');
+            sendBtnEl.innerHTML = '<div style="width:12px;height:12px;border:2px solid #9ca3af;border-top-color:#6b7280;border-radius:50%;animation:spin 0.6s linear infinite"></div>';
+        } else {
+            sendBtnEl.classList.remove('streaming');
+            sendBtnEl.innerHTML = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M14.5 8L1.5 1.5l2.5 6.5-2.5 6.5z" fill="currentColor"/></svg>';
+        }
+    }
+
+    // ---------------------------------------------------------------------------
+    // PostMessage API — receive context from NeonApp
+    // ---------------------------------------------------------------------------
+    function setupPostMessageApi() {
+        console.log('[Claude Chat] Setting up PostMessage API');
+
+        window.addEventListener('message', (event) => {
+            if (event.origin !== state.neonAppUrl && event.origin !== window.parent.origin) {
+                console.warn('[Claude Chat] Ignored message from origin:', event.origin);
+                return;
+            }
+
+            if (event.data && event.data.key === 'getInfo') {
+                state.neonContext = event.data.info;
+                console.log('[Claude Chat] Received Neon context:', state.neonContext);
+
+                const node = state.neonContext?.originalNode || {};
+                const title = node.title || node.headline || node.familyRef || 'Unknown story';
+                setContextConnected(title);
+            }
+        });
+
+        // Request context from parent
+        window.parent.postMessage({ type: 'panel-ready', info: { op: 'getInfo' } }, window.parent.origin);
+        console.log('[Claude Chat] Sent panel-ready to parent');
+    }
+
+    // ---------------------------------------------------------------------------
+    // Demo mode — inject fake context without NeonApp
+    // ---------------------------------------------------------------------------
+    function setupDemoMode() {
+        console.log('[Claude Chat] Demo mode — injecting mock context');
+        state.neonContext = {
+            originalNode: {
+                familyRef: 'demo-family-ref-001',
+                title: 'Demo Story — Climate Change Report 2024',
+                workflowStatus: 'DRAFT',
+                body: '<p>This is a demo story about climate change trends in 2024.</p>'
+            },
+            channel: { name: 'Web' },
+            workfolder: 'Demo Workspace'
+        };
+        setContextConnected('Demo Story — Climate Change Report 2024');
+    }
+
+    // ---------------------------------------------------------------------------
+    // Init
+    // ---------------------------------------------------------------------------
+    document.addEventListener('DOMContentLoaded', () => {
+        if (state.isDemoMode) {
+            setupDemoMode();
+        } else {
+            setupPostMessageApi();
+        }
+    });
+</script>
+</body>
+</html>

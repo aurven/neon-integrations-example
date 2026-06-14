@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{seo.title}}</title>
+  <link rel="stylesheet" href="/css/neon-design-system.css">
+  <link rel="stylesheet" href="/neon/api/demo-integration/css/neon-design-system.css">
+  <link rel="stylesheet" href="/js/react/neon-grid-widget.css">
+  <link rel="stylesheet" href="/neon/api/demo-integration/js/react/neon-grid-widget.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg-app, #f9f9fb); overflow: hidden; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script>
+    window.CONFIG = {
+      neonAppUrl: '{{neonAppUrl}}',
+      apiKey: '{{{apiKey}}}',
+      demo: {{demo}},
+      gridConfigName: '{{gridConfigName}}',
+      gridConfig: {{{gridConfig}}}
+    };
+  </script>
+  <script src="/js/react/neon-grid-widget.js"></script>
+  <script src="/neon/api/demo-integration/js/react/neon-grid-widget.js"></script>
+</body>
+</html>

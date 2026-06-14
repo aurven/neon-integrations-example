@@ -1,10 +1,10 @@
 const querystring = require('querystring');
 const axios = require('axios');
 const FormData = require('form-data');
-const neon = require('./helpers/neon-bo-api.js');
-const edapi = require('./helpers/edapi-utils.js');
+const neon = require('./helpers/neon-bo-api-v3.js');
 const utils = require('./helpers/utils.js');
 const siteshelpers = require('./helpers/sites-helpers.js');
+const { findAllElementsByNodeType, findElementByNodeType, extractTextFromElements } = require('./helpers/neon-content-parser.js');
 
 function isTrelloUrl(url) {
     return /^https?:\/\/(www\.)?trello\.com\//.test(url);
@@ -60,6 +60,32 @@ async function imageToBase64(url) {
     }
 }
 
+function escapeXml(value) {
+  return String(value).replace(/[<>&'"]/g, (c) => ({
+    '<': '&lt;',
+    '>': '&gt;',
+    '&': '&amp;',
+    "'": '&apos;',
+    '"': '&quot;',
+  }[c]));
+}
+
+function buildImageMetadataXml(metadata = {}) {
+  // credit is always emitted (empty when absent) to keep legacy output byte-identical;
+  // caption is only emitted when present; image.dtd requires credit before caption.
+  const caption = metadata.caption ? `<caption>${escapeXml(metadata.caption)}</caption>` : '';
+  const credit = `<credit>${metadata.credit ? escapeXml(metadata.credit) : ''}</credit>`;
+  return `<?xml version="1.0" encoding="UTF-8"?>` +
+         `<!DOCTYPE ObjectMetadata SYSTEM "/common/rules/image.dtd">` +
+         `<ObjectMetadata>` +
+         `<iptc>` +
+         credit +
+         caption +
+         `</iptc>` +
+         `<WebDesign><WebType>Image</WebType></WebDesign>` +
+         `</ObjectMetadata>`;
+}
+
 async function uploadImage(options = {
     imageName: '',
     imageUrl: '',
@@ -103,14 +129,7 @@ async function uploadImage(options = {
                           `Content-Type: application/json\r\n\r\n` +
                           `${JSON.stringify(objectModel)}\r\n`;
 
-  const xmlMetadata = `<?xml version="1.0" encoding="UTF-8"?>` +
-                      `<!DOCTYPE ObjectMetadata SYSTEM "/common/rules/image.dtd">` +
-                      `<ObjectMetadata>` +
-                      `<iptc>` +
-                      `<credit></credit>` +  // Add the credit from description here
-                      `</iptc>` +
-                      `<WebDesign><WebType>Image</WebType></WebDesign>` +
-                      `</ObjectMetadata>`;
+  const xmlMetadata = buildImageMetadataXml(options.metadata);
   
   const attributesPart = `--${boundary}\r\n` +
                          `Content-Disposition: form-data; name="attributes"; filename="blob"\r\n` +
@@ -149,6 +168,7 @@ async function uploadImageFromStory(story) {
 
 async function prepareNeonImage({ siteName, targetId, environment }) {
     try {
+        console.log('prepareNeonImage - process.env.NEON_FO_APIKEY: ' + process.env.NEON_FO_APIKEY); 
         const { node, data } = await siteshelpers.getResourceById({ siteName, targetId, environment });
         // const base64 = Buffer.from(data, 'binary').toString('base64');
         const { fileName, mimeType } = node.files.editorial;
@@ -161,32 +181,58 @@ async function prepareNeonImage({ siteName, targetId, environment }) {
     }
 }
 
-async function modelImagesToMethode(model, {workFolder, channel, issueDate}) {
-  
+function extractImageCaptions(model) {
+  const storyEl = model?.files?.content?.data?.elements?.find(el => el.nodeType === 'story');
+  const imageGroups = findAllElementsByNodeType(storyEl?.elements || [], 'web-image-group');
+
+  return imageGroups.map(group => {
+    const captionGroup = findElementByNodeType(group.elements || [], 'web-image-caption');
+    if (!captionGroup) return { caption: null, credit: null };
+    const captionEl = findElementByNodeType(captionGroup.elements || [], 'caption');
+    const creditEl  = findElementByNodeType(captionGroup.elements || [], 'credit');
+    return {
+      caption: captionEl ? extractTextFromElements(captionEl.elements) : null,
+      credit:  creditEl  ? extractTextFromElements(creditEl.elements)  : null,
+    };
+  });
+}
+
+async function modelImagesToMethode(methodeClient,model, {workFolder, channel, issueDate}) {
+
   const siteName = model.pubInfo.siteName;
-  
+  const captions = extractImageCaptions(model);
+
   const images = model.links?.hyperlink?.image?.map?.(image => image.targetId) || [];
   const methodeImages = {};
   
   for (let i = 0; i < images.length; i++) {
     const targetId = images[i];
     const neonImage = await prepareNeonImage({ siteName, targetId, environment: 'live' })
-    const methodeData = await uploadImageToMethode({ neonImage, workFolder, channel, issueDate });
-    // methodeImages[targetId] = methodeData;
+    if (!neonImage) {
+      console.warn(`⚠️ WARNING: Could not retrieve image ${targetId} from Neon (site: ${siteName}). Skipping image.`);
+      continue;
+    }
+    const methodeData = await uploadImageToMethode(methodeClient, { neonImage, workFolder, channel, issueDate });
+    if (!methodeData) {
+      console.warn(`⚠️ WARNING: Could not upload image ${targetId} to Methode. Skipping image.`);
+      continue;
+    }
     methodeImages[targetId] = {
       loid: methodeData.id,
       uuid: methodeData.pstate.uuid,
       path: methodeData.path,
       fileref: methodeData.path + '?uuid=' + methodeData.pstate.uuid,
       width: neonImage.width,
-      height: neonImage.height
+      height: neonImage.height,
+      caption: captions[i]?.caption || null,
+      credit:  captions[i]?.credit  || null,
     };
   }
   
   return methodeImages;
 }
 
-async function uploadImageToMethode(options = {
+async function uploadImageToMethode(methodeClient, options = {
     neonImage: null,
     workFolder: '',
     channel: '',
@@ -227,7 +273,7 @@ async function uploadImageToMethode(options = {
       contentDisposition: 'form-data'
     });
     
-    return edapi.createObject(form);
+    return methodeClient.createObject(form);
 
   } catch (error) {
     console.error('Error preparing image upload:', error.message);
@@ -237,6 +283,7 @@ async function uploadImageToMethode(options = {
 
 module.exports = {
     mainImageReferenceGenerator,
+    buildImageMetadataXml,
     uploadImage,
     uploadImageFromStory,
     uploadImageToMethode,

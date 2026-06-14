@@ -1,4 +1,5 @@
 const axios = require('axios');
+const { getSiteHostname } = require('../helpers/sites-helpers');
 
 async function sendSingleEmail(emailData) {
   const auth = Buffer.from(`${process.env.MAILJET_APIKEY}:${process.env.MAILJET_APISECRET}`).toString('base64');
@@ -55,7 +56,17 @@ async function sendNewsletter(neonModel) {
   const contentData = neonModel.contentData || {};
   const model = neonModel.model || neonModel;
   const newsletterTitle = contentData.data.title || model.data?.title || "Latest News Updates";
-  const baseUrl = neonModel.siteNode?.hostname || "https://theglobe-demo.neon.eks-dev.dev.eidosmedia.io";
+
+  // Get the public hostname for the site (not the Front Office API URL)
+  let baseUrl = neonModel.siteNode?.hostname;
+  if (!baseUrl) {
+    // Fetch the live hostname from the Front Office API
+    baseUrl = await getSiteHostname('theglobe', 'live');
+  }
+  if (!baseUrl) {
+    // Final fallback to a default public URL
+    baseUrl = 'https://theglobe-demo.neon.eks-dev.dev.eidosmedia.io';
+  }
   
   // Extract linked articles from the model
   const articleIds = contentData.data?.links?.pagelink?.main || model.data?.links?.pagelink?.main || [];

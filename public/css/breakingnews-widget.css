@@ -1,0 +1,244 @@
+/* Breaking News widget styles (bn-* prefix) */
+
+:root {
+    --neon-blue: #2847E2;
+    --neon-pink: #F75880;
+    --neon-text-primary: #1F2937;
+    --neon-text-secondary: #6B7280;
+    --neon-border: #E5E7EB;
+}
+
+.bn-container {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 24px;
+}
+
+.bn-container.bn-embedded {
+    padding: 12px;
+}
+
+.bn-header {
+    background: #fff;
+    border: 1px solid var(--neon-border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.bn-header.hidden {
+    display: none;
+}
+
+.bn-header-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--neon-blue) 0%, var(--neon-pink) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.bn-header-icon svg {
+    width: 22px;
+    height: 22px;
+    color: #fff;
+}
+
+.bn-header-title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--neon-text-primary);
+}
+
+.bn-header-subtitle {
+    margin: 2px 0 0;
+    font-size: 12px;
+    color: var(--neon-text-secondary);
+}
+
+.bn-card {
+    background: #fff;
+    border: 1px solid var(--neon-border);
+    border-radius: 8px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.bn-card.bn-embedded {
+    box-shadow: none;
+    border: none;
+    padding: 8px 0;
+}
+
+.bn-form-group {
+    margin-bottom: 20px;
+}
+
+.bn-form-group:last-of-type {
+    margin-bottom: 24px;
+}
+
+.bn-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--neon-text-primary);
+    margin-bottom: 6px;
+}
+
+.bn-required {
+    color: #EF4444;
+    margin-left: 2px;
+}
+
+.bn-input,
+.bn-textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px 12px;
+    border: 1px solid var(--neon-border);
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--neon-text-primary);
+    background: #fff;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.bn-input:focus,
+.bn-textarea:focus {
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 0 3px rgba(40, 71, 226, 0.1);
+}
+
+.bn-input::placeholder,
+.bn-textarea::placeholder {
+    color: var(--neon-text-secondary);
+}
+
+.bn-textarea {
+    resize: vertical;
+}
+
+.bn-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 9px 18px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.15s, opacity 0.15s;
+}
+
+.bn-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.bn-btn-primary {
+    background-color: var(--neon-blue);
+    color: #fff;
+    width: 100%;
+}
+
+.bn-btn-primary:hover:not(:disabled) {
+    background-color: #1e38c2;
+}
+
+.bn-btn-secondary {
+    background-color: #F3F4F6;
+    color: var(--neon-text-primary);
+}
+
+.bn-btn-secondary:hover:not(:disabled) {
+    background-color: #E5E7EB;
+}
+
+.bn-btn-success {
+    background-color: var(--neon-blue);
+    color: #fff;
+}
+
+.bn-btn-success:hover:not(:disabled) {
+    background-color: #1e38c2;
+}
+
+.bn-btn-danger {
+    background-color: #EF4444;
+    color: #fff;
+}
+
+.bn-btn-danger:hover:not(:disabled) {
+    background-color: #DC2626;
+}
+
+.bn-result-card {
+    background: #fff;
+    border: 1px solid var(--neon-border);
+    border-radius: 8px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    display: none;
+}
+
+.bn-result-card.bn-visible {
+    display: block;
+}
+
+.bn-result-card.bn-success {
+    border-color: #BBF7D0;
+    background-color: #F0FDF4;
+}
+
+.bn-result-card.bn-error {
+    border-color: #FECACA;
+    background-color: #FEF2F2;
+}
+
+.bn-result-message {
+    text-align: center;
+    font-size: 14px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.bn-result-message.bn-success {
+    color: #15803D;
+}
+
+.bn-result-message.bn-error {
+    color: #B91C1C;
+}
+
+.bn-result-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+@keyframes bn-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.bn-spinner {
+    animation: bn-spin 1s linear infinite;
+}

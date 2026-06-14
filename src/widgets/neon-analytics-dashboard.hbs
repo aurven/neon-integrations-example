@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Analytics - Production Metrics Dashboard</title>
+    <link rel="stylesheet" href="/css/tailwind-panels.css">
+    <link rel="stylesheet" href="/neon/api/demo-integration/css/tailwind-panels.css">
+    <script src="/js/panel-api-helper.js"></script>
+    <script src="/neon/api/demo-integration/js/panel-api-helper.js"></script>
+    <script src="/js/chart.js"></script>
+    <script src="/neon/api/demo-integration/js/chart.js"></script>
+    <script src="/js/neon-analytics-data.js"></script>
+    <script src="/neon/api/demo-integration/js/neon-analytics-data.js"></script>
+    <script src="/js/neon-analytics-charts.js"></script>
+    <script src="/neon/api/demo-integration/js/neon-analytics-charts.js"></script>
+    <style>
+        /* Modern font stack */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        /* Neon color variables */
+        :root {
+            --neon-blue: #2847E2;
+            --neon-pink: #F75880;
+            --neon-black: #1D1930;
+            --neon-white: #FFFFFF;
+            --neon-text-primary: #1F2937;
+            --neon-text-secondary: #6B7280;
+            --neon-border: #E5E7EB;
+            --neon-background: #f6f3f6;
+        }
+
+        /* Chart containers */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+        }
+
+        .chart-container-small {
+            position: relative;
+            width: 100%;
+            height: 250px;
+        }
+
+        .chart-container-medium {
+            position: relative;
+            width: 100%;
+            height: 350px;
+        }
+
+        .chart-container-heatmap {
+            position: relative;
+            width: 100%;
+            min-height: 200px;
+        }
+
+        /* Live indicator pulse animation */
+        @keyframes pulse-live {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .live-indicator {
+            animation: pulse-live 2s ease-in-out infinite;
+        }
+
+        /* Gradient background */
+        .neon-gradient {
+            background: linear-gradient(135deg, var(--neon-blue) 0%, var(--neon-pink) 100%);
+        }
+
+        /* Heatmap calendar styling */
+        .heatmap-container {
+            display: grid;
+            gap: 3px;
+            grid-auto-flow: column;
+            justify-content: start;
+        }
+
+        .heatmap-day {
+            width: 15px;
+            height: 15px;
+            border-radius: 2px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .heatmap-day:hover {
+            transform: scale(1.2);
+            border: 2px solid var(--neon-blue);
+        }
+
+        /* Metric card hover effect */
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(40, 71, 226, 0.1);
+            transition: all 0.2s ease;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid var(--neon-blue);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Info icon tooltip */
+        .info-icon-container {
+            position: relative;
+            z-index: 1;
+        }
+
+        .info-icon-container:hover {
+            z-index: 9999;
+        }
+
+        .info-icon-container:hover .info-tooltip {
+            display: block !important;
+        }
+
+        .info-tooltip {
+            animation: fadeIn 0.2s ease-in;
+            line-height: 1.5;
+            min-width: 280px;
+            max-width: 350px;
+            white-space: normal;
+        }
+
+        .info-tooltip::before {
+            content: '';
+            position: absolute;
+            left: -8px;
+            top: 12px;
+            width: 0;
+            height: 0;
+            border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent;
+            border-right: 8px solid white;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-5px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <div class="min-h-screen p-6">
+        <div class="max-w-7xl mx-auto">
+            <!-- Header with Neon Analytics Logo -->
+            <div id="header" class="bg-white rounded-lg shadow-sm p-4 mb-4 border border-gray-200">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <!-- Neon Analytics Logo -->
+                        <div class="w-12 h-12 rounded-lg neon-gradient flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h1 class="text-lg font-semibold text-gray-900">Neon Analytics</h1>
+                            <div class="text-xs text-gray-500 flex items-center">
+                                <span>Production Metrics</span>
+                                <span class="mx-1">›</span>
+                                <span id="metrics-subtitle">Dashboard</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Live indicator -->
+                    <div class="flex items-center space-x-3">
+                        <div id="demo-badge" class="px-3 py-1.5 bg-blue-50 text-blue-700 rounded-full text-xs font-semibold hidden">
+                            DEMO MODE
+                        </div>
+                        <div class="px-3 py-1.5 bg-blue-50 rounded-full text-xs font-semibold flex items-center space-x-1.5" style="color: var(--neon-blue);">
+                            <span class="w-2 h-2 rounded-full live-indicator" style="background-color: var(--neon-blue);"></span>
+                            <span>LIVE</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Report Selector -->
+                <div class="flex items-center space-x-3 mt-4">
+                    <span class="text-xs text-gray-500">Select Report:</span>
+                    <select id="metric-selector" class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs font-semibold focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="">-- Loading Reports --</option>
+                    </select>
+                    <div id="loading-spinner" class="spinner hidden"></div>
+                    <span class="text-xs text-gray-400" id="data-info">Loading available reports...</span>
+                </div>
+                <!-- Report Description -->
+                <div id="report-description" class="mt-2 text-xs text-gray-500 hidden">
+                    <span id="report-desc-text"></span>
+                </div>
+            </div>
+
+            <!-- Content Container (hidden until data loads) -->
+            <div id="analytics-content" class="hidden">
+                <!-- Key Metrics Cards Grid -->
+                <div id="key-metrics" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-4">
+                    <!-- Total Items -->
+                    <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-200 metric-card">
+                        <div class="mb-2">
+                            <span class="text-xs font-semibold text-gray-500 uppercase block mb-1">Total Items</span>
+                        </div>
+                        <div class="text-2xl font-semibold" style="color: var(--neon-blue);" id="metric-total">0</div>
+                        <div class="text-xs text-gray-500 mt-1">documents</div>
+                    </div>
+
+                    <!-- Content Types -->
+                    <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-200 metric-card">
+                        <div class="mb-2">
+                            <span class="text-xs font-semibold text-gray-500 uppercase block mb-1">Content Types</span>
+                        </div>
+                        <div class="text-2xl font-semibold text-gray-900" id="metric-types">0</div>
+                        <div class="text-xs text-gray-500 mt-1">unique types</div>
+                    </div>
+
+                    <!-- Active Users -->
+                    <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-200 metric-card">
+                        <div class="mb-2">
+                            <span class="text-xs font-semibold text-gray-500 uppercase block mb-1">Active Users</span>
+                        </div>
+                        <div class="text-2xl font-semibold text-gray-900" id="metric-users">0</div>
+                        <div class="text-xs text-gray-500 mt-1">contributors</div>
+                    </div>
+
+                    <!-- Avg per User -->
+                    <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-200 metric-card">
+                        <div class="mb-2">
+                            <span class="text-xs font-semibold text-gray-500 uppercase block mb-1">Avg per User</span>
+                        </div>
+                        <div class="text-2xl font-semibold text-gray-900" id="metric-avg">0</div>
+                        <div class="text-xs text-gray-500 mt-1">items/user</div>
+                    </div>
+
+                    <!-- Peak Day -->
+                    <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-200 metric-card">
+                        <div class="mb-2">
+                            <span class="text-xs font-semibold text-gray-500 uppercase block mb-1">Peak Day</span>
+                        </div>
+                        <div class="text-lg font-semibold text-gray-900" id="metric-peak-day">--</div>
+                        <div class="text-xs text-gray-500 mt-1" id="metric-peak-count">0 items</div>
+                    </div>
+
+                    <!-- Workfolders -->
+                    <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-200 metric-card">
+                        <div class="mb-2">
+                            <span class="text-xs font-semibold text-gray-500 uppercase block mb-1">Workfolders</span>
+                        </div>
+                        <div class="text-2xl font-semibold text-gray-900" id="metric-folders">0</div>
+                        <div class="text-xs text-gray-500 mt-1">active folders</div>
+                    </div>
+                </div>
+
+                <!-- Timeline Activity Chart -->
+                <div id="timeline-activity" class="bg-white rounded-lg shadow-sm p-6 mb-4 border border-gray-200">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-base font-semibold text-gray-900">Timeline Activity</h3>
+                            <div class="info-icon-container relative inline-block">
+                                <svg class="w-4 h-4 text-gray-400 cursor-help" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                                </svg>
+                                <div class="info-tooltip hidden absolute p-4 text-xs rounded-lg -top-3 left-6" style="background-color: white; color: #1F2937; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 1px solid #E5E7EB;">
+                                    Shows daily activity volume (bars) and cumulative total (line) over the selected time period. Helps identify trends and peak activity days.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-xs text-gray-500">Daily volume and cumulative trend</div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="timeline-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Two column layout for Types and Users -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+                    <!-- Content Type Distribution -->
+                    <div id="content-type-distribution" class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+                        <div class="flex items-center gap-2 mb-4">
+                            <h3 class="text-base font-semibold text-gray-900">Content Type Distribution</h3>
+                            <div class="info-icon-container relative inline-block">
+                                <svg class="w-4 h-4 text-gray-400 cursor-help" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                                </svg>
+                                <div class="info-tooltip hidden absolute p-4 text-xs rounded-lg -top-3 left-6" style="background-color: white; color: #1F2937; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 1px solid #E5E7EB;">
+                                    Breakdown of content by type (articles, images, SVG, etc.). Shows which content types are most frequently created or worked on.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="types-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- User Productivity -->
+                    <div id="user-productivity" class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+                        <div class="flex items-center gap-2 mb-4">
+                            <h3 class="text-base font-semibold text-gray-900">User Productivity</h3>
+                            <div class="info-icon-container relative inline-block">
+                                <svg class="w-4 h-4 text-gray-400 cursor-help" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                                </svg>
+                                <div class="info-tooltip hidden absolute p-4 text-xs rounded-lg -top-3 left-6" style="background-color: white; color: #1F2937; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 1px solid #E5E7EB;">
+                                    Activity level by user. Shows who is most active in creating or editing content. Color intensity indicates relative productivity level.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="users-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Three column layout: Calendar, Workfolders, Endpoints -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <!-- Calendar Heatmap -->
+                    <div id="activity-calendar" class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+                        <div class="flex items-center gap-2 mb-4">
+                            <h3 class="text-base font-semibold text-gray-900">Activity Calendar</h3>
+                            <div class="info-icon-container relative inline-block">
+                                <svg class="w-4 h-4 text-gray-400 cursor-help" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                                </svg>
+                                <div class="info-tooltip hidden absolute p-4 text-xs rounded-lg -top-3 left-6" style="background-color: white; color: #1F2937; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 1px solid #E5E7EB;">
+                                    GitHub-style activity heatmap showing daily content activity. Darker colors indicate higher activity. Hover over cells to see exact counts and dates.
+                                </div>
+                            </div>
+                        </div>
+                        <div id="calendar-heatmap" class="chart-container-heatmap">
+                            <!-- Heatmap will be generated here -->
+                        </div>
+                    </div>
+
+                    <!-- Workfolder Activity -->
+                    <div id="top-workfolders" class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+                        <div class="flex items-center gap-2 mb-4">
+                            <h3 class="text-base font-semibold text-gray-900">Top Workfolders</h3>
+                            <div class="info-icon-container relative inline-block">
+                                <svg class="w-4 h-4 text-gray-400 cursor-help" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                                </svg>
+                                <div class="info-tooltip hidden absolute p-4 text-xs rounded-lg -top-3 left-6" style="background-color: white; color: #1F2937; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 1px solid #E5E7EB;">
+                                    Most active organizational folders. Shows where content activity is concentrated within your workspace structure.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chart-container-small">
+                            <canvas id="workfolders-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Endpoint Distribution -->
+                    <div id="endpoint-usage" class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+                        <div class="flex items-center gap-2 mb-4">
+                            <h3 class="text-base font-semibold text-gray-900">Endpoint Usage</h3>
+                            <div class="info-icon-container relative inline-block">
+                                <svg class="w-4 h-4 text-gray-400 cursor-help" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                                </svg>
+                                <div class="info-tooltip hidden absolute p-4 text-xs rounded-lg -top-3 left-6" style="background-color: white; color: #1F2937; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 1px solid #E5E7EB;">
+                                    Distribution between NeonBo and NeonApp endpoints. Shows which system interface is being used more frequently.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chart-container-small">
+                            <canvas id="endpoints-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hourly Activity - Full width -->
+                <div id="hourly-activity" class="bg-white rounded-lg shadow-sm p-6 mb-4 border border-gray-200">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-base font-semibold text-gray-900">Hourly Activity</h3>
+                            <div class="info-icon-container relative inline-block">
+                                <svg class="w-4 h-4 text-gray-400 cursor-help" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                                </svg>
+                                <div class="info-tooltip hidden absolute p-4 text-xs rounded-lg -top-3 left-6" style="background-color: white; color: #1F2937; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 1px solid #E5E7EB;">
+                                    Average activity by hour of day (0-23). Identifies peak working hours and optimal times for content operations.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-xs text-gray-500">24-hour activity distribution</div>
+                    </div>
+                    <div class="chart-container-medium">
+                        <canvas id="hourly-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let currentMetric = null;
+        let currentReport = null;
+        let metricsData = null;
+        let availableReports = [];
+        let charts = {};
+        const isDemoMode = new URLSearchParams(window.location.search).get('demo') === 'true';
+
+        // All available widget IDs for visibility control
+        const allWidgetIds = [
+            'header',
+            'key-metrics',
+            'timeline-activity',
+            'content-type-distribution',
+            'user-productivity',
+            'activity-calendar',
+            'top-workfolders',
+            'endpoint-usage',
+            'hourly-activity'
+        ];
+
+        // Initialize on load
+        window.addEventListener('load', async function() {
+            console.log('Neon Analytics Dashboard initializing...');
+
+            // Show demo badge if in demo mode
+            if (isDemoMode) {
+                document.getElementById('demo-badge').classList.remove('hidden');
+            }
+
+            // Load available reports
+            await loadAvailableReports();
+
+            // Set up metric selector
+            const selector = document.getElementById('metric-selector');
+            selector.addEventListener('change', handleMetricChange);
+
+            // Check for report query parameter to preload a specific report
+            const urlParams = new URLSearchParams(window.location.search);
+            const reportParam = urlParams.get('report');
+
+            if (reportParam) {
+                // Find the report by ID in available reports
+                const reportExists = availableReports.some(r => r.id === reportParam);
+                if (reportExists) {
+                    selector.value = reportParam;
+                    handleMetricChange();
+                } else {
+                    console.warn(`Report '${reportParam}' not found in available reports`);
+                    document.getElementById('data-info').textContent = `Report '${reportParam}' not found`;
+                }
+            } else if (isDemoMode && availableReports.length > 0 && availableReports[0].id) {
+                // Pre-select first report if in demo mode (and no specific report requested)
+                selector.value = availableReports[0].id;
+                handleMetricChange();
+            }
+        });
+
+        async function loadAvailableReports() {
+            const demoParam = isDemoMode ? '?demo=true' : '';
+            const endpoint = `/neon/api/core/metrics${demoParam}`;
+
+            try {
+                const data = await PanelAPI.apiCallJson(endpoint);
+                availableReports = data.reports || [];
+
+                populateReportSelector(availableReports);
+                document.getElementById('data-info').textContent = 'Select a report to view analytics';
+
+                console.log('Available reports loaded:', availableReports.length);
+            } catch (error) {
+                console.error('Error loading available reports:', error);
+                document.getElementById('data-info').textContent = 'Error loading reports';
+
+                // Fallback to hardcoded options if API fails
+                const fallbackReports = [
+                    { id: 'month_worked', name: 'Month Worked Content', description: 'Content worked on in the last 30 days' },
+                    { id: 'month_creations', name: 'Month Creations', description: 'New content created in the last 30 days' },
+                    { id: 'month_active_users', name: 'Month Active Users', description: 'User activity for the last 30 days' },
+                    { id: 'week_worked', name: 'Week Worked Content', description: 'Content worked on in the last 7 days' },
+                    { id: 'week_creations', name: 'Week Creations', description: 'New content created in the last 7 days' },
+                    { id: 'week_active_users', name: 'Week Active Users', description: 'User activity for the last 7 days' }
+                ];
+                availableReports = fallbackReports;
+                populateReportSelector(fallbackReports);
+            }
+        }
+
+        function populateReportSelector(reports) {
+            const selector = document.getElementById('metric-selector');
+            selector.innerHTML = '<option value="">-- Select --</option>';
+
+            // Filter out reports without valid IDs
+            const validReports = reports.filter(report => report.id);
+
+            // Group reports by category if available
+            const grouped = {};
+            validReports.forEach(report => {
+                const category = report.category || 'other';
+                if (!grouped[category]) {
+                    grouped[category] = [];
+                }
+                grouped[category].push(report);
+            });
+
+            // Add options, grouped by category
+            Object.keys(grouped).forEach(category => {
+                if (Object.keys(grouped).length > 1) {
+                    const optgroup = document.createElement('optgroup');
+                    optgroup.label = category.charAt(0).toUpperCase() + category.slice(1) + ' Reports';
+
+                    grouped[category].forEach(report => {
+                        const option = document.createElement('option');
+                        option.value = report.id;
+                        option.textContent = report.name;
+                        option.dataset.description = report.description || '';
+                        option.dataset.widgets = JSON.stringify(report.widgets || allWidgetIds);
+                        optgroup.appendChild(option);
+                    });
+
+                    selector.appendChild(optgroup);
+                } else {
+                    grouped[category].forEach(report => {
+                        const option = document.createElement('option');
+                        option.value = report.id;
+                        option.textContent = report.name;
+                        option.dataset.description = report.description || '';
+                        option.dataset.widgets = JSON.stringify(report.widgets || allWidgetIds);
+                        selector.appendChild(option);
+                    });
+                }
+            });
+        }
+
+        function updateWidgetVisibility(reportWidgets) {
+            // Check if URL has active-widgets filter - if so, use that instead
+            const urlParams = new URLSearchParams(window.location.search);
+            const activeWidgetsParam = urlParams.get('active-widgets');
+
+            if (activeWidgetsParam) {
+                // URL filter takes precedence
+                return;
+            }
+
+            // Hide all widgets first
+            allWidgetIds.forEach(widgetId => {
+                const element = document.getElementById(widgetId);
+                if (element) {
+                    element.style.display = reportWidgets.includes(widgetId) ? '' : 'none';
+                }
+            });
+
+            console.log('Widget visibility updated for report. Active widgets:', reportWidgets);
+        }
+
+        async function handleMetricChange() {
+            const selector = document.getElementById('metric-selector');
+            const selectedOption = selector.options[selector.selectedIndex];
+            const metric = selector.value;
+
+            if (!metric) {
+                document.getElementById('analytics-content').classList.add('hidden');
+                document.getElementById('data-info').textContent = 'Select a report to view analytics';
+                document.getElementById('report-description').classList.add('hidden');
+                return;
+            }
+
+            currentMetric = metric;
+
+            // Get report metadata from selected option
+            const reportDescription = selectedOption.dataset.description || '';
+            let reportWidgets = allWidgetIds;
+            try {
+                reportWidgets = JSON.parse(selectedOption.dataset.widgets || '[]');
+                if (reportWidgets.length === 0) reportWidgets = allWidgetIds;
+            } catch (e) {
+                reportWidgets = allWidgetIds;
+            }
+
+            // Find current report from available reports
+            currentReport = availableReports.find(r => r.id === metric) || null;
+
+            // Show report description
+            if (reportDescription) {
+                document.getElementById('report-desc-text').textContent = reportDescription;
+                document.getElementById('report-description').classList.remove('hidden');
+            } else {
+                document.getElementById('report-description').classList.add('hidden');
+            }
+
+            // Update widget visibility based on report context
+            updateWidgetVisibility(reportWidgets);
+
+            showLoading(true);
+
+            try {
+                // Load data (demo or real API)
+                const data = await loadMetricsData(metric);
+                metricsData = parseNeonMetrics(data);
+
+                // Update UI
+                updateDashboard(metricsData, reportWidgets);
+
+                // Show content
+                document.getElementById('analytics-content').classList.remove('hidden');
+                document.getElementById('data-info').textContent = `Loaded: ${currentReport?.name || metric}`;
+
+            } catch (error) {
+                console.error('Error loading metrics:', error);
+                document.getElementById('data-info').textContent = 'Error loading data';
+                document.getElementById('analytics-content').classList.add('hidden');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function loadMetricsData(metric) {
+            // Validate metric parameter to prevent undefined/null in URL
+            if (!metric || metric === 'undefined' || metric === 'null') {
+                throw new Error('Invalid metric ID');
+            }
+
+            const demoParam = isDemoMode ? '?demo=true' : '';
+
+            // Use the consolidated API endpoint which handles both demo and real data
+            // PanelAPI.apiCallJson automatically handles prefix for embedded mode
+            const endpoint = `/neon/api/core/metrics/${metric}${demoParam}`;
+
+            return await PanelAPI.apiCallJson(endpoint);
+        }
+
+        function showLoading(show) {
+            const spinner = document.getElementById('loading-spinner');
+            if (show) {
+                spinner.classList.remove('hidden');
+            } else {
+                spinner.classList.add('hidden');
+            }
+        }
+
+        function updateDashboard(data, reportWidgets = allWidgetIds) {
+            console.log('Updating dashboard with data:', data);
+            console.log('Report widgets:', reportWidgets);
+
+            // Update metrics cards
+            document.getElementById('metric-total').textContent = data.totalItems.toLocaleString();
+            document.getElementById('metric-types').textContent = data.uniqueTypes;
+            document.getElementById('metric-users').textContent = data.uniqueUsers;
+            document.getElementById('metric-avg').textContent = data.avgPerUser.toFixed(1);
+            document.getElementById('metric-peak-day').textContent = data.peakDay.date;
+            document.getElementById('metric-peak-count').textContent = `${data.peakDay.count} items`;
+            document.getElementById('metric-folders').textContent = data.uniqueFolders;
+
+            // Destroy existing charts
+            Object.values(charts).forEach(chart => {
+                if (chart && typeof chart.destroy === 'function') {
+                    chart.destroy();
+                }
+            });
+            charts = {};
+
+            // Determine which charts to show based on both metric type and data availability
+            const hasTypes = data.types && data.types.length > 0;
+            const hasUsers = data.users && data.users.length > 0;
+            const hasWorkfolders = data.workfolders && data.workfolders.length > 0;
+            const hasEndpoints = data.endpoints && data.endpoints.length > 0;
+
+            // Check if URL has active-widgets filter - if so, skip dynamic visibility
+            const urlParams = new URLSearchParams(window.location.search);
+            const hasActiveWidgetsFilter = urlParams.get('active-widgets') !== null;
+
+            if (!hasActiveWidgetsFilter) {
+                // Apply report context-based widget visibility with data availability check
+                const typesContainer = document.getElementById('content-type-distribution');
+                const usersContainer = document.getElementById('user-productivity');
+                const workfoldersContainer = document.getElementById('top-workfolders');
+                const endpointsContainer = document.getElementById('endpoint-usage');
+
+                // Widget is visible if: in report widget list AND has data
+                if (typesContainer) {
+                    typesContainer.style.display = (reportWidgets.includes('content-type-distribution') && hasTypes) ? 'block' : 'none';
+                }
+                if (usersContainer) {
+                    usersContainer.style.display = (reportWidgets.includes('user-productivity') && hasUsers) ? 'block' : 'none';
+                }
+                if (workfoldersContainer) {
+                    workfoldersContainer.style.display = (reportWidgets.includes('top-workfolders') && hasWorkfolders) ? 'block' : 'none';
+                }
+                if (endpointsContainer) {
+                    endpointsContainer.style.display = (reportWidgets.includes('endpoint-usage') && hasEndpoints) ? 'block' : 'none';
+                }
+            }
+
+            // Initialize charts (check if functions exist and widget is in context)
+            if (typeof initTimelineChart === 'function' && reportWidgets.includes('timeline-activity')) {
+                charts.timeline = initTimelineChart(data);
+            }
+
+            if (hasTypes && typeof initTypesChart === 'function' && reportWidgets.includes('content-type-distribution')) {
+                charts.types = initTypesChart(data);
+            }
+
+            if (hasUsers && typeof initUsersChart === 'function' && reportWidgets.includes('user-productivity')) {
+                charts.users = initUsersChart(data);
+            }
+
+            if (typeof initHourlyChart === 'function' && reportWidgets.includes('hourly-activity')) {
+                charts.hourly = initHourlyChart(data);
+            }
+
+            if (hasWorkfolders && typeof initWorkfoldersChart === 'function' && reportWidgets.includes('top-workfolders')) {
+                charts.workfolders = initWorkfoldersChart(data);
+            }
+
+            if (hasEndpoints && typeof initEndpointsChart === 'function' && reportWidgets.includes('endpoint-usage')) {
+                charts.endpoints = initEndpointsChart(data);
+            }
+
+            // Render heatmap
+            if (typeof renderCalendarHeatmap === 'function' && reportWidgets.includes('activity-calendar')) {
+                renderCalendarHeatmap(data);
+            }
+
+            console.log('Dashboard updated successfully');
+        }
+
+        console.log('Neon Analytics Dashboard script loaded');
+
+        // ============================================================
+        // QUERY PARAMETERS HANDLING (runs immediately on page load)
+        // ============================================================
+        (function initQueryParameters() {
+            const urlParams = new URLSearchParams(window.location.search);
+
+            // Handle active-widgets parameter (uses global allWidgetIds)
+            const activeWidgets = urlParams.get('active-widgets');
+            if (activeWidgets) {
+                const widgetIds = activeWidgets.split(',').map(id => id.trim());
+
+                allWidgetIds.forEach(id => {
+                    const element = document.getElementById(id);
+                    if (element) {
+                        if (widgetIds.includes(id)) {
+                            element.style.display = ''; // Show
+                        } else {
+                            element.style.display = 'none'; // Hide
+                        }
+                    }
+                });
+
+                console.log('Active widgets filter applied from URL:', widgetIds);
+            }
+
+            // Handle watermark parameter
+            const watermark = urlParams.get('watermark');
+            if (watermark === 'true') {
+                const prefix = window.__PANEL_EMBED_PREFIX__ || '';
+                const logoPath = prefix + '/assets/Neon_Blue_Logo.svg';
+
+                const watermarkDiv = document.createElement('div');
+                watermarkDiv.id = 'watermark';
+                watermarkDiv.innerHTML = `
+                    <span style="font-size: 12px; color: #6B7280; font-weight: 500;">powered by</span>
+                    <img src="${logoPath}" alt="Neon Logo" style="height: 12px; object-fit: contain;">
+                `;
+                watermarkDiv.style.cssText = 'position: fixed; bottom: 16px; right: 16px; background: white; padding: 8px 12px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 8px; z-index: 9999; border: 1px solid #E5E7EB;';
+
+                document.body.appendChild(watermarkDiv);
+                console.log('Watermark added');
+            }
+        })();
+    </script>
+</body>
+
+</html>

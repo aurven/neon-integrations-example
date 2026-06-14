@@ -1,0 +1,571 @@
+{
+  "results": [
+    {
+      "@type": "WebEventItem",
+      "item": {
+        "type": "authoringmetric",
+        "requestId": "6d40de14-4be8-409a-9b15-1ab3ec67e9f1",
+        "timestamp": "2026-04-01T17:04:41.176Z",
+        "responseStatusCode": 200,
+        "requestCall": "PUT /contents/nodes/lock",
+        "resourceCall": "PUT /contents/nodes/lock",
+        "requestQueryParameters": {},
+        "requestHostName": "neon-app-test-region-a.neon.test",
+        "localHostName": "test-region-a-contents-67cd4d9864-ncszz",
+        "serviceId": "contents",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+        "userName": "Cristiano",
+        "scope": "NeonApp",
+        "userId": "ac8820bb-5e38-3844-bdac-4f8e5a71f5c7",
+        "indexRetry": 0,
+        "durationMs": 115,
+        "workerToServiceMs": 4,
+        "parallelOnStart": 1,
+        "updatedCount": 1,
+        "removedCount": 0,
+        "involvedRefs": [
+          "02a3-20290d6820a4-d149a3a02a54-1000"
+        ],
+        "externalRefs": [],
+        "types": [
+          "article"
+        ],
+        "workflows": [
+          "Story/Created"
+        ],
+        "workFolderPaths": [
+          "/Convergent/News"
+        ]
+      },
+      "score": 1
+    },
+    {
+      "@type": "WebEventItem",
+      "item": {
+        "type": "authoringmetric",
+        "requestId": "faa00434-3741-4cab-8b88-b2eaa31a12b5",
+        "timestamp": "2026-04-01T17:04:50.527Z",
+        "responseStatusCode": 200,
+        "requestCall": "PUT /contents/story/02a3-20290d6820a4-d149a3a02a54-1000",
+        "resourceCall": "PUT /contents/story/{id}",
+        "requestQueryString": "saveMode=MAJOR_CHECKIN&keepCheckedout=true",
+        "requestQueryParameters": {
+          "saveMode": [
+            "MAJOR_CHECKIN"
+          ],
+          "keepCheckedout": [
+            "true"
+          ]
+        },
+        "requestHostName": "neon-app-test-region-a.neon.test",
+        "localHostName": "test-region-a-contents-67cd4d9864-ncszz",
+        "serviceId": "contents",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+        "userName": "Cristiano",
+        "scope": "NeonApp",
+        "userId": "ac8820bb-5e38-3844-bdac-4f8e5a71f5c7",
+        "indexRetry": 0,
+        "durationMs": 503,
+        "workerToServiceMs": 6,
+        "parallelOnStart": 1,
+        "updatedCount": 1,
+        "removedCount": 0,
+        "involvedRefs": [
+          "02a3-20290d6820a4-d149a3a02a54-1000"
+        ],
+        "externalRefs": [],
+        "types": [
+          "article"
+        ],
+        "workflows": [
+          "Story/Created"
+        ],
+        "workFolderPaths": [
+          "/Convergent/News"
+        ]
+      },
+      "score": 1
+    },
+    {
+      "@type": "WebEventItem",
+      "item": {
+        "type": "authoringmetric",
+        "requestId": "22d3efe0-1b4e-4d6e-aa92-3e7ccaa72df8",
+        "timestamp": "2026-04-01T17:04:51.081Z",
+        "responseStatusCode": 200,
+        "requestCall": "PUT /contents/nodes/unlock",
+        "resourceCall": "PUT /contents/nodes/unlock",
+        "requestQueryString": "unlockMode=UNDO",
+        "requestQueryParameters": {
+          "unlockMode": [
+            "UNDO"
+          ]
+        },
+        "requestHostName": "neon-app-test-region-a.neon.test",
+        "localHostName": "test-region-a-contents-67cd4d9864-ncszz",
+        "serviceId": "contents",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+        "userName": "Cristiano",
+        "scope": "NeonApp",
+        "userId": "ac8820bb-5e38-3844-bdac-4f8e5a71f5c7",
+        "indexRetry": 0,
+        "durationMs": 32,
+        "workerToServiceMs": 2,
+        "parallelOnStart": 1,
+        "updatedCount": 1,
+        "removedCount": 0,
+        "involvedRefs": [
+          "02a3-20290d6820a4-d149a3a02a54-1000"
+        ],
+        "externalRefs": [],
+        "types": [
+          "article"
+        ],
+        "workflows": [
+          "Story/Created"
+        ],
+        "workFolderPaths": [
+          "/Convergent/News"
+        ]
+      },
+      "score": 1
+    },
+    {
+      "@type": "WebEventItem",
+      "item": {
+        "type": "authoringmetric",
+        "requestId": "b3f12a07-9c1e-4d88-a301-7e2b0f5c3a91",
+        "timestamp": "2026-04-01T18:22:05.340Z",
+        "responseStatusCode": 200,
+        "requestCall": "PUT /contents/nodes/lock",
+        "resourceCall": "PUT /contents/nodes/lock",
+        "requestQueryParameters": {},
+        "requestHostName": "neon-app-test-region-a.neon.test",
+        "localHostName": "test-region-a-contents-67cd4d9864-ncszz",
+        "serviceId": "contents",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+        "userName": "Sofia",
+        "scope": "NeonApp",
+        "userId": "f72c3d91-a4b7-4e50-9c2d-1f8e0a3b6d44",
+        "indexRetry": 0,
+        "durationMs": 98,
+        "workerToServiceMs": 3,
+        "parallelOnStart": 1,
+        "updatedCount": 1,
+        "removedCount": 0,
+        "involvedRefs": [
+          "02a3-20290d6820a4-d149a3a02a54-1000"
+        ],
+        "externalRefs": [],
+        "types": [
+          "article"
+        ],
+        "workflows": [
+          "Story/Edit"
+        ],
+        "workFolderPaths": [
+          "/Convergent/News"
+        ]
+      },
+      "score": 1
+    },
+    {
+      "@type": "WebEventItem",
+      "item": {
+        "type": "authoringmetric",
+        "requestId": "c9e74b21-5f3a-4102-b8d7-2c3a1e7f9b05",
+        "timestamp": "2026-04-01T18:22:48.912Z",
+        "responseStatusCode": 200,
+        "requestCall": "PUT /contents/story/02a3-20290d6820a4-d149a3a02a54-1000",
+        "resourceCall": "PUT /contents/story/{id}",
+        "requestQueryString": "saveMode=MAJOR_CHECKIN&keepCheckedout=true",
+        "requestQueryParameters": {
+          "saveMode": [
+            "MAJOR_CHECKIN"
+          ],
+          "keepCheckedout": [
+            "true"
+          ]
+        },
+        "requestHostName": "neon-app-test-region-a.neon.test",
+        "localHostName": "test-region-a-contents-67cd4d9864-ncszz",
+        "serviceId": "contents",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+        "userName": "Sofia",
+        "scope": "NeonApp",
+        "userId": "f72c3d91-a4b7-4e50-9c2d-1f8e0a3b6d44",
+        "indexRetry": 0,
+        "durationMs": 441,
+        "workerToServiceMs": 5,
+        "parallelOnStart": 1,
+        "updatedCount": 1,
+        "removedCount": 0,
+        "involvedRefs": [
+          "02a3-20290d6820a4-d149a3a02a54-1000"
+        ],
+        "externalRefs": [],
+        "types": [
+          "article"
+        ],
+        "workflows": [
+          "Story/Edit"
+        ],
+        "workFolderPaths": [
+          "/Convergent/News"
+        ]
+      },
+      "score": 1
+    },
+    {
+      "@type": "WebEventItem",
+      "item": {
+        "type": "authoringmetric",
+        "requestId": "d1a83c54-7b2e-4f60-95e1-3d4b2f8c0a17",
+        "timestamp": "2026-04-01T18:23:01.205Z",
+        "responseStatusCode": 200,
+        "requestCall": "PUT /contents/nodes/unlock",
+        "resourceCall": "PUT /contents/nodes/unlock",
+        "requestQueryString": "unlockMode=UNDO",
+        "requestQueryParameters": {
+          "unlockMode": [
+            "UNDO"
+          ]
+        },
+        "requestHostName": "neon-app-test-region-a.neon.test",
+        "localHostName": "test-region-a-contents-67cd4d9864-ncszz",
+        "serviceId": "contents",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+        "userName": "Sofia",
+        "scope": "NeonApp",
+        "userId": "f72c3d91-a4b7-4e50-9c2d-1f8e0a3b6d44",
+        "indexRetry": 0,
+        "durationMs": 28,
+        "workerToServiceMs": 2,
+        "parallelOnStart": 1,
+        "updatedCount": 1,
+        "removedCount": 0,
+        "involvedRefs": [
+          "02a3-20290d6820a4-d149a3a02a54-1000"
+        ],
+        "externalRefs": [],
+        "types": [
+          "article"
+        ],
+        "workflows": [
+          "Story/Edit"
+        ],
+        "workFolderPaths": [
+          "/Convergent/News"
+        ]
+      },
+      "score": 1
+    },
+    {
+      "@type": "WebEventItem",
+      "item": {
+        "type": "authoringmetric",
+        "requestId": "e5c90271-1d4f-4a73-b6c8-4e5d3a9e1b28",
+        "timestamp": "2026-04-01T18:23:04.667Z",
+        "responseStatusCode": 200,
+        "requestCall": "PUT /contents/story/02a3-20290d6820a4-d149a3a02a54-1000",
+        "resourceCall": "PUT /contents/story/{id}",
+        "requestQueryString": "saveMode=MAJOR_CHECKIN",
+        "requestQueryParameters": {
+          "saveMode": [
+            "MAJOR_CHECKIN"
+          ]
+        },
+        "requestHostName": "neon-app-test-region-a.neon.test",
+        "localHostName": "test-region-a-contents-67cd4d9864-ncszz",
+        "serviceId": "contents",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+        "userName": "Sofia",
+        "scope": "NeonApp",
+        "userId": "f72c3d91-a4b7-4e50-9c2d-1f8e0a3b6d44",
+        "indexRetry": 0,
+        "durationMs": 388,
+        "workerToServiceMs": 4,
+        "parallelOnStart": 1,
+        "updatedCount": 1,
+        "removedCount": 0,
+        "involvedRefs": [
+          "02a3-20290d6820a4-d149a3a02a54-1000"
+        ],
+        "externalRefs": [],
+        "types": [
+          "article"
+        ],
+        "workflows": [
+          "Story/Ready"
+        ],
+        "workFolderPaths": [
+          "/Convergent/News"
+        ]
+      },
+      "score": 1
+    },
+    {
+      "@type": "WebEventItem",
+      "item": {
+        "type": "authoringmetric",
+        "requestId": "a7d21b83-6c0e-4e95-8f3a-5f6e4b0d2c39",
+        "timestamp": "2026-04-01T19:30:57.846Z",
+        "responseStatusCode": 200,
+        "requestCall": "PUT /contents/nodes/lock",
+        "resourceCall": "PUT /contents/nodes/lock",
+        "requestQueryParameters": {},
+        "requestHostName": "neon-app-test-region-a.neon.test",
+        "localHostName": "test-region-a-contents-67cd4d9864-wqmnb",
+        "serviceId": "contents",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+        "userName": "Marco",
+        "scope": "NeonApp",
+        "userId": "3b9a0cf2-8e51-4b7c-a1f0-6c7d5e2f4b80",
+        "indexRetry": 0,
+        "durationMs": 87,
+        "workerToServiceMs": 3,
+        "parallelOnStart": 1,
+        "updatedCount": 1,
+        "removedCount": 0,
+        "involvedRefs": [
+          "02a3-20290d6820a4-d149a3a02a54-1000"
+        ],
+        "externalRefs": [],
+        "types": [
+          "article"
+        ],
+        "workflows": [
+          "Story/Ready"
+        ],
+        "workFolderPaths": [
+          "/Convergent/News"
+        ]
+      },
+      "score": 1
+    },
+    {
+      "@type": "WebEventItem",
+      "item": {
+        "type": "authoringmetric",
+        "requestId": "b8e32c94-7d1f-4fa6-9041-6a7f5c1e3d40",
+        "timestamp": "2026-04-01T19:31:08.193Z",
+        "responseStatusCode": 200,
+        "requestCall": "PUT /publication/publish/02a3-20290d6820a4-d149a3a02a54-1000",
+        "resourceCall": "PUT /publication/publish/{id}",
+        "requestQueryParameters": {},
+        "requestHostName": "neon-app-test-region-a.neon.test",
+        "localHostName": "test-region-a-publication-59bc7f8d74-rxkpl",
+        "serviceId": "publication",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+        "userName": "Marco",
+        "scope": "NeonApp",
+        "userId": "3b9a0cf2-8e51-4b7c-a1f0-6c7d5e2f4b80",
+        "indexRetry": 0,
+        "durationMs": 1247,
+        "workerToServiceMs": 9,
+        "parallelOnStart": 1,
+        "updatedCount": 1,
+        "removedCount": 0,
+        "involvedRefs": [
+          "02a3-20290d6820a4-d149a3a02a54-1000"
+        ],
+        "externalRefs": [],
+        "types": [
+          "article"
+        ],
+        "workflows": [
+          "Story/Ready"
+        ],
+        "workFolderPaths": [
+          "/Convergent/News"
+        ]
+      },
+      "score": 1
+    },
+    {
+      "@type": "WebEventItem",
+      "item": {
+        "type": "authoringmetric",
+        "requestId": "c9f43d05-8e20-4gb7-a152-7b8g6d2f4e51",
+        "timestamp": "2026-04-01T19:31:09.441Z",
+        "responseStatusCode": 200,
+        "requestCall": "PUT /contents/nodes/unlock",
+        "resourceCall": "PUT /contents/nodes/unlock",
+        "requestQueryString": "unlockMode=UNDO",
+        "requestQueryParameters": {
+          "unlockMode": [
+            "UNDO"
+          ]
+        },
+        "requestHostName": "neon-app-test-region-a.neon.test",
+        "localHostName": "test-region-a-contents-67cd4d9864-wqmnb",
+        "serviceId": "contents",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+        "userName": "Marco",
+        "scope": "NeonApp",
+        "userId": "3b9a0cf2-8e51-4b7c-a1f0-6c7d5e2f4b80",
+        "indexRetry": 0,
+        "durationMs": 24,
+        "workerToServiceMs": 2,
+        "parallelOnStart": 1,
+        "updatedCount": 1,
+        "removedCount": 0,
+        "involvedRefs": [
+          "02a3-20290d6820a4-d149a3a02a54-1000"
+        ],
+        "externalRefs": [],
+        "types": [
+          "article"
+        ],
+        "workflows": [
+          "Story/Ready"
+        ],
+        "workFolderPaths": [
+          "/Convergent/News"
+        ]
+      },
+      "score": 1
+    },
+    {
+      "@type": "WebEventItem",
+      "item": {
+        "type": "notificationpsn",
+        "requestId": "d444ffbe-401e-4e2c-9ed6-361b343f159e",
+        "timestamp": "2026-04-01T19:31:17.234Z",
+        "responseStatusCode": 500,
+        "resourceCall": "/psn/<notify>/test",
+        "viewStatus": "LIVE",
+        "localHostName": "eidos-psn-0",
+        "serviceId": "psn",
+        "siteName": [
+          "TheGlobe"
+        ],
+        "indexRetry": 0,
+        "durationMs": 12,
+        "wakeupId": "psn:eidos-psn-0_1775071875061",
+        "involvedNodes": 1,
+        "deltaMsFromPublish": 3082,
+        "externalRefs": [
+          null
+        ],
+        "involvedRefs": [
+          "02a3-20290d6820a4-d149a3a02a54-1000"
+        ],
+        "endpointsResults": {}
+      },
+      "score": 0,
+      "sortValues": {
+        "timestamp": "1775071877234"
+      }
+    },
+    {
+      "@type": "WebEventItem",
+      "item": {
+        "type": "notificationpsn",
+        "requestId": "266b0747-bc81-4dce-adb1-d03e20ca3238",
+        "timestamp": "2026-04-01T19:36:12.532Z",
+        "responseStatusCode": 500,
+        "resourceCall": "/psn/<notify>/test",
+        "viewStatus": "LIVE",
+        "localHostName": "eidos-psn-0",
+        "serviceId": "psn",
+        "siteName": [
+          "TheGlobe"
+        ],
+        "indexRetry": 1,
+        "durationMs": 0,
+        "wakeupId": "psn:eidos-psn-0_1775072171601",
+        "involvedNodes": 1,
+        "deltaMsFromPublish": 305296,
+        "externalRefs": [
+          null
+        ],
+        "involvedRefs": [
+          "02a3-20290d6820a4-d149a3a02a54-1000"
+        ],
+        "endpointsResults": {}
+      },
+      "score": 0,
+      "sortValues": {
+        "timestamp": "1775072172532"
+      }
+    },
+    {
+      "@type": "WebEventItem",
+      "item": {
+        "type": "notificationpsn",
+        "requestId": "2a145535-3a5f-4c37-92ac-b8735e97b187",
+        "timestamp": "2026-04-01T19:36:18.759Z",
+        "responseStatusCode": 500,
+        "resourceCall": "/psn/<notify>/test",
+        "viewStatus": "LIVE",
+        "localHostName": "eidos-psn-0",
+        "serviceId": "psn",
+        "siteName": [
+          "NextFrontier"
+        ],
+        "indexRetry": 1,
+        "durationMs": 0,
+        "wakeupId": "psn:eidos-psn-0_1775072178364",
+        "involvedNodes": 1,
+        "deltaMsFromPublish": 309613,
+        "externalRefs": [
+          null
+        ],
+        "involvedRefs": [
+          "02a3-20290d6820a4-d149a3a02a54-1000"
+        ],
+        "endpointsResults": {}
+      },
+      "score": 0,
+      "sortValues": {
+        "timestamp": "1775072178759"
+      }
+    }
+  ],
+  "aggregations": {
+    "resourceCall": {
+      "type": "buckets",
+      "name": "resourceCall",
+      "buckets": [
+        {
+          "type": "term",
+          "key": "PUT /contents/nodes/lock",
+          "docCount": 3,
+          "aggregations": []
+        },
+        {
+          "type": "term",
+          "key": "PUT /contents/nodes/unlock",
+          "docCount": 3,
+          "aggregations": []
+        },
+        {
+          "type": "term",
+          "key": "PUT /contents/story/{id}",
+          "docCount": 3,
+          "aggregations": []
+        },
+        {
+          "type": "term",
+          "key": "PUT /publication/publish/{id}",
+          "docCount": 1,
+          "aggregations": []
+        },
+        {
+          "type": "term",
+          "key": "/psn/<notify>/test",
+          "docCount": 3,
+          "aggregations": []
+        }
+      ]
+    }
+  },
+  "metadata": {
+    "tookMs": 21,
+    "maxScore": 1,
+    "totalHits": 13,
+    "offset": 0,
+    "maxResults": 1000
+  }
+}

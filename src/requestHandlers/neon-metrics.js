@@ -1,0 +1,117 @@
+const neonApi = require('../helpers/neon-bo-api-v3.js');
+const { safeLogRequest, withNeonSession } = require("../helpers/utils.js");
+const { authenticate } = require("../helpers/auth.js");
+const fs = require('fs');
+const path = require('path');
+
+/**
+ * Get available metrics reports from Neon BO
+ * GET /neon/api/core/metrics
+ */
+async function getMetricsReportsHandler(request, reply) {
+    console.log("getMetricsReportsHandler << IN:");
+    const safeRequest = safeLogRequest(request?.headers || {}, {});
+    console.log("Request Headers:", JSON.stringify(safeRequest.headers));
+
+    const isDemoMode = request.query.demo === 'true';
+
+    if (isDemoMode) {
+        // Return demo data
+        const demoReportsPath = path.join(__dirname, '../../public/data/neon-analytics/available-reports.json');
+        try {
+            const demoData = JSON.parse(fs.readFileSync(demoReportsPath, 'utf8'));
+            console.log("getMetricsReportsHandler << OUT (demo mode):");
+            return reply.status(200).send(demoData);
+        } catch (error) {
+            console.error("Failed to load demo reports data:", error.message);
+            return reply.status(500).send({ error: "Failed to load demo data" });
+        }
+    }
+
+    try {
+        const result = await withNeonSession(async (neon) => {
+            return await neon.getMetricsReports();
+        });
+        console.log("getMetricsReportsHandler << OUT:");
+        console.log("Response Data:", result);
+
+        // Ensure consistent response format - frontend expects { reports: [...] }
+        let reports = result?.reports ? result.reports : (Array.isArray(result) ? result : []);
+
+        // Normalize report data - API returns 'path' but frontend expects 'id'
+        // The path contains the full API path (e.g., "/core/metrics/modelBuild/modelcreation")
+        // We use the path after "/core/metrics/" as the ID to preserve the full route
+        reports = reports.map(report => {
+            if (!report.id && report.path) {
+                // Extract ID from path (e.g., "/core/metrics/modelBuild/modelcreation" -> "modelBuild/modelcreation")
+                const prefix = '/core/metrics/';
+                if (report.path.startsWith(prefix)) {
+                    report.id = report.path.substring(prefix.length);
+                } else {
+                    report.id = report.path;
+                }
+            }
+            return report;
+        });
+
+        return reply.status(200).send({ reports });
+    } catch (error) {
+        console.error("getMetricsReportsHandler << ERROR:", error.message);
+        return reply.status(error.response?.status || 500).send({
+            error: error.message,
+            details: error.response?.data || null
+        });
+    }
+}
+
+/**
+ * Get specific metrics data from Neon BO
+ * GET /neon/api/core/metrics/* (supports reportId with slashes like "outgoingCalls/test")
+ */
+async function getMetricsDataHandler(request, reply) {
+    const reportId = request.params['*'];
+
+    console.log("getMetricsDataHandler << IN:");
+    const safeRequest = safeLogRequest(request?.headers || {}, {});
+    console.log("Request Headers:", JSON.stringify(safeRequest.headers));
+    console.log("Report ID:", reportId);
+
+    const isDemoMode = request.query.demo === 'true';
+
+    if (isDemoMode) {
+        // Return demo data based on reportId
+        const demoDataPath = path.join(__dirname, `../../public/data/neon-analytics/api-metrics-example-${reportId}.json`);
+        try {
+            if (fs.existsSync(demoDataPath)) {
+                const demoData = JSON.parse(fs.readFileSync(demoDataPath, 'utf8'));
+                console.log("getMetricsDataHandler << OUT (demo mode):");
+                return reply.status(200).send(demoData);
+            } else {
+                return reply.status(404).send({ error: `Demo data for report '${reportId}' not found` });
+            }
+        } catch (error) {
+            console.error("Failed to load demo metrics data:", error.message);
+            return reply.status(500).send({ error: "Failed to load demo data" });
+        }
+    }
+
+    try {
+        const result = await withNeonSession(async (neon) => {
+            return await neon.getMetricsData(reportId);
+        });
+        console.log("getMetricsDataHandler << OUT:");
+        console.log("Response Data:", result);
+        return reply.status(200).send(result);
+    } catch (error) {
+        console.error("getMetricsDataHandler << ERROR:", error.message);
+        return reply.status(error.response?.status || 500).send({
+            error: error.message,
+            details: error.response?.data || null
+        });
+    }
+}
+
+module.exports = {
+    getMetricsReportsHandler,
+    getMetricsDataHandler
+};

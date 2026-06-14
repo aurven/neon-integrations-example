@@ -1,0 +1,31 @@
+{
+  "defaults": {
+    "interval": 300,
+    "timeout": 30
+  },
+  "endpoints": [
+    {
+      "name": "production",
+      "enabled": true,
+      "url": "https://prod.example.com/test",
+      "apikey": "${NEON_EXT_APIKEY}"
+    },
+    {
+      "name": "staging",
+      "enabled": true,
+      "host": "staging.example.com",
+      "port": 443,
+      "path": "/test",
+      "apikey": "${NEON_EXT_APIKEY_LIMITED}",
+      "interval": 60
+    },
+    {
+      "name": "local-dev",
+      "enabled": false,
+      "host": "localhost",
+      "port": 3000,
+      "path": "/test",
+      "apikey": "your-dev-api-key-here"
+    }
+  ]
+}

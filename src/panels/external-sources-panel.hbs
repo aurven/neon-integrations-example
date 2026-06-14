@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>External Sources Panel</title>
+    <script src="/js/panel-api-helper.js"></script>
+    <script src="/neon/api/demo-integration/js/panel-api-helper.js"></script>
+    <link rel="stylesheet" href="/css/tailwind-panels.css">
+    <link rel="stylesheet" href="/neon/api/demo-integration/css/tailwind-panels.css">
+    <link rel="stylesheet" href="/css/external-sources-panel.css">
+    <link rel="stylesheet" href="/neon/api/demo-integration/css/external-sources-panel.css">
+</head>
+<body class="bg-gray-50 min-h-screen font-sans">
+    <div id="app" class="container mx-auto p-4 max-w-6xl">
+        <!-- Header -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h1 class="text-2xl font-bold text-gray-800 mb-4" hidden>External Sources</h1>
+            
+            <!-- Source Tabs -->
+            <div class="source-tabs mb-4">
+                <div class="flex flex-wrap gap-3 justify-start">
+                    <button class="provider-chip active" data-source="pexels" title="Pexels">
+                        <img src="/assets/logos/pexels.svg" alt="Pexels" class="provider-logo">
+                    </button>
+                    <button class="provider-chip" data-source="youtube" title="YouTube">
+                        <img src="/assets/logos/youtube.svg" alt="YouTube" class="provider-logo">
+                    </button>
+                    <button class="provider-chip" data-source="dailymotion" title="DailyMotion">
+                        <img src="/assets/logos/dailymotion.svg" alt="DailyMotion" class="provider-logo">
+                    </button>
+                </div>
+            </div>
+
+            <!-- Asset Type Tabs -->
+            <div class="asset-type-tabs mb-4" id="assetTypeTabs">
+                <div class="flex space-x-2">
+                    <button class="tab-button active" data-type="photos">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        Photos
+                    </button>
+                    <button class="tab-button" data-type="videos">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                        </svg>
+                        Videos
+                    </button>
+                </div>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="flex space-x-2">
+                <div class="flex-1 relative">
+                    <input 
+                        id="searchInput" 
+                        type="text" 
+                        placeholder="Search for photos and videos..." 
+                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    />
+                    <svg class="w-5 h-5 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </div>
+                <button 
+                    id="searchBtn" 
+                    class="px-6 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors"
+                >
+                    Search
+                </button>
+                <button 
+                    id="clearBtn" 
+                    class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
+                >
+                    Clear
+                </button>
+            </div>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator" class="hidden text-center py-8">
+            <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+            <p class="mt-2 text-gray-600">Loading assets...</p>
+        </div>
+
+        <!-- No Results -->
+        <div id="noResults" class="hidden text-center py-8 bg-white rounded-lg shadow-md">
+            <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <h3 class="text-lg font-medium text-gray-800 mb-2">No results found</h3>
+            <p class="text-gray-600">Try adjusting your search terms or browse our curated content.</p>
+        </div>
+
+        <!-- Asset Grid -->
+        <div id="assetGrid" class="grid grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Asset cards will be populated here -->
+        </div>
+    </div>
+
+    <!-- Asset Modal -->
+    <div id="assetModal" class="modal">
+        <div class="modal-content p-6 w-full max-w-4xl">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-gray-800">Asset Details</h2>
+                <button id="closeModal" class="text-gray-500 hover:text-gray-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div id="modalBody">
+                <!-- Modal content will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let state = {
+            apiKey: '{{{apiKey}}}',
+            neonAppUrl: '{{{neonAppUrl}}}',
+            pexelsApiKey: '{{{pexelsApiKey}}}',
+            youtubeApiKey: '{{{youtubeApiKey}}}',
+            dailymotionApiKey: '{{{dailymotionApiKey}}}',
+            integrationsApiKey: '{{{integrationsApiKey}}}',
+            currentSource: 'pexels',
+            currentType: 'photos',
+            currentQuery: '',
+            isLoading: false,
+            neonContext: null
+        };
+
+        // DOM elements
+        const domEls = {
+            searchInput: document.getElementById('searchInput'),
+            searchBtn: document.getElementById('searchBtn'),
+            clearBtn: document.getElementById('clearBtn'),
+            assetGrid: document.getElementById('assetGrid'),
+            loadingIndicator: document.getElementById('loadingIndicator'),
+            noResults: document.getElementById('noResults'),
+            assetModal: document.getElementById('assetModal'),
+            modalBody: document.getElementById('modalBody'),
+            closeModal: document.getElementById('closeModal')
+        };
+
+        // Utility functions
+        function apiCall(endpoint, method = 'GET', body = null) {
+            const path = `/panels/external-sources/api/${endpoint}`;
+            const options = {
+                method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apikey': state.apiKey
+                }
+            };
+
+            if (body) {
+                options.body = JSON.stringify(body);
+            }
+
+            // Use PanelAPI helper to handle embedded iframe routing
+            return PanelAPI.apiCallJson(path, options);
+        }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
+
+        // PostMessage API for Neon CMS communication
+        function setupPostMessageApi() {
+            console.log('Setting up PostMessage API for External Sources');
+
+            window.addEventListener('message', (event) => {
+                // Validate origin for security
+                if (event.origin !== state.neonAppUrl && event.origin !== window.parent.origin) {
+                    console.warn('Received message from unwanted origin:', event.origin);
+                    return;
+                }
+                console.log('Received message:', event, event.data);
+
+                if (event.data) {
+                    switch (event.data.key) {
+                        case 'getInfo':
+                            state.neonContext = event.data.info;
+                            console.log('Neon context updated:', state.neonContext);
+                            break;
+
+                        default:
+                            console.warn('Unknown neonContext key:', event.data.key);
+                    }
+                }
+            });
+
+            // Send ready message to parent
+            console.log('Sending ready message to parent');
+            window.parent.postMessage({ type: 'panel-ready', info: { op: 'getInfo' } }, window.parent.origin);
+            console.log('Ready message sent');
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Source tabs
+            document.querySelectorAll('.source-tabs [data-source]').forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const source = e.target.closest('[data-source]').dataset.source;
+                    switchSource(source);
+                });
+            });
+
+            // Asset type tabs
+            document.querySelectorAll('.asset-type-tabs [data-type]').forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const type = e.target.closest('[data-type]').dataset.type;
+                    switchAssetType(type);
+                });
+            });
+
+            // Search functionality
+            domEls.searchBtn.addEventListener('click', performSearch);
+            domEls.searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+
+            // Clear functionality
+            domEls.clearBtn.addEventListener('click', clearSearch);
+
+            // Modal close
+            domEls.closeModal.addEventListener('click', closeModal);
+            domEls.assetModal.addEventListener('click', (e) => {
+                if (e.target === domEls.assetModal) {
+                    closeModal();
+                }
+            });
+        }
+
+        // Switch source
+        function switchSource(source) {
+            state.currentSource = source;
+            updateActiveTab('[data-source]', source);
+
+            // Update asset type tabs visibility based on source
+            const assetTypeTabs = document.getElementById('assetTypeTabs');
+            if (source === 'youtube' || source === 'dailymotion') {
+                // Hide asset type tabs for YouTube and DailyMotion (videos only)
+                assetTypeTabs.style.display = 'none';
+                state.currentType = 'videos';
+            } else {
+                // Show asset type tabs for Pexels
+                assetTypeTabs.style.display = 'block';
+            }
+
+            loadDefaultAssets();
+        }
+
+        // Switch asset type
+        function switchAssetType(type) {
+            state.currentType = type;
+            updateActiveTab('[data-type]', type);
+            loadDefaultAssets();
+        }
+
+        // Update active tab
+        function updateActiveTab(selector, value) {
+            document.querySelectorAll(selector).forEach(tab => {
+                if (tab.dataset.source === value || tab.dataset.type === value) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+        }
+
+        // Perform search
+        function performSearch() {
+            state.currentQuery = domEls.searchInput.value?.trim() || '';
+            searchAssets(state.currentQuery);
+        }
+
+        // Clear search
+        function clearSearch() {
+            domEls.searchInput.value = '';
+            state.currentQuery = '';
+            loadDefaultAssets();
+        }
+
+        // Load default assets
+        function loadDefaultAssets() {
+            searchAssets('');
+        }
+
+        // Search assets
+        async function searchAssets(query) {
+            if (state.isLoading) return;
+
+            showLoading(true);
+            clearResults();
+
+            try {
+                let assets = [];
+
+                if (state.currentSource === 'pexels') {
+                    assets = await searchPexels(query);
+                } else if (state.currentSource === 'youtube') {
+                    assets = await searchYouTube(query);
+                } else if (state.currentSource === 'dailymotion') {
+                    assets = await searchDailyMotion(query);
+                }
+
+                displayAssets(assets);
+            } catch (error) {
+                console.error('Search error:', error);
+                showNoResults();
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Search Pexels
+        async function searchPexels(query) {
+            // Build the full API path including v1 or videos
+            let apiPath;
+            if (state.currentType === 'photos') {
+                apiPath = query ? 'v1/search' : 'v1/curated';
+            } else {
+                apiPath = query ? 'videos/search' : 'videos/popular';
+            }
+
+            const url = query
+                ? `pexels/${apiPath}?query=${encodeURIComponent(query)}&per_page=20`
+                : `pexels/${apiPath}?per_page=20`;
+
+            try {
+                const data = await apiCall(url);
+                return state.currentType === 'photos' ? data.photos : data.videos;
+            } catch (error) {
+                console.error('Error fetching from Pexels:', error);
+                return [];
+            }
+        }
+
+        // Search YouTube
+        async function searchYouTube(query) {
+            try {
+                let endpoint;
+                let params = 'part=snippet&type=video&maxResults=20';
+
+                if (query) {
+                    params += `&q=${encodeURIComponent(query)}`;
+                    endpoint = 'search';
+                } else {
+                    // Get popular videos
+                    endpoint = 'videos';
+                    params = 'part=snippet,contentDetails,statistics&chart=mostPopular&maxResults=20';
+                }
+
+                const url = `youtube/${endpoint}?${params}`;
+                const data = await apiCall(url);
+
+                // Transform YouTube data to standard format
+                return (data.items || []).map(item => ({
+                    id: item.id?.videoId || item.id,
+                    title: item.snippet.title,
+                    description: item.snippet.description,
+                    thumbnail_url: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.medium?.url,
+                    channel: item.snippet.channelTitle,
+                    publishedAt: item.snippet.publishedAt,
+                    videoUrl: `https://www.youtube.com/watch?v=${item.id?.videoId || item.id}`,
+                    embedUrl: `https://www.youtube.com/embed/${item.id?.videoId || item.id}`,
+                    viewCount: item.statistics?.viewCount,
+                    duration: item.contentDetails?.duration
+                }));
+            } catch (error) {
+                console.error('Error fetching from YouTube:', error);
+                return [];
+            }
+        }
+
+        // Search DailyMotion
+        async function searchDailyMotion(query) {
+            try {
+                let params = 'fields=id,title,description,thumbnail_url,thumbnail_720_url,duration,created_time,views_total,owner.screenname,url&limit=20';
+
+                if (query) {
+                    params += `&search=${encodeURIComponent(query)}`;
+                } else {
+                    params += '&featured=true';
+                }
+
+                const url = `dailymotion/videos?${params}`;
+                const data = await apiCall(url);
+
+                // Transform DailyMotion data to standard format
+                return (data.list || []).map(item => ({
+                    id: item.id,
+                    title: item.title,
+                    description: item.description,
+                    thumbnail_url: item.thumbnail_720_url || item.thumbnail_url,
+                    channel: item['owner.screenname'] || 'Unknown',
+                    publishedAt: new Date(item.created_time * 1000).toISOString(),
+                    videoUrl: item.url || `https://www.dailymotion.com/video/${item.id}`,
+                    embedUrl: `https://www.dailymotion.com/embed/video/${item.id}`,
+                    viewCount: item.views_total,
+                    duration: item.duration
+                }));
+            } catch (error) {
+                console.error('Error fetching from DailyMotion:', error);
+                return [];
+            }
+        }
+
+        // Display assets
+        function displayAssets(assets) {
+            if (!assets || assets.length === 0) {
+                showNoResults();
+                return;
+            }
+
+            const cards = assets.map(asset => createAssetCard(asset)).join('');
+            domEls.assetGrid.innerHTML = cards;
+
+            domEls.assetGrid.querySelectorAll('.asset-card').forEach(card => {
+                card.addEventListener('dragstart', handleCardDragStart);
+                card.addEventListener('dragend', handleCardDragEnd);
+            });
+        }
+
+        // Create asset card
+        function createAssetCard(asset) {
+            const isVideo = state.currentType === 'videos';
+            const thumbnailUrl = getImageUrl(asset);
+            const title = getAssetTitle(asset);
+            const meta = getAssetMeta(asset);
+
+            return `
+                <div class="asset-card bg-white rounded-lg shadow-md overflow-hidden" draggable="true" data-asset='${escapeHtml(JSON.stringify(asset))}'>
+                    <div class="drag-handle" title="Drag to insert">
+                        <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+                            <circle cx="3" cy="2" r="1.2"/><circle cx="9" cy="2" r="1.2"/>
+                            <circle cx="3" cy="6" r="1.2"/><circle cx="9" cy="6" r="1.2"/>
+                            <circle cx="3" cy="10" r="1.2"/><circle cx="9" cy="10" r="1.2"/>
+                        </svg>
+                    </div>
+                    <div class="asset-thumbnail">
+                        <img src="${thumbnailUrl}" alt="${escapeHtml(title)}" loading="lazy">
+                        ${isVideo ? 
+                            `<div class="video-overlay">
+                                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M8 5v14l11-7z"/>
+                                </svg>
+                            </div>` : ''
+                        }
+                        <div class="asset-type-icon">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                ${isVideo ? 
+                                    '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>' :
+                                    '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>'
+                                }
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-medium text-gray-800 truncate mb-1">${escapeHtml(title)}</h3>
+                        <p class="text-sm text-gray-600 mb-3">${escapeHtml(meta)}</p>
+                        <div class="flex space-x-2">
+                            <button class="flex-1 px-3 py-2 bg-primary-600 text-white text-sm rounded hover:bg-primary-700 transition-colors" onclick="insertAsset(this)">
+                                <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                </svg>
+                                Insert
+                            </button>
+                            <button class="px-3 py-2 bg-gray-500 text-white text-sm rounded hover:bg-gray-600 transition-colors" onclick="showModal(this)">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Get thumbnail URL
+        function getImageUrl(asset, format = 'medium') {
+            if (state.currentSource === 'pexels') {
+                if (state.currentType === 'photos') {
+                    return asset.src[format] || asset.src.medium;
+                } else {
+                    return asset.image;
+                }
+            } else if (state.currentSource === 'youtube' || state.currentSource === 'dailymotion') {
+                return asset.thumbnail_url || '';
+            }
+            return '';
+        }
+
+        // Get asset title
+        function getAssetTitle(asset) {
+            if (state.currentSource === 'pexels') {
+                return asset.alt || `${state.currentType.slice(0, -1)} by ${asset.photographer || asset.user?.name || 'Unknown'}`;
+            } else if (state.currentSource === 'youtube' || state.currentSource === 'dailymotion') {
+                return asset.title || 'Untitled Video';
+            }
+            return 'Untitled Asset';
+        }
+
+        // Get asset meta
+        function getAssetMeta(asset) {
+            if (state.currentSource === 'pexels') {
+                return `By ${asset.photographer || asset.user?.name || 'Unknown'}`;
+            } else if (state.currentSource === 'youtube' || state.currentSource === 'dailymotion') {
+                const viewCount = asset.viewCount ? ` • ${formatNumber(asset.viewCount)} views` : '';
+                return `${asset.channel || 'Unknown'}${viewCount}`;
+            }
+            return '';
+        }
+
+        // Format number with K/M suffix
+        function formatNumber(num) {
+            if (!num) return '0';
+            const n = parseInt(num);
+            if (n >= 1000000) {
+                return (n / 1000000).toFixed(1) + 'M';
+            } else if (n >= 1000) {
+                return (n / 1000).toFixed(1) + 'K';
+            }
+            return n.toString();
+        }
+
+        // Get highest quality video link from Pexels video asset
+        function getHighestQualityVideo(asset) {
+            if (!asset.video_files || asset.video_files.length === 0) {
+                return null;
+            }
+
+            // Sort video files by resolution (width * height) in descending order
+            const sortedVideos = [...asset.video_files].sort((a, b) => {
+                const resolutionA = (a.width || 0) * (a.height || 0);
+                const resolutionB = (b.width || 0) * (b.height || 0);
+                return resolutionB - resolutionA;
+            });
+
+            // Return the link of the highest resolution video
+            return sortedVideos[0].link;
+        }
+
+        // Derive the canonical asset URL for a given asset object
+        function getAssetUrl(asset) {
+            if (state.currentSource === 'pexels') {
+                return state.currentType === 'photos'
+                    ? getImageUrl(asset, 'original')
+                    : getHighestQualityVideo(asset);
+            } else if (state.currentSource === 'youtube' || state.currentSource === 'dailymotion') {
+                return asset.videoUrl || asset.embedUrl;
+            }
+            return null;
+        }
+
+        function sendInsertPostMessage(url) {
+            window.parent.postMessage({
+                type: 'insert-object',
+                info: {
+                    op: 'uploadAndInsertAsset',
+                    url,
+                    targetWorkfolder: state.neonContext?.workfolderId || null
+                }
+            }, window.parent.origin);
+        }
+
+        // Asset actions
+        function insertAsset(button) {
+            const card = button.closest('.asset-card');
+            const asset = JSON.parse(card.dataset.asset);
+            const url = getAssetUrl(asset);
+
+            if (!url) {
+                console.error('Failed to get asset URL:', asset);
+                return;
+            }
+
+            console.log('Inserting asset:', url);
+            sendInsertPostMessage(url);
+        }
+
+        // Drag handlers — enable dragging cards onto contenteditable fields
+        // in the parent window or other windows/tabs
+        function handleCardDragStart(e) {
+            const card = e.currentTarget.closest('.asset-card');
+            const asset = JSON.parse(card.dataset.asset);
+            const url = getAssetUrl(asset);
+            if (!url) return;
+
+            e.dataTransfer.effectAllowed = 'copy';
+            e.dataTransfer.setData('text/plain', url);
+            e.dataTransfer.setData('text/uri-list', url);
+
+            state.pendingDragUrl = url;
+            card.classList.add('dragging');
+
+            const img = card.querySelector('img');
+            if (img) e.dataTransfer.setDragImage(img, 40, 40);
+        }
+
+        function handleCardDragEnd(e) {
+            const card = e.currentTarget.closest('.asset-card');
+            card.classList.remove('dragging');
+
+            // dropEffect is 'none' when no valid drop target accepted the drag.
+            // In that case fall back to postMessage so the CMS can handle the insert.
+            if (e.dataTransfer.dropEffect === 'none' && state.pendingDragUrl) {
+                sendInsertPostMessage(state.pendingDragUrl);
+            }
+            state.pendingDragUrl = null;
+        }
+
+        function showModal(button) {
+            const card = button.closest('.asset-card');
+            const asset = JSON.parse(card.dataset.asset);
+
+            const isVideo = state.currentType === 'videos';
+            const assetUrl = getImageUrl(asset, 'large');
+            const title = getAssetTitle(asset);
+            let originalUrl;
+
+            if (state.currentSource === 'pexels') {
+                originalUrl = getImageUrl(asset, 'original');
+            } else if (state.currentSource === 'youtube' || state.currentSource === 'dailymotion') {
+                originalUrl = asset.videoUrl;
+            }
+
+            // Build video preview for YouTube/DailyMotion
+            let mediaPreview;
+            if (isVideo && (state.currentSource === 'youtube' || state.currentSource === 'dailymotion')) {
+                mediaPreview = `<iframe class="modal-asset mx-auto rounded-lg" width="640" height="360" src="${asset.embedUrl}" frameborder="0" allowfullscreen></iframe>`;
+            } else if (isVideo && state.currentSource === 'pexels') {
+                mediaPreview = `<video class="modal-asset mx-auto rounded-lg" poster="${assetUrl}" controls>
+                    <source src="${asset.video_files?.[1]?.link || originalUrl}" type="video/mp4">
+                </video>`;
+            } else {
+                mediaPreview = `<img class="modal-asset mx-auto rounded-lg" src="${assetUrl}" alt="${escapeHtml(title)}">`;
+            }
+
+            // Build info section based on source
+            let infoFields = `
+                <p><strong>Title:</strong> ${escapeHtml(title)}</p>
+                <p><strong>Source:</strong> ${state.currentSource}</p>
+                <p><strong>Type:</strong> ${state.currentType.slice(0, -1)}</p>
+            `;
+
+            if (state.currentSource === 'pexels') {
+                infoFields += `
+                    <p><strong>Photographer:</strong> ${escapeHtml(asset.photographer || asset.user?.name || 'Unknown')}</p>
+                    ${asset.width && asset.height ? `<p><strong>Dimensions:</strong> ${asset.width}x${asset.height}</p>` : ''}
+                `;
+            } else if (state.currentSource === 'youtube' || state.currentSource === 'dailymotion') {
+                infoFields += `
+                    <p><strong>Channel:</strong> ${escapeHtml(asset.channel || 'Unknown')}</p>
+                    ${asset.viewCount ? `<p><strong>Views:</strong> ${formatNumber(asset.viewCount)}</p>` : ''}
+                    ${asset.publishedAt ? `<p><strong>Published:</strong> ${new Date(asset.publishedAt).toLocaleDateString()}</p>` : ''}
+                `;
+            }
+
+            domEls.modalBody.innerHTML = `
+                <div class="text-center mb-6">
+                    ${mediaPreview}
+                </div>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3">Asset Information</h3>
+                        <div class="space-y-2 text-sm">
+                            ${infoFields}
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3">Actions</h3>
+                        <div class="space-y-2">
+                            <button class="w-full px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700 transition-colors" onclick="insertAsset(this)">
+                                <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                </svg>
+                                Insert Asset
+                            </button>
+                            <button class="w-full px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors" onclick="openOriginal('${originalUrl}')">
+                                <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                </svg>
+                                View Original
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Store asset data in modal for action buttons
+            domEls.modalBody.dataset.asset = JSON.stringify(asset);
+            domEls.assetModal.style.display = 'flex';
+        }
+
+        function openOriginal(url) {
+            if (url) {
+                window.open(url, '_blank');
+            }
+        }
+
+        function closeModal() {
+            domEls.assetModal.style.display = 'none';
+        }
+
+        // Utility functions
+        function showLoading(show) {
+            state.isLoading = show;
+            domEls.loadingIndicator.style.display = show ? 'block' : 'none';
+        }
+
+        function clearResults() {
+            domEls.assetGrid.innerHTML = '';
+            domEls.noResults.style.display = 'none';
+        }
+
+        function showNoResults() {
+            domEls.noResults.style.display = 'block';
+        }
+
+        // Make functions globally available
+        window.insertAsset = insertAsset;
+        window.showModal = showModal;
+        window.openOriginal = openOriginal;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('External Sources Panel loaded, initializing...');
+            setupPostMessageApi();
+            setupEventListeners();
+            loadDefaultAssets();
+        });
+    </script>
+</body>
+</html>

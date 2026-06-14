@@ -1,21 +1,19 @@
 const { safeLogRequest } = require("../helpers/utils.js");
+const { authenticate } = require("../helpers/auth.js");
 
 async function getNeonWebhookHandler(request, reply) {
   return {"status":"success"};
 }
 
 async function postNeonWebhookHandler(request, reply) {
-  const { apikey } = request.headers?.apikey
-    ? request.headers
-    : { apikey: null };
-
   console.log("postNeonWebhookHandler << IN:");
   const safeRequest = safeLogRequest(request?.headers || {}, request?.body || {});
   console.log("Request Headers:", JSON.stringify(safeRequest.headers));
   console.log("Request Body:", JSON.stringify(safeRequest.body));
 
   // TODO - Restore when we can add ApiKeys to Webhooks headers
-  // if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
+  // const auth = authenticate(request, reply);
+  // if (!auth.authenticated) {
   //   console.log("Received call, but no API key was passed.");
   //   return reply.status(401).send({ error: "Unauthorized" });
   // }
@@ -366,17 +364,14 @@ async function handleSportsArenaWebpage(webhookTrigger, neonModel) {
 }
 
 async function postNeonWebhookTest(request, reply) {
-  const { apikey } = request.headers?.apikey
-    ? request.headers
-    : { apikey: null };
-
   console.log("postNeonWebhookTest << IN:");
   const safeRequest = safeLogRequest(request?.headers || {}, request?.body || {});
   console.log("Request Headers:", JSON.stringify(safeRequest.headers));
   console.log("Request Body:", JSON.stringify(safeRequest.body));
 
   // TODO - Restore when we can add ApiKeys to Webhooks headers
-  // if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
+  // const auth = authenticate(request, reply);
+  // if (!auth.authenticated) {
   //   console.log("Received call, but no API key was passed.");
   //   return reply.status(401).send({ error: "Unauthorized" });
   // }
@@ -424,8 +419,65 @@ async function postNeonWebhookTest(request, reply) {
   }
 }
 
+async function handleSocialMediaPublish(neonModel) {
+  console.log('[Social Publisher Webhook] Processing social media publish request');
+  const registry = require('../connectors/connector-registry');
+
+  try {
+    const modelData = neonModel.data || neonModel;
+    const socialMediaDraft = (modelData.metadata || {}).socialMediaDraft;
+
+    if (!socialMediaDraft) {
+      console.log('[Social Publisher Webhook] No socialMediaDraft in metadata — skipping');
+      return { status: 'skipped', message: 'No social media draft data' };
+    }
+
+    const publishedBy = neonModel.user || neonModel.publisher || 'system@neon.com';
+    const socialMediaHook = {};
+
+    for (const [platform, draft] of Object.entries(socialMediaDraft)) {
+      if (!draft.enabled) {
+        console.log(`[Social Publisher Webhook] ${platform} disabled — skipping`);
+        continue;
+      }
+      try {
+        const connector = registry.getConnector(platform);
+        const tags = (draft.hashtags || []).map(h => `#${h.replace(/^#/, '')}`).join(' ');
+        const text = tags ? `${draft.text || ''}\n\n${tags}` : (draft.text || '');
+        const imageUrl = draft.imageUrl || null;
+
+        console.log(`[Social Publisher Webhook] Publishing to ${platform}...`);
+        const result = await connector.publish(text, { imageUrl });
+
+        if (result.success) {
+          socialMediaHook[platform] = {
+            postId: result.postId,
+            url: result.postUrl,
+            publishedAt: result.publishedAt,
+            publishedBy
+          };
+          console.log(`[Social Publisher Webhook] ✓ ${platform}: ${result.postUrl}`);
+        }
+      } catch (err) {
+        console.error(`[Social Publisher Webhook] ✗ ${platform}:`, err.message);
+        // Continue with other platforms
+      }
+    }
+
+    if (Object.keys(socialMediaHook).length > 0) {
+      return { status: 'success', action: 'Social media posts published', writeback: { socialMediaHook } };
+    }
+    return { status: 'warning', message: 'No platforms were successfully published' };
+
+  } catch (error) {
+    console.error('[Social Publisher Webhook] Error:', error);
+    return { status: 'error', message: 'Failed to publish to social media', error: error.message };
+  }
+}
+
 module.exports = {
   getNeonWebhookHandler,
   postNeonWebhookHandler,
-  postNeonWebhookTest
+  postNeonWebhookTest,
+  handleSocialMediaPublish
 };

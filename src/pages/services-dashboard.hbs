@@ -153,6 +153,37 @@
         transform: translateY(-2px);
         box-shadow: 0 4px 8px rgba(0,0,0,0.15);
       }
+
+      .integration-card.clickable {
+        cursor: pointer;
+        position: relative;
+      }
+
+      .integration-card.clickable::after {
+        content: '→';
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        font-size: 1.2em;
+        color: #007bff;
+        opacity: 0;
+        transition: opacity 0.2s, transform 0.2s;
+      }
+
+      .integration-card.clickable:hover::after {
+        opacity: 1;
+        transform: translateX(4px);
+      }
+
+      .integration-card.clickable:hover {
+        border-color: #007bff;
+      }
+
+      a.integration-card-link {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+      }
       
       .integration-name {
         font-size: 1.2em;
@@ -309,11 +340,21 @@
         </div>
         <div class="integration-grid">
           {{#each integrations.widgets}}
+          {{#if demoUrl}}
+          <a href="{{demoUrl}}" class="integration-card-link" target="_blank">
+            <div class="integration-card clickable">
+              <div class="integration-name">{{name}}</div>
+              <div class="integration-endpoint">{{endpoint}}</div>
+              <div class="integration-description">{{description}}</div>
+            </div>
+          </a>
+          {{else}}
           <div class="integration-card">
             <div class="integration-name">{{name}}</div>
             <div class="integration-endpoint">{{endpoint}}</div>
             <div class="integration-description">{{description}}</div>
           </div>
+          {{/if}}
           {{/each}}
         </div>
       </div>
@@ -325,11 +366,21 @@
         </div>
         <div class="integration-grid">
           {{#each integrations.panels}}
+          {{#if demoUrl}}
+          <a href="{{demoUrl}}" class="integration-card-link" target="_blank">
+            <div class="integration-card clickable">
+              <div class="integration-name">{{name}}</div>
+              <div class="integration-endpoint">{{endpoint}}</div>
+              <div class="integration-description">{{description}}</div>
+            </div>
+          </a>
+          {{else}}
           <div class="integration-card">
             <div class="integration-name">{{name}}</div>
             <div class="integration-endpoint">{{endpoint}}</div>
             <div class="integration-description">{{description}}</div>
           </div>
+          {{/if}}
           {{/each}}
         </div>
       </div>

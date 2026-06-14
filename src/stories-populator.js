@@ -1,7 +1,7 @@
 const dayjs = require('dayjs');
 const utils = require('./helpers/utils.js');
 const neonUtils = require('./helpers/neon-utils.js');
-const neon = require('./helpers/neon-bo-api.js');
+const neon = require('./helpers/neon-bo-api-v3.js');
 const deepl = require('deepl-node');
 const images = require('./images-importer.js');
 
@@ -68,34 +68,35 @@ async function newNodeFromStory(story, publishStory = true) {
         const mainImageReference = imageUpload.node ? images.mainImageReferenceGenerator(imageUpload.node) : null;
         story.mainImageReference = mainImageReference ? mainImageReference : null;
         const bodyOptions = story.translate ? await translateStory(story) : getOptionsFromData(story);
-      
+        const principals = utils.normalizePrincipals(story.assignTo);
+
         if (familyRef) {
             console.log(`Created new node with ID ${familyRef}`);
             createdIds.push(familyRef);
             const updateStatus = await neon.updateNodeContent(familyRef, utils.bodyGenerator(bodyOptions));
             const metaUpdateStatus = await neon.updateNodeMetadata(familyRef, utils.metadataGenerator(story.metadata));
-          
+
             if (updateStatus) {
                 await neon.unlockNode(familyRef);
-                await neonUtils.workflowTransitionTo({ familyRef, targetWorkflowName: 'Story', targetStateName: 'Edit' });
-              
+                await neonUtils.workflowTransitionTo({ familyRef, targetWorkflowName: 'Story', targetStateName: 'Edit', principals });
+
                 if (publishStory) {
-                  await neonUtils.workflowTransitionTo({ familyRef, targetWorkflowName: 'Story', targetStateName: 'Ready' });
+                  await neonUtils.workflowTransitionTo({ familyRef, targetWorkflowName: 'Story', targetStateName: 'Ready', principals });
                   console.log(`${familyRef} updated successfully!`);
                   const promotionResponse = await neon.promoteNode(familyRef, { targetSite: story.tgtSite, targetSection: story.tgtSection, mode: 'LIVE' });
                   await neon.promoteNodeEverywhere(familyRef, { mode: 'LIVE' });
                 } else {
-                  await neonUtils.workflowTransitionTo({ familyRef, targetWorkflowName: 'Story', targetStateName: 'Revision' });  
+                  await neonUtils.workflowTransitionTo({ familyRef, targetWorkflowName: 'Story', targetStateName: 'Revision', principals });
                 }
               
-                resolve();
+                resolve(familyRef);
             } else {
                 console.warn(`Error during content Update, deletion of ${familyRef} in progress...`);
                 await neon.deleteNode(familyRef, true);
-                resolve();
+                resolve(null);
             }
         } else {
-            reject();
+            reject(new Error(`Story node creation failed for "${story.title || story.id}"`));
         }
     });
 }
@@ -131,8 +132,6 @@ async function populateNeonInstance(data, options = {site: null, workspace: null
   
     createdIds = [];
   
-    await neon.login();
-
     return await data.reduce(async (promiseAcc, story) => {
         console.log(story.id || story.title);
 
@@ -150,9 +149,8 @@ async function populateNeonInstance(data, options = {site: null, workspace: null
         });
     }, Promise.resolve())
         .then(() => {
-            neon.logout();
             return createdIds;
-        });  
+        });
 }
 
 async function testStoryTranslations(data, options = {site: null, workspace: null, language: 'en', translate: null}) {
@@ -180,5 +178,6 @@ async function testStoryTranslations(data, options = {site: null, workspace: nul
 
 module.exports = {
   populateNeonInstance,
-  testStoryTranslations
+  testStoryTranslations,
+  newNodeFromStory
 };

@@ -5,8 +5,8 @@ const fs = require('fs');
 
 // HTTPS configuration
 let httpsOptions = {};
-const sslCertPath = path.join(__dirname, 'ssl', 'neon-integrations-example.neon.com+3.pem');
-const sslKeyPath = path.join(__dirname, 'ssl', 'neon-integrations-example.neon.com+3-key.pem');
+const sslCertPath = path.join(__dirname, 'ssl', 'integrations.neon-examples.test+3.pem');
+const sslKeyPath = path.join(__dirname, 'ssl', 'integrations.neon-examples.test+3-key.pem');
 
 if (fs.existsSync(sslCertPath) && fs.existsSync(sslKeyPath)) {
   httpsOptions = {
@@ -22,7 +22,7 @@ if (fs.existsSync(sslCertPath) && fs.existsSync(sslKeyPath)) {
 
 const fastify = require("fastify")({
   // Set this to true for detailed logging:
-  logger: false,
+  logger: true,
   ...httpsOptions
 });
 
@@ -37,6 +37,12 @@ fastify.register(require('@fastify/multipart'));
 
 // Formbody lets us parse incoming forms
 fastify.register(require("@fastify/formbody"));
+
+// Cookie support for session-based authentication
+fastify.register(require("@fastify/cookie"), {
+  secret: process.env.NEON_EXT_APIKEY,
+  parseOptions: {}
+});
 
 // View is a templating manager for fastify
 const handlebars = require("handlebars");
@@ -94,7 +100,8 @@ fastify.get("/services", function (request, reply) {
       { name: "RSS Feeds", endpoint: "POST /in/neon/from/rss", description: "Import articles from RSS feeds (ANSA, TGcom24)" },
       { name: "Google Docs", endpoint: "GET /in/googledocs", description: "Import content from Google Docs" },
       { name: "Binary Upload", endpoint: "POST /in/binary", description: "Upload binary files to Neon" },
-      { name: "Trello Integration", endpoint: "GET /in/trello", description: "Import Trello cards to Neon with web interface" }
+      { name: "Trello Integration", endpoint: "GET /in/trello", description: "Import Trello cards to Neon with web interface" },
+      { name: "Delayed Import", endpoint: "POST /in/delayed-import", description: "Simulate a content feed: import a batch of stories/images into a workfolder one item at a time over a timespan (status: GET /in/delayed-import/:jobId, cancel: DELETE)" }
     ],
     outbound: [
       { name: "Méthode CMS", endpoint: "POST /out/methode", description: "Export Neon content to Méthode CMS" },
@@ -104,21 +111,43 @@ fastify.get("/services", function (request, reply) {
     ],
     utilities: [
       { name: "Content Cleanup", endpoint: "POST /utilities/cleanup", description: "Clean up content references" },
+      { name: "Metadata Update", endpoint: "POST /utilities/metadata/update", description: "Apply xpath-based set/unset changes to a node's ObjectMetadata XML (familyRef, changes[])" },
       { name: "OpenAI Processing", endpoint: "POST /ai/openai", description: "Process content with OpenAI" },
       { name: "Pexels Photos", endpoint: "GET /sources/pexels", description: "Source photos from Pexels API" },
-      { name: "Neon Discovery", endpoint: "GET /utilities/services", description: "Discover Neon services" }
+      { name: "Neon Discovery", endpoint: "GET /utilities/services", description: "Discover Neon services" },
+      { name: "Metrics Reports", endpoint: "GET /neon/api/core/metrics", description: "List available Neon BO analytics reports" },
+      { name: "Metrics Data", endpoint: "GET /neon/api/core/metrics/*", description: "Get specific metrics data from Neon BO (supports path-style reportId)" }
     ],
     widgets: [
-      { name: "Test Widget", endpoint: "GET /widgets/test", description: "Test widget interface" },
-      { name: "Document Drop", endpoint: "GET /widgets/drop", description: "Drop and upload documents" },
+      { name: "Test Widget", endpoint: "GET /widgets/test", demoUrl: "/widgets/test", description: "Test widget interface" },
+      { name: "Document Drop", endpoint: "GET /widgets/drop", demoUrl: "/widgets/drop", description: "Drop and upload documents" },
       { name: "Document Upload", endpoint: "POST /widgets/drop/upload", description: "Process uploaded documents" },
-      { name: "Wires Widget", endpoint: "GET /widgets/wires", description: "Wire management interface" },
-      { name: "Breaking News", endpoint: "GET /widgets/breakingnews", description: "Breaking news publisher interface" },
-      { name: "Breaking News Publish", endpoint: "POST /widgets/breakingnews/publish", description: "Publish breaking news to Neon" }
+      { name: "Wires Widget", endpoint: "GET /widgets/wires", demoUrl: "/widgets/wires", description: "Wire management interface" },
+      { name: "Breaking News", endpoint: "GET /widgets/breakingnews", demoUrl: "/widgets/breakingnews", description: "Breaking news publisher interface" },
+      { name: "Breaking News Publish", endpoint: "POST /widgets/breakingnews/publish", description: "Publish breaking news to Neon" },
+      { name: "SmartOcto Dashboard", endpoint: "GET /widgets/smartocto-dashboard", demoUrl: "/widgets/smartocto-dashboard", description: "SmartOcto analytics dashboard (demo)" },
+      { name: "Neon Analytics", endpoint: "GET /widgets/neon-analytics", demoUrl: "/widgets/neon-analytics?demo=true", description: "Production metrics dashboard with interactive charts - supports demo mode (?demo=true)" },
+      { name: "Welcome Widget", endpoint: "GET /widgets/welcome", demoUrl: "/widgets/welcome", description: "Onboarding widget for new users with quick tour and action cards" },
+      { name: "Planning Board", endpoint: "GET /widgets/planning-board", demoUrl: "/widgets/planning-board", description: "Editorial task planning board with Kanban and Calendar views" },
+      { name: "Neon Grid", endpoint: "GET /widgets/neon-grid", demoUrl: "/widgets/neon-grid?demo=true", description: "AG-Grid article list from Neon CMS — headline, summary, date, status columns (supports demo mode with ?demo=true)" },
+      { name: "Tag Manager", endpoint: "GET /tags/widget", demoUrl: "/tags/widget", description: "Manage distribution tags, packages, and customer subscriptions" },
+      { name: "Tags Input Mockup", endpoint: "GET /tags/input-mockup", demoUrl: "/tags/input-mockup", description: "NeonTagsInput component mockup — copy-paste ready for Neon Object Panel" },
+      { name: "Print Query Board", endpoint: "GET /widgets/print-query-board", demoUrl: "/widgets/print-query-board", description: "Kanban board for planning print edition stories — segment by section (with char budget), priority, desk, or access. Drag cards to reclassify." }
     ],
     panels: [
-      { name: "Trello Panel", endpoint: "GET /panels/trello", description: "Trello card management panel for Neon CMS iframe embedding with PostMessage API" },
-      { name: "Trello API Proxy", endpoint: "ALL /panels/trello/api/*", description: "Proxy for Trello API calls with authentication" }
+      { name: "Trello Panel", endpoint: "GET /panels/trello", demoUrl: "/panels/trello", description: "Trello card management panel for Neon CMS iframe embedding with PostMessage API" },
+      { name: "Trello API Proxy", endpoint: "ALL /panels/trello/api/*", description: "Proxy for Trello API calls with authentication" },
+      { name: "External Sources Panel", endpoint: "GET /panels/external-sources", demoUrl: "/panels/external-sources", description: "External assets panel for searching and inserting Pexels, YouTube, and DailyMotion videos into Neon CMS" },
+      { name: "Pexels API Proxy", endpoint: "ALL /panels/external-sources/api/*", description: "Proxy for Pexels API calls with authentication" },
+      { name: "YouTube API Proxy", endpoint: "ALL /panels/external-sources/api/youtube/*", description: "Proxy for YouTube Data API calls with authentication" },
+      { name: "DailyMotion API Proxy", endpoint: "ALL /panels/external-sources/api/dailymotion/*", description: "Proxy for DailyMotion API calls with authentication" },
+      { name: "Méthode Panel", endpoint: "GET /panels/methode", demoUrl: "/panels/methode", description: "Méthode object management panel with PDF preview, workflow status, and Swing integration" },
+      { name: "Méthode API Proxy", endpoint: "ALL /panels/methode/api/*", description: "Proxy for Méthode Editorial API calls with authentication and object retrieval" },
+      { name: "QuickChart Panel", endpoint: "GET /panels/quickchart", demoUrl: "/panels/quickchart", description: "QuickChart.io gallery panel for browsing and importing chart examples as PNG assets into Neon CMS" },
+      { name: "Social Publisher Panel", endpoint: "GET /panels/social-publisher", demoUrl: "/panels/social-publisher", description: "Unified social publishing panel for Twitter/X, Facebook, Instagram, Threads, Bluesky — with AI content generation, publication, and live metrics." },
+      { name: "Social Publisher API", endpoint: "ALL /panels/social-publisher/api/*", description: "Connector registry API: /{platform}/status, /{platform}/publish, /{platform}/metrics/{id}, /generate-post" },
+      { name: "Family Audit Panel", endpoint: "GET /panels/family-audit", demoUrl: "/panels/family-audit?demo=true", description: "Vertical audit timeline for any Neon object — standard and advanced verbosity levels" },
+      { name: "Family Audit API Proxy", endpoint: "GET /panels/family-audit/api/events", description: "Proxy for Neon metrics family_audit API with familyRef authentication" }
     ],
     webhooks: [
       { name: "Neon Webhook Handler", endpoint: "POST /in/neon/webhook", description: "Process incoming Neon CMS webhooks with multi-site routing" },
@@ -131,6 +160,32 @@ fastify.get("/services", function (request, reply) {
       { name: "Save Article", endpoint: "POST /mobileclient/save", description: "Save article content and generate XML for Neon CMS integration" },
       { name: "Articles API - List", endpoint: "GET /mobileclient/api/articles", description: "RESTful API to retrieve list of articles with metadata" },
       { name: "Articles API - Single", endpoint: "GET /mobileclient/api/articles/:id", description: "RESTful API to retrieve specific article by UUID for editing" }
+    ],
+    taxonomies: [
+      { name: "List Taxonomies", endpoint: "GET /iab/taxonomies", description: "List all IAB taxonomies with versions and stats" },
+      { name: "Get Taxonomy", endpoint: "GET /iab/:type", description: "Get full taxonomy data (content, audience, adproduct)" },
+      { name: "Lookup Labels", endpoint: "POST /iab/lookup", description: "Lookup labels for taxonomy IDs (batch supported)" },
+      { name: "Search Taxonomy", endpoint: "GET /iab/search", description: "Search categories by name or path" },
+      { name: "Validate IDs", endpoint: "POST /iab/validate", description: "Validate if taxonomy IDs exist" },
+      { name: "Get Children", endpoint: "GET /iab/:type/children", description: "Get child categories for a parent ID" },
+      { name: "Get Statistics", endpoint: "GET /iab/:type/stats", description: "Get taxonomy statistics" },
+      { name: "Refresh Cache", endpoint: "POST /iab/refresh", description: "Force refresh taxonomies from GitHub" }
+    ],
+    tagManager: [
+      { name: "Tag Manager Widget", endpoint: "GET /tags/widget", demoUrl: "/tags/widget", description: "UI for managing distribution tags, products, packages, customers, and streams" },
+      { name: "List Families", endpoint: "GET /tags/families", description: "List all tag families (supports ?type=categorization|system filter)" },
+      { name: "Create Family", endpoint: "POST /tags/families", description: "Create a new tag family with type (categorization or system)" },
+      { name: "Add Tag", endpoint: "POST /tags/families/:familyId/tags", description: "Add a tag to a family" },
+      { name: "List Products", endpoint: "GET /tags/products", description: "List all products with their tag references" },
+      { name: "Create Product", endpoint: "POST /tags/products", description: "Create a product (aggregates tags)" },
+      { name: "List Packages", endpoint: "GET /tags/packages", description: "List all packages with their product references" },
+      { name: "Create Package", endpoint: "POST /tags/packages", description: "Create a package (aggregates products)" },
+      { name: "List Customers", endpoint: "GET /tags/customers", description: "List all customers with their subscriptions and streams" },
+      { name: "Create Customer", endpoint: "POST /tags/customers", description: "Create a customer with package subscriptions" },
+      { name: "Customers by Package", endpoint: "GET /tags/customers/by-package/:packageId", description: "Get customers subscribed to a specific package" },
+      { name: "List All Streams", endpoint: "GET /tags/streams", description: "List all distribution streams across customers" },
+      { name: "Create Stream", endpoint: "POST /tags/customers/:customerId/streams", description: "Add a distribution stream to a customer (sftp, s3, api, other)" },
+      { name: "List Transformers", endpoint: "GET /tags/transformers", description: "List available content transformers for stream pipelines" }
     ]
   };
 
@@ -168,6 +223,15 @@ fastify.post("/ai/openai", utilitiesHandlers.openAiHandler);
 fastify.get("/sources/pexels", utilitiesHandlers.pexelsPhotosHandler);
 fastify.get("/utilities/services", utilitiesHandlers.neonDiscoveryHandler);
 
+// Metadata
+const metadataHandlers = require("./src/requestHandlers/metadata.js");
+fastify.post("/utilities/metadata/update", metadataHandlers.updateMetadataHandler);
+
+// Neon Metrics API
+const neonMetricsHandlers = require("./src/requestHandlers/neon-metrics.js");
+fastify.get("/neon/api/core/metrics", neonMetricsHandlers.getMetricsReportsHandler);
+fastify.get("/neon/api/core/metrics/*", neonMetricsHandlers.getMetricsDataHandler);
+
 /**
  *
  * Widgets
@@ -180,6 +244,14 @@ fastify.post("/widgets/drop/upload", widgetHandlers.asyncDropUploadWidgetHandler
 fastify.get("/widgets/wires", widgetHandlers.wiresWidgetHandler);
 fastify.get("/widgets/breakingnews", widgetHandlers.breakingNewsWidgetHandler);
 fastify.post("/widgets/breakingnews/publish", widgetHandlers.breakingNewsPublishHandler);
+fastify.get("/widgets/smartocto-dashboard", widgetHandlers.smartOctoDashboardHandler);
+fastify.get("/widgets/neon-analytics", widgetHandlers.neonAnalyticsDashboardHandler);
+fastify.get("/widgets/welcome", widgetHandlers.welcomeWidgetHandler);
+fastify.get("/widgets/planning-board", widgetHandlers.planningBoardWidgetHandler);
+fastify.get("/widgets/neon-grid", widgetHandlers.neonGridWidgetHandler);
+fastify.get("/api/neon/grid/articles", widgetHandlers.neonGridDataHandler);
+fastify.get("/widgets/print-query-board", widgetHandlers.printQueryBoardHandler);
+fastify.get("/api/print-query-board/stories", widgetHandlers.printQueryBoardDataHandler);
 
 /**
  *
@@ -188,13 +260,73 @@ fastify.post("/widgets/breakingnews/publish", widgetHandlers.breakingNewsPublish
  */
 const panelHandlers = require("./src/requestHandlers/panels.js");
 fastify.get("/panels/trello", panelHandlers.trelloPanelHandler);
-fastify.get("/panels/external-sources", panelHandlers.externalSourcesPanelHandler);
+fastify.get("/panels/external-sources", panelHandlers.externalSourcesPanelV2Handler);
+fastify.get("/panels/methode", panelHandlers.methodePanelHandler);
+fastify.get("/panels/quickchart", panelHandlers.quickchartPanelHandler);
+fastify.get("/panels/article-pdf", panelHandlers.articlePdfPanelHandler);
+fastify.get("/panels/article-pdf/generate", panelHandlers.generateArticlePdfHandler);
+fastify.get("/panels/ga4-analytics", panelHandlers.ga4AnalyticsPanelHandler);
+fastify.get("/panels/smartocto", panelHandlers.smartOctoPanelHandler);
 fastify.post("/panels/upload-asset", panelHandlers.uploadAssetHandler);
 fastify.register(async function (fastify) {
   fastify.route({
     method: ['GET', 'POST', 'PUT', 'DELETE'],
     url: '/panels/trello/api/*',
     handler: panelHandlers.trelloApiProxyHandler
+  });
+});
+fastify.register(async function (fastify) {
+  fastify.route({
+    method: ['GET', 'POST', 'PUT', 'DELETE'],
+    url: '/panels/external-sources/api/pexels/*',
+    handler: panelHandlers.pexelsApiProxyHandler
+  });
+});
+fastify.register(async function (fastify) {
+  fastify.route({
+    method: ['GET', 'POST', 'PUT', 'DELETE'],
+    url: '/panels/external-sources/api/youtube/*',
+    handler: panelHandlers.youtubeApiProxyHandler
+  });
+});
+fastify.register(async function (fastify) {
+  fastify.route({
+    method: ['GET', 'POST', 'PUT', 'DELETE'],
+    url: '/panels/external-sources/api/dailymotion/*',
+    handler: panelHandlers.dailymotionApiProxyHandler
+  });
+});
+fastify.register(async function (fastify) {
+  fastify.route({
+    method: ['GET', 'POST', 'PUT', 'DELETE'],
+    url: '/panels/methode/api/*',
+    handler: panelHandlers.methodeApiProxyHandler
+  });
+});
+// Social Publisher (replaces legacy Social Media panel)
+fastify.get("/panels/social-publisher", panelHandlers.socialPublisherPanelHandler);
+fastify.register(async function (fastify) {
+  fastify.route({
+    method: ['GET', 'POST', 'PUT', 'DELETE'],
+    url: '/panels/social-publisher/api/*',
+    handler: panelHandlers.socialPublisherApiProxyHandler
+  });
+});
+fastify.get("/panels/family-audit", panelHandlers.familyAuditPanelV2Handler);
+fastify.register(async function (fastify) {
+  fastify.route({
+    method: ['GET'],
+    url: '/panels/family-audit/api/events',
+    handler: panelHandlers.familyAuditApiProxyHandler
+  });
+});
+const claudeChatHandlers = require("./src/requestHandlers/claude-chat-handler.js");
+fastify.get("/panels/claude-chat", claudeChatHandlers.claudeChatPanelHandler);
+fastify.register(async function (fastify) {
+  fastify.route({
+    method: ['POST'],
+    url: '/panels/claude-chat/api/chat',
+    handler: claudeChatHandlers.claudeChatApiHandler
   });
 });
 
@@ -241,6 +373,17 @@ fastify.post("/in/binary", neonImportHandlers.importBinaryHandler);
 
 /**
  *
+ * Delayed simulated import to Neon
+ *
+ */
+const delayedImportHandlers = require("./src/requestHandlers/neon-delayed-import.js");
+fastify.post("/in/delayed-import", delayedImportHandlers.submitJobHandler);
+fastify.get("/in/delayed-import", delayedImportHandlers.listJobsHandler);
+fastify.get("/in/delayed-import/:jobId", delayedImportHandlers.getJobHandler);
+fastify.delete("/in/delayed-import/:jobId", delayedImportHandlers.cancelJobHandler);
+
+/**
+ *
  * Trello to Neon
  *
  */
@@ -266,6 +409,101 @@ fastify.get("/mobileclient/api/articles/:id", mobileClientHandlers.getMobileClie
 
 /**
  *
+ * IAB Taxonomies API
+ *
+ */
+const iabTaxonomiesHandlers = require("./src/requestHandlers/iab-taxonomies.js");
+fastify.register(async function (fastify) {
+  await iabTaxonomiesHandlers.registerRoutes(fastify, {
+    apikey: process.env.NEON_EXT_APIKEY
+  });
+});
+
+// Initialize IAB taxonomies cache on startup (non-blocking)
+const { initializeAll } = require("./src/connectors/iab-taxonomies-connector");
+setImmediate(async () => {
+  try {
+    console.log('[IAB Taxonomies] Initializing cache...');
+    const results = await initializeAll();
+
+    if (results.initialized.length > 0) {
+      console.log(`[IAB Taxonomies] ✓ Downloaded and cached: ${results.initialized.join(', ')}`);
+    }
+    if (results.cached.length > 0) {
+      console.log(`[IAB Taxonomies] ✓ Already cached: ${results.cached.join(', ')}`);
+    }
+    if (results.errors.length > 0) {
+      console.error(`[IAB Taxonomies] ✗ Errors: ${results.errors.length}`);
+      results.errors.forEach(err => {
+        console.error(`  - ${err.type}: ${err.error}`);
+      });
+    }
+  } catch (error) {
+    console.error('[IAB Taxonomies] Failed to initialize:', error.message);
+  }
+});
+
+/**
+ *
+ * Neon Config Cache API
+ *
+ */
+const neonConfigHandlers = require("./src/requestHandlers/neon-config.js");
+fastify.register(async function (fastify) {
+  await neonConfigHandlers.registerRoutes(fastify, {
+    apikey: process.env.NEON_EXT_APIKEY
+  });
+});
+
+// Initialize Neon config cache on startup (non-blocking)
+const { initializeAll: initializeNeonConfig } = require("./src/connectors/neon-config-connector");
+setImmediate(async () => {
+  try {
+    console.log('[Neon Config] Initializing cache...');
+    const results = await initializeNeonConfig();
+
+    if (results.initialized.length > 0) {
+      console.log(`[Neon Config] ✓ Fetched and cached: ${results.initialized.join(', ')}`);
+    }
+    if (results.cached.length > 0) {
+      console.log(`[Neon Config] ✓ Already cached: ${results.cached.join(', ')}`);
+    }
+    if (results.errors.length > 0) {
+      console.error(`[Neon Config] ✗ Errors: ${results.errors.length}`);
+      results.errors.forEach(err => {
+        console.error(`  - ${err.type}: ${err.error}`);
+      });
+    }
+  } catch (error) {
+    console.error('[Neon Config] Failed to initialize:', error.message);
+  }
+});
+
+/**
+ *
+ * Tag Manager
+ *
+ */
+const tagManagerHandlers = require("./src/requestHandlers/tag-manager.js");
+fastify.register(async function (fastify) {
+  await tagManagerHandlers.registerRoutes(fastify, {
+    apikey: process.env.NEON_EXT_APIKEY
+  });
+});
+
+// Initialize tag manager data on startup (non-blocking)
+const tagManagerStore = require("./src/helpers/tag-manager-store");
+setImmediate(async () => {
+  try {
+    await tagManagerStore.initializeDefaults();
+    console.log('[Tag Manager] Data files initialized');
+  } catch (error) {
+    console.error('[Tag Manager] Failed to initialize:', error.message);
+  }
+});
+
+/**
+ *
  * Run the server and report out to the logs
  *
  */
@@ -273,6 +511,16 @@ fastify.get("/mobileclient/api/articles/:id", mobileClientHandlers.getMobileClie
 const port = process.env.PORT || 3000;
 const host = process.env.HOST || "0.0.0.0";
 const projectDomain = process.env.PROJECT_DOMAIN || "http://localhost:" + port;
+
+// Release the port promptly on nodemon restarts (SIGTERM/SIGUSR2) and Ctrl+C (SIGINT).
+// Without this, fastify's server can stay bound briefly, causing EADDRINUSE on the next start.
+function shutdown(signal) {
+  console.log(`\n${signal} received, closing server...`);
+  fastify.close(() => process.exit(0));
+}
+process.once("SIGTERM", () => shutdown("SIGTERM"));
+process.once("SIGINT", () => shutdown("SIGINT"));
+process.once("SIGUSR2", () => shutdown("SIGUSR2"));
 
 fastify.listen(
   { port: port, host: host },
@@ -296,7 +544,7 @@ fastify.listen(
       console.log(`📲 Mobile client: ${projectDomain}/mobileclient`);
       
       if (httpsOptions.https) {
-        console.log(`🔒 Custom domain: ${protocol}://neon-integrations-example.neon.com${portDisplay}`);
+        console.log(`🔒 Custom domain: ${protocol}://integrations.neon-examples.test${portDisplay}`);
       }
     } else {
       console.log(`🏠 Available at: ${protocol}://${host}${portDisplay}`);

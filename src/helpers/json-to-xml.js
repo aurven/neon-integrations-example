@@ -1,4 +1,4 @@
-async function jsonToXml({ json, excludeAttributes = [], excludeTags = [] }) {
+async function jsonToXml({ json, excludeAttributes = [], excludeTags = [], channelRules = {} }) {
     function convertNode(node) {
         let xmlString = '';
 
@@ -14,7 +14,7 @@ async function jsonToXml({ json, excludeAttributes = [], excludeTags = [] }) {
                 // Start opening tag with nodeType (except plainText, which is handled differently)
                 xmlString += `<${node.nodeType}`;
             }
-    
+
             // Add attributes if they exist, excluding any specified
             if (node.attributes) {
                 for (const [key, value] of Object.entries(node.attributes)) {
@@ -23,7 +23,12 @@ async function jsonToXml({ json, excludeAttributes = [], excludeTags = [] }) {
                     }
                 }
             }
-    
+
+            // Add channel attribute if a rule exists for this tag
+            if (channelRules[node.nodeType]) {
+                xmlString += ` channel="${channelRules[node.nodeType]}"`;
+            }
+
             // Handle anchor tag closing and children
             if (node.nodeType === 'anchor') {
                 xmlString += '>';
@@ -36,7 +41,7 @@ async function jsonToXml({ json, excludeAttributes = [], excludeTags = [] }) {
             } else {
                 // Otherwise, close the tag for non-anchor nodes
                 xmlString += ">";
-    
+
                 // Add elements if they exist (recursive processing of children)
                 if (node.elements && node.elements.length > 0) {
                     node.elements.forEach(child => {

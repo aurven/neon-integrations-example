@@ -1,24 +1,23 @@
 const openaiPrompts = require("../ai/openai.js");
 const pexels = require('../connectors/pexels-connector.js');
 const cleaner = require('../content-cleaner.js');
-const neon = require('../helpers/neon-bo-api.js');
+const neon = require('../helpers/neon-bo-api-v3.js');
 const { safeLogRequest } = require("../helpers/utils.js");
+const { authenticate } = require("../helpers/auth.js");
 
 async function cleanupHandler(request, reply) {
-  const { apikey } = request.headers?.apikey
-    ? request.headers
-    : { apikey: null };
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) {
+    console.log("cleanupHandler << ERROR: Unauthorized");
+    return reply.status(401).send({ error: "Unauthorized" });
+  }
+
   const { familyRefs } = request.body;
 
   console.log("cleanupHandler << IN:");
   const safeRequest = safeLogRequest(request?.headers || {}, request?.body || {});
   console.log("Request Headers:", JSON.stringify(safeRequest.headers));
   console.log("Request Body:", JSON.stringify(safeRequest.body));
-
-  if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
-    console.log("cleanupHandler << ERROR: Unauthorized");
-    return reply.status(401).send({ error: "Unauthorized" });
-  }
 
   if (!familyRefs || familyRefs.length === 0) {
     console.error("cleanupHandler << ERROR: No items provided");
@@ -35,19 +34,16 @@ async function cleanupHandler(request, reply) {
 }
 
 async function openAiHandler(request, reply) {
-  const { apikey } = request.headers?.apikey
-    ? request.headers
-    : { apikey: null };
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) {
+    console.log("openAiHandler << ERROR: Unauthorized");
+    return reply.status(401).send({ error: "Unauthorized" });
+  }
 
   console.log("openAiHandler << IN:");
   const safeRequest = safeLogRequest(request?.headers || {}, request?.body || {});
   console.log("Request Headers:", JSON.stringify(safeRequest.headers));
   console.log("Request Body:", JSON.stringify(safeRequest.body));
-
-  if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
-    console.log("openAiHandler << ERROR: Unauthorized");
-    return reply.status(401).send({ error: "Unauthorized" });
-  }
   
   console.log("Request received:");
   console.log(JSON.stringify(safeRequest.body));
@@ -66,19 +62,16 @@ async function openAiHandler(request, reply) {
 }
 
 async function pexelsPhotosHandler(request, reply) {
-  const { apikey } = request.headers?.apikey
-    ? request.headers
-    : { apikey: null };
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) {
+    console.log("pexelsPhotosHandler << ERROR: Unauthorized");
+    return reply.status(401).send({ error: "Unauthorized" });
+  }
 
   console.log("pexelsPhotosHandler << IN:");
   const safeRequest = safeLogRequest(request?.headers || {}, {});
   console.log("Request Headers:", JSON.stringify(safeRequest.headers));
   console.log("Request Query:", request.query);
-
-  if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
-    console.log("pexelsPhotosHandler << ERROR: Unauthorized");
-    return reply.status(401).send({ error: "Unauthorized" });
-  }
   
   console.log("Request received:");
   
