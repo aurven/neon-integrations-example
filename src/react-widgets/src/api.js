@@ -24,17 +24,23 @@ async function apiFetch(path) {
 export function fetchArticles() {
   const demo = window.CONFIG?.demo;
   const config = window.CONFIG?.gridConfigName;
+  const query = window.CONFIG?.queryConfigName;
   const params = new URLSearchParams();
   if (demo) params.set('demo', 'true');
   if (config) params.set('config', config);
+  if (query) params.set('query', query);
   const qs = params.toString();
   return apiFetch(`/api/neon/grid/articles${qs ? `?${qs}` : ''}`);
 }
 
 export function fetchStories() {
   const demo = window.CONFIG?.demo;
-  const url = demo ? '/api/print-query-board/stories?demo=true' : '/api/print-query-board/stories';
-  return apiFetch(url);
+  const query = window.CONFIG?.queryConfigName;
+  const params = new URLSearchParams();
+  if (demo) params.set('demo', 'true');
+  if (query) params.set('query', query);
+  const qs = params.toString();
+  return apiFetch(`/api/print-query-board/stories${qs ? `?${qs}` : ''}`);
 }
 
 export async function updateMetadata(familyRef, changes) {

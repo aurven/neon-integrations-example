@@ -51,6 +51,19 @@ function loadGridConfig(name) {
   return tryFile(safe) || tryFile('default') || { fields: [], columns: [] };
 }
 
+// Load a query config JSON (queryStatement + variables + options) by name (sanitized),
+// for the given widget dir (e.g. 'neon-grid', 'print-query-board'), falling back to 'default'.
+function loadQueryConfig(widgetDir, name) {
+  const fs = require('fs');
+  const path = require('path');
+  const safe = /^[a-zA-Z0-9_-]+$/.test(name || '') ? name : 'default';
+  const tryFile = (n) => {
+    try { return JSON.parse(fs.readFileSync(path.join(__dirname, '../../conf/widgets', widgetDir, 'queries', `${n}.json`), 'utf8')); }
+    catch { return null; }
+  };
+  return tryFile(safe) || tryFile('default') || { queryStatement: { bool: { and: [], or: [] } }, variables: {}, options: {} };
+}
+
 // Resolve a dotted path (e.g. "nodeMeta.printSection") against an object.
 function getByPath(obj, pathStr) {
   return pathStr.split('.').reduce((o, k) => (o == null ? o : o[k]), obj);
@@ -378,6 +391,7 @@ function neonGridWidgetHandler(request, reply) {
 
   const configName = /^[a-zA-Z0-9_-]+$/.test(request.query.config || '') ? request.query.config : 'default';
   const gridConfig = loadGridConfig(configName);
+  const queryName = /^[a-zA-Z0-9_-]+$/.test(request.query.query || '') ? request.query.query : 'default';
 
   let params = {
     seo: {
@@ -388,7 +402,8 @@ function neonGridWidgetHandler(request, reply) {
     apiKey: auth.apikey,
     demo: request.query.demo === 'true',
     gridConfig: JSON.stringify(gridConfig),
-    gridConfigName: configName
+    gridConfigName: configName,
+    queryConfigName: queryName
   };
   return reply.view("/src/widgets/neon-grid.hbs", params);
 }
@@ -433,155 +448,13 @@ async function neonGridDataHandler(request, reply) {
     }
   }
 
+  const queryName = /^[a-zA-Z0-9_-]+$/.test(request.query.query || '') ? request.query.query : 'default';
+  const queryConfig = loadQueryConfig('neon-grid', queryName);
+
   const queryPayload = {
-    queryStatement: {
-      "bool": {
-        "and": [
-          {
-            "type": "match",
-            "path": "typeName",
-            "match": "${type}*"
-          },
-          {
-            "type": "in",
-            "path": "baseType",
-            "terms": [
-              "${availableTypes}"
-            ]
-          },
-          {
-            "type": "stringBetween",
-            "path": "updateTs",
-            "low": "${dateLow}",
-            "high": "${dateHigh}"
-          },
-          {
-            "type": "in",
-            "path": "workspaceLinkInfo.workspaceFolderPath",
-            "terms": [
-              "${workfolder}"
-            ]
-          },
-          {
-            "type": "match",
-            "path": "versionInfo.workflowInfo.workflow",
-            "match": "${workflow}"
-          },
-          {
-            "type": "match",
-            "path": "lockInfos",
-            "match": "${Lock}"
-          },
-          {
-            "type": "match",
-            "path": "versionInfo.workflowInfo.assigmentInfo.priority",
-            "match": "${priority}"
-          },
-          {
-            "type": "match",
-            "path": "versionInfo.workflowInfo.assigmentInfo.assignees.alias",
-            "match": "${assignees}"
-          },
-          {
-            "type": "match",
-            "path": "versionInfo.workflowInfo.assigmentInfo.assigner.alias",
-            "match": "${assigner}"
-          },
-          {
-            "type": "match",
-            "path": "versionInfo.workflowInfo.assigmentInfo.dueDate",
-            "match": "${dueDate}"
-          },
-          {
-            "type": "match",
-            "path": "versionInfo.workflowInfo.assigmentInfo.assignmentDate",
-            "match": "${assignmentDate}"
-          },
-          {
-            "type": "match",
-            "path": "versionInfo.updateVersionUserRef.alias",
-            "match": "${last Modifier}"
-          },
-          {
-            "type": "match",
-            "path": "versionInfo.createFamilyUserRef.alias",
-            "match": "${createdBy}"
-          },
-          {
-            "type": "match",
-            "path": "nodeMeta.credit",
-            "match": "${image credit}"
-          },
-          {
-            "type": "match",
-            "path": "nodeMeta.source",
-            "match": "${image source}"
-          },
-          {
-            "type": "match",
-            "path": "metadataGroups.eom.sys_attributes.props.productInfo.edition",
-            "match": "${edition}"
-          },
-          {
-            "type": "match",
-            "path": "nodeMeta.printSection",
-            "match": "${print section}"
-          },
-          {
-            "type": "match",
-            "path": "nodeMeta.printPriority",
-            "match": "${print priority}"
-          },
-          {
-            "type": "match",
-            "path": "nodeMeta.printIssueDate",
-            "match": "${print issue date}"
-          },
-          {
-            "type": "contain",
-            "path": "allText",
-            "term": "*${searchTerm}*"
-          },
-          {
-            "type": "nested",
-            "path": "publishInfos",
-            "bool": {
-              "and": [
-                {
-                  "type": "exists",
-                  "path": "overwrittenLiveFirstPublicationDate"
-                }
-              ]
-            }
-          }
-        ],
-        "or": []
-      },
-      "sort": {
-        "type": "fields",
-        "sorts": [
-          {
-            "path": "versionInfo.createFamilyTime",
-            "order": "DESC"
-          }
-        ]
-      },
-      "properties": { "trackTotalHitsCount": 10000 },
-      "sort": {
-        "type": "fields",
-        "sorts": [ { "path": "versionInfo.createFamilyTime", "order": "DESC" } ]
-      }
-    },
-    "variables": {
-      "domain": ["editorial"],
-      "searchTerm": [""],
-      "type": ["article"],
-      "workflow": ["story/ready"]
-    },
-    "options": {
-      "showLoadPublishInfo": true,
-      "showSystemAttributes": true
-    }
+    queryStatement: queryConfig.queryStatement,
+    variables: { ...queryConfig.variables },
+    options: queryConfig.options || { showLoadPublishInfo: true, showSystemAttributes: true }
   };
 
   if (gridConfig.queryOverrides?.variables) {
@@ -611,12 +484,15 @@ function printQueryBoardHandler(request, reply) {
     console.error('printQueryBoardHandler config error:', error);
   }
 
+  const queryName = /^[a-zA-Z0-9_-]+$/.test(request.query.query || '') ? request.query.query : 'default';
+
   return reply.view('/src/widgets/print-query-board.hbs', {
     seo: { title: 'Print Query Board', description: 'Kanban board for planning print edition stories by section, priority, desk, or access' },
     neonAppUrl: process.env.NEON_APP_URL,
     apiKey: auth.apikey,
     demo: request.query.demo === 'true',
-    printConfig: JSON.stringify(printConfig)
+    printConfig: JSON.stringify(printConfig),
+    queryConfigName: queryName
   });
 }
 
@@ -668,59 +544,13 @@ async function printQueryBoardDataHandler(request, reply) {
     }
   }
 
+  const queryName = /^[a-zA-Z0-9_-]+$/.test(request.query.query || '') ? request.query.query : 'default';
+  const queryConfig = loadQueryConfig('print-query-board', queryName);
+
   const queryPayload = {
-    queryStatement: {
-      "bool": {
-        "and": [
-          {
-            "type": "match",
-            "path": "typeName",
-            "match": "${type}*"
-          },
-          {
-            "type": "match",
-            "path": "versionInfo.workflowInfo.workflow",
-            "match": "${workflow}"
-          },
-          {
-            "type": "match",
-            "path": "nodeMeta.printSection",
-            "match": "${print section}"
-          },
-          {
-            "type": "match",
-            "path": "nodeMeta.printPriority",
-            "match": "${print priority}"
-          },
-          {
-            "type": "match",
-            "path": "nodeMeta.printIssueDate",
-            "match": "${print issue date}"
-          },
-          {
-            "type": "contain",
-            "path": "allText",
-            "term": "*${searchTerm}*"
-          }
-        ],
-        "or": []
-      },
-      "sort": {
-        "type": "fields",
-        "sorts": [ { "path": "versionInfo.createFamilyTime", "order": "DESC" } ]
-      },
-      "properties": { "trackTotalHitsCount": 10000 }
-    },
-    "variables": {
-      "domain": ["editorial"],
-      "searchTerm": [""],
-      "type": ["article"],
-      "workflow": ["story/ready"]
-    },
-    "options": {
-      "showLoadPublishInfo": true,
-      "showSystemAttributes": true
-    }
+    queryStatement: queryConfig.queryStatement,
+    variables: { ...queryConfig.variables },
+    options: queryConfig.options || { showLoadPublishInfo: true, showSystemAttributes: true }
   };
 
   try {

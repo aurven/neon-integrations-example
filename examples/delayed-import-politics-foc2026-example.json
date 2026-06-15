@@ -1,10 +1,24 @@
 {
-  "duration": 3,
-  "site": "DailyChronicle",
-  "workspace": "/Politics",
+  "duration": 2,
+  "site": "TheGlobe",
+  "workspace": "/Convergent/Politics",
   "publish": false,
   "assignTo": "62038d84-f161-3579-a5f1-7aba053f999a",
   "items": [
+    {
+      "type": "story",
+      "title": "UK, Australia back embattled submarine deal",
+      "summary": "Has anyone seen my chameleon this morning ? He has to be hiding somewhere. He asked me if we could play hide-and-go-seek, and then disappeared into thin air.",
+      "byline": "AFP",
+      "content": "<p>Britain and Australia said Friday they will sign a 50-year commitment to their nuclear-powered submarine pact with the United States, seeking to bolster a deal that Washington has thrown into doubt. The two countries cast their pledge as a historic treaty but gave few details beyond saying it would help economic cooperation and « underpin » the existing, three-nation AUKUS pact.</p><p>« It is a profoundly important treaty that we will sign tomorrow, » Australian Defence Minister Richard Marles told reporters after talks in Sydney between the two countries' defence and foreign ministers. A US defence official last month revealed that a review of AUKUS was underway to ensure it « aligned with the President's America First agenda » and that the US defence industrial base was « meeting our needs ».</p><p>Under the 2021 AUKUS deal, Australia would acquire at least three Virginia-class submarines from the United States within 15 years, eventually manufacturing its own subs. The US Navy has 24 Virginia-class vessels but American shipyards are struggling to meet production targets set at two new boats each year.</p><p>In the United States, critics question why Washington would sell nuclear-powered submarines to Australia without stocking its own military first. « A new government undertaking a review is the most natural thing in the world, » Marles said of the decision by US President Donald Trump's administration.</p><p>Australia had already contributed US $1 billion this year to help boost production and maintenance of submarines in the United States, he said.n« We are really confident that the production rates will be raised in America. »</p><p>Under AUKUS, Britain will eventually develop a new class of nuclear-powered attack submarines, the SSN-AUKUS, to enter service from the late 2030s. Australia would also build the SSN-AUKUS, with delivery expected to its navy in the early 2040s. British Defence Secretary John Healey said London welcomed the US review.</p><p>« It's an opportunity for the new administration to renew America's commitment to the deep AUKUS partnership that our three nations have, » he said. In a government statement, Britain repeated previously released figures saying that the AUKUS submarine programme would lead to the creation of 21,000 UK jobs.</p><p>It said the submarine programme was expected to be worth « up to » 20 billion pounds (US $27 billion) in British exports over the next 25 years. Analyst Tom Corben from the United States Studies Centre in Australia said the new treaty between Canberra and London was an important show of solidarity.</p><p>« The symbolism is important given everything else that is happening, » he said.</p><p>Britain's defence and foreign ministers were visiting Australia as their country's Carrier Strike Group and 3,000 personnel took part in annual Talisman Sabre military exercises across Australia and Papua New Guinea.</p>",
+      "metadata": {
+        "seoTitle": "UK, Australia back embattled submarine deal",
+        "printSection": "/Product/Politics",
+        "printPriority": "3",
+        "printIssueDate": "20260618",
+        "printDiffusion": "Yes"
+      }
+    },
     {
       "type": "story",
       "title": "Tough balancing act for Australia",
@@ -12,11 +26,10 @@
       "byline": "TG",
       "content": "<p>There was a moment in federal parliament this week when the seriousness of the looming Aukus announcement seemed to dawn on the defence minister, Richard Marles.</p><p>“It is difficult to overstate the step that, as a nation, we are about to take,” Marles, in the acting prime minister’s chair, solemnly told the chamber on Thursday.</p><p>“Australia will become just the seventh country to have the ability to operate a nuclear-powered submarine. We have never operated a military capability at this level before.”</p><p>The statement may not have been intended to raise doubts about whether Australia is up to the task – but it does happen to underline the extremely complex undertaking the country is about to pursue.</p><p>These challenges include building up a predicted workforce of 10,000 or more to develop Australia’s nuclear expertise and safely build, operate, maintain and regulate the new submarines.</p><p>After 18 months of planning among Australia, the US and the UK, the three countries’ leaders are set to finally announce the details of the so-called “optimal pathway” for Australia to have “at least” eight nuclear-powered submarines. This is expected in San Diego on Monday local time, Tuesday morning Canberra time.</p><p>But we have had some clues about the outlines of the deal, thanks to leaks out of the US and the UK. It seems Australia could acquire up to five Virginia class submarines from the US by the mid 2030s before adopting a British design as a more permanent solution.</p><p>For now, many questions remain unanswered. It’s unclear how much it will cost, how we’ll pay for it, when construction in South Australia will begin and what plans we have in the meantime to invite US and UK submarines to visit Australia for extended periods.</p><p>But it is worth noting that the Australian government – while not confirming any of the details in advance – felt it was necessary to pre-emptively reassure partners in south-east Asia and the Pacific of the motivations for proceeding with the submarine acquisition.</p><p>Indonesia and Malaysia were likely front of mind when Marles said that even though the submarines would have the capability to operate at war, “the true intent” was to defend the rules-based order across the region.</p><p>Workers and sailers with a model of the Hunter-class frigate</p><p>“So I want to say at this moment to our neighbours and to our friends around the world that as Australia invests in its defence, as we acquire this nuclear-powered submarine capability, we do so as part of making our contribution to the peace and the stability of our region and of the world,” Marles told parliament on Thursday.</p><p>At a press event, Qin read from a copy of the constitution of the People’s Republic of China to declare that Taiwan was “part of the sacred territory of the People’s Republic of China” and that it was “the inviolable duty of all Chinese people, including our compatriots in Taiwan, to accomplish the great task of reunifying the motherland”.</p><p>Describing Taiwan as “the first red line that must not be crossed in China-US relations”, Qin warned the US against taking “a reckless gamble with the stakes being the fundamental interests of the two peoples and even the future of humanity”.</p><p>Kevin Rudd, Australia’s soon-to-be-ambassador to the US, will be active in pushing the guardrails concept when he arrives in Washington DC. He was clear this week that Australian strategic thinking was driven by a key question : “How do we deter our friends in China from taking premeditated military action against Taiwan, which will then be a fundamental destabilisation of the strategic status quo?”</p><p>The Australian government has argued there is no contradiction between its desire to acquire the best defence assets possible (as part of maintaining a “strategic equilibrium” in the Indo-Pacific) and its continued push for a less rocky relationship with China. But it’s quite the needle to thread.</p><p>And for all the focus on the precise detail to come, Aukus will clearly be seen overall as Australia drawing even closer to the US and the UK for decades.</p>",
       "metadata": {
-        "seoTitle": "Tough balancing act for Australia: Aukus deal explained",
-        "keywords": "Australia, Aukus, submarines, defence, China, politics",
-        "printSection": "/Politics",
+        "seoTitle": "Tough balancing act for Australia",
+        "printSection": "/Product/Politics",
         "printPriority": "3",
-        "printIssueDate": "2026-06-18",
+        "printIssueDate": "20260618",
         "printDiffusion": "Yes"
       }
     }
