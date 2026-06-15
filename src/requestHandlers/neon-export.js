@@ -71,31 +71,42 @@ async function postMailjetHandler(request, reply) {
   }
 
   try {
-    let result;
-    
     // Check if this is a Neon model (newsletter) or direct Mailjet Messages format
     if (request.body.model || request.body.nodes || request.body.contentData) {
       // This is a Neon newsletter model - convert to newsletter
-      result = await mailjetService.sendNewsletter(request.body);
+      const result = await mailjetService.sendNewsletter(request.body);
+
+      const storyId = request.body.contentData?.data?.id || request.body.model?.data?.id || request.body.model?.id;
+      const timestamp = new Date().toISOString();
+
+      const returnMessage = {
+        action: "writeback",
+        payload: { storyId, lastSend: timestamp },
+      };
+
+      console.log("postMailjetHandler << OUT:");
+      console.log("Response Data:", returnMessage, "Mailjet Result:", result);
+
+      return reply.status(200).send(returnMessage);
     } else if (request.body.Messages) {
       // This is direct Mailjet format
-      result = await mailjetService.sendSingleEmail(request.body);
+      const result = await mailjetService.sendSingleEmail(request.body);
+
+      const response = {
+        message: "Email sent successfully",
+        data: result,
+      };
+
+      console.log("postMailjetHandler << OUT:");
+      console.log("Response Data:", response);
+
+      return reply.status(200).send(response);
     } else {
       console.error("postMailjetHandler << ERROR: Invalid request format - expected either 'model' (Neon) or 'Messages' (Mailjet)");
-      return reply.status(400).send({ 
-        error: "Invalid request format - expected either 'model' for newsletter or 'Messages' for direct email" 
+      return reply.status(400).send({
+        error: "Invalid request format - expected either 'model' for newsletter or 'Messages' for direct email"
       });
     }
-    
-    const response = {
-      message: "Email sent successfully",
-      data: result,
-    };
-    
-    console.log("postMailjetHandler << OUT:");
-    console.log("Response Data:", response);
-    
-    return reply.status(200).send(response);
   } catch (error) {
     console.error("postMailjetHandler << ERROR: Error sending email:", error);
     const errorResponse = {
