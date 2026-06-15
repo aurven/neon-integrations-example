@@ -7,7 +7,7 @@ const cheerio = require('cheerio');
 const edapi = require('./helpers/edapi-utils.js');
 const dayjs = require('dayjs');
 const images = require('./images-importer.js');
-const { buildPrintFieldOperators, buildUpdateField } = require('./helpers/methode-metadata-utils.js');
+const { buildPrintFieldOperators, buildUpdateField, setOp, attributePath } = require('./helpers/methode-metadata-utils.js');
 const { findElementByNodeType, extractTextFromElements } = require('./helpers/neon-content-parser.js');
 
 const USERNAME = process.env.EDAPI_USERNAME;
@@ -296,7 +296,7 @@ async function resolveMethodeStory(methodeClient, { info, name, issueDate, workF
     if (existingStory) {
       console.log(`[${existingStoryId}] Story exists — will update.`);
       const isLinkedToPage = await ensureTabloidChannelCopy(methodeClient, existingStoryId);
-      return { loid: existingStoryId, isLinkedToPage };
+      return { loid: existingStoryId, isLinkedToPage, isNewStory: false };
     }
 
     console.log(`[${existingStoryId}] Story not found in Méthode — creating a new story.`);
@@ -312,7 +312,7 @@ async function resolveMethodeStory(methodeClient, { info, name, issueDate, workF
   });
   console.log(`[${loid}] New story created in Méthode.`);
 
-  return { loid, isLinkedToPage: false };
+  return { loid, isLinkedToPage: false, isNewStory: true };
 }
 
 async function processNeonStoryV2 (model) {
@@ -331,7 +331,7 @@ async function processNeonStoryV2 (model) {
 
     await methodeClient.login({ username: USERNAME, password: PASSWORD });
 
-    const { loid, isLinkedToPage } = await resolveMethodeStory(methodeClient, { info, name, issueDate, workFolder });
+    const { loid, isLinkedToPage, isNewStory } = await resolveMethodeStory(methodeClient, { info, name, issueDate, workFolder });
 
     const imageReferences = await images.modelImagesToMethode(
       methodeClient,
@@ -354,6 +354,11 @@ async function processNeonStoryV2 (model) {
     console.log(`[${loid}] Content updated.`);
 
     const printFieldOperators = buildPrintFieldOperators(info.attributes);
+
+    if (isNewStory) {
+      printFieldOperators.push(setOp(attributePath('/metadata/AutoLayout/StoryType'), 'Standard_Variants'));
+    }
+
     const printFieldsBody = { sourceIds: [ loid ], operators: printFieldOperators };
     const updateFields = buildUpdateField(printFieldsBody);
 
