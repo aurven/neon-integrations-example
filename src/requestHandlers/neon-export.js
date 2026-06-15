@@ -74,7 +74,8 @@ async function postMailjetHandler(request, reply) {
     // Check if this is a Neon model (newsletter) or direct Mailjet Messages format
     if (request.body.model || request.body.nodes || request.body.contentData) {
       // This is a Neon newsletter model - convert to newsletter
-      const result = await mailjetService.sendNewsletter(request.body);
+      const mode = request.query.mode === 'webpage' ? 'webpage' : 'generated';
+      const result = await mailjetService.sendNewsletter(request.body, { mode });
 
       const storyId = request.body.contentData?.data?.id || request.body.model?.data?.id || request.body.model?.id;
       const timestamp = new Date().toISOString();
