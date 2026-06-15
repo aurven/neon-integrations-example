@@ -1,6 +1,14 @@
 const utils = require('./utils.js');
 const neon = require('./neon-bo-api-v3.js');
 
+async function hasWorkflow(familyRef) {
+    const getNextStepsResult = await neon.getNextSteps?.(familyRef);
+    const associatedWorkflow = getNextStepsResult?.data?.associatedWorkflow;
+    const availableWorkflows = getNextStepsResult?.data?.availableWorkflows;
+
+    return !!associatedWorkflow?.processInstance?.processName || !!(availableWorkflows?.length > 0);
+}
+
 async function workflowTransitionTo({ familyRef, targetStateName, targetWorkflowName = null, priority = 0, principals = [], comment = '' }) {
     const getNextStepsResult = await neon.getNextSteps?.(familyRef);
     const nodeData = getNextStepsResult?.data?.node;
@@ -98,6 +106,7 @@ async function deleteObjectsByQuery(query) {
 }
 
 module.exports = {
+    hasWorkflow,
     workflowTransitionTo,
     deleteObjectsByQuery
 };

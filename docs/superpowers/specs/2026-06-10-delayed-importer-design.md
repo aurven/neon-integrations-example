@@ -59,7 +59,8 @@ Submit a job.
   "publish": false,
   "items": [
     {
-      "type": "story",
+      "contentType": "story",
+      "type": "wirestory",
       "title": "Headline here",
       "content": "<p>Body HTML…</p>",
       "summary": "Optional standfirst",
@@ -68,7 +69,7 @@ Submit a job.
       "workfolder": "/Demo/Imports/Politics"
     },
     {
-      "type": "image",
+      "contentType": "image",
       "url": "https://example.com/live/image.jpg",
       "name": "optional-file-name",
       "metadata": { "caption": "…", "credit": "…" },
@@ -82,7 +83,8 @@ Submit a job.
 - `site`, `workspace`: required (same semantics as the existing `/in/import` handler).
 - `workfolder`: job-level default target; per-item `workfolder` overrides it. At least one of the two must resolve for every item.
 - `publish`: optional, default `false`.
-- `items`: non-empty array; each item must have a valid `type` and the type's required fields (`title`+`content` for story, `url` for image).
+- `items`: non-empty array; each item must have a valid `contentType` (`story` or `image`) and that type's required fields (`title`+`content` for story, `url` for image).
+- `type` (story items only): Neon content type for the created node (e.g. `article`, `wirestory`). Optional, defaults to `article`.
 
 **Validation failures** → `400` with `{ error: "<reason>" }`, listing the index of the first invalid item. Nothing is scheduled on a 400.
 

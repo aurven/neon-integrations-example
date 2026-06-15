@@ -6,7 +6,7 @@
   "assignTo": "62038d84-f161-3579-a5f1-7aba053f999a",
   "items": [
     {
-      "type": "story",
+      "contentType": "story",
       "title": "Tough balancing act for Australia",
       "summary": "Bid to maintain ‘strategic equilibrium’ through the Aukus pact and a better relationship with Beijing is quite the needle to thread.",
       "byline": "TG",
@@ -20,7 +20,7 @@
       }
     },
     {
-      "type": "story",
+      "contentType": "story",
       "title": "Mapping the unexplained mysteries of the deep cosmos",
       "summary": "Echoes of the Ancient Void : Wisps of cosmic dust and distant starlight frame the precipice of a high-altitude overlook, where a quiet dock juts into a glassy lake beneath a turbulent, brooding sky. A earthly mirror to the deep cosmos—a silent threshold where humanity stands at the edge of the known, gazing out into a vast, dark, and profoundly unexplained universe.",
       "byline": "Gemini",
@@ -34,7 +34,7 @@
       }
     },
     {
-      "type": "story",
+      "contentType": "story",
       "title": "Where the mountains meet the moody skies.",
       "summary": "« The Last Ferryman of Lake McDonald » tells the story of Samuel, an elderly man who maintains a secluded, private dock at the edge of a vast, mountain-fringed lake. As a violent storm gathers under an ominous sky, Samuel confronts the profound isolation of his life, his stubborn adherence to the « Private Dock : Customers Only » rules, and the ghosts of his past.",
       "byline": "A Gemini story",

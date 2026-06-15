@@ -39,13 +39,13 @@ function validatePayload(body) {
     if (!item || typeof item !== 'object') {
       return { valid: false, error: `items[${i}]: must be an object` };
     }
-    if (!ITEM_TYPES.includes(item.type)) {
-      return { valid: false, error: `items[${i}]: type must be one of ${ITEM_TYPES.join(', ')}` };
+    if (!ITEM_TYPES.includes(item.contentType)) {
+      return { valid: false, error: `items[${i}]: contentType must be one of ${ITEM_TYPES.join(', ')}` };
     }
     if (item.assignTo !== undefined && !isValidAssignTo(item.assignTo)) {
       return { valid: false, error: `items[${i}]: assignTo must be a string or an array of strings` };
     }
-    if (item.type === 'story') {
+    if (item.contentType === 'story') {
       if (!item.title || typeof item.title !== 'string') {
         return { valid: false, error: `items[${i}]: story requires a title` };
       }
@@ -53,7 +53,7 @@ function validatePayload(body) {
         return { valid: false, error: `items[${i}]: story requires content` };
       }
     }
-    if (item.type === 'image') {
+    if (item.contentType === 'image') {
       if (!item.url || typeof item.url !== 'string') {
         return { valid: false, error: `items[${i}]: image requires a url` };
       }
@@ -108,21 +108,21 @@ async function runTick(job, index, deps) {
 
   const item = job.items[index];
   try {
-    const dispatch = item.type === 'story' ? deps.dispatchStory : deps.dispatchImage;
+    const dispatch = item.contentType === 'story' ? deps.dispatchStory : deps.dispatchImage;
     const outcome = await dispatch(item, job);
     job.results.push({
       index,
-      type: item.type,
+      type: item.contentType,
       status: 'ok',
       familyRef: outcome?.familyRef || null,
       at: new Date().toISOString(),
     });
-    console.log(`delayed-import ${job.jobId}: item ${index} (${item.type}) imported`);
+    console.log(`delayed-import ${job.jobId}: item ${index} (${item.contentType}) imported`);
   } catch (error) {
-    console.error(`❌ delayed-import ${job.jobId}: item ${index} (${item.type}) failed: ${error.message}`);
+    console.error(`❌ delayed-import ${job.jobId}: item ${index} (${item.contentType}) failed: ${error.message}`);
     job.results.push({
       index,
-      type: item.type,
+      type: item.contentType,
       status: 'error',
       error: error.message,
       at: new Date().toISOString(),
@@ -143,12 +143,14 @@ async function runTick(job, index, deps) {
 
 /**
  * Story item -> storiesPopulator.newNodeFromStory.
- * Deliberately does NOT copy item.type onto the story: getCreationOptions
- * uses story.type as the Neon node type and must default to 'article'.
+ * item.type is the Neon content type (e.g. 'article', 'wirestory'); getCreationOptions
+ * uses story.type as the Neon node type and defaults to 'article' when unset.
  * No figureUrl / language / translate: image upload no-ops, translation skipped.
  */
 async function dispatchStoryItem(item, job, populator = storiesPopulator) {
   const story = {
+    type: item.type,
+    name: item.name,
     title: item.title,
     headline: item.title,
     summary: item.summary || '',

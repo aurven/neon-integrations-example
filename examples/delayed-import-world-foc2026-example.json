@@ -6,7 +6,7 @@
   "assignTo": "62038d84-f161-3579-a5f1-7aba053f999a",
   "items": [
     {
-      "type": "story",
+      "contentType": "story",
       "title": "India widens Russian insurance",
       "summary": "",
       "byline": "",
@@ -20,7 +20,7 @@
       }
     },
     {
-      "type": "story",
+      "contentType": "story",
       "title": "Safe exit of ships via Strait of Hormuz",
       "summary": "",
       "byline": "",
@@ -34,7 +34,7 @@
       }
     },
     {
-      "type": "story",
+      "contentType": "story",
       "title": "Reliance, Essar top bidders",
       "summary": "",
       "byline": "",
@@ -48,7 +48,7 @@
       }
     },
     {
-      "type": "story",
+      "contentType": "story",
       "title": "ISS astronauts first-ever medical evacuation",
       "summary": "Four International Space Station crewmembers splashed down in the Pacific Ocean on Thursday, NASA footage showed, after the first ever medical evacuation in the orbital lab’s history.",
       "byline": "AFP",
@@ -62,7 +62,7 @@
       }
     },
     {
-      "type": "story",
+      "contentType": "story",
       "title": "Toronto dog owners bite back after city posts ‘no barking’ sign at pooch park",
       "summary": "City called off its dogs and said it would review its sign approval process after canine owners called the prohibition ‘lunacy’",
       "byline": "DR",
@@ -76,7 +76,7 @@
       }
     },
     {
-      "type": "story",
+      "contentType": "story",
       "title": "The work of art age",
       "summary": "Has anyone seen my chameleon this morning ? He has to be hiding somewhere. He asked me if we could play hide-and-go-seek, and then disappeared into thin air. I've looked high and low in the yard and the house and it seems like he's nowhere around.",
       "byline": "Emmanuel",
@@ -90,7 +90,7 @@
       }
     },
     {
-      "type": "story",
+      "contentType": "story",
       "title": "Mont Blanc moonrise",
       "summary": "A moment of perfect alignment, captured without preparation. From his balcony in Cordon, Anthony Blondet photographed the Moon as if suspended from the crane at the Grands Montets construction site. The image, which has gone viral, intrigues with its realism… Yet it is entirely natural.",
       "byline": "With AFP",
@@ -104,7 +104,7 @@
       }
     },
     {
-      "type": "story",
+      "contentType": "story",
       "title": "Short story",
       "summary": "",
       "byline": "",
@@ -118,7 +118,7 @@
       }
     },
     {
-      "type": "story",
+      "contentType": "story",
       "title": "Fire alarms issues",
       "summary": "",
       "byline": "Emmanuel",

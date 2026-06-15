@@ -6,7 +6,7 @@
   "assignTo": "62038d84-f161-3579-a5f1-7aba053f999a",
   "items": [
     {
-      "type": "story",
+      "contentType": "story",
       "title": "Portugal qualify for 2026 World Cup by thrashing Armenia",
       "summary": "Portugal crushed Armenia 9-1 despite the absence of suspended talisman Cristiano Ronaldo on Sunday to clinch qualification for the 2026 World Cup finals.",
       "byline": "AFP",
@@ -20,7 +20,7 @@
       }
     },
     {
-      "type": "story",
+      "contentType": "story",
       "title": "France wins vs inspired Fidji",
       "summary": "Centre Nicolas Depoortere scored twice",
       "byline": "With AFP",
@@ -34,7 +34,7 @@
       }
     },
     {
-      "type": "story",
+      "contentType": "story",
       "title": "France wins again",
       "summary": "Centre Nicolas Depoortere scored twice",
       "byline": "With AFP",
@@ -48,7 +48,7 @@
       }
     },
     {
-      "type": "story",
+      "contentType": "story",
       "title": "Zverev wins first Grand Slam with epic final victory",
       "summary": "Alexander Zverev finally secured his maiden Grand Slam title with a dramatic five-set victory over Italy's Flavio Cobolli in the French Open final on Sunday.",
       "byline": "AFP",
