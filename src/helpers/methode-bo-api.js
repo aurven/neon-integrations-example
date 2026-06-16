@@ -276,7 +276,7 @@ class MethodeClient {
                 showPath: true,
                 createMode: 'NEW_VERSION',
                 useDefaultProduct: false,
-                issueDateDefaultStrategy: 'CALENDAR',
+                //issueDateDefaultStrategy: 'CALENDAR',
                 timeSuffix: false,
                 checkinAction: true,
                 unlock: true,
