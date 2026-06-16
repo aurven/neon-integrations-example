@@ -397,8 +397,8 @@
                             // Capture familyRef for metadata saves
                             state.familyRef = state.neonContext?.originalNode?.familyRef || null;
 
-                            // Populate print fields from node attributes
-                            setPrintFieldsFromAttributes(state.neonContext?.originalNode?.attributes);
+                            // Populate print fields from node metadata
+                            setPrintFieldsFromAttributes(state.neonContext?.originalNode?.nodeMeta);
 
                             // Extract methodeHook from publishInfos
                             const publishInfos = state.neonContext?.originalNode?.publishInfos;
