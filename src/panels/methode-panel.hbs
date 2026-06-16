@@ -102,11 +102,17 @@
                 <!-- Tab Navigation -->
                 <div class="border-b border-gray-200">
                     <nav class="flex -mb-px">
-                        <button id="tab-metadata" class="tab-button active flex-1 py-3 px-4 text-center border-b-2 border-methode-500 text-methode-600 font-medium text-sm transition-colors" data-tab="metadata">
+                        <button id="tab-info" class="tab-button active flex-1 py-3 px-4 text-center border-b-2 border-methode-500 text-methode-600 font-medium text-sm transition-colors" data-tab="info">
+                            <svg class="w-4 h-4 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Info
+                        </button>
+                        <button id="tab-print" class="tab-button hidden flex-1 py-3 px-4 text-center border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-sm transition-colors" data-tab="print">
                             <svg class="w-4 h-4 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
                             </svg>
-                            PRINT
+                            Print
                         </button>
                         <button id="tab-preview" class="tab-button flex-1 py-3 px-4 text-center border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-sm transition-colors" data-tab="preview">
                             <svg class="w-4 h-4 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -120,8 +126,42 @@
 
                 <!-- Tab Content -->
                 <div class="p-6">
+                    <!-- Info Tab Content (default, read-only Méthode AutoLayout values) -->
+                    <div id="content-info" class="tab-content">
+                        <div class="space-y-3">
+                            <p class="text-xs text-gray-400 mb-4">Values as sent to Méthode on last export. Read-only.</p>
+
+                            <div class="grid grid-cols-2 gap-x-6 gap-y-3">
+                                <div>
+                                    <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Layout Priority</p>
+                                    <p id="info-layout-prio" class="mt-0.5 text-sm text-gray-800 font-mono">—</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Boost Priority</p>
+                                    <p id="info-boost-prio" class="mt-0.5 text-sm text-gray-800 font-mono">—</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Work Folder</p>
+                                    <p id="info-work-folder" class="mt-0.5 text-sm text-gray-800 font-mono break-all">—</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Issue Date</p>
+                                    <p id="info-issue-date" class="mt-0.5 text-sm text-gray-800">—</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Story Type</p>
+                                    <p id="info-story-type" class="mt-0.5 text-sm text-gray-800 font-mono">—</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Diffusion</p>
+                                    <p id="info-diffusion" class="mt-0.5 text-sm text-gray-800">—</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Print Tab Content -->
-                    <div id="content-metadata" class="tab-content">
+                    <div id="content-print" class="tab-content hidden">
                         <div class="space-y-5">
 
                             <!-- Diffusion -->
@@ -284,6 +324,7 @@
             methodeHookData: null,
             currentPreviewUrl: null,
             familyRef: null,
+            activeTab: 'info',
         };
 
         // Utility functions
@@ -397,8 +438,10 @@
                             // Capture familyRef for metadata saves
                             state.familyRef = state.neonContext?.originalNode?.familyRef || null;
 
-                            // Populate print fields from node metadata
-                            setPrintFieldsFromAttributes(state.neonContext?.originalNode?.nodeMeta);
+                            // Populate Info and Print tabs from node metadata
+                            const nodeMeta = state.neonContext?.originalNode?.nodeMeta;
+                            populateInfoTab(nodeMeta);
+                            setPrintFieldsFromAttributes(nodeMeta);
 
                             // Extract methodeHook from publishInfos
                             const publishInfos = state.neonContext?.originalNode?.publishInfos;
@@ -469,8 +512,8 @@
                 state.currentObject = newObjectData;
                 updateTimestamp();
 
-                // Generate preview asynchronously after object is loaded
-                generatePreviewAsync();
+                // Preview is lazy — only generated when the Preview tab is active
+                if (state.activeTab === 'preview') generatePreviewAsync();
             } catch (error) {
                 console.error('Error loading object:', error);
                 if (!state.currentObject) {
@@ -791,9 +834,11 @@
             tabButtons.forEach(button => {
                 button.addEventListener('click', () => {
                     const tabName = button.dataset.tab;
+                    state.activeTab = tabName;
 
-                    // Update button states
+                    // Update button states (skip hidden tabs)
                     tabButtons.forEach(btn => {
+                        if (btn.classList.contains('hidden')) return;
                         if (btn.dataset.tab === tabName) {
                             btn.classList.add('border-methode-500', 'text-methode-600');
                             btn.classList.remove('border-transparent', 'text-gray-500');
@@ -812,12 +857,61 @@
                         }
                     });
 
-                    // If switching to preview tab for the first time and no preview loaded yet
-                    if (tabName === 'preview' && !state.currentPreviewUrl && state.currentObject) {
+                    // Lazy-load preview only when tab becomes active
+                    if (tabName === 'preview' && state.currentObject) {
                         generatePreviewAsync();
                     }
                 });
             });
+        }
+
+        // ── Info tab (read-only AutoLayout values) ────────────────────────────
+
+        function mapLayoutPrio(p) {
+            const n = (p === null || p === undefined || p === '') ? null : Number(p);
+            if (n === 1 || n === 2 || n === 3) return 'A';
+            if (n === 4 || n === null) return 'B';
+            return 'C';
+        }
+
+        function mapBoostPriority(p) {
+            const n = (p === null || p === undefined || p === '') ? null : Number(p);
+            if (n === 1) return '2';
+            if (n === 2) return '1';
+            if (n === 3) return '0';
+            return '0';
+        }
+
+        function populateInfoTab(nodeMeta) {
+            if (!nodeMeta) return;
+
+            const set = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = val || '—';
+            };
+
+            set('info-layout-prio',  mapLayoutPrio(nodeMeta.printPriority));
+            set('info-boost-prio',   mapBoostPriority(nodeMeta.printPriority));
+            set('info-work-folder',  nodeMeta.printSection || '—');
+            set('info-story-type',   'Standard_Variants');
+
+            // YYYYMMDD → DD/MM/YYYY
+            const raw = nodeMeta.printIssueDate;
+            if (raw && raw.length === 8) {
+                const d = new Date(`${raw.slice(0,4)}-${raw.slice(4,6)}-${raw.slice(6,8)}`);
+                set('info-issue-date', isNaN(d) ? raw : d.toLocaleDateString('en-GB'));
+            } else {
+                set('info-issue-date', '—');
+            }
+
+            const diffEl = document.getElementById('info-diffusion');
+            if (diffEl) {
+                const d = nodeMeta.printDiffusion || '—';
+                diffEl.textContent = d;
+                diffEl.className = d === 'No'
+                    ? 'mt-0.5 text-sm font-medium text-amber-600'
+                    : 'mt-0.5 text-sm text-gray-800';
+            }
         }
 
         // ── Print field helpers ───────────────────────────────────────────────
