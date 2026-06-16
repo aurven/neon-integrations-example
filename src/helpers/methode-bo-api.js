@@ -259,6 +259,8 @@ class MethodeClient {
             throw new Error('Missing required parameters: name, issueDate, channel, template, workFolder');
         }
 
+        console.log(`📰 [${this.sessionId}] Creating story with name: ${name}, issueDate: ${issueDate}, channel: ${channel}, template: ${template}, workFolder: ${workFolder}`) ;
+
         const options = {
             name,
             workFolder,
