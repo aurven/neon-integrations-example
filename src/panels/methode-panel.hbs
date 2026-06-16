@@ -120,64 +120,60 @@
 
                 <!-- Tab Content -->
                 <div class="p-6">
-                    <!-- Metadata Tab Content -->
+                    <!-- Print Tab Content -->
                     <div id="content-metadata" class="tab-content">
-                        <div class="space-y-4">
-                            <!-- Position -->
-                            <div class="flex items-center">
-                                <label for="meta-position" class="w-32 text-sm font-medium text-gray-700">Position</label>
-                                <select id="meta-position" class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-methode-500 focus:border-methode-500 text-sm">
-                                    <option value="AboveFold">AboveFold</option>
-                                    <option value="BelowFold">BelowFold</option>
-                                    <option value="Inside">Inside</option>
+                        <div class="space-y-5">
+
+                            <!-- Diffusion -->
+                            <div class="flex items-start gap-4">
+                                <label for="meta-diffusion" class="w-32 pt-2 text-sm font-medium text-gray-700 flex-shrink-0">Diffusion</label>
+                                <div class="flex-1">
+                                    <select id="meta-diffusion" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-methode-500 focus:border-methode-500 text-sm">
+                                        <option value="">— not set —</option>
+                                        <option value="Yes">Yes</option>
+                                        <option value="No">No</option>
+                                    </select>
+                                    <p id="diffusion-warning" class="hidden mt-1.5 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded px-2 py-1.5">
+                                        ⚠ Setting Diffusion to <strong>No</strong> will block any further updates to Méthode when this article is published.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Section -->
+                            <div class="flex items-center gap-4">
+                                <label for="meta-section" class="w-32 text-sm font-medium text-gray-700 flex-shrink-0">Section</label>
+                                <select id="meta-section" class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-methode-500 focus:border-methode-500 text-sm">
+                                    <option value="">— not set —</option>
                                 </select>
                             </div>
 
                             <!-- Priority -->
-                            <div class="flex items-center">
-                                <label for="meta-priority" class="w-32 text-sm font-medium text-gray-700">Priority</label>
+                            <div class="flex items-center gap-4">
+                                <label for="meta-priority" class="w-32 text-sm font-medium text-gray-700 flex-shrink-0">Priority</label>
                                 <select id="meta-priority" class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-methode-500 focus:border-methode-500 text-sm">
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3" selected>3</option>
-                                    <option value="4">4</option>
-                                    <option value="5">5</option>
+                                    <option value="">— not set —</option>
+                                    <option value="1">P1 · Breaking</option>
+                                    <option value="2">P2 · High</option>
+                                    <option value="3">P3 · Standard</option>
+                                    <option value="4">P4 · Low</option>
+                                    <option value="5">P5 · Filler</option>
                                 </select>
                             </div>
 
                             <!-- Issue Date -->
-                            <div class="flex items-center">
-                                <label for="meta-issue-date" class="w-32 text-sm font-medium text-gray-700">Issue Date</label>
-                                <input type="text" id="meta-issue-date" placeholder="Tomorrow" class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-methode-500 focus:border-methode-500 text-sm">
+                            <div class="flex items-center gap-4">
+                                <label for="meta-issue-date" class="w-32 text-sm font-medium text-gray-700 flex-shrink-0">Issue Date</label>
+                                <input type="date" id="meta-issue-date" class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-methode-500 focus:border-methode-500 text-sm">
                             </div>
 
-                            <!-- Include Image -->
-                            <div class="flex items-center">
-                                <label for="meta-include-image" class="w-32 text-sm font-medium text-gray-700">Include Image</label>
-                                <select id="meta-include-image" class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-methode-500 focus:border-methode-500 text-sm">
-                                    <option value="Yes">Yes</option>
-                                    <option value="No">No</option>
-                                </select>
+                            <!-- Save -->
+                            <div class="flex items-center justify-end gap-3 pt-2">
+                                <p id="save-status" class="hidden text-xs"></p>
+                                <button id="save-print-btn" disabled class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-methode-500 hover:bg-methode-600 rounded-md transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+                                    Save
+                                </button>
                             </div>
 
-                            <!-- Image Size -->
-                            <div class="flex items-center">
-                                <label for="meta-image-size" class="w-32 text-sm font-medium text-gray-700">Image Size</label>
-                                <select id="meta-image-size" class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-methode-500 focus:border-methode-500 text-sm">
-                                    <option value="Small">Small</option>
-                                    <option value="Medium" selected>Medium</option>
-                                    <option value="Large">Large</option>
-                                </select>
-                            </div>
-
-                            <!-- Adjacent Ads -->
-                            <div class="flex items-center">
-                                <label for="meta-adjacent-ads" class="w-32 text-sm font-medium text-gray-700">Adjacent Ads</label>
-                                <select id="meta-adjacent-ads" class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-methode-500 focus:border-methode-500 text-sm">
-                                    <option value="Yes">Yes</option>
-                                    <option value="No">No</option>
-                                </select>
-                            </div>
                         </div>
                     </div>
 
@@ -263,6 +259,16 @@
     </div>
 
     <script>
+        // Static config injected server-side
+        const PRINT_CONFIG = {{{printConfig}}};
+
+        const METADATA_XPATHS = {
+            printSection:   '/ObjectMetadata/DistributionChannels/Print/PrintSection',
+            printPriority:  '/ObjectMetadata/DistributionChannels/Print/PrintPriority',
+            printIssueDate: '/ObjectMetadata/DistributionChannels/Print/PrintIssueDate',
+            printDiffusion: '/ObjectMetadata/Diffusion/Diff_Print',
+        };
+
         // Global state
         let state = {
             apiKey: '{{{apiKey}}}',
@@ -276,7 +282,8 @@
             neonContext: null,
             siteId: null,
             methodeHookData: null,
-            currentPreviewUrl: null
+            currentPreviewUrl: null,
+            familyRef: null,
         };
 
         // Utility functions
@@ -313,7 +320,6 @@
             document.getElementById('update-time').textContent = formatDate(new Date());
         }
 
-        // Create story preview using edapi-utils.js
         async function createStoryPreview() {
             if (!state.methodeId) {
                 console.log('No methodeId available for preview generation');
@@ -331,7 +337,6 @@
 
                 console.log('Preview payload:', previewPayload);
 
-                // Call the backend API to create story preview using edapi-utils
                 const previewResult = await apiCall('preview/create', 'POST', previewPayload);
 
                 console.log('Preview creation result:', previewResult);
@@ -389,13 +394,18 @@
                             state.neonContext = event.data.info;
                             console.log('Neon context updated:', state.neonContext);
 
+                            // Capture familyRef for metadata saves
+                            state.familyRef = state.neonContext?.originalNode?.familyRef || null;
+
+                            // Populate print fields from node attributes
+                            setPrintFieldsFromAttributes(state.neonContext?.originalNode?.attributes);
+
                             // Extract methodeHook from publishInfos
                             const publishInfos = state.neonContext?.originalNode?.publishInfos;
                             let methodeHook = null;
                             let siteFound = null;
 
                             if (publishInfos) {
-                                // Search through all sites to find one with methodeHook
                                 for (const [siteId, publishInfo] of Object.entries(publishInfos)) {
                                     if (publishInfo.webhookData?.methodeHook) {
                                         methodeHook = publishInfo.webhookData.methodeHook;
@@ -407,7 +417,6 @@
                             }
 
                             if (methodeHook && methodeHook.storyId) {
-                                // We found methodeHook data, use the storyId as methodeId
                                 state.methodeId = methodeHook.storyId;
                                 state.siteId = siteFound;
                                 state.methodeHookData = methodeHook;
@@ -811,40 +820,99 @@
             });
         }
 
-        // Get metadata values from form
-        function getMetadataValues() {
-            return {
-                position: document.getElementById('meta-position')?.value || 'AboveFold',
-                priority: document.getElementById('meta-priority')?.value || '3',
-                issueDate: document.getElementById('meta-issue-date')?.value || '',
-                includeImage: document.getElementById('meta-include-image')?.value || 'Yes',
-                imageSize: document.getElementById('meta-image-size')?.value || 'Medium',
-                adjacentAds: document.getElementById('meta-adjacent-ads')?.value || 'Yes'
-            };
+        // ── Print field helpers ───────────────────────────────────────────────
+
+        function buildSectionOptions() {
+            const sel = document.getElementById('meta-section');
+            (PRINT_CONFIG.sectionsAndBooks || []).forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s.printSection;
+                opt.textContent = s.label;
+                sel.appendChild(opt);
+            });
         }
 
-        // Set metadata values in form
-        function setMetadataValues(metadata) {
-            if (!metadata) return;
+        // YYYYMMDD → yyyy-mm-dd (for <input type="date">)
+        function neonDateToInput(v) {
+            if (!v || v.length !== 8) return '';
+            return `${v.slice(0,4)}-${v.slice(4,6)}-${v.slice(6,8)}`;
+        }
 
-            if (metadata.position) {
-                document.getElementById('meta-position').value = metadata.position;
+        // yyyy-mm-dd → YYYYMMDD (for Neon metadata xpath value)
+        function inputDateToNeon(v) {
+            return v ? v.replace(/-/g, '') : '';
+        }
+
+        function setPrintFieldsFromAttributes(attrs) {
+            if (!attrs) return;
+            document.getElementById('meta-diffusion').value = attrs.printDiffusion || '';
+            document.getElementById('meta-section').value   = attrs.printSection   || '';
+            document.getElementById('meta-priority').value  = attrs.printPriority  || '';
+            document.getElementById('meta-issue-date').value = neonDateToInput(attrs.printIssueDate);
+            updateDiffusionWarning();
+            document.getElementById('save-print-btn').disabled = false;
+        }
+
+        function updateDiffusionWarning() {
+            const val = document.getElementById('meta-diffusion').value;
+            document.getElementById('diffusion-warning').classList.toggle('hidden', val !== 'No');
+        }
+
+        function buildMetadataChange(field, value) {
+            const xpath = METADATA_XPATHS[field];
+            if (!xpath) return null;
+            if (value === null || value === undefined || value === '')
+                return { xpath, action: 'unset' };
+            return { xpath, action: 'set', value: String(value) };
+        }
+
+        async function savePrintFields() {
+            const btn = document.getElementById('save-print-btn');
+            const status = document.getElementById('save-status');
+
+            if (!state.familyRef) {
+                showSaveStatus('error', 'No familyRef — cannot save.');
+                return;
             }
-            if (metadata.priority) {
-                document.getElementById('meta-priority').value = metadata.priority;
+
+            const rawDate = document.getElementById('meta-issue-date').value;
+            const changes = [
+                buildMetadataChange('printDiffusion', document.getElementById('meta-diffusion').value),
+                buildMetadataChange('printSection',   document.getElementById('meta-section').value),
+                buildMetadataChange('printPriority',  document.getElementById('meta-priority').value),
+                buildMetadataChange('printIssueDate', inputDateToNeon(rawDate)),
+            ].filter(Boolean);
+
+            btn.disabled = true;
+            btn.textContent = 'Saving…';
+            status.classList.add('hidden');
+
+            try {
+                await apiCall('neon/metadata/update', 'POST', { familyRef: state.familyRef, changes });
+                showSaveStatus('ok', 'Saved.');
+            } catch (err) {
+                console.error('Print fields save failed:', err);
+                showSaveStatus('error', 'Save failed — see console.');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Save';
             }
-            if (metadata.issueDate) {
-                document.getElementById('meta-issue-date').value = metadata.issueDate;
-            }
-            if (metadata.includeImage) {
-                document.getElementById('meta-include-image').value = metadata.includeImage;
-            }
-            if (metadata.imageSize) {
-                document.getElementById('meta-image-size').value = metadata.imageSize;
-            }
-            if (metadata.adjacentAds) {
-                document.getElementById('meta-adjacent-ads').value = metadata.adjacentAds;
-            }
+        }
+
+        function showSaveStatus(type, msg) {
+            const el = document.getElementById('save-status');
+            el.textContent = msg;
+            el.className = type === 'ok'
+                ? 'text-xs text-green-700'
+                : 'text-xs text-red-600';
+            el.classList.remove('hidden');
+            setTimeout(() => el.classList.add('hidden'), 4000);
+        }
+
+        function setupPrintTab() {
+            buildSectionOptions();
+            document.getElementById('meta-diffusion').addEventListener('change', updateDiffusionWarning);
+            document.getElementById('save-print-btn').addEventListener('click', savePrintFields);
         }
 
         // Initialize
@@ -852,6 +920,7 @@
             console.log('Document loaded, initializing Méthode panel...');
             setupPostMessageApi();
             setupTabs();
+            setupPrintTab();
             
             // Check if we have a direct methodeId (from URL parameter)
             if (state.methodeId && state.methodeId !== 'null' && state.methodeId !== '') {

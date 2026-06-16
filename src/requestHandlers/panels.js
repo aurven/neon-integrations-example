@@ -1,3 +1,5 @@
+const fs = require("fs");
+const path = require("path");
 const seo = require("../seo.json");
 const axios = require("axios");
 const neon = require("../helpers/neon-bo-api-v3.js");
@@ -7,6 +9,16 @@ const { createStoryPreviewWithSetup } = require("../helpers/methode-bo-api.js");
 const { authenticate, shouldShowMaintenance } = require("../helpers/auth.js");
 const { parseNeonArticleContent } = require("../helpers/neon-content-parser.js");
 const { generateArticlePDF } = require("../helpers/pdf-generator.js");
+const { applyMetadataChanges } = require("../helpers/metadata-xpath-utils.js");
+
+function loadPrintConfig() {
+  try {
+    return JSON.parse(fs.readFileSync(path.join(__dirname, '../../conf/widgets/print-query-board/print-query-board-config.json'), 'utf8'));
+  } catch (e) {
+    console.warn('Could not load print config:', e.message);
+    return {};
+  }
+}
 
 function trelloPanelHandler(request, reply) {
   const auth = authenticate(request, reply);
@@ -383,17 +395,16 @@ function methodePanelHandler(request, reply) {
 
   const methodeId = request.query.methodeId;
 
-  // params is an object we'll pass to our handlebars template
   let params = {
     seo: seo,
     apiKey: auth.apikey,
     neonAppUrl: process.env.NEON_APP_URL,
     swingAppUrl: process.env.SWING_APP_URL,
     swingHost: process.env.SWING_HOST,
-    methodeId: methodeId || null
+    methodeId: methodeId || null,
+    printConfig: JSON.stringify(loadPrintConfig()),
   };
 
-  // The Handlebars code will be able to access the parameter values and build them into the page
   return reply.view("/src/panels/methode-panel.hbs", params);
 }
 
@@ -520,6 +531,21 @@ async function methodeApiProxyHandler(request, reply) {
       } else {
         return reply.status(400).send({ error: "Invalid content endpoint format" });
       }
+    } else if (endpoint === 'neon/metadata/update' && method === 'post') {
+      const { familyRef, changes } = request.body || {};
+
+      if (!familyRef) return reply.status(400).send({ error: "familyRef is required" });
+      if (!Array.isArray(changes) || changes.length === 0) return reply.status(400).send({ error: "changes must be a non-empty array" });
+
+      let updatedXml = await neon.getNodeMetadata(familyRef);
+      for (const change of changes) {
+        try { updatedXml = applyMetadataChanges(updatedXml, [change]); }
+        catch (e) { console.warn(`metadata update skipped change ${JSON.stringify(change)}: ${e.message}`); }
+      }
+      const success = await neon.updateNodeMetadata(familyRef, updatedXml);
+      if (!success) return reply.status(502).send({ error: "Failed to update node metadata" });
+
+      result = { success: true, familyRef };
     } else {
       // Handle other endpoints as needed
       return reply.status(400).send({ error: "Unknown endpoint" });
