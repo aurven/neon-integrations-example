@@ -128,34 +128,30 @@
                 <div class="p-6">
                     <!-- Info Tab Content (default, read-only Méthode AutoLayout values) -->
                     <div id="content-info" class="tab-content">
-                        <div class="space-y-3">
-                            <p class="text-xs text-gray-400 mb-4">Values as sent to Méthode on last export. Read-only.</p>
-
-                            <div class="grid grid-cols-2 gap-x-6 gap-y-3">
-                                <div>
-                                    <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Layout Priority</p>
-                                    <p id="info-layout-prio" class="mt-0.5 text-sm text-gray-800 font-mono">—</p>
-                                </div>
-                                <div>
-                                    <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Boost Priority</p>
-                                    <p id="info-boost-prio" class="mt-0.5 text-sm text-gray-800 font-mono">—</p>
-                                </div>
-                                <div>
-                                    <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Work Folder</p>
-                                    <p id="info-work-folder" class="mt-0.5 text-sm text-gray-800 font-mono break-all">—</p>
-                                </div>
-                                <div>
-                                    <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Issue Date</p>
-                                    <p id="info-issue-date" class="mt-0.5 text-sm text-gray-800">—</p>
-                                </div>
-                                <div>
-                                    <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Story Type</p>
-                                    <p id="info-story-type" class="mt-0.5 text-sm text-gray-800 font-mono">—</p>
-                                </div>
-                                <div>
-                                    <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Diffusion</p>
-                                    <p id="info-diffusion" class="mt-0.5 text-sm text-gray-800">—</p>
-                                </div>
+                        <div class="grid grid-cols-2 gap-x-6 gap-y-4">
+                            <div>
+                                <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Layout Priority</p>
+                                <p id="info-layout-prio" class="mt-1">—</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Boost Priority</p>
+                                <p id="info-boost-prio" class="mt-1">—</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Work Folder</p>
+                                <p id="info-work-folder" class="mt-1 text-sm text-gray-800 font-mono break-all">—</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Issue Date</p>
+                                <p id="info-issue-date" class="mt-1 text-sm text-gray-800">—</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Story Type</p>
+                                <p id="info-story-type" class="mt-1 text-sm text-gray-800 font-mono">—</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Diffusion</p>
+                                <p id="info-diffusion" class="mt-1">—</p>
                             </div>
                         </div>
                     </div>
@@ -882,36 +878,57 @@
             return '0';
         }
 
+        function chip(label, bg, text) {
+            return `<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold ${bg} ${text}">${label}</span>`;
+        }
+
+        const LAYOUT_PRIO_CHIP = {
+            A: chip('A · High',   'bg-green-100', 'text-green-700'),
+            B: chip('B · Mid',    'bg-amber-100', 'text-amber-700'),
+            C: chip('C · Low',    'bg-red-100',   'text-red-600'),
+        };
+
+        const BOOST_PRIO_CHIP = {
+            '2': chip('2 · High',    'bg-green-100', 'text-green-700'),
+            '1': chip('1 · Medium',  'bg-blue-100',  'text-blue-700'),
+            '0': chip('0 · Neutral', 'bg-gray-100',  'text-gray-600'),
+        };
+
         function populateInfoTab(nodeMeta) {
             if (!nodeMeta) return;
 
-            const set = (id, val) => {
+            const setHtml = (id, html) => {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = html;
+            };
+            const setText = (id, val) => {
                 const el = document.getElementById(id);
                 if (el) el.textContent = val || '—';
             };
 
-            set('info-layout-prio',  mapLayoutPrio(nodeMeta.printPriority));
-            set('info-boost-prio',   mapBoostPriority(nodeMeta.printPriority));
-            set('info-work-folder',  nodeMeta.printSection || '—');
-            set('info-story-type',   'Standard_Variants');
+            const lp = mapLayoutPrio(nodeMeta.printPriority);
+            setHtml('info-layout-prio', LAYOUT_PRIO_CHIP[lp] || `<span class="text-sm text-gray-400">—</span>`);
 
-            // YYYYMMDD → DD/MM/YYYY
+            const bp = mapBoostPriority(nodeMeta.printPriority);
+            setHtml('info-boost-prio', BOOST_PRIO_CHIP[bp] || `<span class="text-sm text-gray-400">—</span>`);
+
+            setText('info-work-folder', nodeMeta.printSection || '—');
+            setText('info-story-type',  'Standard_Variants');
+
             const raw = nodeMeta.printIssueDate;
             if (raw && raw.length === 8) {
                 const d = new Date(`${raw.slice(0,4)}-${raw.slice(4,6)}-${raw.slice(6,8)}`);
-                set('info-issue-date', isNaN(d) ? raw : d.toLocaleDateString('en-GB'));
+                setText('info-issue-date', isNaN(d) ? raw : d.toLocaleDateString('en-GB'));
             } else {
-                set('info-issue-date', '—');
+                setText('info-issue-date', '—');
             }
 
-            const diffEl = document.getElementById('info-diffusion');
-            if (diffEl) {
-                const d = nodeMeta.printDiffusion || '—';
-                diffEl.textContent = d;
-                diffEl.className = d === 'No'
-                    ? 'mt-0.5 text-sm font-medium text-amber-600'
-                    : 'mt-0.5 text-sm text-gray-800';
-            }
+            const diff = nodeMeta.printDiffusion;
+            setHtml('info-diffusion', diff === 'No'
+                ? chip('No · Blocked', 'bg-amber-100', 'text-amber-700')
+                : diff === 'Yes'
+                    ? chip('Yes', 'bg-green-100', 'text-green-700')
+                    : `<span class="text-sm text-gray-400">—</span>`);
         }
 
         // ── Print field helpers ───────────────────────────────────────────────
