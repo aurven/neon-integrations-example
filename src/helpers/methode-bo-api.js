@@ -588,6 +588,125 @@ class MethodeSessionManager {
 }
 
 /**
+ * Helper to get story shape, linked print page info, and XML content in one call.
+ */
+async function getStoryShapeWithContent(loid) {
+    try {
+        const methodeClient = new MethodeClient();
+
+        await methodeClient.login({
+            username: process.env.EDAPI_USERNAME,
+            password: process.env.EDAPI_PASSWORD
+        });
+
+        const storyObject = await methodeClient.getObject(loid);
+        if (!storyObject) {
+            throw new Error('Failed to retrieve story object');
+        }
+
+        let printPageId = null;
+        let targetBundleChannel = null;
+        let targetWorkfolder = null;
+        let linkId = null;
+        let linkedPagePath = null;
+
+        const linkedObjects = await methodeClient.getObjectLinked(loid, 'EOM::PrintPageLinked');
+        console.log(`Found ${linkedObjects.count || 0} EOM::PrintPageLinked objects for story ${loid}`);
+
+        if (linkedObjects.roles && linkedObjects.roles.length > 0) {
+            const firstRole = linkedObjects.roles[0];
+            linkId = firstRole.name || null;
+            printPageId = firstRole.object?.id || null;
+            targetBundleChannel = firstRole.bundleChildChannel || null;
+            targetWorkfolder = firstRole.object?.system_attributes?.workfolder || null;
+            linkedPagePath = firstRole.object?.path || null;
+
+            console.log(`Story ${loid} is linked to print page: ${printPageId}, bundle channel: ${targetBundleChannel}, page path: ${linkedPagePath}`);
+        } else {
+            console.log(`No EOM::PrintPageLinked objects found for story ${loid}`);
+        }
+
+        const getStoryShapeOptions = {};
+        if (targetBundleChannel) getStoryShapeOptions.channel = targetBundleChannel;
+        if (targetWorkfolder) getStoryShapeOptions.workFolder = targetWorkfolder;
+        if (printPageId) getStoryShapeOptions.pageId = printPageId;
+
+        const shapeResult = await methodeClient.getStoryShape(loid, getStoryShapeOptions);
+
+        const pgxContent = shapeResult?.pgx?.xml || null;
+        const pgxValue = pgxContent ? `<?xml version="1.0" encoding="utf-8"?><pgx>${pgxContent}</pgx>` : null;
+        pgxValue && console.log(`Extracted and formatted pgx XML for story ${loid}`);
+
+        const token = methodeClient.getCurrentToken();
+        const xmlContent = await methodeClient.readContent(token, loid);
+
+        await methodeClient.cleanup();
+
+        return {
+            shape: pgxValue,
+            storyObject,
+            xmlContent,
+            printPageId,
+            targetBundleChannel,
+            linkId,
+            linkedPagePath
+        };
+
+    } catch (error) {
+        console.error(`Get story shape with content failed for LOID ${loid}:`, error.message);
+        throw error;
+    }
+}
+
+/**
+ * Orchestrates story preview generation: fetches shape + content, builds payload, calls print service.
+ */
+async function createStoryPreviewWithSetup(loid, previewOptions = {}) {
+    try {
+        console.log(`Starting story preview generation for LOID: ${loid}`);
+
+        const methodeClient = new MethodeClient();
+        await methodeClient.login({
+            username: process.env.EDAPI_USERNAME,
+            password: process.env.EDAPI_PASSWORD
+        });
+
+        const { shape, storyObject, xmlContent, printPageId, targetBundleChannel, linkId, linkedPagePath } = await getStoryShapeWithContent(loid);
+
+        console.log(`Preview setup - Print Page ID: ${printPageId}, Target Bundle Channel: ${targetBundleChannel}, Linked Page Path: ${linkedPagePath}`);
+
+        const previewPayload = {
+            requestID: `U${Date.now()}${Math.random().toString(36).substring(2, 8)}`,
+            content: xmlContent,
+            pgx: shape,
+            parameters: {
+                id: storyObject.id,
+                border: previewOptions.border || "yes",
+                hrefPdf: previewOptions.hrefPdf !== false,
+                channel: targetBundleChannel,
+                lid: linkId,
+                page: linkedPagePath
+            },
+            op: "preview",
+            forcePdfCreation: previewOptions.forcePdfCreation !== false
+        };
+
+        console.log('Preview payload structure:', JSON.stringify(previewPayload, null, 2));
+
+        const getPdf = previewOptions.getPdf !== false;
+        const previewResult = await methodeClient.createStoryPreview(loid, previewPayload, getPdf);
+
+        await methodeClient.cleanup();
+
+        return previewResult;
+
+    } catch (error) {
+        console.error(`Create story preview with setup failed for LOID ${loid}:`, error.message);
+        throw error;
+    }
+}
+
+/**
  * Backwards compatibility - Default single session instance
  */
 const defaultClient = new MethodeClient();
@@ -616,5 +735,9 @@ module.exports = {
     getStoryShape: (loid, options) => defaultClient.getStoryShape(loid, options),
     createStoryPreview: (id, payload, getPdf) => defaultClient.createStoryPreview(id, payload, getPdf),
     createChannelCopy: (loid, channel, inheritFrom) => defaultClient.createChannelCopy(loid, channel, inheritFrom),
-    sendMessage: (options) => defaultClient.sendMessage(options)
+    sendMessage: (options) => defaultClient.sendMessage(options),
+
+    // Orchestration helpers
+    getStoryShapeWithContent,
+    createStoryPreviewWithSetup,
 };

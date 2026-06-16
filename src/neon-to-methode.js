@@ -1,10 +1,7 @@
-const unorm = require('unorm');
-const { remove } = require('remove-accents');
 const { jsonToXml } = require('./helpers/json-to-xml.js');
 //const {XMLParser, XMLBuilder, XMLValidator} = require('fast-xml-parser');
 const utils = require('./helpers/utils.js');
 const cheerio = require('cheerio');
-const edapi = require('./helpers/edapi-utils.js');
 const dayjs = require('dayjs');
 const images = require('./images-importer.js');
 const { buildPrintFieldOperators, buildUpdateField, setOp, attributePath } = require('./helpers/methode-metadata-utils.js');
@@ -47,34 +44,6 @@ const processWebhookData = async (model) => {
       pubInfo: model.pubInfo,
       attributes: model.attributes,
     };
-  };
-
-  const generateNameFromModel = (model) => {
-    function normalizeToPlainText(input) {
-      // Normalize the string to NFC form (decomposes characters with diacritics)
-      let normalized = unorm.nfd(input);
-
-      // Remove diacritical marks and accents
-      normalized = remove(normalized);
-
-      // Remove non-Latin characters (anything not a-z, A-Z, and spaces)
-      normalized = normalized.replace(/[^a-zA-Z\s]/g, '');
-
-      // Replace multiple spaces with a single space
-      normalized = normalized.replace(/\s+/g, ' ');
-
-      // Replace spaces with dashes
-      normalized = normalized.replace(/\s/g, '-');
-
-      console.log(normalized);
-      return normalized;
-    }
-
-    const title = model.title;
-    const normalizedTitle = normalizeToPlainText(title);
-    const newName = `${normalizedTitle}.xml`;
-
-    return newName;
   };
 
   const generateContentFromModel = async (model) => {
@@ -124,7 +93,6 @@ const processWebhookData = async (model) => {
   };
 
   const info = generateInfoFromModel(model);
-  //const name = generateNameFromModel(model);
   const name = `neon_${info.id}.xml`;
   const { content, xmlDeclarations, $doc } = await generateContentFromModel(model);
 
@@ -208,39 +176,6 @@ function addPrintImageGroup($doc, methodeImage) {
 
   $doc('story').prepend(groupElement);
 }
-
-async function processNeonStory(model) {
-  try {
-    const { info, name, content } = await processWebhookData(model);
-
-    const issueDate = dayjs().add(1, 'day').format('YYYYMMDD');
-
-    await edapi.login({
-      username: USERNAME,
-      password: PASSWORD,
-    });
-    const loid = await edapi.createStory({
-      name,
-      issueDate,
-      template: TEMPLATE,
-      channel: CHANNEL,
-      workFolder: WORKFOLDER,
-      attributes: info.attributes,
-    });
-    loid && (await edapi.putContentToStory(loid, content));
-    await edapi.logout();
-    console.log('Neon item imported successfully!');
-
-    return {
-      source: info,
-      target: {
-        id: loid,
-      },
-    };
-  } catch (error) {
-    console.error(error);
-  }
-};
 
 // Check if a Méthode story is linked to a print page, and ensure it has a Tabloid
 // channel copy if so. Returns whether the story is linked to a page.
@@ -393,28 +328,6 @@ async function processNeonStoryV2 (model) {
   }
 };
 
-async function processNeonImages(model) {
-  try {
-    const { info, name, content } = await processWebhookData(model);
-
-    const issueDate = dayjs().add(1, 'day').format('YYYYMMDD');
-
-    await edapi.login({
-      username: USERNAME,
-      password: PASSWORD,
-    });
-    const imageReferences = await images.modelImagesToMethode(model, { channel: CHANNEL, workFolder: WORKFOLDER, issueDate })
-    await edapi.logout();
-    console.log('Neon item imported successfully!');
-
-    return {
-      imageReferences
-    };
-  } catch (error) {
-    console.error(error);
-  }
-};
-
 /**
  * Simplifies the imageReferences structure to contain only loid and uuid
  * @param {Object} imageReferences - The complex imageReferences object
@@ -440,7 +353,5 @@ function simplifyImageReferences(imageReferences) {
 }
 
 module.exports = {
-  processNeonStory,
   processNeonStoryV2,
-  processNeonImages
 };

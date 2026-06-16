@@ -340,7 +340,6 @@ fastify.register(async function (fastify) {
 const methodeHandlers = require("./src/requestHandlers/methode.js");
 fastify.get("/out/methode", methodeHandlers.getMethodeHandler);
 fastify.post("/out/methode", methodeHandlers.postMethodeHandler);
-fastify.post("/out/imagesToMethode", methodeHandlers.postMethodeImageHandler);
 fastify.post("/out/methode/test", methodeHandlers.postMethodeTest);
 
 // Sendgrid

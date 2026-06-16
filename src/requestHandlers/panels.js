@@ -3,7 +3,7 @@ const axios = require("axios");
 const neon = require("../helpers/neon-bo-api-v3.js");
 const imagesImporter = require("../images-importer.js");
 const { MethodeClient } = require("../helpers/methode-bo-api.js");
-const { createStoryPreviewWithSetup } = require("../helpers/edapi-utils.js");
+const { createStoryPreviewWithSetup } = require("../helpers/methode-bo-api.js");
 const { authenticate, shouldShowMaintenance } = require("../helpers/auth.js");
 const { parseNeonArticleContent } = require("../helpers/neon-content-parser.js");
 const { generateArticlePDF } = require("../helpers/pdf-generator.js");
@@ -475,7 +475,6 @@ async function methodeApiProxyHandler(request, reply) {
 
       console.log(`Creating story preview for LOID: ${loid} with options:`, options);
 
-      // Use the edapi-utils function to create story preview with setup
       const previewResult = await createStoryPreviewWithSetup(loid, options);
 
       console.log('Preview creation result:', previewResult);
