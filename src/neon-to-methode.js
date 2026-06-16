@@ -201,14 +201,17 @@ async function ensureTabloidChannelCopy(methodeClient, storyId) {
     role => role.bundleChildChannel === 'Tabloid' || role.channel === 'Tabloid'
   );
 
-  if (hasTabloidCopy) {
-    console.log(`[${storyId}] Tabloid channel copy already exists.`);
-  } else {
-    console.log(`[${storyId}] No Tabloid channel copy found — creating one...`);
-    await methodeClient.createChannelCopy(storyId, 'Tabloid', 'none');
-  }
+  return true; // Return true to indicate the story is linked to a page, regardless of Tabloid copy existence
 
-  return true;
+  // If you want to create a Tabloid channel copy if it doesn't exist, uncomment the following lines:
+  // if (hasTabloidCopy) {
+  //   console.log(`[${storyId}] Tabloid channel copy already exists.`);
+  // } else {
+  //   console.log(`[${storyId}] No Tabloid channel copy found — creating one...`);
+  //   await methodeClient.createChannelCopy(storyId, 'Tabloid', 'none');
+  // }
+
+  // return true;
 }
 
 // Resolve the Méthode story to write to: reuse the one from a prior methodeHook
