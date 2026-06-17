@@ -262,6 +262,10 @@ async function processNeonStoryV2 (model) {
 
     const { workFolder, issueDate, printDiffusion } = resolvePrintFields(info.attributes);
 
+    console.log(`[${info.id}] Resolved print fields:`)
+    console.log(`    workFolder     -> "${workFolder}"`)
+    console.log(`    issueDate      -> "${issueDate}"`)
+    console.log(`    printDiffusion -> "${printDiffusion}"`);
     if (printDiffusion === 'No') {
       console.log(`[${info.id}] printDiffusion="No" — skipping Méthode export.`);
       return { source: info, skipped: true, reason: 'printDiffusion=No' };
