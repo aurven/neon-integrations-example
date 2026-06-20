@@ -1,6 +1,21 @@
 function HeadlineCellRenderer({ data }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '100%', gap: '2px' }}>
+      {data?.isNew && (
+        <span style={{
+          display: 'inline-block',
+          alignSelf: 'flex-start',
+          padding: '2px 10px',
+          borderRadius: '9999px',
+          fontSize: '11px',
+          fontWeight: 600,
+          color: '#fff',
+          background: '#2563eb',
+          whiteSpace: 'nowrap'
+        }}>
+          NEW
+        </span>
+      )}
       <span style={{ fontSize: '13px', fontWeight: 600, color: '#3f3c4e', lineHeight: '1.3', whiteSpace: 'normal', wordBreak: 'break-word' }}>
         {data?.headline || '—'}
       </span>

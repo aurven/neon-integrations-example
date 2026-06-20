@@ -60,3 +60,16 @@
 .ag-theme-alpine .ag-paging-button button:not(:disabled):hover {
   background: #f6f3f6;
 }
+
+.ag-theme-alpine .ag-row.ag-row-new {
+  animation: ag-row-new-settle 1.6s ease-out forwards;
+}
+
+@keyframes ag-row-new-settle {
+  from {
+    background-color: rgba(37, 99, 235, 0.22);
+  }
+  to {
+    background-color: rgba(37, 99, 235, 0.06);
+  }
+}

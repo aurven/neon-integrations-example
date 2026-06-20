@@ -1,8 +1,9 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import { buildColumnDefs, defaultColDef } from './columns.jsx';
 import { fetchArticles, updateMetadata } from './api.js';
 import { buildMetadataChangeFromXpath } from './metadata.js';
+import { usePollingSearchDelta } from './usePollingSearchDelta.js';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import './neon-grid.css';
@@ -21,24 +22,46 @@ export default function NeonGridWidget() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const loadArticles = useCallback(() => {
-    setLoading(true);
-    setError(null);
-    fetchArticles()
-      .then(data => {
-        setRowData(data.articles ?? data);
-        setLoading(false);
-      })
+  const fetchFn = useCallback(() => {
+    return fetchArticles()
+      .then(d => d.articles ?? d)
       .catch(err => {
         setError(err.message);
         setLoading(false);
+        return [];
       });
   }, []);
 
-  useEffect(() => { loadArticles(); }, [loadArticles]);
+  const handleDelta = useCallback((delta) => {
+    if (delta.type === 'init') {
+      setRowData(delta.items);
+      setLoading(false);
+      return;
+    }
+    const removed = new Set(delta.removedIds);
+    setRowData(prev => {
+      const kept = prev.filter(r => !removed.has(r.id));
+      return [...kept, ...delta.added.map(a => ({ ...a, isNew: true }))];
+    });
+  }, []);
+
+  const { reload } = usePollingSearchDelta({
+    fetchFn,
+    idKey: 'id',
+    intervalMs: gridConfig.pollIntervalMs ?? 20000,
+    onDelta: handleDelta
+  });
+
+  const handleRefresh = useCallback(() => {
+    setLoading(true);
+    setError(null);
+    reload();
+  }, [reload]);
 
   const handleCellValueChanged = useCallback((params) => {
     const familyRef = params.data?.id;
+    setRowData(prev => prev.map(r => r.id === familyRef ? { ...r, isNew: false } : r));
+
     const colCfg = gridConfig.columns.find(c => c.field === params.colDef.field);
     const change = buildMetadataChangeFromXpath(colCfg?.metadataXpath, params.newValue, { isDate: !!colCfg?.isDate });
     if (!familyRef || !change) return;
@@ -52,6 +75,11 @@ export default function NeonGridWidget() {
       console.error(`[Neon Grid] Metadata update failed for ${familyRef}:`, err.message);
     });
   }, [gridConfig]);
+
+  const handleRowClicked = useCallback((params) => {
+    const familyRef = params.data?.id;
+    setRowData(prev => prev.map(r => r.id === familyRef ? { ...r, isNew: false } : r));
+  }, []);
 
   return (
     <div style={{
@@ -86,7 +114,7 @@ export default function NeonGridWidget() {
         )}
         <div style={{ flex: 1 }} />
         <button
-          onClick={loadArticles}
+          onClick={handleRefresh}
           disabled={loading}
           style={{
             display: 'inline-flex',
@@ -154,6 +182,8 @@ export default function NeonGridWidget() {
               pagination={true}
               paginationPageSize={25}
               onCellValueChanged={handleCellValueChanged}
+              onRowClicked={handleRowClicked}
+              rowClassRules={{ 'ag-row-new': params => !!params.data?.isNew }}
             />
           </div>
         )}
