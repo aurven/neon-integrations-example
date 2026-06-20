@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 function HeadlineCellRenderer({ data }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '100%', gap: '2px' }}>
@@ -93,7 +95,113 @@ function BadgeCellRenderer({ value, colDef }) {
   );
 }
 
-export function buildColumnDefs(columns = []) {
+const CopyIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="9" y="9" width="13" height="13" rx="2" />
+    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+  </svg>
+);
+
+const MoveIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="5 9 2 12 5 15" />
+    <polyline points="9 5 12 2 15 5" />
+    <polyline points="15 19 12 22 9 19" />
+    <polyline points="19 9 22 12 19 15" />
+    <line x1="2" y1="12" x2="22" y2="12" />
+    <line x1="12" y1="2" x2="12" y2="22" />
+  </svg>
+);
+
+const SendIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="22" y1="2" x2="11" y2="13" />
+    <polygon points="22 2 15 22 11 13 2 9 22 2" />
+  </svg>
+);
+
+const MoreIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+    <circle cx="5" cy="12" r="2" />
+    <circle cx="12" cy="12" r="2" />
+    <circle cx="19" cy="12" r="2" />
+  </svg>
+);
+
+const ACTION_ICONS = { copy: CopyIcon, move: MoveIcon, send: SendIcon };
+
+function ActionsCellRenderer({ data, colDef }) {
+  const [open, setOpen] = useState(false);
+  const actions = colDef.cellRendererParams?.actions || [];
+  const onAction = colDef.cellRendererParams?.onAction || (() => {});
+
+  if (actions.length === 0) return null;
+
+  if (actions.length === 1) {
+    const action = actions[0];
+    const Icon = ACTION_ICONS[action.icon] || MoreIcon;
+    return (
+      <button
+        onClick={() => onAction(action.id, data)}
+        title={action.label}
+        style={{
+          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+          width: '28px', height: '28px', border: '1px solid #dddce5', borderRadius: '8px',
+          background: 'none', cursor: 'pointer', color: '#3f3c4e',
+        }}
+      >
+        <Icon />
+      </button>
+    );
+  }
+
+  return (
+    <span style={{ position: 'relative', display: 'inline-flex' }}>
+      <button
+        onClick={() => setOpen(o => !o)}
+        title="Actions"
+        style={{
+          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+          width: '28px', height: '28px', border: '1px solid #dddce5', borderRadius: '8px',
+          background: open ? '#f6f3f6' : 'none', cursor: 'pointer', color: '#3f3c4e',
+        }}
+      >
+        <MoreIcon />
+      </button>
+      {open && (
+        <>
+          <div onClick={() => setOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 90 }} />
+          <div style={{
+            position: 'absolute', top: 'calc(100% + 4px)', right: 0, zIndex: 100,
+            background: '#ffffff', border: '1px solid #dddce5', borderRadius: '9px',
+            boxShadow: '0 8px 24px rgba(63,60,78,.18)', padding: '4px', width: '140px',
+          }}>
+            {actions.map(action => {
+              const Icon = ACTION_ICONS[action.icon] || MoreIcon;
+              return (
+                <button
+                  key={action.id}
+                  onClick={() => { onAction(action.id, data); setOpen(false); }}
+                  style={{
+                    width: '100%', display: 'flex', alignItems: 'center', gap: '8px',
+                    padding: '6px 8px', borderRadius: '6px', border: 'none', cursor: 'pointer',
+                    background: 'transparent', color: '#3f3c4e', fontSize: '12px',
+                    fontFamily: 'inherit', textAlign: 'left',
+                  }}
+                >
+                  <Icon />
+                  {action.label}
+                </button>
+              );
+            })}
+          </div>
+        </>
+      )}
+    </span>
+  );
+}
+
+export function buildColumnDefs(columns = [], { onAction } = {}) {
   return columns.map(col => {
     const base = {
       field: col.field,
@@ -125,6 +233,8 @@ export function buildColumnDefs(columns = []) {
           cellEditor: 'agSelectCellEditor',
           cellEditorParams: { values: (col.options || []).map(o => o.value) },
         };
+      case 'actions':
+        return { ...base, cellRenderer: ActionsCellRenderer, cellRendererParams: { actions: col.actions || [], onAction } };
       default:
         return { ...base, valueFormatter: (p) => p.value ?? '—' };
     }

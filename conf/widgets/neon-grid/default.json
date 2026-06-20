@@ -14,6 +14,11 @@
     { "field": "headline", "headerName": "Title", "type": "headline", "flex": 5, "minWidth": 260, "sortable": true, "filter": true },
     { "field": "type", "headerName": "Type", "type": "badge", "width": 130, "sortable": true, "filter": true, "options": [] },
     { "field": "date", "headerName": "Date", "type": "date", "width": 180, "sortable": true },
-    { "field": "status", "headerName": "Status", "type": "status", "width": 130, "sortable": true, "filter": true }
+    { "field": "status", "headerName": "Status", "type": "status", "width": 130, "sortable": true, "filter": true },
+    { "field": "actions", "headerName": "", "type": "actions", "width": 90, "actions": [
+      { "id": "copy", "label": "Copy", "icon": "copy" },
+      { "id": "move", "label": "Move", "icon": "move" },
+      { "id": "send", "label": "Send", "icon": "send" }
+    ] }
   ]
 }

@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useRef } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import { buildColumnDefs, defaultColDef } from './columns.jsx';
 import { fetchArticles, updateMetadata } from './api.js';
@@ -14,9 +14,42 @@ const RefreshIcon = () => (
   </svg>
 );
 
+function Toast({ toast }) {
+  if (!toast) return null;
+  return (
+    <div style={{
+      position: 'fixed', bottom: '22px', left: '50%', transform: 'translateX(-50%)', zIndex: 600,
+      background: '#3f3c4e', color: '#fff', borderRadius: '10px', padding: '10px 16px',
+      fontSize: '12.5px', fontWeight: 600, boxShadow: '0 10px 30px rgba(0,0,0,.28)',
+    }}>
+      {toast.text}
+    </div>
+  );
+}
+
+const ACTION_LABELS = { copy: 'Copy', move: 'Move', send: 'Send' };
+
 export default function NeonGridWidget() {
   const gridConfig = window.CONFIG?.gridConfig ?? { columns: [] };
-  const columnDefs = useMemo(() => buildColumnDefs(gridConfig.columns), [gridConfig]);
+
+  const [toast, setToast] = useState(null);
+  const toastTimerRef = useRef(null);
+
+  const showToast = useCallback((text) => {
+    setToast({ text, t: Date.now() });
+    clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = setTimeout(() => setToast(null), 2400);
+  }, []);
+
+  const handleAction = useCallback((actionId, row) => {
+    const label = ACTION_LABELS[actionId] || actionId;
+    showToast(`${label} triggered for "${row?.headline ?? row?.id ?? 'row'}"`);
+  }, [showToast]);
+
+  const columnDefs = useMemo(
+    () => buildColumnDefs(gridConfig.columns, { onAction: handleAction }),
+    [gridConfig, handleAction]
+  );
 
   const [rowData, setRowData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -188,6 +221,7 @@ export default function NeonGridWidget() {
           </div>
         )}
       </div>
+      <Toast toast={toast} />
     </div>
   );
 }
