@@ -142,7 +142,7 @@ function ActionsCellRenderer({ data, colDef }) {
     const Icon = ACTION_ICONS[action.icon] || MoreIcon;
     return (
       <button
-        onClick={() => onAction(action.id, data)}
+        onClick={e => { e.stopPropagation(); onAction(action.id, data); }}
         title={action.label}
         style={{
           display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
@@ -158,7 +158,7 @@ function ActionsCellRenderer({ data, colDef }) {
   return (
     <span style={{ position: 'relative', display: 'inline-flex' }}>
       <button
-        onClick={() => setOpen(o => !o)}
+        onClick={e => { e.stopPropagation(); setOpen(o => !o); }}
         title="Actions"
         style={{
           display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
@@ -170,7 +170,7 @@ function ActionsCellRenderer({ data, colDef }) {
       </button>
       {open && (
         <>
-          <div onClick={() => setOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 90 }} />
+          <div onClick={e => { e.stopPropagation(); setOpen(false); }} style={{ position: 'fixed', inset: 0, zIndex: 90 }} />
           <div style={{
             position: 'absolute', top: 'calc(100% + 4px)', right: 0, zIndex: 100,
             background: '#ffffff', border: '1px solid #dddce5', borderRadius: '9px',
@@ -181,7 +181,7 @@ function ActionsCellRenderer({ data, colDef }) {
               return (
                 <button
                   key={action.id}
-                  onClick={() => { onAction(action.id, data); setOpen(false); }}
+                  onClick={e => { e.stopPropagation(); onAction(action.id, data); setOpen(false); }}
                   style={{
                     width: '100%', display: 'flex', alignItems: 'center', gap: '8px',
                     padding: '6px 8px', borderRadius: '6px', border: 'none', cursor: 'pointer',
