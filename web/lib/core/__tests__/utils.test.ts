@@ -135,6 +135,25 @@ describe('metadataGenerator', () => {
     const xml = metadataGenerator(undefined);
     expect(xml).toContain('<SEOTitle></SEOTitle>');
   });
+
+  it('includes print fields when provided', () => {
+    const xml = metadataGenerator({
+      printSection: '/Product/World',
+      printPriority: '2',
+      printIssueDate: '20260620',
+      printDiffusion: 'PRINT',
+    });
+    expect(xml).toContain('<PrintSection>/Product/World</PrintSection>');
+    expect(xml).toContain('<PrintPriority>2</PrintPriority>');
+    expect(xml).toContain('<PrintIssueDate>20260620</PrintIssueDate>');
+    expect(xml).toContain('<Diff_Print>PRINT</Diff_Print>');
+  });
+
+  it('renders empty print fields when not provided', () => {
+    const xml = metadataGenerator(null);
+    expect(xml).toContain('<PrintSection></PrintSection>');
+    expect(xml).toContain('<Diff_Print></Diff_Print>');
+  });
 });
 
 describe('parseSrcset', () => {
