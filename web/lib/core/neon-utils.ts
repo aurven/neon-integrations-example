@@ -4,6 +4,14 @@
 import { getNextSteps, nextStepAssignment } from './neon-bo-api-v3';
 import type { NextStepsData, NextStepAssignmentBody, WorkflowStep } from './neon-bo-api-v3';
 
+export async function hasWorkflow(familyRef?: string): Promise<boolean> {
+  const getNextStepsResult = await getNextSteps(familyRef);
+  const associatedWorkflow = getNextStepsResult?.data?.associatedWorkflow;
+  const availableWorkflows = getNextStepsResult?.data?.availableWorkflows;
+
+  return !!associatedWorkflow?.processInstance?.processName || !!(availableWorkflows && availableWorkflows.length > 0);
+}
+
 export interface WorkflowTransitionOptions {
   familyRef?: string;
   targetStateName: string;

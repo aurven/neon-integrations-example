@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { workflowTransitionTo, nextStepAssignmentBodyGenerator } from '../neon-utils';
+import { workflowTransitionTo, nextStepAssignmentBodyGenerator, hasWorkflow } from '../neon-utils';
 import { getNextSteps, nextStepAssignment } from '../neon-bo-api-v3';
 
 vi.mock('../neon-bo-api-v3', () => ({
@@ -92,6 +92,40 @@ describe('workflowTransitionTo', () => {
     await workflowTransitionTo({ familyRef: 'fam-1', targetWorkflowName: 'Story', targetStateName: 'Edit' });
 
     expect(mockNextStepAssignment).not.toHaveBeenCalled();
+  });
+});
+
+describe('hasWorkflow', () => {
+  beforeEach(() => {
+    mockGetNextSteps.mockReset();
+  });
+
+  it('returns true when the node has an associated workflow', async () => {
+    mockGetNextSteps.mockResolvedValue({
+      data: { associatedWorkflow: { processInstance: { processName: 'Story' } } },
+    });
+
+    expect(await hasWorkflow('fam-1')).toBe(true);
+  });
+
+  it('returns true when there are available workflows but none associated yet', async () => {
+    mockGetNextSteps.mockResolvedValue({
+      data: { associatedWorkflow: {}, availableWorkflows: [{ processInstance: { processName: 'Story' } }] },
+    });
+
+    expect(await hasWorkflow('fam-1')).toBe(true);
+  });
+
+  it('returns false when there is no associated workflow and no available workflows', async () => {
+    mockGetNextSteps.mockResolvedValue({ data: { associatedWorkflow: {}, availableWorkflows: [] } });
+
+    expect(await hasWorkflow('fam-1')).toBe(false);
+  });
+
+  it('returns false when getNextSteps resolves with no data', async () => {
+    mockGetNextSteps.mockResolvedValue(undefined);
+
+    expect(await hasWorkflow('fam-1')).toBe(false);
   });
 });
 
