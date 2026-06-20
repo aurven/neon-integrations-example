@@ -69,6 +69,27 @@ function getByPath(obj, pathStr) {
   return pathStr.split('.').reduce((o, k) => (o == null ? o : o[k]), obj);
 }
 
+// Demo-mode reveal simulation: tracks how much of a static fixture has been
+// "revealed" so far per cache key, so repeated polling requests against the
+// same demo data show a growing slice instead of the exact same payload every
+// time. Module-scope in-memory state, same convention as `typeLabels` in
+// src/connectors/neon-config-connector.js (no session/db involved).
+const demoRevealState = new Map(); // key -> { revealCount }
+
+function getDemoRevealSlice(key, totalLength, { initialSize = 20, stepSize = 3 } = {}) {
+  const initial = Math.min(initialSize, totalLength);
+  const state = demoRevealState.get(key);
+  if (!state) {
+    demoRevealState.set(key, { revealCount: initial });
+    return initial;
+  }
+  state.revealCount += stepSize;
+  if (state.revealCount > totalLength) {
+    state.revealCount = initial;
+  }
+  return state.revealCount;
+}
+
 function testWidgetHandler(request, reply) {
   const auth = authenticate(request, reply);
   if (!auth.authenticated) {
@@ -393,6 +414,13 @@ function neonGridWidgetHandler(request, reply) {
   const gridConfig = loadGridConfig(configName);
   const queryName = /^[a-zA-Z0-9_-]+$/.test(request.query.query || '') ? request.query.query : 'default';
 
+  // Optional fast-QA override: ?pollMs=4000 lets a manual tester shorten the
+  // poll interval without editing the config JSON. Works in demo and live mode.
+  const pollMsOverride = parseInt(request.query.pollMs, 10);
+  if (Number.isInteger(pollMsOverride) && pollMsOverride > 0) {
+    gridConfig.pollIntervalMs = pollMsOverride;
+  }
+
   let params = {
     seo: {
       title: "Neon Articles Grid",
@@ -417,6 +445,7 @@ async function neonGridDataHandler(request, reply) {
   const demoMode = request.query.demo === 'true';
   const configName = /^[a-zA-Z0-9_-]+$/.test(request.query.config || '') ? request.query.config : 'default';
   const gridConfig = loadGridConfig(configName);
+  const queryName = /^[a-zA-Z0-9_-]+$/.test(request.query.query || '') ? request.query.query : 'default';
 
   await neonConfigConnector.loadContentTypesConfig();
 
@@ -441,14 +470,16 @@ async function neonGridDataHandler(request, reply) {
       const fs = require('fs');
       const path = require('path');
       const demoData = JSON.parse(fs.readFileSync(path.join(__dirname, '../../examples', gridConfig.demoData || 'search-results.json'), 'utf8'));
-      return reply.status(200).send({ articles: mapNodes(demoData.nodes || []) });
+      const nodes = demoData.nodes || [];
+      const revealKey = `grid:${configName}:${queryName}`;
+      const revealCount = getDemoRevealSlice(revealKey, nodes.length);
+      return reply.status(200).send({ articles: mapNodes(nodes.slice(0, revealCount)) });
     } catch (error) {
       console.error('neonGridDataHandler demo error:', error);
       return reply.status(500).send({ error: 'Failed to load demo data' });
     }
   }
 
-  const queryName = /^[a-zA-Z0-9_-]+$/.test(request.query.query || '') ? request.query.query : 'default';
   const queryConfig = loadQueryConfig('neon-grid', queryName);
 
   const queryPayload = {
@@ -486,6 +517,13 @@ function printQueryBoardHandler(request, reply) {
 
   const queryName = /^[a-zA-Z0-9_-]+$/.test(request.query.query || '') ? request.query.query : 'default';
 
+  // Optional fast-QA override: ?pollMs=4000 lets a manual tester shorten the
+  // poll interval without editing the config JSON. Works in demo and live mode.
+  const pollMsOverride = parseInt(request.query.pollMs, 10);
+  if (Number.isInteger(pollMsOverride) && pollMsOverride > 0) {
+    printConfig.pollIntervalMs = pollMsOverride;
+  }
+
   return reply.view('/src/widgets/print-query-board.hbs', {
     seo: { title: 'Print Query Board', description: 'Kanban board for planning print edition stories by section, priority, desk, or access' },
     neonAppUrl: process.env.NEON_APP_URL,
@@ -503,6 +541,7 @@ async function printQueryBoardDataHandler(request, reply) {
   }
 
   const demoMode = request.query.demo === 'true';
+  const queryName = /^[a-zA-Z0-9_-]+$/.test(request.query.query || '') ? request.query.query : 'default';
 
   await neonConfigConnector.loadContentTypesConfig();
 
@@ -537,14 +576,16 @@ async function printQueryBoardDataHandler(request, reply) {
       const fs = require('fs');
       const path = require('path');
       const demoData = JSON.parse(fs.readFileSync(path.join(__dirname, '../../examples/search-results.json'), 'utf8'));
-      return reply.status(200).send({ stories: mapStories(demoData.nodes || []) });
+      const nodes = demoData.nodes || [];
+      const revealKey = `board:${queryName}`;
+      const revealCount = getDemoRevealSlice(revealKey, nodes.length);
+      return reply.status(200).send({ stories: mapStories(nodes.slice(0, revealCount)) });
     } catch (error) {
       console.error('printQueryBoardDataHandler demo error:', error);
       return reply.status(500).send({ error: 'Failed to load demo data' });
     }
   }
 
-  const queryName = /^[a-zA-Z0-9_-]+$/.test(request.query.query || '') ? request.query.query : 'default';
   const queryConfig = loadQueryConfig('print-query-board', queryName);
 
   const queryPayload = {

@@ -1,6 +1,7 @@
 {
   "issueDate": "2026-06-18",
   "printProduct": "Tabloid",
+  "pollIntervalMs": 20000,
   "editions": ["EUROPE", "USA", "ASIA"],
   "sectionsAndBooks": [
     { "key": "World",    "label": "World",    "color": "#0B60D8", "wordTarget": 4000, "printSection": "/Product/World" },

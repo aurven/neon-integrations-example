@@ -1,6 +1,7 @@
 {
   "title": "Articles Grid",
   "demoData": "search-results.json",
+  "pollIntervalMs": 20000,
   "fields": [
     { "key": "headline", "source": "title" },
     { "key": "summary", "source": "summary" },
