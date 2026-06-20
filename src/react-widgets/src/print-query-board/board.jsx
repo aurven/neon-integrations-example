@@ -97,22 +97,27 @@ export function DateChip({ offset, onChange }) {
   );
 }
 
-export function StoryCard({ story, dragging, onDragStart, onDragEnd, onPriority, onDate }) {
+export function StoryCard({ story, dragging, onDragStart, onDragEnd, onPriority, onDate, onDismissNew }) {
   const borderColor = PAYWALL_BORDER[story.paywallLevel] || C.border;
   return (
     <div
       draggable
       onDragStart={e => { e.dataTransfer.setData('storyId', story.id); e.dataTransfer.effectAllowed = 'move'; onDragStart(story.id); }}
       onDragEnd={onDragEnd}
+      onClick={() => onDismissNew(story.id)}
       style={{
         background: C.white, border: `1px solid ${dragging ? C.blue : C.border}`,
         borderLeft: `3px solid ${dragging ? C.blue : borderColor}`,
         borderRadius: 8, padding: '9px 10px', cursor: 'grab', userSelect: 'none',
         opacity: dragging ? 0.5 : 1, boxShadow: '0 1px 2px rgba(63,60,78,.06)',
         display: 'flex', flexDirection: 'column', gap: 7, transition: 'opacity .1s, border-color .1s',
+        animation: story.isNew ? 'pqbCardNew 1.2s ease-out' : undefined,
       }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 6 }}>
         <span style={{ width: 8, height: 8, borderRadius: '50%', background: story.statusColor || C.muted, flexShrink: 0, marginTop: 4 }} title={story.status} />
+        {story.isNew && (
+          <span style={{ fontSize: 9, fontWeight: 700, padding: '0 5px', borderRadius: 999, background: C.blueLight, color: C.blue, flexShrink: 0 }}>NEW</span>
+        )}
         <p style={{ fontSize: 12.5, fontWeight: 700, color: C.dark, lineHeight: 1.32, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', margin: 0, flex: 1 }}>
           {story.title}
         </p>
@@ -177,7 +182,8 @@ export function BoardColumn({ col, stories, budgeted, dragOver, onDragOver, onDr
             dragging={cardProps.dragId === st.id}
             onDragStart={cardProps.onDragStart} onDragEnd={cardProps.onDragEnd}
             onPriority={k => cardProps.onPriority(st.id, k)}
-            onDate={off => cardProps.onDate(st.id, off)} />
+            onDate={off => cardProps.onDate(st.id, off)}
+            onDismissNew={() => cardProps.onDismissNew(st.id)} />
         ))}
       </div>
     </div>
