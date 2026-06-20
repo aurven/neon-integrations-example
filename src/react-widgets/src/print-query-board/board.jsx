@@ -230,11 +230,13 @@ export function Distribution({ facet, stories }) {
           : facet.budgeted
           ? Math.round(inCol.reduce((a, s) => a + (s.wordCount || 0), 0) / col.target * 100) + '%'
           : n;
-        const barPct = unbudgetedCol
-          ? 0
+        const barPct = Math.min(
+          unbudgetedCol ? 0
           : facet.budgeted
-          ? Math.min(inCol.reduce((a, s) => a + (s.wordCount || 0), 0) / col.target, 1) * 100
-          : (n / total) * 100;
+          ? (inCol.reduce((a, s) => a + (s.wordCount || 0), 0) / col.target) * 100
+          : (n / total) * 100,
+          100
+        );
         return (
           <div key={col.key} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <span style={{ width: 8, height: 8, borderRadius: '50%', background: col.color, flexShrink: 0 }} />
