@@ -9,6 +9,7 @@ export function usePollingSearchDelta({ fetchFn, idKey = 'id', intervalMs, enabl
   const knownIdsRef = useRef(new Set());
   const intervalHandleRef = useRef(null);
   const inFlightRef = useRef(false);
+  const reloadPendingRef = useRef(false);
   const mountedRef = useRef(true);
 
   // fetchFn/onDelta are read through refs inside async callbacks so that a
@@ -37,6 +38,10 @@ export function usePollingSearchDelta({ fetchFn, idKey = 'id', intervalMs, enabl
       onDeltaRef.current?.({ type: 'init', items });
     } finally {
       inFlightRef.current = false;
+      if (mountedRef.current && reloadPendingRef.current) {
+        reloadPendingRef.current = false;
+        runInit();
+      }
     }
   }, [idKey]);
 
@@ -89,6 +94,10 @@ export function usePollingSearchDelta({ fetchFn, idKey = 'id', intervalMs, enabl
           })
           .finally(() => {
             inFlightRef.current = false;
+            if (mountedRef.current && reloadPendingRef.current) {
+              reloadPendingRef.current = false;
+              runInit();
+            }
           });
       }, intervalMs);
     });
@@ -104,6 +113,10 @@ export function usePollingSearchDelta({ fetchFn, idKey = 'id', intervalMs, enabl
   }, [fetchFn, idKey, intervalMs, enabled, runInit]);
 
   const reload = useCallback(() => {
+    if (inFlightRef.current) {
+      reloadPendingRef.current = true;
+      return;
+    }
     knownIdsRef.current.clear();
     runInit();
   }, [runInit]);
