@@ -18,7 +18,8 @@ import type { ImageMetadata } from '../populator/images';
 export type ItemType = 'story' | 'image';
 
 export interface JobItem {
-  type: ItemType;
+  contentType: ItemType;
+  type?: string;
   title?: string;
   content?: string;
   summary?: string;
@@ -74,13 +75,13 @@ export function validatePayload(body: unknown): ValidationResult {
     if (!item || typeof item !== 'object') {
       return { valid: false, error: `items[${i}]: must be an object` };
     }
-    if (!item.type || !ITEM_TYPES.includes(item.type)) {
-      return { valid: false, error: `items[${i}]: type must be one of ${ITEM_TYPES.join(', ')}` };
+    if (!item.contentType || !ITEM_TYPES.includes(item.contentType)) {
+      return { valid: false, error: `items[${i}]: contentType must be one of ${ITEM_TYPES.join(', ')}` };
     }
     if (item.assignTo !== undefined && !isValidAssignTo(item.assignTo)) {
       return { valid: false, error: `items[${i}]: assignTo must be a string or an array of strings` };
     }
-    if (item.type === 'story') {
+    if (item.contentType === 'story') {
       if (!item.title || typeof item.title !== 'string') {
         return { valid: false, error: `items[${i}]: story requires a title` };
       }
@@ -88,7 +89,7 @@ export function validatePayload(body: unknown): ValidationResult {
         return { valid: false, error: `items[${i}]: story requires content` };
       }
     }
-    if (item.type === 'image') {
+    if (item.contentType === 'image') {
       if (!item.url || typeof item.url !== 'string') {
         return { valid: false, error: `items[${i}]: image requires a url` };
       }
@@ -215,21 +216,21 @@ async function runTick(job: Job, index: number, deps: Dispatchers): Promise<void
 
   const item = job.items[index];
   try {
-    const dispatch = item.type === 'story' ? deps.dispatchStory : deps.dispatchImage;
+    const dispatch = item.contentType === 'story' ? deps.dispatchStory : deps.dispatchImage;
     const outcome = await dispatch(item, job);
     job.results.push({
       index,
-      type: item.type,
+      type: item.contentType,
       status: 'ok',
       familyRef: outcome?.familyRef || null,
       at: new Date().toISOString(),
     });
-    console.log(`delayed-import ${job.jobId}: item ${index} (${item.type}) imported`);
+    console.log(`delayed-import ${job.jobId}: item ${index} (${item.contentType}) imported`);
   } catch (error) {
-    console.error(`❌ delayed-import ${job.jobId}: item ${index} (${item.type}) failed: ${(error as Error).message}`);
+    console.error(`❌ delayed-import ${job.jobId}: item ${index} (${item.contentType}) failed: ${(error as Error).message}`);
     job.results.push({
       index,
-      type: item.type,
+      type: item.contentType,
       status: 'error',
       error: (error as Error).message,
       at: new Date().toISOString(),
@@ -250,9 +251,9 @@ async function runTick(job: Job, index: number, deps: Dispatchers): Promise<void
 
 /**
  * Story item -> storiesPopulator.newNodeFromStory.
- * Deliberately does NOT copy item.type onto the story: getCreationOptions
- * uses story.type as the Neon node type and must default to 'article'.
- * No figureUrl / language: image upload no-ops.
+ * item.type is the Neon content type (e.g. 'article', 'wirestory'); getCreationOptions
+ * uses story.type as the Neon node type and defaults to 'article' when unset.
+ * No figureUrl / language / translate: image upload no-ops, translation skipped.
  */
 export async function dispatchStoryItem(
   item: JobItem,
@@ -260,6 +261,8 @@ export async function dispatchStoryItem(
   populator: Pick<typeof storiesPopulator, 'newNodeFromStory'> = storiesPopulator
 ): Promise<DispatchOutcome> {
   const story: storiesPopulator.StoryInput = {
+    type: item.type,
+    name: item.name,
     title: item.title,
     headline: item.title,
     summary: item.summary || '',

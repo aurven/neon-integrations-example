@@ -67,7 +67,7 @@ describe('POST /api/in/delayed-import', () => {
       duration: 1,
       site: 'demo-site',
       workspace: 'Demo Workspace',
-      items: [{ type: 'story', title: 'A', content: '<p>a</p>' }],
+      items: [{ contentType: 'story', title: 'A', content: '<p>a</p>' }],
     };
     const response = await POST(jsonRequest('https://example.com/api/in/delayed-import', payload));
 

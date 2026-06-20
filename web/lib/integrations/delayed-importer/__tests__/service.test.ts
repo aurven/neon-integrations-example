@@ -18,9 +18,9 @@ function basePayload(overrides: Partial<DelayedImportPayload> = {}): DelayedImpo
     site: 'demo-site',
     workspace: 'Demo Workspace',
     items: [
-      { type: 'story', title: 'A', content: '<p>a</p>' },
-      { type: 'story', title: 'B', content: '<p>b</p>' },
-      { type: 'story', title: 'C', content: '<p>c</p>' },
+      { contentType: 'story', title: 'A', content: '<p>a</p>' },
+      { contentType: 'story', title: 'B', content: '<p>b</p>' },
+      { contentType: 'story', title: 'C', content: '<p>c</p>' },
     ],
     ...overrides,
   };
@@ -30,8 +30,8 @@ describe('validatePayload', () => {
   it('accepts a valid mixed payload', () => {
     const payload = basePayload({
       items: [
-        { type: 'story', title: 'A', content: '<p>a</p>' },
-        { type: 'image', url: 'https://example.com/pic.jpg' },
+        { contentType: 'story', title: 'A', content: '<p>a</p>' },
+        { contentType: 'image', url: 'https://example.com/pic.jpg' },
       ],
     });
     expect(validatePayload(payload)).toEqual({ valid: true });
@@ -62,8 +62,8 @@ describe('validatePayload', () => {
   it('rejects invalid item type with index in the message', () => {
     const payload = basePayload({
       items: [
-        { type: 'story', title: 'A', content: '<p>a</p>' },
-        { type: 'video' as unknown as 'story', url: 'https://example.com/x' },
+        { contentType: 'story', title: 'A', content: '<p>a</p>' },
+        { contentType: 'video' as unknown as 'story', url: 'https://example.com/x' },
       ],
     });
     const result = validatePayload(payload);
@@ -77,7 +77,9 @@ describe('validatePayload', () => {
       valid: true,
     });
     expect(
-      validatePayload(basePayload({ items: [{ type: 'story', title: 'A', content: '<p>a</p>', assignTo: 'jane.doe' }] }))
+      validatePayload(
+        basePayload({ items: [{ contentType: 'story', title: 'A', content: '<p>a</p>', assignTo: 'jane.doe' }] })
+      )
     ).toEqual({ valid: true });
   });
 
@@ -86,19 +88,22 @@ describe('validatePayload', () => {
     expect(validatePayload(basePayload({ assignTo: [] })).error).toMatch(/assignTo/);
     expect(validatePayload(basePayload({ assignTo: 123 as unknown as string })).error).toMatch(/assignTo/);
     expect(
-      validatePayload(basePayload({ items: [{ type: 'story', title: 'A', content: '<p>a</p>', assignTo: 5 as unknown as string }] }))
-        .error
+      validatePayload(
+        basePayload({ items: [{ contentType: 'story', title: 'A', content: '<p>a</p>', assignTo: 5 as unknown as string }] })
+      ).error
     ).toMatch(/items\[0\]: assignTo/);
   });
 
   it('enforces per-type required fields', () => {
-    expect(validatePayload(basePayload({ items: [{ type: 'story', content: '<p>a</p>' } as JobItem] })).error).toMatch(
-      /items\[0\].*title/
+    expect(
+      validatePayload(basePayload({ items: [{ contentType: 'story', content: '<p>a</p>' } as JobItem] })).error
+    ).toMatch(/items\[0\].*title/);
+    expect(
+      validatePayload(basePayload({ items: [{ contentType: 'story', title: 'A' } as JobItem] })).error
+    ).toMatch(/items\[0\].*content/);
+    expect(validatePayload(basePayload({ items: [{ contentType: 'image' } as JobItem] })).error).toMatch(
+      /items\[0\].*url/
     );
-    expect(validatePayload(basePayload({ items: [{ type: 'story', title: 'A' } as JobItem] })).error).toMatch(
-      /items\[0\].*content/
-    );
-    expect(validatePayload(basePayload({ items: [{ type: 'image' } as JobItem] })).error).toMatch(/items\[0\].*url/);
   });
 });
 
@@ -224,8 +229,8 @@ describe('createJob scheduling', () => {
     };
     const payload = basePayload({
       items: [
-        { type: 'image', url: 'https://example.com/a.jpg' },
-        { type: 'story', title: 'A', content: '<p>a</p>' },
+        { contentType: 'image', url: 'https://example.com/a.jpg' },
+        { contentType: 'story', title: 'A', content: '<p>a</p>' },
       ],
     });
     createJob(payload, deps);
@@ -251,7 +256,7 @@ describe('dispatchStoryItem', () => {
       publish: false,
     } as Parameters<typeof dispatchStoryItem>[1];
     const item: JobItem = {
-      type: 'story',
+      contentType: 'story',
       title: 'Headline',
       content: '<p>body</p>',
       summary: 'Standfirst',
@@ -272,6 +277,7 @@ describe('dispatchStoryItem', () => {
     expect(story.metadata).toEqual({ seoTitle: 'seo' });
     expect(story.tgtSite).toBe('demo-site');
     expect(story.tgtWorkspace).toBe('/Demo/Imports');
+    // no item.type set: getCreationOptions defaults story.type to 'article'
     expect(story.type).toBeUndefined();
     expect(story.figureUrl).toBeUndefined();
   });
@@ -288,7 +294,11 @@ describe('dispatchStoryItem', () => {
       typeof dispatchStoryItem
     >[1];
 
-    await dispatchStoryItem({ type: 'story', title: 'T', content: 'c', workfolder: '/item-wf' }, job, fakePopulator);
+    await dispatchStoryItem(
+      { contentType: 'story', title: 'T', content: 'c', workfolder: '/item-wf' },
+      job,
+      fakePopulator
+    );
     expect(received?.tgtWorkspace).toBe('/item-wf');
   });
 
@@ -308,7 +318,7 @@ describe('dispatchStoryItem', () => {
       publish: false,
     } as Parameters<typeof dispatchStoryItem>[1];
 
-    await dispatchStoryItem({ type: 'story', title: 'T', content: 'c' }, job, fakePopulator);
+    await dispatchStoryItem({ contentType: 'story', title: 'T', content: 'c' }, job, fakePopulator);
     expect(received?.assignTo).toBe('62038d84-f161-3579-a5f1-7aba053f999a');
   });
 
@@ -328,8 +338,26 @@ describe('dispatchStoryItem', () => {
       publish: false,
     } as Parameters<typeof dispatchStoryItem>[1];
 
-    await dispatchStoryItem({ type: 'story', title: 'T', content: 'c', assignTo: 'jane.doe' }, job, fakePopulator);
+    await dispatchStoryItem(
+      { contentType: 'story', title: 'T', content: 'c', assignTo: 'jane.doe' },
+      job,
+      fakePopulator
+    );
     expect(received?.assignTo).toBe('jane.doe');
+  });
+
+  it('passes item.type through to the populator as the Neon content type', async () => {
+    let received: Record<string, unknown> | undefined;
+    const fakePopulator = {
+      newNodeFromStory: async (story: unknown) => {
+        received = story as Record<string, unknown>;
+        return 'x';
+      },
+    };
+    const job = { site: 's', workspace: 'ws', workfolder: null, publish: false } as Parameters<typeof dispatchStoryItem>[1];
+
+    await dispatchStoryItem({ contentType: 'story', type: 'wirestory', title: 'T', content: 'c' }, job, fakePopulator);
+    expect(received?.type).toBe('wirestory');
   });
 });
 
@@ -346,7 +374,7 @@ describe('dispatchImageItem', () => {
       typeof dispatchImageItem
     >[1];
     const item: JobItem = {
-      type: 'image',
+      contentType: 'image',
       url: 'https://example.com/photos/sunset.jpg',
       metadata: { caption: 'A sunset', credit: 'Jane' },
     };
@@ -373,7 +401,7 @@ describe('dispatchImageItem', () => {
     >[1];
 
     const out = await dispatchImageItem(
-      { type: 'image', url: 'https://example.com/a.jpg', name: 'custom-name' },
+      { contentType: 'image', url: 'https://example.com/a.jpg', name: 'custom-name' },
       job,
       fakeImporter
     );
