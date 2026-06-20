@@ -10,7 +10,7 @@ import {
   promoteNode,
   promoteNodeEverywhere,
 } from '../../../core/neon-bo-api-v3';
-import { workflowTransitionTo } from '../../../core/neon-utils';
+import { workflowTransitionTo, hasWorkflow } from '../../../core/neon-utils';
 import { uploadImageFromStory, mainImageReferenceGenerator } from '../images';
 
 vi.mock('../../../core/neon-bo-api-v3', () => ({
@@ -24,6 +24,7 @@ vi.mock('../../../core/neon-bo-api-v3', () => ({
 }));
 vi.mock('../../../core/neon-utils', () => ({
   workflowTransitionTo: vi.fn(),
+  hasWorkflow: vi.fn(),
 }));
 vi.mock('../images', () => ({
   uploadImageFromStory: vi.fn(),
@@ -39,6 +40,7 @@ const mocks = {
   promoteNode: promoteNode as unknown as ReturnType<typeof vi.fn>,
   promoteNodeEverywhere: promoteNodeEverywhere as unknown as ReturnType<typeof vi.fn>,
   workflowTransitionTo: workflowTransitionTo as unknown as ReturnType<typeof vi.fn>,
+  hasWorkflow: hasWorkflow as unknown as ReturnType<typeof vi.fn>,
   uploadImageFromStory: uploadImageFromStory as unknown as ReturnType<typeof vi.fn>,
   mainImageReferenceGenerator: mainImageReferenceGenerator as unknown as ReturnType<typeof vi.fn>,
 };
@@ -62,6 +64,16 @@ describe('getCreationOptions', () => {
     const options = getCreationOptions({ id: 'my-story', language: 'en', translation: 'fr' });
     expect(options.name).toBe('my-story_fr.xml');
   });
+
+  it('uses itemData.name as an explicit filename override', () => {
+    const options = getCreationOptions({ id: 'my-story', language: 'en', name: 'custom-name.xml' });
+    expect(options.name).toBe('custom-name.xml');
+  });
+
+  it('omits the trailing underscore segment when neither translation nor language is set', () => {
+    const options = getCreationOptions({ id: 'my-story' });
+    expect(options.name).toBe('my-story.xml');
+  });
 });
 
 describe('getOptionsFromData', () => {
@@ -84,6 +96,7 @@ describe('newNodeFromStory', () => {
     mocks.uploadImageFromStory.mockResolvedValue(false);
     mocks.updateNodeContent.mockResolvedValue(true);
     mocks.updateNodeMetadata.mockResolvedValue(true);
+    mocks.hasWorkflow.mockResolvedValue(true);
   });
 
   it('throws when story creation does not return a familyRef', async () => {
@@ -141,6 +154,16 @@ describe('newNodeFromStory', () => {
 
     expect(story.mainImageReference).toBe('/img?uuid=fam-img-1');
   });
+
+  it('skips workflow transitions and still promotes when the node has no associated workflow', async () => {
+    mocks.hasWorkflow.mockResolvedValue(false);
+
+    const familyRef = await newNodeFromStory({ id: 'story-1', tgtSite: 'theglobe' }, true);
+
+    expect(familyRef).toBe('fam-1');
+    expect(mocks.workflowTransitionTo).not.toHaveBeenCalled();
+    expect(mocks.promoteNode).toHaveBeenCalled();
+  });
 });
 
 describe('populateNeonInstance', () => {
@@ -169,5 +192,18 @@ describe('populateNeonInstance', () => {
 
     expect(result).toEqual(['fam-1', 'fam-2']);
     expect(mocks.createNewStory).toHaveBeenCalledTimes(2);
+  });
+
+  it('lets a per-story workfolder and type override the batch-level options', async () => {
+    mocks.createNewStory.mockResolvedValueOnce({ familyRef: 'fam-1' });
+
+    await populateNeonInstance(
+      [{ id: 'story-1', workfolder: '/Custom/Folder', type: 'wirestory' }],
+      { site: 'theglobe', workspace: '/Default/Folder', directPublish: false }
+    );
+
+    expect(mocks.createNewStory).toHaveBeenCalledWith(
+      expect.objectContaining({ workFolder: '/Custom/Folder', type: 'wirestory' })
+    );
   });
 });

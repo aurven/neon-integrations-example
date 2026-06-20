@@ -21,7 +21,7 @@ import {
   promoteNodeEverywhere,
 } from '../../core/neon-bo-api-v3';
 import type { CreateNewStoryOptions } from '../../core/neon-bo-api-v3';
-import { workflowTransitionTo } from '../../core/neon-utils';
+import { workflowTransitionTo, hasWorkflow } from '../../core/neon-utils';
 import { uploadImageFromStory, mainImageReferenceGenerator } from './images';
 
 export interface StoryInput {
@@ -30,6 +30,8 @@ export interface StoryInput {
   language?: string;
   translation?: string;
   type?: string;
+  name?: string;
+  workfolder?: string;
   tgtWorkspace?: string;
   tgtSite?: string;
   tgtSection?: string;
@@ -54,7 +56,8 @@ export function getCreationOptions(itemData: StoryInput): CreateNewStoryOptions 
   const translation = itemData.translation;
 
   const cleanedUpTitle = removeNonAlphanumeric(itemData.id || itemData.title) || '';
-  const fileName = `${cleanedUpTitle}_${translation || language}.xml`;
+  const generatedFileName = `${cleanedUpTitle}${(translation && `_${translation}`) || (language && `_${language}`) || ''}.xml`;
+  const fileName = itemData.name || generatedFileName;
 
   const type = itemData.type || 'article';
 
@@ -121,15 +124,23 @@ export async function newNodeFromStory(story: StoryInput, publishStory = true): 
   }
 
   await unlockNode(familyRef);
-  await workflowTransitionTo({ familyRef, targetWorkflowName: 'Story', targetStateName: 'Edit', principals });
+
+  if (await hasWorkflow(familyRef)) {
+    await workflowTransitionTo({ familyRef, targetWorkflowName: 'Story', targetStateName: 'Edit', principals });
+
+    if (publishStory) {
+      await workflowTransitionTo({ familyRef, targetWorkflowName: 'Story', targetStateName: 'Ready', principals });
+    } else {
+      await workflowTransitionTo({ familyRef, targetWorkflowName: 'Story', targetStateName: 'Revision', principals });
+    }
+  } else {
+    console.log(`Node ${familyRef} has no associated workflow, skipping workflow transitions`);
+  }
 
   if (publishStory) {
-    await workflowTransitionTo({ familyRef, targetWorkflowName: 'Story', targetStateName: 'Ready', principals });
     console.log(`${familyRef} updated successfully!`);
     await promoteNode(familyRef, { targetSite: story.tgtSite, targetSection: story.tgtSection, mode: 'LIVE' });
     await promoteNodeEverywhere(familyRef, { mode: 'LIVE' });
-  } else {
-    await workflowTransitionTo({ familyRef, targetWorkflowName: 'Story', targetStateName: 'Revision', principals });
   }
 
   return familyRef;
@@ -158,11 +169,11 @@ export async function populateNeonInstance(data: StoryInput[], options: Populate
     console.log(story.id || story.title);
 
     story.tgtSite = options.site;
-    story.tgtWorkspace = options.workspace;
+    story.tgtWorkspace = story.workfolder || options.workspace;
     story.tgtSection = options.section;
     story.language = options.language;
     story.siteAsChannel = options.siteAsChannel;
-    story.type = options.type || 'article';
+    story.type = story.type || options.type || 'article';
 
     const familyRef = await newNodeFromStory(story, options.directPublish);
     if (familyRef) {
