@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FileText, Image, Video, Mic, MoreHorizontal } from 'lucide-react';
 
 function HeadlineCellRenderer({ data }) {
@@ -190,6 +190,13 @@ function ActionsCellRenderer({ data, colDef }) {
   const actions = colDef.cellRendererParams?.actions || [];
   const onAction = colDef.cellRendererParams?.onAction || (() => {});
 
+  useEffect(() => {
+    if (!open) return;
+    const close = () => setOpen(false);
+    document.addEventListener('click', close);
+    return () => document.removeEventListener('click', close);
+  }, [open]);
+
   if (actions.length === 0) return null;
 
   if (actions.length === 1) {
@@ -224,33 +231,30 @@ function ActionsCellRenderer({ data, colDef }) {
         <MoreIcon />
       </button>
       {open && (
-        <>
-          <div onMouseDown={e => { e.stopPropagation(); setOpen(false); }} style={{ position: 'fixed', inset: 0, zIndex: 90 }} />
-          <div style={{
-            position: 'absolute', top: 'calc(100% + 4px)', right: 0, zIndex: 100,
-            background: '#ffffff', border: '1px solid #dddce5', borderRadius: '9px',
-            boxShadow: '0 8px 24px rgba(63,60,78,.18)', padding: '4px', width: '140px',
-          }}>
-            {actions.map(action => {
-              const Icon = ACTION_ICONS[action.icon] || MoreIcon;
-              return (
-                <button
-                  key={action.id}
-                  onClick={e => { e.stopPropagation(); onAction(action.id, data); setOpen(false); }}
-                  style={{
-                    width: '100%', display: 'flex', alignItems: 'center', gap: '8px',
-                    padding: '6px 8px', borderRadius: '6px', border: 'none', cursor: 'pointer',
-                    background: 'transparent', color: '#3f3c4e', fontSize: '12px',
-                    fontFamily: 'inherit', textAlign: 'left',
-                  }}
-                >
-                  <Icon />
-                  {action.label}
-                </button>
-              );
-            })}
-          </div>
-        </>
+        <div style={{
+          position: 'absolute', top: 'calc(100% + 4px)', right: 0, zIndex: 100,
+          background: '#ffffff', border: '1px solid #dddce5', borderRadius: '9px',
+          boxShadow: '0 8px 24px rgba(63,60,78,.18)', padding: '4px', width: '140px',
+        }}>
+          {actions.map(action => {
+            const Icon = ACTION_ICONS[action.icon] || MoreIcon;
+            return (
+              <button
+                key={action.id}
+                onClick={e => { e.stopPropagation(); onAction(action.id, data); setOpen(false); }}
+                style={{
+                  width: '100%', display: 'flex', alignItems: 'center', gap: '8px',
+                  padding: '6px 8px', borderRadius: '6px', border: 'none', cursor: 'pointer',
+                  background: 'transparent', color: '#3f3c4e', fontSize: '12px',
+                  fontFamily: 'inherit', textAlign: 'left',
+                }}
+              >
+                <Icon />
+                {action.label}
+              </button>
+            );
+          })}
+        </div>
       )}
     </span>
   );
