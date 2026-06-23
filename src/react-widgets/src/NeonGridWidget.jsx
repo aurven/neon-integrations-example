@@ -223,6 +223,7 @@ export default function NeonGridWidget() {
               rowData={rowData}
               columnDefs={columnDefs}
               defaultColDef={defaultColDef}
+              getRowId={params => params.data.id}
               context={{ userCache }}
               pagination={true}
               paginationPageSize={25}

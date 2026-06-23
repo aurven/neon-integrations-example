@@ -190,14 +190,24 @@ function ActionsCellRenderer({ data, colDef }) {
   const [open, setOpen] = useState(false);
   const [menuPos, setMenuPos] = useState({ top: 0, right: 0 });
   const buttonRef = useRef(null);
+  const menuRef = useRef(null);
   const actions = colDef.cellRendererParams?.actions || [];
   const onAction = colDef.cellRendererParams?.onAction || (() => {});
 
   useEffect(() => {
     if (!open) return;
-    const close = () => setOpen(false);
-    document.addEventListener('click', close);
-    return () => document.removeEventListener('click', close);
+    let listenerId = null;
+    const handleClose = (e) => {
+      if (buttonRef.current?.contains(e.target)) return;
+      if (menuRef.current?.contains(e.target)) return;
+      setOpen(false);
+    };
+    // setTimeout(0) defers past the current browser event that opened the menu
+    listenerId = setTimeout(() => document.addEventListener('mousedown', handleClose), 0);
+    return () => {
+      clearTimeout(listenerId);
+      document.removeEventListener('mousedown', handleClose);
+    };
   }, [open]);
 
   if (actions.length === 0) return null;
@@ -207,6 +217,7 @@ function ActionsCellRenderer({ data, colDef }) {
     const Icon = ACTION_ICONS[action.icon] || MoreIcon;
     return (
       <button
+        onMouseDown={e => e.stopPropagation()}
         onClick={e => { e.stopPropagation(); onAction(action.id, data); }}
         title={action.label}
         style={{
@@ -233,6 +244,7 @@ function ActionsCellRenderer({ data, colDef }) {
     <span style={{ display: 'inline-flex' }}>
       <button
         ref={buttonRef}
+        onMouseDown={e => e.stopPropagation()}
         onClick={handleToggle}
         title="Actions"
         style={{
@@ -244,7 +256,7 @@ function ActionsCellRenderer({ data, colDef }) {
         <MoreIcon />
       </button>
       {open && createPortal(
-        <div style={{
+        <div ref={menuRef} style={{
           position: 'fixed', top: menuPos.top, right: menuPos.right, zIndex: 9999,
           background: '#ffffff', border: '1px solid #dddce5', borderRadius: '9px',
           boxShadow: '0 8px 24px rgba(63,60,78,.18)', padding: '4px', width: '140px',
