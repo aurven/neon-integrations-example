@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { FileText, Image, Video, Mic, MoreHorizontal } from 'lucide-react';
 
 function HeadlineCellRenderer({ data }) {
@@ -187,6 +188,8 @@ const ACTION_ICONS = { copy: CopyIcon, move: MoveIcon, send: SendIcon };
 
 function ActionsCellRenderer({ data, colDef }) {
   const [open, setOpen] = useState(false);
+  const [menuPos, setMenuPos] = useState({ top: 0, right: 0 });
+  const buttonRef = useRef(null);
   const actions = colDef.cellRendererParams?.actions || [];
   const onAction = colDef.cellRendererParams?.onAction || (() => {});
 
@@ -217,10 +220,20 @@ function ActionsCellRenderer({ data, colDef }) {
     );
   }
 
+  const handleToggle = (e) => {
+    e.stopPropagation();
+    if (!open && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setMenuPos({ top: rect.bottom + 4, right: window.innerWidth - rect.right });
+    }
+    setOpen(o => !o);
+  };
+
   return (
-    <span style={{ position: 'relative', display: 'inline-flex' }}>
+    <span style={{ display: 'inline-flex' }}>
       <button
-        onClick={e => { e.stopPropagation(); setOpen(o => !o); }}
+        ref={buttonRef}
+        onClick={handleToggle}
         title="Actions"
         style={{
           display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
@@ -230,9 +243,9 @@ function ActionsCellRenderer({ data, colDef }) {
       >
         <MoreIcon />
       </button>
-      {open && (
+      {open && createPortal(
         <div style={{
-          position: 'absolute', top: 'calc(100% + 4px)', right: 0, zIndex: 100,
+          position: 'fixed', top: menuPos.top, right: menuPos.right, zIndex: 9999,
           background: '#ffffff', border: '1px solid #dddce5', borderRadius: '9px',
           boxShadow: '0 8px 24px rgba(63,60,78,.18)', padding: '4px', width: '140px',
         }}>
@@ -254,7 +267,8 @@ function ActionsCellRenderer({ data, colDef }) {
               </button>
             );
           })}
-        </div>
+        </div>,
+        document.body
       )}
     </span>
   );
