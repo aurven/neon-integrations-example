@@ -217,6 +217,7 @@ function ActionsCellRenderer({ data, colDef }) {
     const Icon = ACTION_ICONS[action.icon] || MoreIcon;
     return (
       <button
+        className="neon-actions-cell"
         onMouseDown={e => e.stopPropagation()}
         onClick={e => { e.stopPropagation(); onAction(action.id, data); }}
         title={action.label}
@@ -241,7 +242,7 @@ function ActionsCellRenderer({ data, colDef }) {
   };
 
   return (
-    <span style={{ display: 'inline-flex' }}>
+    <span className="neon-actions-cell" style={{ display: 'inline-flex' }}>
       <button
         ref={buttonRef}
         onMouseDown={e => e.stopPropagation()}

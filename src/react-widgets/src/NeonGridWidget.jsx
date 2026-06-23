@@ -121,6 +121,11 @@ export default function NeonGridWidget() {
   }, [gridConfig]);
 
   const handleRowClicked = useCallback((params) => {
+    // AG-Grid fires row click via a native listener on the row, so a cell
+    // renderer's React stopPropagation can't suppress it. Bail when the click
+    // originated inside the actions cell — otherwise mutating the row here
+    // refreshes the cell and destroys the open dropdown.
+    if (params.event?.target?.closest?.('.neon-actions-cell')) return;
     const familyRef = params.data?.id;
     setRowData(prev => prev.map(r => r.id === familyRef ? { ...r, isNew: false } : r));
   }, []);
