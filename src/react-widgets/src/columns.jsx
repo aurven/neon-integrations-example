@@ -39,18 +39,16 @@ function StatusCellRenderer({ value, data, colDef }) {
 
   if (display === 'dot') {
     return (
-      <span style={{ display: 'inline-flex', alignItems: 'center', height: '100%' }}>
-        <span
-          role="img"
-          aria-label={label}
-          title={label}
-          tabIndex={0}
-          style={{
-            display: 'inline-block', width: '12px', height: '12px',
-            borderRadius: '9999px', background: bg, cursor: 'default',
-          }}
-        />
-      </span>
+      <span
+        role="img"
+        aria-label={label}
+        title={label}
+        tabIndex={0}
+        style={{
+          display: 'inline-block', width: '12px', height: '12px',
+          borderRadius: '9999px', background: bg, cursor: 'default',
+        }}
+      />
     );
   }
 
@@ -136,7 +134,7 @@ function TypeIconRenderer({ value, colDef }) {
         aria-label={value}
         title={value}
         tabIndex={0}
-        style={{ display: 'inline-flex', alignItems: 'center', height: '100%', color: '#69667f', cursor: 'default' }}
+        style={{ display: 'inline-flex', alignItems: 'center', color: '#69667f', cursor: 'default' }}
       >
         {Icon ? <Icon size={16} strokeWidth={2} /> : value}
       </span>
@@ -339,7 +337,12 @@ export function buildColumnDefs(columns = [], { onAction } = {}) {
       case 'headline':
         return { ...base, autoHeight: true, cellRenderer: HeadlineCellRenderer };
       case 'status':
-        return { ...base, cellRenderer: StatusCellRenderer, cellRendererParams: { display: col.display } };
+        return {
+          ...base,
+          cellRenderer: StatusCellRenderer,
+          cellRendererParams: { display: col.display },
+          ...(col.display === 'dot' ? { tooltipValueGetter: p => p.value || 'Unknown' } : {}),
+        };
       case 'date':
         return { ...base, valueFormatter: col.dateFormat === 'ddmmyyyy' ? formatIssueDate : formatDate, cellEditor: col.editable ? 'agDateStringCellEditor' : undefined };
       case 'badge':
@@ -347,7 +350,12 @@ export function buildColumnDefs(columns = [], { onAction } = {}) {
           ? { ...base, cellRenderer: BadgeCellRenderer, cellRendererParams: { options: col.options } }
           : { ...base, cellRenderer: TypeCellRenderer };
       case 'typeIcon':
-        return { ...base, cellRenderer: TypeIconRenderer, cellRendererParams: { iconMap: col.iconMap || {}, iconOnly: !!col.iconOnly } };
+        return {
+          ...base,
+          cellRenderer: TypeIconRenderer,
+          cellRendererParams: { iconMap: col.iconMap || {}, iconOnly: !!col.iconOnly },
+          ...(col.iconOnly ? { tooltipValueGetter: p => p.value } : {}),
+        };
       case 'select':
         return {
           ...base,
