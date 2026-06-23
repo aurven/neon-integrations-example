@@ -32,8 +32,28 @@ function HeadlineCellRenderer({ data }) {
   );
 }
 
-function StatusCellRenderer({ value, data }) {
+function StatusCellRenderer({ value, data, colDef }) {
   const bg = data?.statusColor ?? '#9ca3af';
+  const label = value || 'Unknown';
+  const display = colDef.cellRendererParams?.display;
+
+  if (display === 'dot') {
+    return (
+      <span style={{ display: 'inline-flex', alignItems: 'center', height: '100%' }}>
+        <span
+          role="img"
+          aria-label={label}
+          title={label}
+          tabIndex={0}
+          style={{
+            display: 'inline-block', width: '12px', height: '12px',
+            borderRadius: '9999px', background: bg, cursor: 'default',
+          }}
+        />
+      </span>
+    );
+  }
+
   return (
     <span style={{
       display: 'inline-block',
@@ -45,7 +65,7 @@ function StatusCellRenderer({ value, data }) {
       background: bg,
       whiteSpace: 'nowrap'
     }}>
-      {value || 'Unknown'}
+      {label}
     </span>
   );
 }
@@ -97,17 +117,32 @@ function BadgeCellRenderer({ value, colDef }) {
   );
 }
 
-const TYPE_ICONS = {
-  article: FileText,
-  gallery: Image,
-  photo: Image,
-  video: Video,
-  audio: Mic,
-};
+// Registry of Lucide icon components available to the widget. The type→icon
+// mapping itself lives in the widget config (conf/widgets/neon-grid/*.json) as
+// value→name strings; this registry resolves those names to components.
+const LUCIDE_ICONS = { FileText, Image, Video, Mic, MoreHorizontal };
 
-function TypeIconRenderer({ value }) {
+function TypeIconRenderer({ value, colDef }) {
+  const iconMap = colDef.cellRendererParams?.iconMap || {};
+  const iconOnly = colDef.cellRendererParams?.iconOnly;
   if (!value) return <span style={{ color: '#9ca3af' }}>—</span>;
-  const Icon = TYPE_ICONS[value?.toLowerCase()];
+  const iconName = iconMap[value?.toLowerCase()];
+  const Icon = iconName ? LUCIDE_ICONS[iconName] : null;
+
+  if (iconOnly) {
+    return (
+      <span
+        role="img"
+        aria-label={value}
+        title={value}
+        tabIndex={0}
+        style={{ display: 'inline-flex', alignItems: 'center', height: '100%', color: '#69667f', cursor: 'default' }}
+      >
+        {Icon ? <Icon size={16} strokeWidth={2} /> : value}
+      </span>
+    );
+  }
+
   return (
     <span style={{
       display: 'inline-flex', alignItems: 'center', gap: '5px',
@@ -304,7 +339,7 @@ export function buildColumnDefs(columns = [], { onAction } = {}) {
       case 'headline':
         return { ...base, autoHeight: true, cellRenderer: HeadlineCellRenderer };
       case 'status':
-        return { ...base, cellRenderer: StatusCellRenderer };
+        return { ...base, cellRenderer: StatusCellRenderer, cellRendererParams: { display: col.display } };
       case 'date':
         return { ...base, valueFormatter: col.dateFormat === 'ddmmyyyy' ? formatIssueDate : formatDate, cellEditor: col.editable ? 'agDateStringCellEditor' : undefined };
       case 'badge':
@@ -312,7 +347,7 @@ export function buildColumnDefs(columns = [], { onAction } = {}) {
           ? { ...base, cellRenderer: BadgeCellRenderer, cellRendererParams: { options: col.options } }
           : { ...base, cellRenderer: TypeCellRenderer };
       case 'typeIcon':
-        return { ...base, cellRenderer: TypeIconRenderer };
+        return { ...base, cellRenderer: TypeIconRenderer, cellRendererParams: { iconMap: col.iconMap || {}, iconOnly: !!col.iconOnly } };
       case 'select':
         return {
           ...base,
