@@ -170,7 +170,7 @@ function ActionsCellRenderer({ data, colDef }) {
       </button>
       {open && (
         <>
-          <div onClick={e => { e.stopPropagation(); setOpen(false); }} style={{ position: 'fixed', inset: 0, zIndex: 90 }} />
+          <div onMouseDown={e => { e.stopPropagation(); setOpen(false); }} style={{ position: 'fixed', inset: 0, zIndex: 90 }} />
           <div style={{
             position: 'absolute', top: 'calc(100% + 4px)', right: 0, zIndex: 100,
             background: '#ffffff', border: '1px solid #dddce5', borderRadius: '9px',
