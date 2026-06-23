@@ -125,8 +125,8 @@ function getNestedValue(obj, path) {
   return path.split('.').reduce((o, k) => (o == null ? o : o[k]), obj);
 }
 
-function DateUserRenderer({ value, colDef, data }) {
-  const userCache = colDef.cellRendererParams?.userCache ?? {};
+function DateUserRenderer({ value, colDef, context, data }) {
+  const userCache = context?.userCache ?? {};
   const userField = colDef.cellRendererParams?.userField;
   const userAliasField = colDef.cellRendererParams?.userAliasField;
 
@@ -274,7 +274,7 @@ function ActionsCellRenderer({ data, colDef }) {
   );
 }
 
-export function buildColumnDefs(columns = [], { onAction, userCache = {} } = {}) {
+export function buildColumnDefs(columns = [], { onAction } = {}) {
   return columns.map(col => {
     const base = {
       field: col.field,
@@ -313,7 +313,7 @@ export function buildColumnDefs(columns = [], { onAction, userCache = {} } = {})
           ...base,
           autoHeight: true,
           cellRenderer: DateUserRenderer,
-          cellRendererParams: { userCache, userField: col.userField, userAliasField: col.userAliasField },
+          cellRendererParams: { userField: col.userField, userAliasField: col.userAliasField },
         };
       case 'actions':
         return { ...base, cellRenderer: ActionsCellRenderer, cellRendererParams: { actions: col.actions || [], onAction } };

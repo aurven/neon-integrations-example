@@ -62,8 +62,8 @@ export default function NeonGridWidget() {
   }, [rowData]);
 
   const columnDefs = useMemo(
-    () => buildColumnDefs(gridConfig.columns, { onAction: handleAction, userCache }),
-    [gridConfig, handleAction, userCache]
+    () => buildColumnDefs(gridConfig.columns, { onAction: handleAction }),
+    [gridConfig, handleAction]
   );
 
   const fetchFn = useCallback(() => {
@@ -223,6 +223,7 @@ export default function NeonGridWidget() {
               rowData={rowData}
               columnDefs={columnDefs}
               defaultColDef={defaultColDef}
+              context={{ userCache }}
               pagination={true}
               paginationPageSize={25}
               onCellValueChanged={handleCellValueChanged}
