@@ -8,13 +8,21 @@
     { "key": "type", "derived": "typeLabel" },
     { "key": "date", "source": "updateTs" },
     { "key": "status", "derived": "status" },
-    { "key": "statusColor", "derived": "statusColor" }
+    { "key": "statusColor", "derived": "statusColor" },
+    { "key": "versionInfo", "source": "versionInfo" },
+    { "key": "lockInfos", "source": "lockInfos" }
   ],
   "columns": [
     { "field": "headline", "headerName": "Title", "type": "headline", "flex": 5, "minWidth": 260, "sortable": true, "filter": true },
     { "field": "type", "headerName": "Type", "type": "typeIcon", "width": 130, "sortable": true, "filter": true },
     { "field": "date", "headerName": "Date", "type": "date", "width": 180, "sortable": true },
     { "field": "status", "headerName": "Status", "type": "status", "width": 130, "sortable": true, "filter": true },
+    { "field": "versionInfo.createFamilyTime", "headerName": "Created", "type": "dateUser", "width": 160, "sortable": true,
+      "userField": "versionInfo.createFamilyUserRef.userId", "userAliasField": "versionInfo.createFamilyUserRef.alias" },
+    { "field": "lockInfos.USER.locked", "headerName": "Locked", "type": "dateUser", "width": 160, "sortable": false,
+      "userField": "lockInfos.USER.userUpdateRef.userId", "userAliasField": "lockInfos.USER.userUpdateRef.userName" },
+    { "field": "versionInfo.updateVersionTime", "headerName": "Updated", "type": "dateUser", "width": 160, "sortable": true,
+      "userField": "versionInfo.updateVersionUserRef.userId", "userAliasField": "versionInfo.updateVersionUserRef.alias" },
     { "field": "actions", "headerName": "", "type": "actions", "width": 90, "actions": [
       { "id": "copy", "label": "Copy", "icon": "copy" },
       { "id": "move", "label": "Move", "icon": "move" },

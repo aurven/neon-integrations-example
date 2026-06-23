@@ -46,14 +46,25 @@ export default function NeonGridWidget() {
     showToast(`${label} triggered for "${row?.headline ?? row?.id ?? 'row'}"`);
   }, [showToast]);
 
-  const columnDefs = useMemo(
-    () => buildColumnDefs(gridConfig.columns, { onAction: handleAction }),
-    [gridConfig, handleAction]
-  );
-
   const [rowData, setRowData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const userCache = useMemo(() => {
+    const map = {};
+    rowData.forEach(row => {
+      const addUser = (userId, alias) => { if (userId) map[userId] = alias || userId; };
+      addUser(row.versionInfo?.createFamilyUserRef?.userId, row.versionInfo?.createFamilyUserRef?.alias);
+      addUser(row.lockInfos?.USER?.userUpdateRef?.userId, row.lockInfos?.USER?.userUpdateRef?.userName);
+      addUser(row.versionInfo?.updateVersionUserRef?.userId, row.versionInfo?.updateVersionUserRef?.alias);
+    });
+    return map;
+  }, [rowData]);
+
+  const columnDefs = useMemo(
+    () => buildColumnDefs(gridConfig.columns, { onAction: handleAction, userCache }),
+    [gridConfig, handleAction, userCache]
+  );
 
   const fetchFn = useCallback(() => {
     return fetchArticles()

@@ -119,6 +119,37 @@ function TypeIconRenderer({ value }) {
   );
 }
 
+function getNestedValue(obj, path) {
+  if (!path) return undefined;
+  return path.split('.').reduce((o, k) => (o == null ? o : o[k]), obj);
+}
+
+function DateUserRenderer({ value, colDef, data }) {
+  const userCache = colDef.cellRendererParams?.userCache ?? {};
+  const userField = colDef.cellRendererParams?.userField;
+  const userAliasField = colDef.cellRendererParams?.userAliasField;
+
+  if (!value) return <span style={{ color: '#9ca3af' }}>—</span>;
+
+  const dateStr = new Date(value).toLocaleString(undefined, {
+    day: '2-digit', month: 'short', year: 'numeric',
+    hour: '2-digit', minute: '2-digit',
+  });
+
+  const userId = getNestedValue(data, userField);
+  const userAlias = getNestedValue(data, userAliasField);
+  const userName = userId ? (userCache[userId] || userAlias || userId) : (userAlias || null);
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '100%', gap: '1px' }}>
+      <span style={{ fontSize: '12px', fontWeight: 600, color: '#3f3c4e', lineHeight: '1.3' }}>{dateStr}</span>
+      {userName && (
+        <span style={{ fontSize: '11px', color: '#69667f', lineHeight: '1.3' }}>{userName}</span>
+      )}
+    </div>
+  );
+}
+
 const CopyIcon = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <rect x="9" y="9" width="13" height="13" rx="2" />
@@ -225,7 +256,7 @@ function ActionsCellRenderer({ data, colDef }) {
   );
 }
 
-export function buildColumnDefs(columns = [], { onAction } = {}) {
+export function buildColumnDefs(columns = [], { onAction, userCache = {} } = {}) {
   return columns.map(col => {
     const base = {
       field: col.field,
@@ -258,6 +289,13 @@ export function buildColumnDefs(columns = [], { onAction } = {}) {
           cellRendererParams: { options: col.options || [] },
           cellEditor: 'agSelectCellEditor',
           cellEditorParams: { values: (col.options || []).map(o => o.value) },
+        };
+      case 'dateUser':
+        return {
+          ...base,
+          autoHeight: true,
+          cellRenderer: DateUserRenderer,
+          cellRendererParams: { userCache, userField: col.userField, userAliasField: col.userAliasField },
         };
       case 'actions':
         return { ...base, cellRenderer: ActionsCellRenderer, cellRendererParams: { actions: col.actions || [], onAction } };
