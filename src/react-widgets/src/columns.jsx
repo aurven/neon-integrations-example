@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { FileText, Image, Video, Mic, MoreHorizontal } from 'lucide-react';
 
 function HeadlineCellRenderer({ data }) {
   return (
@@ -91,6 +92,29 @@ function BadgeCellRenderer({ value, colDef }) {
       fontWeight: 600, color: '#fff', background: opt?.color ?? '#9ca3af', whiteSpace: 'nowrap'
     }}>
       {opt?.label ?? value}
+    </span>
+  );
+}
+
+const TYPE_ICONS = {
+  article: FileText,
+  gallery: Image,
+  photo: Image,
+  video: Video,
+  audio: Mic,
+};
+
+function TypeIconRenderer({ value }) {
+  if (!value) return <span style={{ color: '#9ca3af' }}>—</span>;
+  const Icon = TYPE_ICONS[value?.toLowerCase()];
+  return (
+    <span style={{
+      display: 'inline-flex', alignItems: 'center', gap: '5px',
+      padding: '2px 10px', borderRadius: '9999px', fontSize: '11px',
+      fontWeight: 600, color: '#69667f', background: '#e7e6ed', whiteSpace: 'nowrap',
+    }}>
+      {Icon && <Icon size={12} strokeWidth={2} />}
+      {value}
     </span>
   );
 }
@@ -225,6 +249,8 @@ export function buildColumnDefs(columns = [], { onAction } = {}) {
         return (col.options && col.options.length)
           ? { ...base, cellRenderer: BadgeCellRenderer, cellRendererParams: { options: col.options } }
           : { ...base, cellRenderer: TypeCellRenderer };
+      case 'typeIcon':
+        return { ...base, cellRenderer: TypeIconRenderer };
       case 'select':
         return {
           ...base,
