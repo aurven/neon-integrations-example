@@ -1,0 +1,9 @@
+{
+  "workfolders": [
+    { "path": "/Convergent", "label": "Convergent", "isWorkspace": true },
+    { "path": "/Convergent/News", "label": "News", "workspace": "Convergent" },
+    { "path": "/Convergent/Sports", "label": "Sports", "workspace": "Convergent" },
+    { "path": "/Science", "label": "Science", "isWorkspace": true },
+    { "path": "/Science/Space", "label": "Space", "workspace": "Science" }
+  ]
+}

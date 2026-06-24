@@ -8,11 +8,6 @@ const CACHE_DIR = path.join(process.cwd(), 'data', 'neon-config');
  * Registry of all cacheable Neon BO configuration types.
  * Mirrors the TAXONOMIES registry in iab-taxonomies-connector.js.
  */
-const WORKFOLDER_TYPES = [
-    'article', 'wirestory', 'wirestory/extcontributions', 'wirestory/afpwirestory',
-    'article/take', 'article/longform', 'article/poll', 'hero'
-];
-
 const CONFIGS = {
     usersGroups: {
         label:     'Users & Groups',
@@ -207,22 +202,17 @@ async function fetchFromNeon(type) {
     }
 
     if (type === 'workfolders') {
-        let rawResult = null;
+        // Workfolders are statically configured — the Neon BO endpoint for this
+        // does not exist on all versions. Edit conf/neon-config/workfolders.json to update.
+        const fsSync = require('fs');
+        const cfgPath = path.join(process.cwd(), 'conf', 'neon-config', 'workfolders.json');
+        let workfolders = [];
         try {
-            rawResult = await client.getWorkfolders(WORKFOLDER_TYPES);
+            workfolders = JSON.parse(fsSync.readFileSync(cfgPath, 'utf8')).workfolders || [];
         } catch (e) {
-            console.warn(`[Neon Config] getWorkfolders() failed: ${e.message}`);
+            console.warn(`[Neon Config] Could not read workfolders config: ${e.message}`);
         }
-        const workfolders = [];
-        for (const ws of (rawResult?.workfolders || [])) {
-            const wsPath = ws.workspaceLinkInfo?.workspaceUriPath;
-            if (wsPath) workfolders.push({ path: wsPath, label: ws.workspaceLinkInfo?.name || wsPath, isWorkspace: true });
-            for (const folder of (ws.workspaceFolders || [])) {
-                const folderPath = folder.workspaceLinkInfo?.workspaceUriPath;
-                if (folderPath) workfolders.push({ path: folderPath, label: folder.workspaceLinkInfo?.name || folderPath, workspace: ws.workspaceLinkInfo?.name });
-            }
-        }
-        return { lastUpdated: new Date().toISOString(), source: 'neon-bo', workfolders };
+        return { lastUpdated: new Date().toISOString(), source: 'conf', workfolders };
     }
 }
 
