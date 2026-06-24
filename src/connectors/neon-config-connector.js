@@ -49,12 +49,26 @@ async function saveToCache(type, data) {
     console.log(`[Neon Config] Saved ${type} to cache`);
 }
 
+function isCacheUsable(type, data) {
+    if (!data) return false;
+    if (type === 'workflows')   return data.workflows  && Object.keys(data.workflows).length > 0;
+    if (type === 'workfolders') return data.workfolders && data.workfolders.length > 0;
+    if (type === 'usersGroups') return (data.users && data.users.length > 0) || (data.groups && data.groups.length > 0);
+    if (type === 'contentTypes') return data.types && data.types.length > 0;
+    return true;
+}
+
 async function loadFromCache(type) {
     try {
         const cacheFile = path.join(CACHE_DIR, CONFIGS[type].cacheFile);
         const content = await fs.readFile(cacheFile, 'utf8');
+        const data = JSON.parse(content);
+        if (!isCacheUsable(type, data)) {
+            console.log(`[Neon Config] Cache for ${type} is empty — treating as miss`);
+            return null;
+        }
         console.log(`[Neon Config] Loaded ${type} from cache`);
-        return JSON.parse(content);
+        return data;
     } catch (error) {
         if (error.code === 'ENOENT') return null;
         throw new Error(`Failed to load cache for ${type}: ${error.message}`);
