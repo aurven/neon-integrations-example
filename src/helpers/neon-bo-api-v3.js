@@ -410,6 +410,23 @@ class NeonClient {
             params: queryParams
         }, `Metrics data for ${reportId} retrieved`, true);
     }
+
+    async getWorkfolders(types = []) {
+        return await this.makeRequest({
+            method: 'post',
+            url: '/contents/conf/workfolder',
+            data: { types }
+        }, 'Workfolders retrieved', true);
+    }
+
+    async duplicateNode(familyRef, { name, workFolder, type, issueDate }) {
+        if (!familyRef) throw new Error('familyRef is required');
+        return await this.makeRequest({
+            method: 'post',
+            url: `/contents/nodes/${familyRef}/duplicate`,
+            data: { name, workFolder, type, issueDate, retrieveOptions: {} }
+        }, `Node ${familyRef} duplicated to ${workFolder}`, true);
+    }
 }
 
 const defaultClient = new NeonClient();
@@ -448,5 +465,7 @@ module.exports = {
     discoveryServices: () => defaultClient.discoveryServices(),
     searchContents: (queryPayload, numberOfNodes, numberOfIds) => defaultClient.searchContents(queryPayload, numberOfNodes, numberOfIds),
     getMetricsReports: () => defaultClient.getMetricsReports(),
-    getMetricsData: (reportId, queryParams) => defaultClient.getMetricsData(reportId, queryParams)
+    getMetricsData: (reportId, queryParams) => defaultClient.getMetricsData(reportId, queryParams),
+    getWorkfolders: (types) => defaultClient.getWorkfolders(types),
+    duplicateNode: (familyRef, payload) => defaultClient.duplicateNode(familyRef, payload)
 };

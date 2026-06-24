@@ -1,6 +1,19 @@
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { FileText, Image, Video, Mic, MoreHorizontal } from 'lucide-react';
+import { FileText, Image, Video, Mic, MoreHorizontal, ChevronRight, ArrowLeft, Loader } from 'lucide-react';
+import { fetchWorkfolders, duplicateArticle } from './api.js';
+
+// Module-level workfolders cache — fetched once per page load
+let _wfCache = null;
+let _wfPromise = null;
+function loadWorkfolders() {
+  if (_wfCache) return Promise.resolve(_wfCache);
+  if (_wfPromise) return _wfPromise;
+  _wfPromise = fetchWorkfolders()
+    .then(r => { _wfCache = r.workfolders || []; return _wfCache; })
+    .catch(err => { _wfPromise = null; throw err; });
+  return _wfPromise;
+}
 
 function HeadlineCellRenderer({ data }) {
   return (
@@ -118,7 +131,7 @@ function BadgeCellRenderer({ value, colDef }) {
 // Registry of Lucide icon components available to the widget. The type→icon
 // mapping itself lives in the widget config (conf/widgets/neon-grid/*.json) as
 // value→name strings; this registry resolves those names to components.
-const LUCIDE_ICONS = { FileText, Image, Video, Mic, MoreHorizontal };
+const LUCIDE_ICONS = { FileText, Image, Video, Mic, MoreHorizontal, ChevronRight, ArrowLeft, Loader };
 
 function TypeIconRenderer({ value, colDef }) {
   const iconMap = colDef.cellRendererParams?.iconMap || {};
@@ -219,13 +232,82 @@ const MoreIcon = () => (
 
 const ACTION_ICONS = { copy: CopyIcon, move: MoveIcon, send: SendIcon };
 
+function WorkspacePicker({ data, onAction, onBack, onClose }) {
+  const [workfolders, setWorkfolders] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [duplicating, setDuplicating] = useState(null);
+
+  useEffect(() => {
+    loadWorkfolders()
+      .then(wf => { setWorkfolders(wf); setLoading(false); })
+      .catch(err => { setError(err.message); setLoading(false); });
+  }, []);
+
+  const handleSelect = async (path) => {
+    if (duplicating) return;
+    setDuplicating(path);
+    try {
+      await duplicateArticle(data.id, { workFolder: path, name: data.headline, type: data.type });
+      onAction('moveToWorkspace', data, { workFolder: path });
+      onClose();
+    } catch (err) {
+      setError(`Failed: ${err.message}`);
+      setDuplicating(null);
+    }
+  };
+
+  return (
+    <div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 8px 4px', borderBottom: '1px solid #ebe9f0' }}>
+        <button
+          onClick={onBack}
+          style={{ display: 'inline-flex', background: 'none', border: 'none', cursor: 'pointer', color: '#69667f', padding: '2px' }}
+        >
+          <ArrowLeft size={13} />
+        </button>
+        <span style={{ fontSize: '11px', fontWeight: 700, color: '#3f3c4e', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Select workspace</span>
+      </div>
+      <div style={{ maxHeight: '220px', overflowY: 'auto' }}>
+        {loading && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 8px', color: '#69667f', fontSize: '12px' }}>
+            <Loader size={12} style={{ animation: 'spin 1s linear infinite' }} /> Loading…
+          </div>
+        )}
+        {error && (
+          <div style={{ padding: '8px', fontSize: '11px', color: '#d22d2d' }}>{error}</div>
+        )}
+        {!loading && !error && workfolders?.map(wf => (
+          <button
+            key={wf.path}
+            onClick={() => handleSelect(wf.path)}
+            disabled={!!duplicating}
+            style={{
+              width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-start',
+              padding: '5px 8px', borderRadius: '5px', border: 'none', cursor: duplicating ? 'wait' : 'pointer',
+              background: duplicating === wf.path ? '#f0edff' : 'transparent',
+              color: '#3f3c4e', fontFamily: 'inherit', textAlign: 'left', gap: '1px',
+            }}
+          >
+            <span style={{ fontSize: '12px', fontWeight: wf.isWorkspace ? 700 : 400 }}>{wf.label}</span>
+            {wf.workspace && <span style={{ fontSize: '10px', color: '#9d9aac' }}>{wf.path}</span>}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function ActionsCellRenderer({ data, colDef }) {
   const [open, setOpen] = useState(false);
   const [menuPos, setMenuPos] = useState({ top: 0, right: 0 });
+  const [subPanel, setSubPanel] = useState(null); // null | 'workspacePicker'
   const buttonRef = useRef(null);
   const menuRef = useRef(null);
   const actions = colDef.cellRendererParams?.actions || [];
   const onAction = colDef.cellRendererParams?.onAction || (() => {});
+
+  const closeMenu = () => { setOpen(false); setSubPanel(null); };
 
   useEffect(() => {
     if (!open) return;
@@ -233,7 +315,7 @@ function ActionsCellRenderer({ data, colDef }) {
     const handleClose = (e) => {
       if (buttonRef.current?.contains(e.target)) return;
       if (menuRef.current?.contains(e.target)) return;
-      setOpen(false);
+      closeMenu();
     };
     // setTimeout(0) defers past the current browser event that opened the menu
     listenerId = setTimeout(() => document.addEventListener('mousedown', handleClose), 0);
@@ -246,7 +328,7 @@ function ActionsCellRenderer({ data, colDef }) {
   // Close when another row's actions menu opens
   useEffect(() => {
     const handleOtherOpen = (e) => {
-      if (e.detail?.rowId !== data?.id) setOpen(false);
+      if (e.detail?.rowId !== data?.id) closeMenu();
     };
     document.addEventListener('neon-actions-open', handleOtherOpen);
     return () => document.removeEventListener('neon-actions-open', handleOtherOpen);
@@ -281,8 +363,11 @@ function ActionsCellRenderer({ data, colDef }) {
       setMenuPos({ top: rect.bottom + 4, right: window.innerWidth - rect.right });
       document.dispatchEvent(new CustomEvent('neon-actions-open', { detail: { rowId: data?.id } }));
     }
+    if (open) setSubPanel(null);
     setOpen(o => !o);
   };
+
+  const menuWidth = subPanel === 'workspacePicker' ? '220px' : '150px';
 
   return (
     <span className="neon-actions-cell" style={{ display: 'inline-flex' }}>
@@ -303,26 +388,45 @@ function ActionsCellRenderer({ data, colDef }) {
         <div ref={menuRef} style={{
           position: 'fixed', top: menuPos.top, right: menuPos.right, zIndex: 9999,
           background: '#ffffff', border: '1px solid #dddce5', borderRadius: '9px',
-          boxShadow: '0 8px 24px rgba(63,60,78,.18)', padding: '4px', width: '140px',
+          boxShadow: '0 8px 24px rgba(63,60,78,.18)', padding: '4px', width: menuWidth,
+          transition: 'width 120ms ease',
         }}>
-          {actions.map(action => {
-            const Icon = ACTION_ICONS[action.icon] || MoreIcon;
-            return (
-              <button
-                key={action.id}
-                onClick={e => { e.stopPropagation(); onAction(action.id, data); setOpen(false); }}
-                style={{
-                  width: '100%', display: 'flex', alignItems: 'center', gap: '8px',
-                  padding: '6px 8px', borderRadius: '6px', border: 'none', cursor: 'pointer',
-                  background: 'transparent', color: '#3f3c4e', fontSize: '12px',
-                  fontFamily: 'inherit', textAlign: 'left',
-                }}
-              >
-                <Icon />
-                {action.label}
-              </button>
-            );
-          })}
+          {subPanel === 'workspacePicker' ? (
+            <WorkspacePicker
+              data={data}
+              onAction={onAction}
+              onBack={() => setSubPanel(null)}
+              onClose={closeMenu}
+            />
+          ) : (
+            actions.map(action => {
+              const Icon = ACTION_ICONS[action.icon] || MoreIcon;
+              const isMoveToWs = action.actionType === 'moveToWorkspace';
+              return (
+                <button
+                  key={action.id}
+                  onClick={e => {
+                    e.stopPropagation();
+                    if (isMoveToWs) { setSubPanel('workspacePicker'); }
+                    else { onAction(action.id, data); closeMenu(); }
+                  }}
+                  style={{
+                    width: '100%', display: 'flex', alignItems: 'center', gap: '8px',
+                    padding: '6px 8px', borderRadius: '6px', border: 'none', cursor: 'pointer',
+                    background: 'transparent', color: '#3f3c4e', fontSize: '12px',
+                    fontFamily: 'inherit', textAlign: 'left',
+                    justifyContent: isMoveToWs ? 'space-between' : 'flex-start',
+                  }}
+                >
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Icon />
+                    {action.label}
+                  </span>
+                  {isMoveToWs && <ChevronRight size={12} style={{ color: '#9d9aac' }} />}
+                </button>
+              );
+            })
+          )}
         </div>,
         document.body
       )}

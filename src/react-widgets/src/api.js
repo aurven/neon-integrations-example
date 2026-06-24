@@ -43,6 +43,25 @@ export function fetchStories() {
   return apiFetch(`/api/print-query-board/stories${qs ? `?${qs}` : ''}`);
 }
 
+export function fetchWorkfolders() {
+  const config = window.CONFIG?.gridConfigName;
+  const params = config ? `?config=${encodeURIComponent(config)}` : '';
+  return apiFetch(`/api/neon/grid/workfolders${params}`);
+}
+
+export async function duplicateArticle(familyRef, { workFolder, name, type }) {
+  const apiKey = window.CONFIG?.apiKey ?? '';
+  const response = await fetch(`${BASE_URL}/api/neon/grid/duplicate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', apikey: apiKey },
+    body: JSON.stringify({ familyRef, workFolder, name, type })
+  });
+  if (!response.ok) {
+    throw new Error(`API error ${response.status}: /api/neon/grid/duplicate`);
+  }
+  return response.json();
+}
+
 export async function updateMetadata(familyRef, changes) {
   const apiKey = window.CONFIG?.apiKey ?? '';
   const response = await fetch(`${BASE_URL}/utilities/metadata/update`, {

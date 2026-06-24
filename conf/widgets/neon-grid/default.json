@@ -2,6 +2,7 @@
   "title": "Articles Grid",
   "demoData": "search-results.json",
   "pollIntervalMs": 20000,
+  "workfolderTypes": ["article","wirestory","wirestory/extcontributions","wirestory/afpwirestory","article/take","article/longform","article/poll","hero"],
   "fields": [
     { "key": "headline", "source": "title" },
     { "key": "summary", "source": "summary" },
@@ -27,7 +28,7 @@
       "userField": "versionInfo.updateVersionUserRef.userId", "userAliasField": "versionInfo.updateVersionUserRef.alias" },
     { "field": "actions", "headerName": "", "type": "actions", "width": 90, "actions": [
       { "id": "copy", "label": "Copy", "icon": "copy" },
-      { "id": "move", "label": "Move", "icon": "move" },
+      { "id": "move", "label": "Move to...", "icon": "move", "actionType": "moveToWorkspace" },
       { "id": "send", "label": "Send", "icon": "send" }
     ] }
   ]

@@ -502,6 +502,54 @@ async function neonGridDataHandler(request, reply) {
   }
 }
 
+async function neonGridWorkfoldersHandler(request, reply) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) return reply.status(401).send({ error: 'Unauthorized' });
+
+  const configName = /^[a-zA-Z0-9_-]+$/.test(request.query.config || '') ? request.query.config : 'default';
+  const gridConfig = loadGridConfig(configName);
+  const types = Array.isArray(gridConfig.workfolderTypes) ? gridConfig.workfolderTypes : [
+    'article', 'wirestory', 'wirestory/extcontributions', 'wirestory/afpwirestory',
+    'article/take', 'article/longform', 'article/poll', 'hero'
+  ];
+
+  try {
+    const data = await neonBoApi.getWorkfolders(types);
+    const workfolders = [];
+    for (const ws of (data.workfolders || [])) {
+      const wsPath = ws.workspaceLinkInfo?.workspaceUriPath;
+      if (wsPath) workfolders.push({ path: wsPath, label: ws.workspaceLinkInfo?.name || wsPath, isWorkspace: true });
+      for (const folder of (ws.workspaceFolders || [])) {
+        const folderPath = folder.workspaceLinkInfo?.workspaceUriPath;
+        if (folderPath) workfolders.push({ path: folderPath, label: folder.workspaceLinkInfo?.name || folderPath, workspace: ws.workspaceLinkInfo?.name });
+      }
+    }
+    return reply.status(200).send({ workfolders });
+  } catch (error) {
+    console.error('neonGridWorkfoldersHandler error:', error);
+    return reply.status(500).send({ error: 'Failed to fetch workfolders from Neon' });
+  }
+}
+
+async function neonGridDuplicateHandler(request, reply) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) return reply.status(401).send({ error: 'Unauthorized' });
+
+  const { familyRef, workFolder, name, type } = request.body || {};
+  if (!familyRef || !workFolder) return reply.status(400).send({ error: 'familyRef and workFolder are required' });
+
+  const issueDate = new Date().toISOString().split('T')[0];
+
+  try {
+    const result = await neonBoApi.duplicateNode(familyRef, { name, workFolder, type, issueDate });
+    return reply.status(200).send(result);
+  } catch (error) {
+    console.error('neonGridDuplicateHandler error:', error);
+    const status = error.response?.status || 500;
+    return reply.status(status).send({ error: `Duplicate failed: ${error.message}` });
+  }
+}
+
 function printQueryBoardHandler(request, reply) {
   const auth = authenticate(request, reply);
   if (!auth.authenticated) return reply.status(401).send({ error: 'Unauthorized' });
@@ -617,6 +665,8 @@ module.exports = {
   planningBoardWidgetHandler,
   neonGridWidgetHandler,
   neonGridDataHandler,
+  neonGridWorkfoldersHandler,
+  neonGridDuplicateHandler,
   printQueryBoardHandler,
   printQueryBoardDataHandler,
 };

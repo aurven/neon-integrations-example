@@ -41,7 +41,11 @@ export default function NeonGridWidget() {
     toastTimerRef.current = setTimeout(() => setToast(null), 2400);
   }, []);
 
-  const handleAction = useCallback((actionId, row) => {
+  const handleAction = useCallback((actionId, row, extra) => {
+    if (actionId === 'moveToWorkspace' && extra?.workFolder) {
+      showToast(`Moved "${row?.headline ?? row?.id}" → ${extra.workFolder}`);
+      return;
+    }
     const label = ACTION_LABELS[actionId] || actionId;
     showToast(`${label} triggered for "${row?.headline ?? row?.id ?? 'row'}"`);
   }, [showToast]);
