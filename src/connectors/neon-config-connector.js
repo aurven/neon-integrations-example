@@ -8,6 +8,11 @@ const CACHE_DIR = path.join(process.cwd(), 'data', 'neon-config');
  * Registry of all cacheable Neon BO configuration types.
  * Mirrors the TAXONOMIES registry in iab-taxonomies-connector.js.
  */
+const WORKFOLDER_TYPES = [
+    'article', 'wirestory', 'wirestory/extcontributions', 'wirestory/afpwirestory',
+    'article/take', 'article/longform', 'article/poll', 'hero'
+];
+
 const CONFIGS = {
     usersGroups: {
         label:     'Users & Groups',
@@ -20,6 +25,10 @@ const CONFIGS = {
     contentTypes: {
         label:     'Content Types',
         cacheFile: 'content-types.json'
+    },
+    workfolders: {
+        label:     'Workfolders',
+        cacheFile: 'workfolders.json'
     }
 };
 
@@ -137,6 +146,20 @@ async function fetchFromNeon(type) {
             types: flattenContentTypes(typesResult)
         };
     }
+
+    if (type === 'workfolders') {
+        const result = await client.getWorkfolders(WORKFOLDER_TYPES);
+        const workfolders = [];
+        for (const ws of (result.workfolders || [])) {
+            const wsPath = ws.workspaceLinkInfo?.workspaceUriPath;
+            if (wsPath) workfolders.push({ path: wsPath, label: ws.workspaceLinkInfo?.name || wsPath, isWorkspace: true });
+            for (const folder of (ws.workspaceFolders || [])) {
+                const folderPath = folder.workspaceLinkInfo?.workspaceUriPath;
+                if (folderPath) workfolders.push({ path: folderPath, label: folder.workspaceLinkInfo?.name || folderPath, workspace: ws.workspaceLinkInfo?.name });
+            }
+        }
+        return { lastUpdated: new Date().toISOString(), source: 'neon-bo', workfolders };
+    }
 }
 
 async function fetchAndCache(type) {
@@ -244,6 +267,19 @@ function getTypeLabel(composedTypeName) {
     return labels[composedTypeName] || composedTypeName;
 }
 
+/**
+ * Load (cache or fetch) the workfolders config and return the flat list.
+ */
+async function loadWorkfoldersConfig(forceRefresh = false) {
+    try {
+        const config = await getConfig('workfolders', forceRefresh);
+        return config?.workfolders || [];
+    } catch (error) {
+        console.warn(`⚠️ loadWorkfoldersConfig(): failed to load (${error.message})`);
+        return [];
+    }
+}
+
 function getAvailableConfigs() {
     return Object.entries(CONFIGS).reduce((acc, [type, config]) => {
         acc[type] = { label: config.label, cacheFile: config.cacheFile };
@@ -262,6 +298,7 @@ module.exports = {
     refreshConfig,
     getAvailableConfigs,
     loadContentTypesConfig,
+    loadWorkfoldersConfig,
     getTypeLabel,
     CONFIGS
 };

@@ -43,12 +43,6 @@ export function fetchStories() {
   return apiFetch(`/api/print-query-board/stories${qs ? `?${qs}` : ''}`);
 }
 
-export function fetchWorkfolders() {
-  const config = window.CONFIG?.gridConfigName;
-  const params = config ? `?config=${encodeURIComponent(config)}` : '';
-  return apiFetch(`/api/neon/grid/workfolders${params}`);
-}
-
 export async function duplicateArticle(familyRef, { workFolder, name, type }) {
   const apiKey = window.CONFIG?.apiKey ?? '';
   const response = await fetch(`${BASE_URL}/api/neon/grid/duplicate`, {

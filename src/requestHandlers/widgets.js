@@ -404,7 +404,7 @@ function planningBoardWidgetHandler(request, reply) {
   return reply.view("/src/widgets/planning-board.hbs", params);
 }
 
-function neonGridWidgetHandler(request, reply) {
+async function neonGridWidgetHandler(request, reply) {
   const auth = authenticate(request, reply);
   if (!auth.authenticated) {
     return reply.status(401).send({ error: "Unauthorized" });
@@ -420,6 +420,9 @@ function neonGridWidgetHandler(request, reply) {
   if (Number.isInteger(pollMsOverride) && pollMsOverride > 0) {
     gridConfig.pollIntervalMs = pollMsOverride;
   }
+
+  // Embed cached workfolders so the client never needs to fetch them live
+  gridConfig.workfolders = await neonConfigConnector.loadWorkfoldersConfig();
 
   let params = {
     seo: {
@@ -499,35 +502,6 @@ async function neonGridDataHandler(request, reply) {
   } catch (error) {
     console.error('neonGridDataHandler error:', error);
     return reply.status(500).send({ error: 'Failed to fetch articles from Neon' });
-  }
-}
-
-async function neonGridWorkfoldersHandler(request, reply) {
-  const auth = authenticate(request, reply);
-  if (!auth.authenticated) return reply.status(401).send({ error: 'Unauthorized' });
-
-  const configName = /^[a-zA-Z0-9_-]+$/.test(request.query.config || '') ? request.query.config : 'default';
-  const gridConfig = loadGridConfig(configName);
-  const types = Array.isArray(gridConfig.workfolderTypes) ? gridConfig.workfolderTypes : [
-    'article', 'wirestory', 'wirestory/extcontributions', 'wirestory/afpwirestory',
-    'article/take', 'article/longform', 'article/poll', 'hero'
-  ];
-
-  try {
-    const data = await neonBoApi.getWorkfolders(types);
-    const workfolders = [];
-    for (const ws of (data.workfolders || [])) {
-      const wsPath = ws.workspaceLinkInfo?.workspaceUriPath;
-      if (wsPath) workfolders.push({ path: wsPath, label: ws.workspaceLinkInfo?.name || wsPath, isWorkspace: true });
-      for (const folder of (ws.workspaceFolders || [])) {
-        const folderPath = folder.workspaceLinkInfo?.workspaceUriPath;
-        if (folderPath) workfolders.push({ path: folderPath, label: folder.workspaceLinkInfo?.name || folderPath, workspace: ws.workspaceLinkInfo?.name });
-      }
-    }
-    return reply.status(200).send({ workfolders });
-  } catch (error) {
-    console.error('neonGridWorkfoldersHandler error:', error);
-    return reply.status(500).send({ error: 'Failed to fetch workfolders from Neon' });
   }
 }
 
@@ -665,7 +639,6 @@ module.exports = {
   planningBoardWidgetHandler,
   neonGridWidgetHandler,
   neonGridDataHandler,
-  neonGridWorkfoldersHandler,
   neonGridDuplicateHandler,
   printQueryBoardHandler,
   printQueryBoardDataHandler,

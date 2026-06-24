@@ -1,18 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { FileText, Image, Video, Mic, MoreHorizontal, ChevronRight, ArrowLeft, Loader } from 'lucide-react';
-import { fetchWorkfolders, duplicateArticle } from './api.js';
+import { FileText, Image, Video, Mic, MoreHorizontal, ChevronRight, ArrowLeft } from 'lucide-react';
+import { duplicateArticle } from './api.js';
 
-// Module-level workfolders cache — fetched once per page load
-let _wfCache = null;
-let _wfPromise = null;
-function loadWorkfolders() {
-  if (_wfCache) return Promise.resolve(_wfCache);
-  if (_wfPromise) return _wfPromise;
-  _wfPromise = fetchWorkfolders()
-    .then(r => { _wfCache = r.workfolders || []; return _wfCache; })
-    .catch(err => { _wfPromise = null; throw err; });
-  return _wfPromise;
+function getWorkfolders() {
+  return window.CONFIG?.gridConfig?.workfolders || [];
 }
 
 function HeadlineCellRenderer({ data }) {
@@ -131,7 +123,7 @@ function BadgeCellRenderer({ value, colDef }) {
 // Registry of Lucide icon components available to the widget. The type→icon
 // mapping itself lives in the widget config (conf/widgets/neon-grid/*.json) as
 // value→name strings; this registry resolves those names to components.
-const LUCIDE_ICONS = { FileText, Image, Video, Mic, MoreHorizontal, ChevronRight, ArrowLeft, Loader };
+const LUCIDE_ICONS = { FileText, Image, Video, Mic, MoreHorizontal, ChevronRight, ArrowLeft };
 
 function TypeIconRenderer({ value, colDef }) {
   const iconMap = colDef.cellRendererParams?.iconMap || {};
@@ -233,16 +225,9 @@ const MoreIcon = () => (
 const ACTION_ICONS = { copy: CopyIcon, move: MoveIcon, send: SendIcon };
 
 function WorkspacePicker({ data, onAction, onBack, onClose }) {
-  const [workfolders, setWorkfolders] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const workfolders = getWorkfolders();
   const [error, setError] = useState(null);
   const [duplicating, setDuplicating] = useState(null);
-
-  useEffect(() => {
-    loadWorkfolders()
-      .then(wf => { setWorkfolders(wf); setLoading(false); })
-      .catch(err => { setError(err.message); setLoading(false); });
-  }, []);
 
   const handleSelect = async (path) => {
     if (duplicating) return;
@@ -269,15 +254,13 @@ function WorkspacePicker({ data, onAction, onBack, onClose }) {
         <span style={{ fontSize: '11px', fontWeight: 700, color: '#3f3c4e', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Select workspace</span>
       </div>
       <div style={{ maxHeight: '220px', overflowY: 'auto' }}>
-        {loading && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 8px', color: '#69667f', fontSize: '12px' }}>
-            <Loader size={12} style={{ animation: 'spin 1s linear infinite' }} /> Loading…
-          </div>
-        )}
         {error && (
           <div style={{ padding: '8px', fontSize: '11px', color: '#d22d2d' }}>{error}</div>
         )}
-        {!loading && !error && workfolders?.map(wf => (
+        {workfolders.length === 0 && !error && (
+          <div style={{ padding: '10px 8px', color: '#9d9aac', fontSize: '12px' }}>No workfolders available</div>
+        )}
+        {workfolders.map(wf => (
           <button
             key={wf.path}
             onClick={() => handleSelect(wf.path)}
