@@ -243,6 +243,15 @@ function ActionsCellRenderer({ data, colDef }) {
     };
   }, [open]);
 
+  // Close when another row's actions menu opens
+  useEffect(() => {
+    const handleOtherOpen = (e) => {
+      if (e.detail?.rowId !== data?.id) setOpen(false);
+    };
+    document.addEventListener('neon-actions-open', handleOtherOpen);
+    return () => document.removeEventListener('neon-actions-open', handleOtherOpen);
+  }, [data?.id]);
+
   if (actions.length === 0) return null;
 
   if (actions.length === 1) {
@@ -270,6 +279,7 @@ function ActionsCellRenderer({ data, colDef }) {
     if (!open && buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
       setMenuPos({ top: rect.bottom + 4, right: window.innerWidth - rect.right });
+      document.dispatchEvent(new CustomEvent('neon-actions-open', { detail: { rowId: data?.id } }));
     }
     setOpen(o => !o);
   };
