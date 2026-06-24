@@ -6,7 +6,7 @@ const {
     refreshConfig
 } = require('../connectors/neon-config-connector');
 
-const VALID_TYPES = ['usersGroups', 'workflows', 'contentTypes'];
+const VALID_TYPES = ['usersGroups', 'workflows', 'contentTypes', 'workfolders'];
 
 function buildStats(type, data) {
     if (type === 'usersGroups') {
@@ -16,10 +16,14 @@ function buildStats(type, data) {
         };
     }
     if (type === 'workflows') {
-        return { workflowCount: Array.isArray(data.workflows) ? data.workflows.length : 0 };
+        const wf = data.workflows || {};
+        return { workflowCount: Object.keys(wf).length, workflows: Object.keys(wf) };
     }
     if (type === 'contentTypes') {
         return { typeCount: Array.isArray(data.types) ? data.types.length : 0 };
+    }
+    if (type === 'workfolders') {
+        return { workfolderCount: Array.isArray(data.workfolders) ? data.workfolders.length : 0 };
     }
     return {};
 }

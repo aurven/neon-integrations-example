@@ -114,10 +114,20 @@ async function fetchFromNeon(type) {
     const client = new NeonClient();
 
     if (type === 'usersGroups') {
-        const [usersResult, groupsResult] = await Promise.all([
+        const [usersSettled, groupsSettled] = await Promise.allSettled([
             client.getUsers(),
             client.getGroups()
         ]);
+
+        if (usersSettled.status === 'rejected') {
+            console.warn(`[Neon Config] getUsers() failed: ${usersSettled.reason?.message}`);
+        }
+        if (groupsSettled.status === 'rejected') {
+            console.warn(`[Neon Config] getGroups() failed: ${groupsSettled.reason?.message}`);
+        }
+
+        const usersResult  = usersSettled.status  === 'fulfilled' ? usersSettled.value  : null;
+        const groupsResult = groupsSettled.status === 'fulfilled' ? groupsSettled.value : null;
 
         return {
             lastUpdated: new Date().toISOString(),
@@ -183,9 +193,14 @@ async function fetchFromNeon(type) {
     }
 
     if (type === 'workfolders') {
-        const result = await client.getWorkfolders(WORKFOLDER_TYPES);
+        let rawResult = null;
+        try {
+            rawResult = await client.getWorkfolders(WORKFOLDER_TYPES);
+        } catch (e) {
+            console.warn(`[Neon Config] getWorkfolders() failed: ${e.message}`);
+        }
         const workfolders = [];
-        for (const ws of (result.workfolders || [])) {
+        for (const ws of (rawResult?.workfolders || [])) {
             const wsPath = ws.workspaceLinkInfo?.workspaceUriPath;
             if (wsPath) workfolders.push({ path: wsPath, label: ws.workspaceLinkInfo?.name || wsPath, isWorkspace: true });
             for (const folder of (ws.workspaceFolders || [])) {
