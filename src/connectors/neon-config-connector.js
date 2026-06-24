@@ -122,18 +122,53 @@ async function fetchFromNeon(type) {
         return {
             lastUpdated: new Date().toISOString(),
             source: 'neon-bo',
-            users:  usersResult?.users  || (Array.isArray(usersResult)  ? usersResult  : []),
-            groups: groupsResult?.groups || (Array.isArray(groupsResult) ? groupsResult : [])
+            users:  usersResult?.result  || usersResult?.users  || [],
+            groups: groupsResult?.result || groupsResult?.groups || []
         };
     }
 
     if (type === 'workflows') {
-        const workflowsResult = await client.getWorkflowDefinitions();
+        const fs = require('fs');
+        const cfgPath = path.join(process.cwd(), 'conf', 'neon-config', 'workflows.json');
+        let workflowNames = [];
+        try {
+            workflowNames = JSON.parse(fs.readFileSync(cfgPath, 'utf8')).workflows || [];
+        } catch (e) {
+            console.warn(`[Neon Config] Could not read workflows config: ${e.message}`);
+        }
+
+        // Fetch each configured workflow graph and build a step lookup map.
+        // Shape: { "Story": { version, steps: { "Edit": { id, color, description, initialState, endState, transitions[] } } } }
+        const byName = {};
+        for (const entry of workflowNames) {
+            const wfName = typeof entry === 'string' ? entry : entry.name;
+            const version = entry.version ?? undefined;
+            try {
+                const graph = await client.getWorkflowGraph(wfName, version);
+                const steps = {};
+                for (const step of (graph.steps || [])) {
+                    steps[step.name] = {
+                        id:           step.id,
+                        color:        step.color || null,
+                        description:  step.description || null,
+                        initialState: !!step.initialState,
+                        endState:     !!step.endState,
+                        transitions:  (step.transitions || []).map(t => t.name)
+                    };
+                }
+                byName[wfName] = {
+                    version: graph.process?.version ?? null,
+                    steps
+                };
+            } catch (e) {
+                console.error(`[Neon Config] Failed to fetch workflow graph "${wfName}": ${e.message}`);
+            }
+        }
 
         return {
             lastUpdated: new Date().toISOString(),
             source: 'neon-bo',
-            workflows: workflowsResult?.workflows || (Array.isArray(workflowsResult) ? workflowsResult : [])
+            workflows: byName
         };
     }
 
@@ -268,6 +303,20 @@ function getTypeLabel(composedTypeName) {
 }
 
 /**
+ * Load (cache or fetch) the workflows config.
+ * Returns { "Story": { version, steps: { stepName: { color, description, transitions[] } } } }
+ */
+async function loadWorkflowsConfig(forceRefresh = false) {
+    try {
+        const config = await getConfig('workflows', forceRefresh);
+        return config?.workflows || {};
+    } catch (error) {
+        console.warn(`⚠️ loadWorkflowsConfig(): failed to load (${error.message})`);
+        return {};
+    }
+}
+
+/**
  * Load (cache or fetch) the workfolders config and return the flat list.
  */
 async function loadWorkfoldersConfig(forceRefresh = false) {
@@ -298,6 +347,7 @@ module.exports = {
     refreshConfig,
     getAvailableConfigs,
     loadContentTypesConfig,
+    loadWorkflowsConfig,
     loadWorkfoldersConfig,
     getTypeLabel,
     CONFIGS

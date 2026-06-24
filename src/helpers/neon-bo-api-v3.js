@@ -315,25 +315,14 @@ class NeonClient {
         }, `Assigned new workflow step to ${familyRef}`);
     }
 
-    async getWorkflowDefinitions() {
-        try {
-            return await this.makeRequest({
-                method: 'get',
-                url: '/workflow/definitions'
-            }, 'Workflow definitions retrieved', true);
-        } catch (error) {
-            console.warn(`⚠️ getWorkflowDefinitions(): endpoint unavailable (${error.response?.status || error.code}), returning stub`);
-            // TODO: remove stub when a real workflow-list endpoint is confirmed on this Neon BO version
-            return {
-                workflows: [
-                    { name: 'Story/Created'   },
-                    { name: 'Story/Edit'      },
-                    { name: 'Story/Ready'     },
-                    { name: 'Story/Published' },
-                    { name: 'Story/Archived'  }
-                ]
-            };
-        }
+    async getWorkflowGraph(name, version) {
+        const params = { name };
+        if (version != null) params.version = version;
+        return await this.makeRequest({
+            method: 'get',
+            url: '/workflow/process/graph',
+            params
+        }, `Workflow graph for "${name}" retrieved`, true);
     }
 
     async getContentTypesConfig() {
@@ -458,7 +447,7 @@ module.exports = {
     createBasefolder: (options) => defaultClient.createBasefolder(options),
     getNextSteps: (familyRef) => defaultClient.getNextSteps(familyRef),
     nextStepAssignment: (familyRef, options) => defaultClient.nextStepAssignment(familyRef, options),
-    getWorkflowDefinitions: () => defaultClient.getWorkflowDefinitions(),
+    getWorkflowGraph: (name, version) => defaultClient.getWorkflowGraph(name, version),
     getContentTypesConfig: () => defaultClient.getContentTypesConfig(),
     promoteNode: (familyRef, params) => defaultClient.promoteNode(familyRef, params),
     promoteNodeEverywhere: (familyRef, params) => defaultClient.promoteNodeEverywhere(familyRef, params),
