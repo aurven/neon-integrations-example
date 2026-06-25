@@ -237,6 +237,7 @@ export default function NeonGridWidget() {
               enableBrowserTooltips={true}
               pagination={true}
               paginationPageSize={25}
+              paginationPageSizeSelector={[25, 100, 200]}
               onCellValueChanged={handleCellValueChanged}
               onRowClicked={handleRowClicked}
               rowClassRules={{ 'ag-row-new': params => !!params.data?.isNew }}
