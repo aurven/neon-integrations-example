@@ -19,15 +19,16 @@
     "image": "Image",
     "video": "Video",
     "mic": "Mic",
-    "globe": "Globe",
-    "trophy": "Trophy",
-    "rocket": "Rocket",
+    "zap": "Zap",
+    "rss": "Rss",
+    "monitor": "Monitor",
     "copy": "Copy",
     "move": "ArrowRight",
     "send": "Send"
   },
   "typeIcons": {
     "article": "file",
+    "article/flash": "zap",
     "gallery": "image",
     "photo": "image",
     "video": "video",
@@ -40,26 +41,25 @@
   ],
   "rowColorRules": [
     {
-      "when": { "field": "lockInfos.USER", "op": "exists" },
-      "background": "#ebebeb",
-      "label": "locked"
+      "when": { "field": "type", "op": "eq", "value": "article/flash" },
+      "background": "#fef9c3",
+      "label": "flash"
     }
   ],
   "columns": [
     { "field": "status", "headerName": "Status", "type": "status", "width": 20, "sortable": true, "filter": true, "display": "dot" },
     { "field": "headline", "headerName": "Title", "type": "headline", "flex": 5, "minWidth": 260, "sortable": true, "filter": true },
-    { "field": "type", "headerName": "Type", "type": "typeIcon", "width": 90, "sortable": true, "filter": true, "iconOnly": false },
+    { "field": "type", "headerName": "Type", "type": "typeIcon", "width": 100, "sortable": true, "filter": true, "iconOnly": false },
     { "field": "versionInfo.createFamilyTime", "headerName": "Created", "type": "dateUser", "width": 160, "sortable": true,
       "userField": "versionInfo.createFamilyUserRef.userId", "userAliasField": "versionInfo.createFamilyUserRef.alias" },
     { "field": "lockInfos.USER.locked", "headerName": "Locked", "type": "dateUser", "width": 160, "sortable": false,
       "userField": "lockInfos.USER.userUpdateRef.userId", "userAliasField": "lockInfos.USER.userUpdateRef.userName" },
     { "field": "versionInfo.updateVersionTime", "headerName": "Updated", "type": "dateUser", "width": 160, "sortable": true,
       "userField": "versionInfo.updateVersionUserRef.userId", "userAliasField": "versionInfo.updateVersionUserRef.alias" },
-    { "field": "publishInfos", "headerName": "Publication", "type": "publication", "width": 110,
+    { "field": "publishInfos", "headerName": "Publication", "type": "publication", "width": 80,
       "publications": [
-        { "id": "TheGlobe", "icon": "globe", "label": "The Globe" },
-        { "id": "SportsArena", "icon": "trophy", "label": "Sports Arena" },
-        { "id": "NextFrontier", "icon": "rocket", "label": "Next Frontier" }
+        { "id": "Wire", "icon": "rss", "label": "Wire" },
+        { "id": "Web", "icon": "monitor", "label": "Web" }
       ]
     },
     { "field": "actions", "headerName": "", "type": "actions", "width": 90 }

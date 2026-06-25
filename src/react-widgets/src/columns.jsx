@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { FileText, Image, Video, Mic, MoreHorizontal, ChevronRight, ArrowLeft } from 'lucide-react';
+import { FileText, Image, Video, Mic, Copy, ArrowRight, Send, Zap, Globe, Trophy, Rocket, Rss, Monitor, MoreHorizontal, ChevronRight, ArrowLeft } from 'lucide-react';
 import { duplicateArticle } from './api.js';
 
 function getWorkfolders() {
@@ -41,19 +41,23 @@ function StatusCellRenderer({ value, data, colDef }) {
   const bg = data?.statusColor ?? '#9ca3af';
   const label = value || 'Unknown';
   const display = colDef.cellRendererParams?.display;
+  const [tip, setTip] = useState(null);
 
   if (display === 'dot') {
     return (
       <span
         role="img"
         aria-label={label}
-        title={label}
         tabIndex={0}
+        onMouseEnter={e => { const r = e.currentTarget.getBoundingClientRect(); setTip({ top: r.top, left: r.left + r.width / 2 }); }}
+        onMouseLeave={() => setTip(null)}
         style={{
           display: 'inline-block', width: '12px', height: '12px',
           borderRadius: '9999px', background: bg, cursor: 'default',
         }}
-      />
+      >
+        <BalloonTooltip visible={!!tip} top={tip?.top} left={tip?.left}>{label}</BalloonTooltip>
+      </span>
     );
   }
 
@@ -120,16 +124,18 @@ function BadgeCellRenderer({ value, colDef }) {
   );
 }
 
-// Registry of Lucide icon components available to the widget. The type→icon
-// mapping itself lives in the widget config (conf/widgets/neon-grid/*.json) as
-// value→name strings; this registry resolves those names to components.
-const LUCIDE_ICONS = { FileText, Image, Video, Mic, MoreHorizontal, ChevronRight, ArrowLeft };
+// Registry of Lucide icon components available to the widget.
+// The icons registry in conf (id → lucide name) resolves into this map.
+const LUCIDE_ICONS = { FileText, Image, Video, Mic, Copy, ArrowRight, Send, Zap, Globe, Trophy, Rocket, Rss, Monitor, MoreHorizontal, ChevronRight, ArrowLeft };
 
-function TypeIconRenderer({ value, colDef }) {
-  const iconMap = colDef.cellRendererParams?.iconMap || {};
+function TypeIconRenderer({ value, colDef, context }) {
+  const icons = context?.icons || {};
+  const typeIcons = context?.typeIcons || {};
   const iconOnly = colDef.cellRendererParams?.iconOnly;
+  const [tip, setTip] = useState(null);
   if (!value) return <span style={{ color: '#9ca3af' }}>—</span>;
-  const iconName = iconMap[value?.toLowerCase()];
+  const iconId = typeIcons[value?.toLowerCase()];
+  const iconName = iconId ? icons[iconId] : null;
   const Icon = iconName ? LUCIDE_ICONS[iconName] : null;
 
   if (iconOnly) {
@@ -137,11 +143,13 @@ function TypeIconRenderer({ value, colDef }) {
       <span
         role="img"
         aria-label={value}
-        title={value}
         tabIndex={0}
+        onMouseEnter={e => { const r = e.currentTarget.getBoundingClientRect(); setTip({ top: r.top, left: r.left + r.width / 2 }); }}
+        onMouseLeave={() => setTip(null)}
         style={{ display: 'inline-flex', alignItems: 'center', color: '#69667f', cursor: 'default' }}
       >
         {Icon ? <Icon size={16} strokeWidth={2} /> : value}
+        <BalloonTooltip visible={!!tip} top={tip?.top} left={tip?.left}>{value}</BalloonTooltip>
       </span>
     );
   }
@@ -188,41 +196,6 @@ function DateUserRenderer({ value, colDef, context, data }) {
     </div>
   );
 }
-
-const CopyIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="9" y="9" width="13" height="13" rx="2" />
-    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-  </svg>
-);
-
-const MoveIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="5 9 2 12 5 15" />
-    <polyline points="9 5 12 2 15 5" />
-    <polyline points="15 19 12 22 9 19" />
-    <polyline points="19 9 22 12 19 15" />
-    <line x1="2" y1="12" x2="22" y2="12" />
-    <line x1="12" y1="2" x2="12" y2="22" />
-  </svg>
-);
-
-const SendIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="22" y1="2" x2="11" y2="13" />
-    <polygon points="22 2 15 22 11 13 2 9 22 2" />
-  </svg>
-);
-
-const MoreIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-    <circle cx="5" cy="12" r="2" />
-    <circle cx="12" cy="12" r="2" />
-    <circle cx="19" cy="12" r="2" />
-  </svg>
-);
-
-const ACTION_ICONS = { copy: CopyIcon, move: MoveIcon, send: SendIcon };
 
 function WorkspacePicker({ data, onAction, onBack, onClose }) {
   const workfolders = getWorkfolders();
@@ -281,13 +254,14 @@ function WorkspacePicker({ data, onAction, onBack, onClose }) {
   );
 }
 
-function ActionsCellRenderer({ data, colDef }) {
+function ActionsCellRenderer({ data, colDef, context }) {
   const [open, setOpen] = useState(false);
   const [menuPos, setMenuPos] = useState({ top: 0, right: 0 });
   const [subPanel, setSubPanel] = useState(null); // null | 'workspacePicker'
   const buttonRef = useRef(null);
   const menuRef = useRef(null);
-  const actions = colDef.cellRendererParams?.actions || [];
+  const actions = context?.gridActions || [];
+  const icons = context?.icons || {};
   const onAction = colDef.cellRendererParams?.onAction || (() => {});
 
   const closeMenu = () => { setOpen(false); setSubPanel(null); };
@@ -321,7 +295,7 @@ function ActionsCellRenderer({ data, colDef }) {
 
   if (actions.length === 1) {
     const action = actions[0];
-    const Icon = ACTION_ICONS[action.icon] || MoreIcon;
+    const Icon = LUCIDE_ICONS[icons[action.icon]] || MoreHorizontal;
     return (
       <button
         className="neon-actions-cell"
@@ -334,7 +308,7 @@ function ActionsCellRenderer({ data, colDef }) {
           background: 'none', cursor: 'pointer', color: '#3f3c4e',
         }}
       >
-        <Icon />
+        <Icon size={14} strokeWidth={2} />
       </button>
     );
   }
@@ -365,7 +339,7 @@ function ActionsCellRenderer({ data, colDef }) {
           background: open ? '#f6f3f6' : 'none', cursor: 'pointer', color: '#3f3c4e',
         }}
       >
-        <MoreIcon />
+        <MoreHorizontal size={14} strokeWidth={2} />
       </button>
       {open && createPortal(
         <div ref={menuRef} style={{
@@ -383,7 +357,7 @@ function ActionsCellRenderer({ data, colDef }) {
             />
           ) : (
             actions.map(action => {
-              const Icon = ACTION_ICONS[action.icon] || MoreIcon;
+              const Icon = LUCIDE_ICONS[icons[action.icon]] || MoreHorizontal;
               const isMoveToWs = action.actionType === 'moveToWorkspace';
               return (
                 <button
@@ -402,7 +376,7 @@ function ActionsCellRenderer({ data, colDef }) {
                   }}
                 >
                   <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Icon />
+                    <Icon size={14} strokeWidth={2} />
                     {action.label}
                   </span>
                   {isMoveToWs && <ChevronRight size={12} style={{ color: '#9d9aac' }} />}
@@ -414,6 +388,95 @@ function ActionsCellRenderer({ data, colDef }) {
         document.body
       )}
     </span>
+  );
+}
+
+function BalloonTooltip({ visible, top, left, children }) {
+  if (!visible) return null;
+  return createPortal(
+    <div style={{
+      position: 'fixed', top, left,
+      transform: 'translate(-50%, calc(-100% - 8px))',
+      background: '#3f3c4e', color: '#fff', borderRadius: '8px',
+      padding: '7px 10px', fontSize: '11px', zIndex: 9999,
+      pointerEvents: 'none', whiteSpace: 'nowrap',
+      boxShadow: '0 4px 16px rgba(63,60,78,.28)', lineHeight: 1.5,
+    }}>
+      {children}
+      <div style={{
+        position: 'absolute', bottom: -5, left: '50%', transform: 'translateX(-50%)',
+        width: 0, height: 0,
+        borderLeft: '5px solid transparent', borderRight: '5px solid transparent',
+        borderTop: '5px solid #3f3c4e',
+      }} />
+    </div>,
+    document.body
+  );
+}
+
+function PublicationIcon({ pub, pubData, iconComponent: Icon }) {
+  const [tip, setTip] = useState(null);
+  const isPublished = !!pubData;
+
+  const dateStr = pubData?.liveFirstPublicationDate
+    ? new Date(pubData.liveFirstPublicationDate).toLocaleString(undefined, {
+        day: '2-digit', month: 'short', year: 'numeric',
+        hour: '2-digit', minute: '2-digit',
+      })
+    : null;
+  const userAlias = pubData?.liveUserRef?.alias || pubData?.liveUserRef?.userId || null;
+
+  return (
+    <span
+      onMouseEnter={e => {
+        const r = e.currentTarget.getBoundingClientRect();
+        setTip({ top: r.top, left: r.left + r.width / 2 });
+      }}
+      onMouseLeave={() => setTip(null)}
+      style={{ display: 'inline-flex', alignItems: 'center', cursor: 'default' }}
+    >
+      <Icon
+        size={15}
+        strokeWidth={isPublished ? 2 : 1.5}
+        style={{ color: isPublished ? '#2563eb' : '#d1d0d8' }}
+      />
+      <BalloonTooltip visible={!!tip} top={tip?.top} left={tip?.left}>
+        <div style={{ fontWeight: 700, marginBottom: '2px' }}>{pub.label || pub.id}</div>
+        {isPublished ? (
+          <>
+            {dateStr && <div style={{ color: '#c4c1d4' }}>{dateStr}</div>}
+            {userAlias && <div style={{ color: '#a5b4fc' }}>{userAlias}</div>}
+          </>
+        ) : (
+          <div style={{ color: '#9d9aac' }}>Not published</div>
+        )}
+      </BalloonTooltip>
+    </span>
+  );
+}
+
+function PublicationCellRenderer({ data, colDef, context }) {
+  const publications = colDef.cellRendererParams?.publications || [];
+  const icons = context?.icons || {};
+  const publishInfos = data?.publishInfos || {};
+
+  if (!publications.length) return null;
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', height: '100%' }}>
+      {publications.map(pub => {
+        const Icon = LUCIDE_ICONS[icons[pub.icon]];
+        if (!Icon) return null;
+        return (
+          <PublicationIcon
+            key={pub.id}
+            pub={pub}
+            pubData={publishInfos[pub.id] ?? null}
+            iconComponent={Icon}
+          />
+        );
+      })}
+    </div>
   );
 }
 
@@ -438,7 +501,6 @@ export function buildColumnDefs(columns = [], { onAction } = {}) {
           ...base,
           cellRenderer: StatusCellRenderer,
           cellRendererParams: { display: col.display },
-          ...(col.display === 'dot' ? { tooltipValueGetter: p => p.value || 'Unknown' } : {}),
         };
       case 'date':
         return { ...base, valueFormatter: col.dateFormat === 'ddmmyyyy' ? formatIssueDate : formatDate, cellEditor: col.editable ? 'agDateStringCellEditor' : undefined };
@@ -450,8 +512,7 @@ export function buildColumnDefs(columns = [], { onAction } = {}) {
         return {
           ...base,
           cellRenderer: TypeIconRenderer,
-          cellRendererParams: { iconMap: col.iconMap || {}, iconOnly: !!col.iconOnly },
-          ...(col.iconOnly ? { tooltipValueGetter: p => p.value } : {}),
+          cellRendererParams: { iconOnly: !!col.iconOnly },
         };
       case 'select':
         return {
@@ -468,8 +529,10 @@ export function buildColumnDefs(columns = [], { onAction } = {}) {
           cellRenderer: DateUserRenderer,
           cellRendererParams: { userField: col.userField, userAliasField: col.userAliasField },
         };
+      case 'publication':
+        return { ...base, cellRenderer: PublicationCellRenderer, cellRendererParams: { publications: col.publications || [] } };
       case 'actions':
-        return { ...base, cellRenderer: ActionsCellRenderer, cellRendererParams: { actions: col.actions || [], onAction } };
+        return { ...base, cellRenderer: ActionsCellRenderer, cellRendererParams: { onAction } };
       default:
         return { ...base, valueFormatter: (p) => p.value ?? '—' };
     }

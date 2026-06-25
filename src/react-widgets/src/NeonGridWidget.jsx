@@ -1,6 +1,7 @@
 import { useState, useCallback, useMemo, useRef } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import { buildColumnDefs, defaultColDef } from './columns.jsx';
+import { evaluateRowRules } from './row-rules.js';
 import { fetchArticles, updateMetadata } from './api.js';
 import { buildMetadataChangeFromXpath } from './metadata.js';
 import { usePollingSearchDelta } from './usePollingSearchDelta.js';
@@ -124,6 +125,10 @@ export default function NeonGridWidget() {
     });
   }, [gridConfig]);
 
+  const getRowStyle = useCallback((params) => {
+    return evaluateRowRules(gridConfig.rowColorRules, params.data);
+  }, [gridConfig.rowColorRules]);
+
   const handleRowClicked = useCallback((params) => {
     // AG-Grid fires row click via a native listener on the row, so a cell
     // renderer's React stopPropagation can't suppress it. Bail when the click
@@ -233,11 +238,12 @@ export default function NeonGridWidget() {
               columnDefs={columnDefs}
               defaultColDef={defaultColDef}
               getRowId={params => params.data.id}
-              context={{ userCache }}
+              context={{ userCache, icons: gridConfig.icons || {}, typeIcons: gridConfig.typeIcons || {}, gridActions: gridConfig.actions || [] }}
               enableBrowserTooltips={true}
               pagination={true}
               paginationPageSize={25}
               paginationPageSizeSelector={[25, 100, 200]}
+              getRowStyle={getRowStyle}
               onCellValueChanged={handleCellValueChanged}
               onRowClicked={handleRowClicked}
               rowClassRules={{ 'ag-row-new': params => !!params.data?.isNew }}
