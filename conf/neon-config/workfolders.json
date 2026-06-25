@@ -1,9 +1,18 @@
 {
   "workfolders": [
-    { "path": "/Convergent", "label": "Convergent", "isWorkspace": true },
-    { "path": "/Convergent/News", "label": "News", "workspace": "Convergent" },
-    { "path": "/Convergent/Sports", "label": "Sports", "workspace": "Convergent" },
-    { "path": "/Science", "label": "Science", "isWorkspace": true },
-    { "path": "/Science/Space", "label": "Space", "workspace": "Science" }
+    { "path": "/Wire",           "label": "Wire",     "isWorkspace": true },
+    { "path": "/Wire/Morning",   "label": "Morning",  "workspace": "Wire" },
+    { "path": "/Wire/Cronaca",   "label": "Cronaca",  "workspace": "Wire" },
+    { "path": "/Wire/Cultura",   "label": "Cultura",  "workspace": "Wire" },
+    { "path": "/Wire/Esteri",    "label": "Esteri",   "workspace": "Wire" },
+    { "path": "/Wire/Salute",    "label": "Salute",   "workspace": "Wire" },
+    { "path": "/Wire/Politica",  "label": "Politica", "workspace": "Wire" },
+    { "path": "/Wire/Economia",  "label": "Economia", "workspace": "Wire" },
+    { "path": "/Wire/Servizi",   "label": "Servizi",  "workspace": "Wire" },
+    { "path": "/Web",            "label": "Web",      "isWorkspace": true },
+    { "path": "/Web/Multimedia", "label": "Multimedia","workspace": "Web" },
+    { "path": "/Web/Prometeo",   "label": "Prometeo", "workspace": "Web" },
+    { "path": "/Web/Speciali",   "label": "Speciali", "workspace": "Web" },
+    { "path": "/Web/Sport",      "label": "Sport",    "workspace": "Web" }
   ]
 }

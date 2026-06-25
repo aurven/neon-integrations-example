@@ -18,6 +18,11 @@ function evalCondition(condition, row) {
   }
 }
 
+export function matchesCondition(condition, row) {
+  if (!condition || !row) return true;
+  return evalCondition(condition, row);
+}
+
 export function evaluateRowRules(rules, row) {
   if (!rules?.length || !row) return {};
   for (const rule of rules) {

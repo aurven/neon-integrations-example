@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { FileText, Image, Video, Mic, Copy, ArrowRight, Send, Zap, Globe, Trophy, Rocket, Rss, Monitor, MoreHorizontal, ChevronRight, ArrowLeft } from 'lucide-react';
 import { duplicateArticle } from './api.js';
+import { matchesCondition } from './row-rules.js';
 
 function getWorkfolders() {
   return window.CONFIG?.gridConfig?.workfolders || [];
@@ -197,8 +198,14 @@ function DateUserRenderer({ value, colDef, context, data }) {
   );
 }
 
-function WorkspacePicker({ data, onAction, onBack, onClose }) {
-  const workfolders = getWorkfolders();
+function WorkspacePicker({ data, onAction, onBack, onClose, workspaceFilter, title }) {
+  const allWorkfolders = getWorkfolders();
+  const workfolders = workspaceFilter
+    ? allWorkfolders.filter(wf =>
+        wf.workspace === workspaceFilter ||
+        (wf.isWorkspace && wf.label === workspaceFilter)
+      )
+    : allWorkfolders;
   const [error, setError] = useState(null);
   const [duplicating, setDuplicating] = useState(null);
 
@@ -224,7 +231,7 @@ function WorkspacePicker({ data, onAction, onBack, onClose }) {
         >
           <ArrowLeft size={13} />
         </button>
-        <span style={{ fontSize: '11px', fontWeight: 700, color: '#3f3c4e', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Select workspace</span>
+        <span style={{ fontSize: '11px', fontWeight: 700, color: '#3f3c4e', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{title || 'Select workspace'}</span>
       </div>
       <div style={{ maxHeight: '220px', overflowY: 'auto' }}>
         {error && (
@@ -257,10 +264,12 @@ function WorkspacePicker({ data, onAction, onBack, onClose }) {
 function ActionsCellRenderer({ data, colDef, context }) {
   const [open, setOpen] = useState(false);
   const [menuPos, setMenuPos] = useState({ top: 0, right: 0 });
-  const [subPanel, setSubPanel] = useState(null); // null | 'workspacePicker'
+  const [subPanel, setSubPanel] = useState(null); // null | { type: 'workspacePicker', workspaceFilter, label }
+  const [btnTip, setBtnTip] = useState(null);
   const buttonRef = useRef(null);
   const menuRef = useRef(null);
-  const actions = context?.gridActions || [];
+  const allActions = context?.gridActions || [];
+  const actions = allActions.filter(a => matchesCondition(a.showWhen, data));
   const icons = context?.icons || {};
   const onAction = colDef.cellRendererParams?.onAction || (() => {});
 
@@ -293,23 +302,27 @@ function ActionsCellRenderer({ data, colDef, context }) {
 
   if (actions.length === 0) return null;
 
-  if (actions.length === 1) {
+  if (actions.length === 1 && actions[0].actionType !== 'moveToWorkspace') {
     const action = actions[0];
     const Icon = LUCIDE_ICONS[icons[action.icon]] || MoreHorizontal;
     return (
-      <button
-        className="neon-actions-cell"
-        onMouseDown={e => e.stopPropagation()}
-        onClick={e => { e.stopPropagation(); onAction(action.id, data); }}
-        title={action.label}
-        style={{
-          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-          width: '28px', height: '28px', border: '1px solid #dddce5', borderRadius: '8px',
-          background: 'none', cursor: 'pointer', color: '#3f3c4e',
-        }}
-      >
-        <Icon size={14} strokeWidth={2} />
-      </button>
+      <span style={{ display: 'inline-flex', verticalAlign: 'middle' }}>
+        <button
+          className="neon-actions-cell"
+          onMouseDown={e => e.stopPropagation()}
+          onClick={e => { e.stopPropagation(); onAction(action.id, data); }}
+          onMouseEnter={e => { const r = e.currentTarget.getBoundingClientRect(); setBtnTip({ top: r.top, left: r.left + r.width / 2 }); }}
+          onMouseLeave={() => setBtnTip(null)}
+          style={{
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            width: '28px', height: '28px', border: '1px solid #dddce5', borderRadius: '8px',
+            background: 'none', cursor: 'pointer', color: '#3f3c4e',
+          }}
+        >
+          <Icon size={14} strokeWidth={2} />
+          <BalloonTooltip visible={!!btnTip} top={btnTip?.top} left={btnTip?.left}>{action.label}</BalloonTooltip>
+        </button>
+      </span>
     );
   }
 
@@ -324,15 +337,16 @@ function ActionsCellRenderer({ data, colDef, context }) {
     setOpen(o => !o);
   };
 
-  const menuWidth = subPanel === 'workspacePicker' ? '220px' : '150px';
+  const menuWidth = subPanel?.type === 'workspacePicker' ? '220px' : '150px';
 
   return (
-    <span className="neon-actions-cell" style={{ display: 'inline-flex' }}>
+    <span className="neon-actions-cell" style={{ display: 'inline-flex', verticalAlign: 'middle' }}>
       <button
         ref={buttonRef}
         onMouseDown={e => e.stopPropagation()}
         onClick={handleToggle}
-        title="Actions"
+        onMouseEnter={e => { const r = e.currentTarget.getBoundingClientRect(); setBtnTip({ top: r.top, left: r.left + r.width / 2 }); }}
+        onMouseLeave={() => setBtnTip(null)}
         style={{
           display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
           width: '28px', height: '28px', border: '1px solid #dddce5', borderRadius: '8px',
@@ -340,6 +354,7 @@ function ActionsCellRenderer({ data, colDef, context }) {
         }}
       >
         <MoreHorizontal size={14} strokeWidth={2} />
+        <BalloonTooltip visible={!!btnTip && !open} top={btnTip?.top} left={btnTip?.left}>Actions</BalloonTooltip>
       </button>
       {open && createPortal(
         <div ref={menuRef} style={{
@@ -348,12 +363,14 @@ function ActionsCellRenderer({ data, colDef, context }) {
           boxShadow: '0 8px 24px rgba(63,60,78,.18)', padding: '4px', width: menuWidth,
           transition: 'width 120ms ease',
         }}>
-          {subPanel === 'workspacePicker' ? (
+          {subPanel?.type === 'workspacePicker' ? (
             <WorkspacePicker
               data={data}
               onAction={onAction}
               onBack={() => setSubPanel(null)}
               onClose={closeMenu}
+              workspaceFilter={subPanel.workspaceFilter}
+              title={subPanel.label}
             />
           ) : (
             actions.map(action => {
@@ -364,7 +381,7 @@ function ActionsCellRenderer({ data, colDef, context }) {
                   key={action.id}
                   onClick={e => {
                     e.stopPropagation();
-                    if (isMoveToWs) { setSubPanel('workspacePicker'); }
+                    if (isMoveToWs) { setSubPanel({ type: 'workspacePicker', workspaceFilter: action.workspaceFilter || null, label: action.label }); }
                     else { onAction(action.id, data); closeMenu(); }
                   }}
                   style={{
@@ -436,8 +453,8 @@ function PublicationIcon({ pub, pubData, iconComponent: Icon }) {
       style={{ display: 'inline-flex', alignItems: 'center', cursor: 'default' }}
     >
       <Icon
-        size={15}
-        strokeWidth={isPublished ? 2 : 1.5}
+        size={16}
+        strokeWidth={2}
         style={{ color: isPublished ? '#2563eb' : '#d1d0d8' }}
       />
       <BalloonTooltip visible={!!tip} top={tip?.top} left={tip?.left}>
@@ -463,7 +480,7 @@ function PublicationCellRenderer({ data, colDef, context }) {
   if (!publications.length) return null;
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', height: '100%' }}>
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
       {publications.map(pub => {
         const Icon = LUCIDE_ICONS[icons[pub.icon]];
         if (!Icon) return null;
@@ -476,7 +493,7 @@ function PublicationCellRenderer({ data, colDef, context }) {
           />
         );
       })}
-    </div>
+    </span>
   );
 }
 

@@ -1,6 +1,6 @@
 {
   "title": "Articles Grid",
-  "demoData": "search-results.json",
+  "demoData": "adn-search-results.json",
   "pollIntervalMs": 20000,
   "workfolderTypes": ["article","wirestory","wirestory/extcontributions","wirestory/afpwirestory","article/take","article/longform","article/poll","hero"],
   "fields": [
@@ -12,7 +12,8 @@
     { "key": "statusColor", "derived": "statusColor" },
     { "key": "versionInfo", "source": "versionInfo" },
     { "key": "lockInfos", "source": "lockInfos" },
-    { "key": "publishInfos", "source": "publishInfos" }
+    { "key": "publishInfos", "source": "publishInfos" },
+    { "key": "workFolder", "source": "metadataGroups.eom.sys_attributes_json.workFolder" }
   ],
   "icons": {
     "file": "FileText",
@@ -35,9 +36,8 @@
     "audio": "mic"
   },
   "actions": [
-    { "id": "copy", "label": "Copy", "icon": "copy" },
-    { "id": "move", "label": "Move to...", "icon": "move", "actionType": "moveToWorkspace" },
-    { "id": "send", "label": "Send", "icon": "send" }
+    { "id": "copy-wire", "label": "Copia in Wire", "icon": "rss",     "actionType": "moveToWorkspace", "workspaceFilter": "Wire", "showWhen": { "field": "workFolder", "op": "contains", "value": "/Web" } },
+    { "id": "copy-web",  "label": "Copia in Web",  "icon": "monitor", "actionType": "moveToWorkspace", "workspaceFilter": "Web",  "showWhen": { "field": "workFolder", "op": "contains", "value": "/Wire" } }
   ],
   "rowColorRules": [
     {
@@ -47,16 +47,16 @@
     }
   ],
   "columns": [
-    { "field": "status", "headerName": "Status", "type": "status", "width": 20, "sortable": true, "filter": true, "display": "dot" },
-    { "field": "headline", "headerName": "Title", "type": "headline", "flex": 5, "minWidth": 260, "sortable": true, "filter": true },
-    { "field": "type", "headerName": "Type", "type": "typeIcon", "width": 100, "sortable": true, "filter": true, "iconOnly": false },
-    { "field": "versionInfo.createFamilyTime", "headerName": "Created", "type": "dateUser", "width": 160, "sortable": true,
+    { "field": "status", "headerName": "Stato", "type": "status", "width": 20, "sortable": true, "filter": true, "display": "dot" },
+    { "field": "headline", "headerName": "Titolo e Sommario", "type": "headline", "flex": 5, "minWidth": 260, "sortable": true, "filter": true },
+    { "field": "type", "headerName": "Tipo", "type": "typeIcon", "width": 100, "sortable": true, "filter": true, "iconOnly": false },
+    { "field": "versionInfo.createFamilyTime", "headerName": "Creato", "type": "dateUser", "width": 160, "sortable": true,
       "userField": "versionInfo.createFamilyUserRef.userId", "userAliasField": "versionInfo.createFamilyUserRef.alias" },
-    { "field": "lockInfos.USER.locked", "headerName": "Locked", "type": "dateUser", "width": 160, "sortable": false,
+    { "field": "lockInfos.USER.locked", "headerName": "Bloccato", "type": "dateUser", "width": 160, "sortable": false,
       "userField": "lockInfos.USER.userUpdateRef.userId", "userAliasField": "lockInfos.USER.userUpdateRef.userName" },
-    { "field": "versionInfo.updateVersionTime", "headerName": "Updated", "type": "dateUser", "width": 160, "sortable": true,
+    { "field": "versionInfo.updateVersionTime", "headerName": "Ultima Modifica", "type": "dateUser", "width": 160, "sortable": true,
       "userField": "versionInfo.updateVersionUserRef.userId", "userAliasField": "versionInfo.updateVersionUserRef.alias" },
-    { "field": "publishInfos", "headerName": "Publication", "type": "publication", "width": 80,
+    { "field": "publishInfos", "headerName": "Pubblicato", "type": "publication", "width": 80,
       "publications": [
         { "id": "Wire", "icon": "rss", "label": "Wire" },
         { "id": "Web", "icon": "monitor", "label": "Web" }
