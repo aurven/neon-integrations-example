@@ -17,7 +17,7 @@ async function neonEventsSubscribeHandler(request, reply) {
 
   const { subscriptions = [], startingPoint } = request.body || {};
   const requestBody = { subscriptions };
-  if (startingPoint) requestBody.startingPoint = startingPoint;
+  if (startingPoint !== undefined && startingPoint !== null) requestBody.startingPoint = startingPoint;
 
   reply.hijack();
   const rawReply = reply.raw;
@@ -47,7 +47,6 @@ async function neonEventsSubscribeHandler(request, reply) {
 
     neonStream = response.data;
     neonStream.pipe(rawReply);
-    neonStream.on('end', () => rawReply.end());
     neonStream.on('error', (err) => {
       console.error('[neon-events] Neon stream error:', err.message);
       rawReply.end();
@@ -58,7 +57,7 @@ async function neonEventsSubscribeHandler(request, reply) {
     if (!rawReply.headersSent) {
       rawReply.writeHead(502, { 'Content-Type': 'application/json' });
     }
-    rawReply.end(JSON.stringify({ error: 'Failed to connect to Neon events stream' }));
+    try { rawReply.end(JSON.stringify({ error: 'Failed to connect to Neon events stream' })); } catch {}
   }
 }
 
