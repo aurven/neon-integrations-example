@@ -461,7 +461,7 @@ async function neonGridDataHandler(request, reply) {
       status: node.versionInfo?.workflowInfo?.workflow || 'Unknown',
       statusColor: node.versionInfo?.workflowInfo?.color || null,
     };
-    const row = { id: node.familyRef };
+    const row = { id: node.familyRef, typeName: node.typeName ?? null };
     for (const f of gridConfig.fields) {
       row[f.key] = f.derived ? (derivedMap[f.derived] ?? null) : (getByPath(node, f.source) ?? null);
     }

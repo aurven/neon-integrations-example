@@ -71,7 +71,7 @@
   ],
   "rowColorRules": [
     {
-      "when": { "field": "type", "op": "eq", "value": "article/flash" },
+      "when": { "field": "typeName", "op": "eq", "value": "article/flash" },
       "background": "#fef9c3",
       "label": "flash"
     }

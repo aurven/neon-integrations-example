@@ -167,13 +167,13 @@ function BadgeCellRenderer({ value, colDef }) {
 // The icons registry in conf (id → lucide name) resolves into this map.
 const LUCIDE_ICONS = { FileText, Image, Video, Mic, Copy, ArrowRight, Send, Zap, Globe, Trophy, Rocket, Rss, Monitor, MoreHorizontal, ChevronRight, ArrowLeft, Lock, Pencil, Eye };
 
-function TypeIconRenderer({ value, colDef, context }) {
+function TypeIconRenderer({ value, colDef, context, data }) {
   const icons = context?.icons || {};
   const typeIcons = context?.typeIcons || {};
   const iconOnly = colDef.cellRendererParams?.iconOnly;
   const [tip, setTip] = useState(null);
   if (!value) return <span style={{ color: '#9ca3af' }}>—</span>;
-  const iconId = typeIcons[value?.toLowerCase()];
+  const iconId = typeIcons[data?.typeName?.toLowerCase()] ?? typeIcons[value?.toLowerCase()];
   const iconName = iconId ? icons[iconId] : null;
   const Icon = iconName ? LUCIDE_ICONS[iconName] : null;
 
