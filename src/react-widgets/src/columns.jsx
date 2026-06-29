@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { FileText, Image, Video, Mic, Copy, ArrowRight, Send, Zap, Globe, Trophy, Rocket, Rss, Monitor, MoreHorizontal, ChevronRight, ArrowLeft } from 'lucide-react';
+import { FileText, Image, Video, Mic, Copy, ArrowRight, Send, Zap, Globe, Trophy, Rocket, Rss, Monitor, MoreHorizontal, ChevronRight, ArrowLeft, Lock } from 'lucide-react';
 import { duplicateArticle } from './api.js';
 import { matchesCondition } from './row-rules.js';
 
@@ -161,7 +161,7 @@ function BadgeCellRenderer({ value, colDef }) {
 
 // Registry of Lucide icon components available to the widget.
 // The icons registry in conf (id → lucide name) resolves into this map.
-const LUCIDE_ICONS = { FileText, Image, Video, Mic, Copy, ArrowRight, Send, Zap, Globe, Trophy, Rocket, Rss, Monitor, MoreHorizontal, ChevronRight, ArrowLeft };
+const LUCIDE_ICONS = { FileText, Image, Video, Mic, Copy, ArrowRight, Send, Zap, Globe, Trophy, Rocket, Rss, Monitor, MoreHorizontal, ChevronRight, ArrowLeft, Lock };
 
 function TypeIconRenderer({ value, colDef, context }) {
   const icons = context?.icons || {};
@@ -208,7 +208,8 @@ function getNestedValue(obj, path) {
 
 function DateUserRenderer({ value, colDef, context, data }) {
   const userCache = context?.userCache ?? {};
-  const { userField, userAliasField, locale, dateFormatOptions } = colDef.cellRendererParams ?? {};
+  const { userField, userAliasField, locale, dateFormatOptions, display } = colDef.cellRendererParams ?? {};
+  const [tip, setTip] = useState(null);
 
   if (!value) return <span style={{ color: '#9ca3af' }}>—</span>;
 
@@ -221,6 +222,22 @@ function DateUserRenderer({ value, colDef, context, data }) {
   const userId = getNestedValue(data, userField);
   const userAlias = getNestedValue(data, userAliasField);
   const userName = userId ? (userCache[userId] || userAlias || userId) : (userAlias || null);
+
+  if (display === 'icon') {
+    return (
+      <span
+        onMouseEnter={e => { const r = e.currentTarget.getBoundingClientRect(); setTip({ top: r.top, left: r.left + r.width / 2 }); }}
+        onMouseLeave={() => setTip(null)}
+        style={{ display: 'inline-flex', alignItems: 'center', cursor: 'default', color: '#69667f' }}
+      >
+        <Lock size={15} strokeWidth={2} />
+        <BalloonTooltip visible={!!tip} top={tip?.top} left={tip?.left}>
+          <div style={{ fontWeight: 700, marginBottom: '2px' }}>{dateStr}</div>
+          {userName && <div style={{ color: '#a5b4fc' }}>{userName}</div>}
+        </BalloonTooltip>
+      </span>
+    );
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '100%', gap: '1px' }}>
@@ -637,13 +654,14 @@ export function buildColumnDefs(columns = [], { onAction } = {}) {
       case 'dateUser':
         return {
           ...base,
-          autoHeight: true,
+          autoHeight: col.display !== 'icon',
           cellRenderer: DateUserRenderer,
           cellRendererParams: {
             userField: col.userField,
             userAliasField: col.userAliasField,
             locale: col.locale,
             dateFormatOptions: col.dateFormatOptions,
+            display: col.display,
           },
         };
       case 'publication':
