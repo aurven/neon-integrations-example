@@ -5,6 +5,7 @@ import { evaluateRowRules } from './row-rules.js';
 import { fetchArticles, updateMetadata } from './api.js';
 import { buildMetadataChangeFromXpath } from './metadata.js';
 import { usePollingSearchDelta } from './usePollingSearchDelta.js';
+import { useNeonNotifier } from './useNeonNotifier.js';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import './neon-grid.css';
@@ -29,6 +30,11 @@ function Toast({ toast }) {
 }
 
 const ACTION_LABELS = { copy: 'Copy', move: 'Move', send: 'Send' };
+
+const NOTIFIER_EVENTS = [
+  'lock', 'unlock', 'changeStatus', 'majorVersion', 'minorVersion',
+  'noLockUpdate', 'changeAssignment', 'publishLiveUpdateState'
+];
 
 export default function NeonGridWidget() {
   const gridConfig = window.CONFIG?.gridConfig ?? { columns: [] };
@@ -99,6 +105,15 @@ export default function NeonGridWidget() {
     idKey: 'id',
     intervalMs: gridConfig.pollIntervalMs ?? 20000,
     onDelta: handleDelta
+  });
+
+  const familyRefs = useMemo(() => rowData.map(r => r.id), [rowData]);
+
+  useNeonNotifier({
+    familyRefs,
+    events: NOTIFIER_EVENTS,
+    onEvent: useCallback(() => { reload(); }, [reload]),
+    enabled: !window.CONFIG?.demo
   });
 
   const handleRefresh = useCallback(() => {
