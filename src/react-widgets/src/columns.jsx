@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { FileText, Image, Video, Mic, Copy, ArrowRight, Send, Zap, Globe, Trophy, Rocket, Rss, Monitor, MoreHorizontal, ChevronRight, ArrowLeft, Lock } from 'lucide-react';
+import { FileText, Image, Video, Mic, Copy, ArrowRight, Send, Zap, Globe, Trophy, Rocket, Rss, Monitor, MoreHorizontal, ChevronRight, ArrowLeft, Lock, Pencil, Eye } from 'lucide-react';
 import { duplicateArticle } from './api.js';
 import { matchesCondition } from './row-rules.js';
 
@@ -152,7 +152,7 @@ function BadgeCellRenderer({ value, colDef }) {
 
 // Registry of Lucide icon components available to the widget.
 // The icons registry in conf (id → lucide name) resolves into this map.
-const LUCIDE_ICONS = { FileText, Image, Video, Mic, Copy, ArrowRight, Send, Zap, Globe, Trophy, Rocket, Rss, Monitor, MoreHorizontal, ChevronRight, ArrowLeft, Lock };
+const LUCIDE_ICONS = { FileText, Image, Video, Mic, Copy, ArrowRight, Send, Zap, Globe, Trophy, Rocket, Rss, Monitor, MoreHorizontal, ChevronRight, ArrowLeft, Lock, Pencil, Eye };
 
 function TypeIconRenderer({ value, colDef, context }) {
   const icons = context?.icons || {};
@@ -303,6 +303,40 @@ function WorkspacePicker({ data, onAction, onBack, onClose, workspaceFilter, tit
   );
 }
 
+function openNeonAction(action, data) {
+  const neonAppUrl = window.CONFIG?.neonAppUrl || '';
+  const id = data?.id;
+  const qs = action.readonly ? '?readonly=true' : '';
+  window.open(`${neonAppUrl}/neon/app/neon.html#open/${id}${qs}`);
+}
+
+function InlineActionButton({ action, data, icons, onAction }) {
+  const [tip, setTip] = useState(null);
+  const Icon = LUCIDE_ICONS[icons[action.icon]] || MoreHorizontal;
+  const handleClick = (e) => {
+    e.stopPropagation();
+    if (action.actionType === 'open') { openNeonAction(action, data); }
+    else { onAction(action.id, data); }
+  };
+  return (
+    <button
+      className="neon-actions-cell"
+      onMouseDown={e => e.stopPropagation()}
+      onClick={handleClick}
+      onMouseEnter={e => { const r = e.currentTarget.getBoundingClientRect(); setTip({ top: r.top, left: r.left + r.width / 2 }); }}
+      onMouseLeave={() => setTip(null)}
+      style={{
+        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+        width: '28px', height: '28px', border: '1px solid #dddce5', borderRadius: '8px',
+        background: 'none', cursor: 'pointer', color: '#3f3c4e',
+      }}
+    >
+      <Icon size={14} strokeWidth={2} />
+      <BalloonTooltip visible={!!tip} top={tip?.top} left={tip?.left}>{action.label}</BalloonTooltip>
+    </button>
+  );
+}
+
 function ActionsCellRenderer({ data, colDef, context }) {
   const [open, setOpen] = useState(false);
   const [menuPos, setMenuPos] = useState({ top: 0, right: 0 });
@@ -311,9 +345,11 @@ function ActionsCellRenderer({ data, colDef, context }) {
   const buttonRef = useRef(null);
   const menuRef = useRef(null);
   const allActions = context?.gridActions || [];
-  const actions = allActions.filter(a => matchesCondition(a.showWhen, data));
   const icons = context?.icons || {};
   const onAction = colDef.cellRendererParams?.onAction || (() => {});
+
+  const inlineActions = allActions.filter(a => a.placement === 'inline' && matchesCondition(a.showWhen, data));
+  const menuActions = allActions.filter(a => a.placement !== 'inline' && matchesCondition(a.showWhen, data));
 
   const closeMenu = () => { setOpen(false); setSubPanel(null); };
 
@@ -342,17 +378,22 @@ function ActionsCellRenderer({ data, colDef, context }) {
     return () => document.removeEventListener('neon-actions-open', handleOtherOpen);
   }, [data?.id]);
 
-  if (actions.length === 0) return null;
+  if (inlineActions.length === 0 && menuActions.length === 0) return null;
 
-  if (actions.length === 1 && actions[0].actionType !== 'moveToWorkspace') {
-    const action = actions[0];
+  // Single menu-action shortcut: render as direct icon button when no inline actions
+  if (inlineActions.length === 0 && menuActions.length === 1 && menuActions[0].actionType !== 'moveToWorkspace') {
+    const action = menuActions[0];
     const Icon = LUCIDE_ICONS[icons[action.icon]] || MoreHorizontal;
     return (
       <span style={{ display: 'inline-flex', verticalAlign: 'middle' }}>
         <button
           className="neon-actions-cell"
           onMouseDown={e => e.stopPropagation()}
-          onClick={e => { e.stopPropagation(); onAction(action.id, data); }}
+          onClick={e => {
+            e.stopPropagation();
+            if (action.actionType === 'open') { openNeonAction(action, data); }
+            else { onAction(action.id, data); }
+          }}
           onMouseEnter={e => { const r = e.currentTarget.getBoundingClientRect(); setBtnTip({ top: r.top, left: r.left + r.width / 2 }); }}
           onMouseLeave={() => setBtnTip(null)}
           style={{
@@ -382,22 +423,27 @@ function ActionsCellRenderer({ data, colDef, context }) {
   const menuWidth = subPanel?.type === 'workspacePicker' ? '220px' : '150px';
 
   return (
-    <span className="neon-actions-cell" style={{ display: 'inline-flex', verticalAlign: 'middle' }}>
-      <button
-        ref={buttonRef}
-        onMouseDown={e => e.stopPropagation()}
-        onClick={handleToggle}
-        onMouseEnter={e => { const r = e.currentTarget.getBoundingClientRect(); setBtnTip({ top: r.top, left: r.left + r.width / 2 }); }}
-        onMouseLeave={() => setBtnTip(null)}
-        style={{
-          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-          width: '28px', height: '28px', border: '1px solid #dddce5', borderRadius: '8px',
-          background: open ? '#f6f3f6' : 'none', cursor: 'pointer', color: '#3f3c4e',
-        }}
-      >
-        <MoreHorizontal size={14} strokeWidth={2} />
-        <BalloonTooltip visible={!!btnTip && !open} top={btnTip?.top} left={btnTip?.left}>{context?.locales?.actions || 'Actions'}</BalloonTooltip>
-      </button>
+    <span className="neon-actions-cell" style={{ display: 'inline-flex', verticalAlign: 'middle', alignItems: 'center', gap: '4px' }}>
+      {inlineActions.map(action => (
+        <InlineActionButton key={action.id} action={action} data={data} icons={icons} onAction={onAction} />
+      ))}
+      {menuActions.length > 0 && (
+        <button
+          ref={buttonRef}
+          onMouseDown={e => e.stopPropagation()}
+          onClick={handleToggle}
+          onMouseEnter={e => { const r = e.currentTarget.getBoundingClientRect(); setBtnTip({ top: r.top, left: r.left + r.width / 2 }); }}
+          onMouseLeave={() => setBtnTip(null)}
+          style={{
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            width: '28px', height: '28px', border: '1px solid #dddce5', borderRadius: '8px',
+            background: open ? '#f6f3f6' : 'none', cursor: 'pointer', color: '#3f3c4e',
+          }}
+        >
+          <MoreHorizontal size={14} strokeWidth={2} />
+          <BalloonTooltip visible={!!btnTip && !open} top={btnTip?.top} left={btnTip?.left}>{context?.locales?.actions || 'Actions'}</BalloonTooltip>
+        </button>
+      )}
       {open && createPortal(
         <div ref={menuRef} style={{
           position: 'fixed', top: menuPos.top, right: menuPos.right, zIndex: 9999,
@@ -416,7 +462,7 @@ function ActionsCellRenderer({ data, colDef, context }) {
               locales={context?.locales}
             />
           ) : (
-            actions.map(action => {
+            menuActions.map(action => {
               const Icon = LUCIDE_ICONS[icons[action.icon]] || MoreHorizontal;
               const isMoveToWs = action.actionType === 'moveToWorkspace';
               return (
@@ -425,6 +471,7 @@ function ActionsCellRenderer({ data, colDef, context }) {
                   onClick={e => {
                     e.stopPropagation();
                     if (isMoveToWs) { setSubPanel({ type: 'workspacePicker', workspaceFilter: action.workspaceFilter || null, label: action.label }); }
+                    else if (action.actionType === 'open') { openNeonAction(action, data); closeMenu(); }
                     else { onAction(action.id, data); closeMenu(); }
                   }}
                   style={{
