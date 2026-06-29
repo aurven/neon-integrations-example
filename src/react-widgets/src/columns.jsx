@@ -652,7 +652,7 @@ function InfoCellRenderer({ data, colDef, context }) {
 }
 
 function SectionCellRenderer({ data, colDef }) {
-  const site = colDef.cellRendererParams?.site;
+  const { site, colors } = colDef.cellRendererParams ?? {};
 
   let path = null;
 
@@ -669,6 +669,31 @@ function SectionCellRenderer({ data, colDef }) {
 
   const segment = path.split('/').filter(Boolean).pop() ?? '—';
   const label = segment.replace(/-/g, ' ');
+  const labelLower = label.toLowerCase();
+
+  let chipStyle = null;
+  if (colors?.length) {
+    const rule = colors.find(r => !r.match || labelLower.includes(r.match.toLowerCase()));
+    if (rule) chipStyle = { background: rule.background, color: rule.color };
+  }
+
+  if (chipStyle) {
+    return (
+      <span style={{
+        display: 'inline-block',
+        padding: '2px 8px',
+        borderRadius: '9999px',
+        fontSize: '11px',
+        fontWeight: 600,
+        whiteSpace: 'nowrap',
+        textTransform: 'capitalize',
+        background: chipStyle.background,
+        color: chipStyle.color,
+      }}>
+        {label}
+      </span>
+    );
+  }
 
   return (
     <span style={{
@@ -764,7 +789,7 @@ export function buildColumnDefs(columns = [], { onAction } = {}) {
         return {
           ...base,
           cellRenderer: SectionCellRenderer,
-          cellRendererParams: { site: col.site || null },
+          cellRendererParams: { site: col.site || null, colors: col.colors || null },
         };
       case 'actions':
         return { ...base, cellRenderer: ActionsCellRenderer, cellRendererParams: { onAction } };

@@ -98,7 +98,27 @@
     },
     {
       "field": "publishInfos", "headerName": "Categoria", "type": "section",
-      "site": "TheGlobe", "width": 110, "sortable": false
+      "site": "TheGlobe", "width": 120, "sortable": false,
+      "colors": [
+        { "match": "football",     "background": "#dcfce7", "color": "#15803d" },
+        { "match": "tennis",       "background": "#dcfce7", "color": "#15803d" },
+        { "match": "golf",         "background": "#dcfce7", "color": "#15803d" },
+        { "match": "nba",          "background": "#dcfce7", "color": "#15803d" },
+        { "match": "serie",        "background": "#dcfce7", "color": "#15803d" },
+        { "match": "fighting",     "background": "#fee2e2", "color": "#b91c1c" },
+        { "match": "space",        "background": "#ede9fe", "color": "#6d28d9" },
+        { "match": "ai",           "background": "#dbeafe", "color": "#1d4ed8" },
+        { "match": "earth",        "background": "#ccfbf1", "color": "#0f766e" },
+        { "match": "business",     "background": "#fef9c3", "color": "#854d0e" },
+        { "match": "economy",      "background": "#fef9c3", "color": "#854d0e" },
+        { "match": "culture",      "background": "#fce7f3", "color": "#be185d" },
+        { "match": "books",        "background": "#fce7f3", "color": "#be185d" },
+        { "match": "tv",           "background": "#fce7f3", "color": "#be185d" },
+        { "match": "games",        "background": "#f3e8ff", "color": "#7e22ce" },
+        { "match": "news",         "background": "#f1f5f9", "color": "#475569" },
+        { "match": "north",        "background": "#f1f5f9", "color": "#475569" },
+        {                          "background": "#f1f5f9", "color": "#64748b" }
+      ]
     },
     {
       "field": "versionInfo.createFamilyTime", "headerName": "Creato", "type": "dateUser",
