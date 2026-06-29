@@ -4,7 +4,7 @@
   "pollIntervalMs": 20000,
   "workfolderTypes": [
     "article", "wirestory", "wirestory/extcontributions", "wirestory/afpwirestory",
-    "article/take", "article/longform", "article/poll", "hero"
+    "article/flash", "article/longform", "article/poll", "hero"
   ],
   "locales": {
     "loading": "Caricamento articoli…",
@@ -96,20 +96,24 @@
       ]
     },
     {
+      "field": "publishInfos", "headerName": "Categoria", "type": "section",
+      "site": "TheGlobe", "width": 110, "sortable": false
+    },
+    {
       "field": "versionInfo.createFamilyTime", "headerName": "Creato", "type": "dateUser",
-      "width": 160, "sortable": true, "locale": "it-IT",
+      "width": 150, "sortable": true, "datePattern": "dd/MM/yyyy HH:mm",
       "userField": "versionInfo.createFamilyUserRef.userId",
       "userAliasField": "versionInfo.createFamilyUserRef.alias"
     },
     {
       "field": "lockInfos.USER.locked", "headerName": "Bloccato", "type": "dateUser",
-      "width": 55, "sortable": false, "display": "icon", "locale": "it-IT",
+      "width": 55, "sortable": false, "display": "icon", "datePattern": "dd/MM/yyyy HH:mm",
       "userField": "lockInfos.USER.userUpdateRef.userId",
       "userAliasField": "lockInfos.USER.userUpdateRef.userName"
     },
     {
       "field": "versionInfo.updateVersionTime", "headerName": "Ultima Modifica", "type": "dateUser",
-      "width": 160, "sortable": true, "locale": "it-IT",
+      "width": 150, "sortable": true, "datePattern": "dd/MM/yyyy HH:mm",
       "userField": "versionInfo.updateVersionUserRef.userId",
       "userAliasField": "versionInfo.updateVersionUserRef.alias"
     },

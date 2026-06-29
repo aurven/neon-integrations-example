@@ -8,6 +8,19 @@ function getWorkfolders() {
   return window.CONFIG?.gridConfig?.workfolders || [];
 }
 
+function formatByPattern(date, pattern) {
+  const d = new Date(date);
+  const p = n => String(n).padStart(2, '0');
+  return pattern
+    .replace('yyyy', d.getFullYear())
+    .replace('yy', String(d.getFullYear()).slice(-2))
+    .replace('MM', p(d.getMonth() + 1))
+    .replace('dd', p(d.getDate()))
+    .replace('HH', p(d.getHours()))
+    .replace('mm', p(d.getMinutes()))
+    .replace('ss', p(d.getSeconds()));
+}
+
 function HeadlineCellRenderer({ data }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '100%', gap: '2px' }}>
@@ -199,16 +212,21 @@ function getNestedValue(obj, path) {
 
 function DateUserRenderer({ value, colDef, context, data }) {
   const userCache = context?.userCache ?? {};
-  const { userField, userAliasField, locale, dateFormatOptions, display } = colDef.cellRendererParams ?? {};
+  const { userField, userAliasField, locale, dateFormatOptions, datePattern, display } = colDef.cellRendererParams ?? {};
   const [tip, setTip] = useState(null);
 
   if (!value) return <span style={{ color: '#9ca3af' }}>—</span>;
 
-  const fmtOpts = dateFormatOptions || {
-    day: '2-digit', month: 'short', year: 'numeric',
-    hour: '2-digit', minute: '2-digit',
-  };
-  const dateStr = new Date(value).toLocaleString(locale, fmtOpts);
+  let dateStr;
+  if (datePattern) {
+    dateStr = formatByPattern(value, datePattern);
+  } else {
+    const fmtOpts = dateFormatOptions || {
+      day: '2-digit', month: 'short', year: 'numeric',
+      hour: '2-digit', minute: '2-digit',
+    };
+    dateStr = new Date(value).toLocaleString(locale, fmtOpts);
+  }
 
   const userId = getNestedValue(data, userField);
   const userAlias = getNestedValue(data, userAliasField);
@@ -633,6 +651,35 @@ function InfoCellRenderer({ data, colDef, context }) {
   );
 }
 
+function SectionCellRenderer({ data, colDef }) {
+  const site = colDef.cellRendererParams?.site;
+
+  let path = null;
+
+  if (site) {
+    path = data?.publishInfos?.[site]?.sitePrimaryParentPath ?? null;
+  }
+
+  if (!path) {
+    const names = data?.categories?.primary_section?.[0]?.names;
+    if (names) path = typeof names === 'string' ? names : Object.values(names)[0] ?? null;
+  }
+
+  if (!path) return <span style={{ color: '#9ca3af' }}>—</span>;
+
+  const segment = path.split('/').filter(Boolean).pop() ?? '—';
+  const label = segment.replace(/-/g, ' ');
+
+  return (
+    <span style={{
+      fontSize: '12px', color: '#3f3c4e', fontWeight: 500,
+      textTransform: 'capitalize', whiteSpace: 'nowrap',
+    }}>
+      {label}
+    </span>
+  );
+}
+
 export function buildColumnDefs(columns = [], { onAction } = {}) {
   return columns.map(col => {
     const base = {
@@ -659,14 +706,16 @@ export function buildColumnDefs(columns = [], { onAction } = {}) {
         };
       case 'date': {
         const locale = col.locale;
-        const fmtOpts = col.dateFormatOptions || {
-          day: '2-digit', month: 'short', year: 'numeric',
-          hour: '2-digit', minute: '2-digit',
-        };
         const valueFormatter = col.dateFormat === 'ddmmyyyy'
           ? formatIssueDate
+          : col.datePattern
+          ? (params) => params.value ? formatByPattern(params.value, col.datePattern) : '—'
           : (params) => {
               if (!params.value) return '—';
+              const fmtOpts = col.dateFormatOptions || {
+                day: '2-digit', month: 'short', year: 'numeric',
+                hour: '2-digit', minute: '2-digit',
+              };
               return new Date(params.value).toLocaleString(locale, fmtOpts);
             };
         return { ...base, valueFormatter, cellEditor: col.editable ? 'agDateStringCellEditor' : undefined };
@@ -699,6 +748,7 @@ export function buildColumnDefs(columns = [], { onAction } = {}) {
             userAliasField: col.userAliasField,
             locale: col.locale,
             dateFormatOptions: col.dateFormatOptions,
+            datePattern: col.datePattern,
             display: col.display,
           },
         };
@@ -709,6 +759,12 @@ export function buildColumnDefs(columns = [], { onAction } = {}) {
           ...base,
           cellRenderer: InfoCellRenderer,
           cellRendererParams: { icons: col.icons || [] },
+        };
+      case 'section':
+        return {
+          ...base,
+          cellRenderer: SectionCellRenderer,
+          cellRendererParams: { site: col.site || null },
         };
       case 'actions':
         return { ...base, cellRenderer: ActionsCellRenderer, cellRendererParams: { onAction } };
