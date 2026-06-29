@@ -533,6 +533,51 @@ function PublicationCellRenderer({ data, colDef, context }) {
   );
 }
 
+function InfoIcon({ def, Icon }) {
+  const [tip, setTip] = useState(null);
+  return (
+    <span
+      onMouseEnter={e => { const r = e.currentTarget.getBoundingClientRect(); setTip({ top: r.top, left: r.left + r.width / 2 }); }}
+      onMouseLeave={() => setTip(null)}
+      style={{ display: 'inline-flex', alignItems: 'center', cursor: 'default' }}
+    >
+      <Icon size={15} strokeWidth={2} style={{ color: '#2563eb' }} />
+      {def.label && (
+        <BalloonTooltip visible={!!tip} top={tip?.top} left={tip?.left}>{def.label}</BalloonTooltip>
+      )}
+    </span>
+  );
+}
+
+function InfoCellRenderer({ data, colDef, context }) {
+  const icons = context?.icons || {};
+  const iconDefs = colDef.cellRendererParams?.icons || [];
+
+  const visible = iconDefs.filter(def => {
+    if (!def.condition) return true;
+    const { field, op, value } = def.condition;
+    const fieldVal = getNestedValue(data, field);
+    if (op === 'exists')    return fieldVal != null && fieldVal !== '';
+    if (op === 'notExists') return fieldVal == null || fieldVal === '';
+    if (op === 'eq')        return String(fieldVal) === String(value);
+    if (op === 'neq')       return String(fieldVal) !== String(value);
+    if (op === 'contains')  return String(fieldVal ?? '').includes(String(value));
+    return true;
+  });
+
+  if (!visible.length) return null;
+
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+      {visible.map((def, i) => {
+        const Icon = LUCIDE_ICONS[icons[def.icon]];
+        if (!Icon) return null;
+        return <InfoIcon key={i} def={def} Icon={Icon} />;
+      })}
+    </span>
+  );
+}
+
 export function buildColumnDefs(columns = [], { onAction } = {}) {
   return columns.map(col => {
     const base = {
@@ -603,6 +648,12 @@ export function buildColumnDefs(columns = [], { onAction } = {}) {
         };
       case 'publication':
         return { ...base, cellRenderer: PublicationCellRenderer, cellRendererParams: { publications: col.publications || [] } };
+      case 'info':
+        return {
+          ...base,
+          cellRenderer: InfoCellRenderer,
+          cellRendererParams: { icons: col.icons || [] },
+        };
       case 'actions':
         return { ...base, cellRenderer: ActionsCellRenderer, cellRendererParams: { onAction } };
       default:
