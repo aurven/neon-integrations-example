@@ -49,9 +49,9 @@ async function neonEventsSubscribeHandler(request, reply) {
     neonStream.pipe(rawReply);
     neonStream.on('error', (err) => {
       console.error('[neon-events] Neon stream error:', err.message);
-      rawReply.end();
+      try { rawReply.end(); } catch {}
     });
-    rawReply.on('close', () => neonStream.destroy());
+    rawReply.on('close', () => { if (neonStream) neonStream.destroy(); });
   } catch (err) {
     console.error('[neon-events] Failed to connect to Neon client-notifier:', err.message);
     if (!rawReply.headersSent) {
