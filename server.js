@@ -132,7 +132,8 @@ fastify.get("/services", function (request, reply) {
       { name: "Neon Grid", endpoint: "GET /widgets/neon-grid", demoUrl: "/widgets/neon-grid?demo=true", description: "AG-Grid article list from Neon CMS — headline, summary, date, status columns (supports demo mode with ?demo=true)" },
       { name: "Tag Manager", endpoint: "GET /tags/widget", demoUrl: "/tags/widget", description: "Manage distribution tags, packages, and customer subscriptions" },
       { name: "Tags Input Mockup", endpoint: "GET /tags/input-mockup", demoUrl: "/tags/input-mockup", description: "NeonTagsInput component mockup — copy-paste ready for Neon Object Panel" },
-      { name: "Print Query Board", endpoint: "GET /widgets/print-query-board", demoUrl: "/widgets/print-query-board", description: "Kanban board for planning print edition stories — segment by section (with char budget), priority, desk, or access. Drag cards to reclassify." }
+      { name: "Print Query Board", endpoint: "GET /widgets/print-query-board", demoUrl: "/widgets/print-query-board", description: "Kanban board for planning print edition stories — segment by section (with char budget), priority, desk, or access. Drag cards to reclassify." },
+      { name: "Create Content", endpoint: "GET /widgets/neon-create", demoUrl: "/widgets/neon-create", description: "Config-driven grid of buttons to create new Neon content objects. Each button defines a label, icon, and createOptions (type, workFolder, etc.). On click: creates the object via Neon API, then opens it. Use ?config=name to load a named button set from conf/widgets/neon-create/." }
     ],
     panels: [
       { name: "Trello Panel", endpoint: "GET /panels/trello", demoUrl: "/panels/trello", description: "Trello card management panel for Neon CMS iframe embedding with PostMessage API" },
@@ -253,6 +254,12 @@ fastify.get("/api/neon/grid/articles", widgetHandlers.neonGridDataHandler);
 fastify.post("/api/neon/grid/duplicate", widgetHandlers.neonGridDuplicateHandler);
 fastify.get("/widgets/print-query-board", widgetHandlers.printQueryBoardHandler);
 fastify.get("/api/print-query-board/stories", widgetHandlers.printQueryBoardDataHandler);
+fastify.get("/widgets/neon-create", widgetHandlers.neonCreateWidgetHandler);
+fastify.post("/api/neon/create", widgetHandlers.neonCreateHandler);
+
+// Neon live events proxy (client-notifier SSE)
+const neonEventsHandlers = require("./src/requestHandlers/neon-events.js");
+fastify.post("/api/neon/events/subscribe", neonEventsHandlers.neonEventsSubscribeHandler);
 
 /**
  *
