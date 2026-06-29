@@ -529,7 +529,7 @@ export function buildColumnDefs(columns = [], { onAction } = {}) {
           ? formatIssueDate
           : (params) => {
               if (!params.value) return '—';
-              return new Date(params.value).toLocaleDateString(locale, fmtOpts);
+              return new Date(params.value).toLocaleString(locale, fmtOpts);
             };
         return { ...base, valueFormatter, cellEditor: col.editable ? 'agDateStringCellEditor' : undefined };
       }
