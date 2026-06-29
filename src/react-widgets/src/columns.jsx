@@ -174,15 +174,15 @@ function getNestedValue(obj, path) {
 
 function DateUserRenderer({ value, colDef, context, data }) {
   const userCache = context?.userCache ?? {};
-  const userField = colDef.cellRendererParams?.userField;
-  const userAliasField = colDef.cellRendererParams?.userAliasField;
+  const { userField, userAliasField, locale, dateFormatOptions } = colDef.cellRendererParams ?? {};
 
   if (!value) return <span style={{ color: '#9ca3af' }}>—</span>;
 
-  const dateStr = new Date(value).toLocaleString(undefined, {
+  const fmtOpts = dateFormatOptions || {
     day: '2-digit', month: 'short', year: 'numeric',
     hour: '2-digit', minute: '2-digit',
-  });
+  };
+  const dateStr = new Date(value).toLocaleString(locale, fmtOpts);
 
   const userId = getNestedValue(data, userField);
   const userAlias = getNestedValue(data, userAliasField);
@@ -519,8 +519,20 @@ export function buildColumnDefs(columns = [], { onAction } = {}) {
           cellRenderer: StatusCellRenderer,
           cellRendererParams: { display: col.display },
         };
-      case 'date':
-        return { ...base, valueFormatter: col.dateFormat === 'ddmmyyyy' ? formatIssueDate : formatDate, cellEditor: col.editable ? 'agDateStringCellEditor' : undefined };
+      case 'date': {
+        const locale = col.locale;
+        const fmtOpts = col.dateFormatOptions || {
+          day: '2-digit', month: 'short', year: 'numeric',
+          hour: '2-digit', minute: '2-digit',
+        };
+        const valueFormatter = col.dateFormat === 'ddmmyyyy'
+          ? formatIssueDate
+          : (params) => {
+              if (!params.value) return '—';
+              return new Date(params.value).toLocaleDateString(locale, fmtOpts);
+            };
+        return { ...base, valueFormatter, cellEditor: col.editable ? 'agDateStringCellEditor' : undefined };
+      }
       case 'badge':
         return (col.options && col.options.length)
           ? { ...base, cellRenderer: BadgeCellRenderer, cellRendererParams: { options: col.options } }
@@ -544,7 +556,12 @@ export function buildColumnDefs(columns = [], { onAction } = {}) {
           ...base,
           autoHeight: true,
           cellRenderer: DateUserRenderer,
-          cellRendererParams: { userField: col.userField, userAliasField: col.userAliasField },
+          cellRendererParams: {
+            userField: col.userField,
+            userAliasField: col.userAliasField,
+            locale: col.locale,
+            dateFormatOptions: col.dateFormatOptions,
+          },
         };
       case 'publication':
         return { ...base, cellRenderer: PublicationCellRenderer, cellRendererParams: { publications: col.publications || [] } };
