@@ -100,11 +100,15 @@
       var event = events[i];
       if (!event.trim()) continue;
       var lines = event.split('\n');
-      var eventId, dataLine = '';
+      var eventId, dataLine = '', hasData = false;
       for (var j = 0; j < lines.length; j++) {
         var line = lines[j];
         if (line.indexOf('id:') === 0) eventId = line.slice(3).trim();
-        else if (line.indexOf('data:') === 0) dataLine += line.slice(5).trim();
+        else if (line.indexOf('data:') === 0) {
+          if (hasData) dataLine += '\n';
+          dataLine += line.slice(5).trim();
+          hasData = true;
+        }
       }
       if (eventId) this._lastEventId = eventId;
       if (dataLine) {
