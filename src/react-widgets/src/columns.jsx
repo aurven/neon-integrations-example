@@ -650,7 +650,7 @@ export function buildColumnDefs(columns = [], { onAction } = {}) {
       case 'headline':
         return { ...base, autoHeight: true, cellRenderer: HeadlineCellRenderer };
       case 'title':
-        return { ...base, autoHeight: true, cellRenderer: TitleCellRenderer };
+        return { ...base, autoHeight: true, wrapText: true, cellRenderer: TitleCellRenderer };
       case 'status':
         return {
           ...base,
