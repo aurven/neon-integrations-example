@@ -112,15 +112,6 @@ function StatusCellRenderer({ value, data, colDef }) {
   );
 }
 
-function formatDate(params) {
-  if (!params.value) return '—';
-  const d = new Date(params.value);
-  return d.toLocaleDateString('en-GB', {
-    day: '2-digit', month: 'short', year: 'numeric',
-    hour: '2-digit', minute: '2-digit'
-  });
-}
-
 function TypeCellRenderer({ value }) {
   if (!value) return '—';
   return (
