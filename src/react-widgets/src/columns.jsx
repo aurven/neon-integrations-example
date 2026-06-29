@@ -38,6 +38,40 @@ function HeadlineCellRenderer({ data }) {
   );
 }
 
+function TitleCellRenderer({ data }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '100%', gap: '2px' }}>
+      {data?.isNew && (
+        <span style={{
+          display: 'inline-block',
+          alignSelf: 'flex-start',
+          padding: '2px 10px',
+          borderRadius: '9999px',
+          fontSize: '11px',
+          fontWeight: 600,
+          color: '#fff',
+          background: '#2563eb',
+          whiteSpace: 'nowrap',
+        }}>
+          NEW
+        </span>
+      )}
+      <span style={{
+        fontSize: '13px',
+        fontWeight: 600,
+        color: '#3f3c4e',
+        lineHeight: '1.35',
+        display: '-webkit-box',
+        WebkitBoxOrient: 'vertical',
+        WebkitLineClamp: 2,
+        overflow: 'hidden',
+      }}>
+        {data?.headline || '—'}
+      </span>
+    </div>
+  );
+}
+
 function StatusCellRenderer({ value, data, colDef }) {
   const bg = data?.statusColor ?? '#9ca3af';
   const label = value || 'Unknown';
@@ -515,6 +549,8 @@ export function buildColumnDefs(columns = [], { onAction } = {}) {
     switch (col.type) {
       case 'headline':
         return { ...base, autoHeight: true, cellRenderer: HeadlineCellRenderer };
+      case 'title':
+        return { ...base, autoHeight: true, cellRenderer: TitleCellRenderer };
       case 'status':
         return {
           ...base,
