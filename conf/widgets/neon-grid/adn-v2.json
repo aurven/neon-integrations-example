@@ -24,6 +24,7 @@
     { "key": "versionInfo", "source": "versionInfo" },
     { "key": "lockInfos", "source": "lockInfos" },
     { "key": "publishInfos", "source": "publishInfos" },
+    { "key": "categories", "source": "categories" },
     { "key": "workFolder", "source": "metadataGroups.eom.sys_attributes_json.workFolder" }
   ],
   "icons": {
