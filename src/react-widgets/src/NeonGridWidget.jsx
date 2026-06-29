@@ -158,7 +158,7 @@ export default function NeonGridWidget() {
         borderBottom: '1px solid #dddce5',
         flexShrink: 0
       }}>
-        <span style={{ fontSize: '14px', fontWeight: 600, color: '#3f3c4e' }}>Articles</span>
+        <span style={{ fontSize: '14px', fontWeight: 600, color: '#3f3c4e' }}>{gridConfig.title || 'Articles'}</span>
         {!loading && !error && (
           <span style={{
             fontSize: '11px',
@@ -192,7 +192,7 @@ export default function NeonGridWidget() {
           onMouseLeave={e => { e.currentTarget.style.background = 'none'; }}
         >
           <RefreshIcon />
-          Refresh
+          {gridConfig.locales?.refresh || 'Refresh'}
         </button>
       </div>
 
@@ -206,7 +206,7 @@ export default function NeonGridWidget() {
             color: '#9d9aac',
             fontSize: '14px'
           }}>
-            Loading articles…
+            {gridConfig.locales?.loading || 'Loading articles…'}
           </div>
         )}
         {error && !loading && (
@@ -238,7 +238,7 @@ export default function NeonGridWidget() {
               columnDefs={columnDefs}
               defaultColDef={defaultColDef}
               getRowId={params => params.data.id}
-              context={{ userCache, icons: gridConfig.icons || {}, typeIcons: gridConfig.typeIcons || {}, gridActions: gridConfig.actions || [] }}
+              context={{ userCache, icons: gridConfig.icons || {}, typeIcons: gridConfig.typeIcons || {}, gridActions: gridConfig.actions || [], locales: gridConfig.locales || {} }}
               enableBrowserTooltips={true}
               pagination={true}
               paginationPageSize={25}

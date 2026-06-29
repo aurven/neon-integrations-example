@@ -198,7 +198,7 @@ function DateUserRenderer({ value, colDef, context, data }) {
   );
 }
 
-function WorkspacePicker({ data, onAction, onBack, onClose, workspaceFilter, title }) {
+function WorkspacePicker({ data, onAction, onBack, onClose, workspaceFilter, title, locales }) {
   const allWorkfolders = getWorkfolders();
   const workfolders = workspaceFilter
     ? allWorkfolders.filter(wf =>
@@ -231,14 +231,14 @@ function WorkspacePicker({ data, onAction, onBack, onClose, workspaceFilter, tit
         >
           <ArrowLeft size={13} />
         </button>
-        <span style={{ fontSize: '11px', fontWeight: 700, color: '#3f3c4e', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{title || 'Select workspace'}</span>
+        <span style={{ fontSize: '11px', fontWeight: 700, color: '#3f3c4e', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{title || locales?.selectWorkspace || 'Select workspace'}</span>
       </div>
       <div style={{ maxHeight: '220px', overflowY: 'auto' }}>
         {error && (
           <div style={{ padding: '8px', fontSize: '11px', color: '#d22d2d' }}>{error}</div>
         )}
         {workfolders.length === 0 && !error && (
-          <div style={{ padding: '10px 8px', color: '#9d9aac', fontSize: '12px' }}>No workfolders available</div>
+          <div style={{ padding: '10px 8px', color: '#9d9aac', fontSize: '12px' }}>{locales?.noWorkfolders || 'No workfolders available'}</div>
         )}
         {workfolders.map(wf => (
           <button
@@ -354,7 +354,7 @@ function ActionsCellRenderer({ data, colDef, context }) {
         }}
       >
         <MoreHorizontal size={14} strokeWidth={2} />
-        <BalloonTooltip visible={!!btnTip && !open} top={btnTip?.top} left={btnTip?.left}>Actions</BalloonTooltip>
+        <BalloonTooltip visible={!!btnTip && !open} top={btnTip?.top} left={btnTip?.left}>{context?.locales?.actions || 'Actions'}</BalloonTooltip>
       </button>
       {open && createPortal(
         <div ref={menuRef} style={{
@@ -371,6 +371,7 @@ function ActionsCellRenderer({ data, colDef, context }) {
               onClose={closeMenu}
               workspaceFilter={subPanel.workspaceFilter}
               title={subPanel.label}
+              locales={context?.locales}
             />
           ) : (
             actions.map(action => {
@@ -431,7 +432,7 @@ function BalloonTooltip({ visible, top, left, children }) {
   );
 }
 
-function PublicationIcon({ pub, pubData, iconComponent: Icon }) {
+function PublicationIcon({ pub, pubData, iconComponent: Icon, locales }) {
   const [tip, setTip] = useState(null);
   const isPublished = !!pubData;
 
@@ -465,7 +466,7 @@ function PublicationIcon({ pub, pubData, iconComponent: Icon }) {
             {userAlias && <div style={{ color: '#a5b4fc' }}>{userAlias}</div>}
           </>
         ) : (
-          <div style={{ color: '#9d9aac' }}>Not published</div>
+          <div style={{ color: '#9d9aac' }}>{locales?.notPublished || 'Not published'}</div>
         )}
       </BalloonTooltip>
     </span>
@@ -490,6 +491,7 @@ function PublicationCellRenderer({ data, colDef, context }) {
             pub={pub}
             pubData={publishInfos[pub.id] ?? null}
             iconComponent={Icon}
+            locales={context?.locales}
           />
         );
       })}
