@@ -24,10 +24,12 @@
     "rocket": "Rocket",
     "copy": "Copy",
     "move": "ArrowRight",
-    "send": "Send"
+    "send": "Send",
+    "zap": "Zap"
   },
   "typeIcons": {
     "article": "file",
+    "article/flash": "zap",
     "gallery": "image",
     "photo": "image",
     "video": "video",

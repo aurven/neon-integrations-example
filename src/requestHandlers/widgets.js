@@ -496,7 +496,7 @@ async function neonGridDataHandler(request, reply) {
   }
 
   try {
-    const searchResults = await neonBoApi.searchContents(queryPayload, 50, 50);
+    const searchResults = await neonBoApi.searchContents(queryPayload, 500, 500);
     const articles = mapNodes(searchResults.nodes || []);
     return reply.status(200).send({ articles });
   } catch (error) {
