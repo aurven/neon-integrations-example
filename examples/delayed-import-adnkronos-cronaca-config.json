@@ -1,0 +1,10 @@
+{
+  "rssUrl": "https://www.adnkronos.com/RSS_Cronaca.xml",
+  "site": "Wire",
+  "workspace": "wire/cronaca",
+  "duration": 1,
+  "type": "wirestory",
+  "publish": false,
+  "sourceName": "Adnkronos.com",
+  "locale": "it-IT"
+}

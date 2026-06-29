@@ -382,6 +382,9 @@ fastify.get("/in/delayed-import", delayedImportHandlers.listJobsHandler);
 fastify.get("/in/delayed-import/:jobId", delayedImportHandlers.getJobHandler);
 fastify.delete("/in/delayed-import/:jobId", delayedImportHandlers.cancelJobHandler);
 
+const rssDelayedImportHandlers = require("./src/requestHandlers/neon-rss-delayed-import.js");
+fastify.post("/in/delayed-import/from/rss", rssDelayedImportHandlers.submitRssDelayedImportHandler);
+
 /**
  *
  * Trello to Neon
