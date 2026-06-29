@@ -239,6 +239,7 @@ fastify.get("/neon/api/core/metrics/*", neonMetricsHandlers.getMetricsDataHandle
  *
  */
 const widgetHandlers = require("./src/requestHandlers/widgets.js");
+const neonEventsHandlers = require("./src/requestHandlers/neon-events.js");
 fastify.get("/widgets/test", widgetHandlers.testWidgetHandler);
 fastify.get("/widgets/drop", widgetHandlers.dropWidgetHandler);
 fastify.post("/widgets/drop/upload", widgetHandlers.asyncDropUploadWidgetHandler);
@@ -258,7 +259,6 @@ fastify.get("/widgets/neon-create", widgetHandlers.neonCreateWidgetHandler);
 fastify.post("/api/neon/create", widgetHandlers.neonCreateHandler);
 
 // Neon live events proxy (client-notifier SSE)
-const neonEventsHandlers = require("./src/requestHandlers/neon-events.js");
 fastify.post("/api/neon/events/subscribe", neonEventsHandlers.neonEventsSubscribeHandler);
 
 /**

@@ -51,10 +51,14 @@ export function useNeonNotifier({ familyRefs, events, onEvent, enabled = true })
       buffer = parts.pop() ?? '';
       for (const raw of parts) {
         if (!raw.trim()) continue;
-        let eventId, dataLine = '';
+        let eventId, dataLine = '', hasData = false;
         for (const line of raw.split('\n')) {
           if (line.startsWith('id:')) eventId = line.slice(3).trim();
-          else if (line.startsWith('data:')) dataLine += line.slice(5).trim();
+          else if (line.startsWith('data:')) {
+            if (hasData) dataLine += '\n';
+            dataLine += line.slice(5).trim();
+            hasData = true;
+          }
         }
         if (eventId) lastEventId = eventId;
         if (dataLine) {
@@ -62,6 +66,8 @@ export function useNeonNotifier({ familyRefs, events, onEvent, enabled = true })
             const payload = JSON.parse(dataLine);
             const payloads = Array.isArray(payload) ? payload : [payload];
             for (const p of payloads) {
+              // Neon content-change events always carry a `details` object;
+              // filter drops keep-alive and other protocol-level payloads.
               if (p?.details) onEventRef.current?.(p);
             }
           } catch {}

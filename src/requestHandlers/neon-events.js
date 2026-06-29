@@ -15,7 +15,10 @@ async function neonEventsSubscribeHandler(request, reply) {
     return reply.status(503).send({ error: 'Neon not configured: NEON_APP_URL or NEON_BO_APIKEY missing' });
   }
 
-  const { subscriptions = [], startingPoint } = request.body || {};
+  const { subscriptions, startingPoint } = request.body || {};
+  if (!Array.isArray(subscriptions)) {
+    return reply.status(400).send({ error: 'subscriptions must be an array' });
+  }
   const requestBody = { subscriptions };
   if (startingPoint !== undefined && startingPoint !== null) requestBody.startingPoint = startingPoint;
 
