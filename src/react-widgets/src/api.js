@@ -57,12 +57,12 @@ export async function duplicateArticle(familyRef, { workFolder, name, type }) {
   return response.json();
 }
 
-export async function unlockNode(familyRef) {
+export async function unlockNode(familyRef, updateContextId = null) {
   const apiKey = window.CONFIG?.apiKey ?? '';
   const response = await fetch(`${BASE_URL}/api/neon/nodes/unlock`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', apikey: apiKey },
-    body: JSON.stringify({ familyRef })
+    body: JSON.stringify({ familyRef, ...(updateContextId && { updateContextId }) })
   });
   if (!response.ok) {
     throw new Error(`API error ${response.status}: /api/neon/nodes/unlock`);

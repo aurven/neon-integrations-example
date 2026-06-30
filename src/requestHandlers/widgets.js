@@ -692,10 +692,10 @@ async function neonCreateHandler(request, reply) {
 async function neonNodeUnlockHandler(request, reply) {
   const auth = authenticate(request, reply);
   if (!auth.authenticated) return reply.status(401).send({ error: 'Unauthorized' });
-  const { familyRef, unlockMode } = request.body || {};
+  const { familyRef, unlockMode, updateContextId } = request.body || {};
   if (!familyRef) return reply.status(400).send({ error: 'familyRef is required' });
   try {
-    await neonBoApi.unlockNode(familyRef, unlockMode || 'MAJOR');
+    await neonBoApi.unlockNode(familyRef, unlockMode || 'MAJOR', true, updateContextId || null);
     return reply.status(200).send({ success: true });
   } catch (err) {
     console.error('[neonNodeUnlockHandler] Unlock failed:', err.message);

@@ -125,11 +125,12 @@ class NeonClient {
         }, `Node ${familyRef} locked`, true);
     }
 
-    async unlockNode(familyRef, unlockMode = 'MAJOR') {
+    async unlockNode(familyRef, unlockMode = 'MAJOR', force = false, updateContextId = null) {
         return await this.makeRequest({
             method: 'put',
-            url: `/contents/nodes/unlock?unlockMode=${unlockMode}`,
-            data: [familyRef]
+            url: `/contents/nodes/unlock?unlockMode=${unlockMode}${force ? '&force=true' : ''}`,
+            data: [familyRef],
+            ...(updateContextId && { headers: { 'update-context-id': updateContextId } })
         }, `Node ${familyRef} unlocked`);
     }
 
@@ -428,7 +429,7 @@ module.exports = {
     getNodeMetadata: (familyRef) => defaultClient.getNodeMetadata(familyRef),
     deleteNode: (familyRef, force) => defaultClient.deleteNode(familyRef, force),
     lockNode: (familyRef) => defaultClient.lockNode(familyRef),
-    unlockNode: (familyRef, unlockMode) => defaultClient.unlockNode(familyRef, unlockMode),
+    unlockNode: (familyRef, unlockMode, force) => defaultClient.unlockNode(familyRef, unlockMode, force),
     updateNodeContent: (familyRef, xmlBodyString) => defaultClient.updateNodeContent(familyRef, xmlBodyString),
     updateNodeMetadata: (familyRef, xmlBodyString) => defaultClient.updateNodeMetadata(familyRef, xmlBodyString),
     createNewStory: (options) => defaultClient.createNewStory(options),

@@ -280,7 +280,7 @@ function DateUserRenderer({ value, colDef, context, data }) {
       if (unlocking) return;
       setUnlocking(true);
       try {
-        await unlockNode(data.id);
+        await unlockNode(data.id, data?.lockInfos?.USER?.userUpdateRef?.updateContextId ?? null);
         setTip(null);
         document.dispatchEvent(new CustomEvent('neon-unlock-success', { detail: { familyRef: data.id } }));
       } catch (err) {
@@ -771,7 +771,7 @@ function LockerInfoIcon({ lockData, data, context }) {
     if (unlocking) return;
     setUnlocking(true);
     try {
-      await unlockNode(data.id);
+      await unlockNode(data.id, lockData?.userUpdateRef?.updateContextId ?? null);
       setTip(null);
       document.dispatchEvent(new CustomEvent('neon-unlock-success', { detail: { familyRef: data.id } }));
     } catch (err) {
