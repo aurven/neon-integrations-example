@@ -1,0 +1,251 @@
+{
+  "queryStatement": {
+    "aggregations": [
+      {
+        "type": "terms",
+        "name": "workfolder",
+        "fieldPath": "workspaceLinkInfo.workspaceFolderPath",
+        "size": 100
+      },
+      {
+        "type": "terms",
+        "name": "workflow",
+        "fieldPath": "versionInfo.workflowInfo.workflow",
+        "size": 100
+      },
+      {
+        "type": "terms",
+        "name": "priority",
+        "fieldPath": "versionInfo.workflowInfo.assigmentInfo.priority",
+        "size": 100
+      },
+      {
+        "type": "terms",
+        "name": "assignees",
+        "fieldPath": "versionInfo.workflowInfo.assigmentInfo.assignees.alias",
+        "size": 100
+      },
+      {
+        "type": "terms",
+        "name": "assigner",
+        "fieldPath": "versionInfo.workflowInfo.assigmentInfo.assigner.alias",
+        "size": 100
+      },
+      {
+        "type": "terms",
+        "name": "dueDate",
+        "fieldPath": "versionInfo.workflowInfo.assigmentInfo.dueDate",
+        "size": 100
+      },
+      {
+        "type": "terms",
+        "name": "assignmentDate",
+        "fieldPath": "versionInfo.workflowInfo.assigmentInfo.assignmentDate",
+        "size": 100
+      },
+      {
+        "type": "terms",
+        "name": "Last Modifier",
+        "fieldPath": "versionInfo.updateVersionUserRef.alias",
+        "size": 100
+      },
+      {
+        "type": "terms",
+        "name": "createdBy",
+        "fieldPath": "versionInfo.createFamilyUserRef.alias",
+        "size": 100
+      },
+      {
+        "type": "terms",
+        "name": "Image Credit",
+        "fieldPath": "nodeMeta.credit",
+        "size": 100
+      },
+      {
+        "type": "terms",
+        "name": "Image Source",
+        "fieldPath": "nodeMeta.source",
+        "size": 100
+      },
+      {
+        "type": "terms",
+        "name": "Edition",
+        "fieldPath": "metadataGroups.eom.sys_attributes.props.productInfo.edition",
+        "size": 100
+      },
+      {
+        "type": "terms",
+        "name": "Print Diffusion",
+        "fieldPath": "nodeMeta.printDiffusion",
+        "size": 100
+      },
+      {
+        "type": "terms",
+        "name": "Print Section",
+        "fieldPath": "nodeMeta.printSection",
+        "size": 100
+      },
+      {
+        "type": "terms",
+        "name": "Print Priority",
+        "fieldPath": "nodeMeta.printPriority",
+        "size": 100
+      },
+      {
+        "type": "terms",
+        "name": "Print Issue Date",
+        "fieldPath": "nodeMeta.printIssueDate",
+        "size": 100
+      }
+    ],
+    "bool": {
+      "and": [
+        {
+          "type": "match",
+          "path": "typeName",
+          "match": "${type}*"
+        },
+        {
+          "type": "in",
+          "path": "baseType",
+          "terms": [
+            "${availableTypes}"
+          ]
+        },
+        {
+          "type": "stringBetween",
+          "path": "updateTs",
+          "low": "${dateLow}",
+          "high": "${dateHigh}"
+        },
+        {
+          "type": "in",
+          "path": "workspaceLinkInfo.workspaceFolderPath",
+          "terms": [
+            "${workfolder}"
+          ]
+        },
+        {
+          "type": "match",
+          "path": "versionInfo.workflowInfo.workflow",
+          "match": "${workflow}"
+        },
+        {
+          "type": "match",
+          "path": "lockInfos",
+          "match": "${Lock}"
+        },
+        {
+          "type": "match",
+          "path": "versionInfo.workflowInfo.assigmentInfo.priority",
+          "match": "${priority}"
+        },
+        {
+          "type": "match",
+          "path": "versionInfo.workflowInfo.assigmentInfo.assignees.alias",
+          "match": "${assignees}"
+        },
+        {
+          "type": "match",
+          "path": "versionInfo.workflowInfo.assigmentInfo.assigner.alias",
+          "match": "${assigner}"
+        },
+        {
+          "type": "match",
+          "path": "versionInfo.workflowInfo.assigmentInfo.dueDate",
+          "match": "${dueDate}"
+        },
+        {
+          "type": "match",
+          "path": "versionInfo.workflowInfo.assigmentInfo.assignmentDate",
+          "match": "${assignmentDate}"
+        },
+        {
+          "type": "match",
+          "path": "versionInfo.updateVersionUserRef.alias",
+          "match": "${Last Modifier}"
+        },
+        {
+          "type": "match",
+          "path": "versionInfo.createFamilyUserRef.alias",
+          "match": "${createdBy}"
+        },
+        {
+          "type": "match",
+          "path": "nodeMeta.credit",
+          "match": "${Image Credit}"
+        },
+        {
+          "type": "match",
+          "path": "nodeMeta.source",
+          "match": "${Image Source}"
+        },
+        {
+          "type": "match",
+          "path": "metadataGroups.eom.sys_attributes.props.productInfo.edition",
+          "match": "${Edition}"
+        },
+        {
+          "type": "match",
+          "path": "nodeMeta.printDiffusion",
+          "match": "${Print Diffusion}"
+        },
+        {
+          "type": "match",
+          "path": "nodeMeta.printSection",
+          "match": "${Print Section}"
+        },
+        {
+          "type": "match",
+          "path": "nodeMeta.printPriority",
+          "match": "${Print Priority}"
+        },
+        {
+          "type": "match",
+          "path": "nodeMeta.printIssueDate",
+          "match": "${Print Issue Date}"
+        },
+        {
+          "type": "contain",
+          "path": "allText",
+          "term": "*${searchTerm}*"
+        }
+      ],
+      "or": []
+    },
+    "sort": {
+      "type": "fields",
+      "sorts": [
+        {
+          "path": "versionInfo.createFamilyTime",
+          "order": "DESC"
+        }
+      ]
+    },
+    "properties": {
+      "trackTotalHitsCount": 10000
+    }
+  },
+  "variables": {
+    "domain": [
+      "editorial"
+    ],
+    "searchTerm": [
+      ""
+    ],
+    "type": [
+      "*"
+    ],
+    "availableTypes": [
+      "article",
+      "liveblog"
+    ],
+    "workfolder": [
+      "*"
+    ]
+  },
+  "options": {
+    "showLoadPublishInfo": true,
+    "showSystemAttributes": true
+  }
+}

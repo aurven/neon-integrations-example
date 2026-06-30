@@ -304,7 +304,7 @@ export default function NeonGridWidget() {
               columnDefs={columnDefs}
               defaultColDef={defaultColDef}
               getRowId={params => params.data.id}
-              context={{ userCache, icons: gridConfig.icons || {}, typeIcons: gridConfig.typeIcons || {}, gridActions: gridConfig.actions || [], locales: gridConfig.locales || {} }}
+              context={{ userCache, icons: gridConfig.icons || {}, typeIcons: gridConfig.typeIcons || {}, typeLabels: gridConfig.typeLabels || {}, gridActions: gridConfig.actions || [], locales: gridConfig.locales || {} }}
               enableBrowserTooltips={true}
               pagination={true}
               paginationPageSize={25}

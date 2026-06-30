@@ -424,7 +424,8 @@ async function neonGridWidgetHandler(request, reply) {
 
   const configName = /^[a-zA-Z0-9_-]+$/.test(request.query.config || '') ? request.query.config : 'default';
   const gridConfig = loadGridConfig(configName);
-  const queryName = /^[a-zA-Z0-9_-]+$/.test(request.query.query || '') ? request.query.query : 'default';
+  const configDefaultQuery = /^[a-zA-Z0-9_-]+$/.test(gridConfig.query || '') ? gridConfig.query : 'default';
+  const queryName = /^[a-zA-Z0-9_-]+$/.test(request.query.query || '') ? request.query.query : configDefaultQuery;
 
   // Optional fast-QA override: ?pollMs=4000 lets a manual tester shorten the
   // poll interval without editing the config JSON. Works in demo and live mode.
@@ -460,7 +461,8 @@ async function neonGridDataHandler(request, reply) {
   const demoMode = request.query.demo === 'true';
   const configName = /^[a-zA-Z0-9_-]+$/.test(request.query.config || '') ? request.query.config : 'default';
   const gridConfig = loadGridConfig(configName);
-  const queryName = /^[a-zA-Z0-9_-]+$/.test(request.query.query || '') ? request.query.query : 'default';
+  const configDefaultQuery = /^[a-zA-Z0-9_-]+$/.test(gridConfig.query || '') ? gridConfig.query : 'default';
+  const queryName = /^[a-zA-Z0-9_-]+$/.test(request.query.query || '') ? request.query.query : configDefaultQuery;
 
   await neonConfigConnector.loadContentTypesConfig();
 
@@ -538,9 +540,11 @@ async function neonGridDuplicateHandler(request, reply) {
   if (!familyRef || !workFolder) return reply.status(400).send({ error: 'familyRef and workFolder are required' });
 
   const issueDate = new Date().toISOString().split('T')[0];
+  const workspaceSuffix = workFolder.split('/').filter(Boolean).pop() ?? '';
+  const duplicateName = workspaceSuffix ? `${name} [${workspaceSuffix}]` : name;
 
   try {
-    const result = await neonBoApi.duplicateNode(familyRef, { name, workFolder, type, issueDate });
+    const result = await neonBoApi.duplicateNode(familyRef, { name: duplicateName, workFolder, type, issueDate });
     return reply.status(200).send(result);
   } catch (error) {
     console.error('neonGridDuplicateHandler error:', error);

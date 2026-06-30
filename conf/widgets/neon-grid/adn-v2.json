@@ -1,5 +1,25 @@
 {
   "title": "Articoli",
+  "query": "adn-v2",
+
+  "querySwitcher": {
+    "label": "Vista:",
+    "options": [
+      {
+        "label": "Tutti",
+        "variables": {}
+      },
+      {
+        "label": "Articoli",
+        "variables": { "type": ["article"] }
+      },
+      {
+        "label": "Flash",
+        "variables": { "type": ["article/flash"] }
+      }
+    ]
+  },
+
   "demoData": "adn-search-results.json",
   "pollIntervalMs": 20000,
   "workfolderTypes": [
@@ -42,15 +62,25 @@
     "move": "ArrowRight",
     "send": "Send",
     "pencil": "Pencil",
-    "eye": "Eye"
+    "eye": "Eye",
+    "live": "CircleDot"
   },
   "typeIcons": {
     "article": "file",
     "article/flash": "zap",
-    "gallery": "image",
+    "article/gallery": "image",
     "photo": "image",
     "video": "video",
-    "audio": "mic"
+    "audio": "mic",
+    "liveblog": "live"
+  },
+  "typeLabels": {
+    "article": "Articolo",
+    "wirestory": "Wire",
+    "image": "Immagine",
+    "video": "Video",
+    "audio": "Audio",
+    "hero": "Hero"
   },
   "actions": [
     {
@@ -90,7 +120,7 @@
     },
     {
       "field": "publishInfos", "headerName": "Info", "type": "extendedInfo", "width": 100,
-      "showTypeIcon": true, "typeIconChip": false, "showLockerInfo": true,
+      "showTypeIcon": true, "typeIconChip": false, "showLockerInfo": true, "datePattern": "dd/MM/yyyy HH:mm",
       "icons": [
         { "icon": "rss",     "label": "Wire", "condition": { "field": "publishInfos.Wire.liveFirstPublicationDate", "op": "exists" } },
         { "icon": "monitor", "label": "Web",  "condition": { "field": "publishInfos.Web.liveFirstPublicationDate",  "op": "exists" } }

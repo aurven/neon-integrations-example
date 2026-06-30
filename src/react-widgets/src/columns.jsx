@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { FileText, Image, Video, Mic, Copy, ArrowRight, Send, Zap, Globe, Trophy, Rocket, Rss, Monitor, MoreHorizontal, ChevronRight, ArrowLeft, Lock, LockOpen, Pencil, Eye } from 'lucide-react';
+import { FileText, Image, Video, Mic, Copy, ArrowRight, Send, Zap, Globe, Trophy, Rocket, Rss, Monitor, MoreHorizontal, ChevronRight, ArrowLeft, Lock, LockOpen, Pencil, Eye, CircleDot } from 'lucide-react';
 import { duplicateArticle, unlockNode } from './api.js';
 import { matchesCondition } from './row-rules.js';
 
@@ -181,7 +181,7 @@ function BadgeCellRenderer({ value, colDef }) {
 
 // Registry of Lucide icon components available to the widget.
 // The icons registry in conf (id → lucide name) resolves into this map.
-const LUCIDE_ICONS = { FileText, Image, Video, Mic, Copy, ArrowRight, Send, Zap, Globe, Trophy, Rocket, Rss, Monitor, MoreHorizontal, ChevronRight, ArrowLeft, Lock, LockOpen, Pencil, Eye };
+const LUCIDE_ICONS = { FileText, Image, Video, Mic, Copy, ArrowRight, Send, Zap, Globe, Trophy, Rocket, Rss, Monitor, MoreHorizontal, ChevronRight, ArrowLeft, Lock, LockOpen, Pencil, Eye, CircleDot };
 
 function TypeIconRenderer({ value, colDef, context, data }) {
   const icons = context?.icons || {};
@@ -193,7 +193,7 @@ function TypeIconRenderer({ value, colDef, context, data }) {
   const iconName = iconId ? icons[iconId] : null;
   const Icon = iconName ? LUCIDE_ICONS[iconName] : null;
 
-  const displayName = typeDisplayName(value);
+  const displayName = typeDisplayName(value, context?.typeLabels);
 
   if (iconOnly) {
     return (
@@ -228,8 +228,9 @@ function getNestedValue(obj, path) {
   return path.split('.').reduce((o, k) => (o == null ? o : o[k]), obj);
 }
 
-function typeDisplayName(typeName) {
+function typeDisplayName(typeName, typeLabels) {
   if (!typeName) return '';
+  if (typeLabels?.[typeName]) return typeLabels[typeName];
   const seg = typeName.split('/').pop();
   return seg.charAt(0).toUpperCase() + seg.slice(1);
 }
@@ -355,8 +356,13 @@ function WorkspacePicker({ data, onAction, onBack, onClose, workspaceFilter, tit
     if (duplicating) return;
     setDuplicating(path);
     try {
-      await duplicateArticle(data.id, { workFolder: path, name: data.headline, type: data.type });
+      const result = await duplicateArticle(data.id, { workFolder: path, name: data.headline, type: data.typeName });
       onAction('moveToWorkspace', data, { workFolder: path });
+      const newRef = result?.familyRef ?? result?.node?.familyRef ?? null;
+      if (newRef) {
+        const neonAppUrl = window.CONFIG?.neonAppUrl || '';
+        window.open(`${neonAppUrl}/neon/app/neon.html#open/${newRef}`);
+      }
       onClose();
     } catch (err) {
       setError(`Failed: ${err.message}`);
@@ -715,7 +721,7 @@ function PublicationCellRenderer({ data, colDef, context }) {
   );
 }
 
-function InfoIcon({ def, Icon, data }) {
+function InfoIcon({ def, Icon, data, datePattern }) {
   const [tip, setTip] = useState(null);
 
   let pubData = null;
@@ -724,9 +730,12 @@ function InfoIcon({ def, Icon, data }) {
     pubData = data.publishInfos?.[site] ?? null;
   }
 
-  const fmtDate = (ts) => ts
-    ? new Date(ts).toLocaleString(undefined, { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
-    : null;
+  const fmtDate = (ts) => {
+    if (!ts) return null;
+    return datePattern
+      ? formatByPattern(ts, datePattern)
+      : new Date(ts).toLocaleString(undefined, { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  };
   const firstPub = fmtDate(pubData?.liveFirstPublicationDate);
   const lastMod = fmtDate(pubData?.lastModified);
 
@@ -821,6 +830,7 @@ function ExtendedInfoCellRenderer({ data, colDef, context }) {
   const showTypeIcon = colDef.cellRendererParams?.showTypeIcon;
   const typeIconChip = colDef.cellRendererParams?.typeIconChip;
   const showLockerInfo = colDef.cellRendererParams?.showLockerInfo;
+  const datePattern = colDef.cellRendererParams?.datePattern ?? null;
   const [typeTip, setTypeTip] = useState(null);
 
   let typeIconEl = null;
@@ -841,7 +851,7 @@ function ExtendedInfoCellRenderer({ data, colDef, context }) {
         </span>
       );
     } else {
-      const displayName = typeDisplayName(v);
+      const displayName = typeDisplayName(v, context?.typeLabels);
       typeIconEl = (
         <span
           role="img"
@@ -883,7 +893,7 @@ function ExtendedInfoCellRenderer({ data, colDef, context }) {
       {visibleIcons.map((def, i) => {
         const Icon = LUCIDE_ICONS[icons[def.icon]];
         if (!Icon) return null;
-        return <InfoIcon key={i} def={def} Icon={Icon} data={data} />;
+        return <InfoIcon key={i} def={def} Icon={Icon} data={data} datePattern={datePattern} />;
       })}
       {lockEl}
     </span>
@@ -893,6 +903,7 @@ function ExtendedInfoCellRenderer({ data, colDef, context }) {
 function InfoCellRenderer({ data, colDef, context }) {
   const icons = context?.icons || {};
   const iconDefs = colDef.cellRendererParams?.icons || [];
+  const datePattern = colDef.cellRendererParams?.datePattern ?? null;
 
   const visible = iconDefs.filter(def => {
     if (!def.condition) return true;
@@ -913,7 +924,7 @@ function InfoCellRenderer({ data, colDef, context }) {
       {visible.map((def, i) => {
         const Icon = LUCIDE_ICONS[icons[def.icon]];
         if (!Icon) return null;
-        return <InfoIcon key={i} def={def} Icon={Icon} data={data} />;
+        return <InfoIcon key={i} def={def} Icon={Icon} data={data} datePattern={datePattern} />;
       })}
     </span>
   );
@@ -932,6 +943,8 @@ function SectionCellRenderer({ data, colDef }) {
     const names = data?.categories?.primary_section?.[0]?.names;
     if (names) path = typeof names === 'string' ? names : Object.values(names)[0] ?? null;
   }
+
+  if (!path && data?.workFolder) path = data.workFolder;
 
   if (!path) return <span style={{ color: '#9ca3af' }}>—</span>;
 
@@ -1058,7 +1071,7 @@ export function buildColumnDefs(columns = [], { onAction } = {}) {
         return {
           ...base,
           cellRenderer: InfoCellRenderer,
-          cellRendererParams: { icons: col.icons || [] },
+          cellRendererParams: { icons: col.icons || [], datePattern: col.datePattern ?? null },
         };
       case 'extendedInfo':
         return {
@@ -1069,6 +1082,7 @@ export function buildColumnDefs(columns = [], { onAction } = {}) {
             showTypeIcon: !!col.showTypeIcon,
             typeIconChip: !!col.typeIconChip,
             showLockerInfo: !!col.showLockerInfo,
+            datePattern: col.datePattern ?? null,
           },
         };
       case 'section':
