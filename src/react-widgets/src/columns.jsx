@@ -51,7 +51,7 @@ function HeadlineCellRenderer({ data }) {
   );
 }
 
-function TitleCellRenderer({ data, colDef }) {
+function TitleCellRenderer({ data, colDef, context }) {
   const showTeaser = colDef?.cellRendererParams?.showTeaser;
   const teaser = showTeaser ? (data?.nodeMeta?.teaser?.title ?? null) : null;
   return (
@@ -92,9 +92,9 @@ function TitleCellRenderer({ data, colDef }) {
           WebkitBoxOrient: 'vertical',
           WebkitLineClamp: 2,
           overflow: 'hidden',
-          fontStyle: 'italic',
         }}>
-          {teaser}
+          <span style={{ fontWeight: 600, color: '#9d9aac', fontStyle: 'normal' }}>{context?.locales?.teaser || 'Teaser:'}{' '}</span>
+          <span style={{ fontStyle: 'italic' }}>{teaser}</span>
         </span>
       )}
     </div>
@@ -193,18 +193,20 @@ function TypeIconRenderer({ value, colDef, context, data }) {
   const iconName = iconId ? icons[iconId] : null;
   const Icon = iconName ? LUCIDE_ICONS[iconName] : null;
 
+  const displayName = typeDisplayName(value);
+
   if (iconOnly) {
     return (
       <span
         role="img"
-        aria-label={value}
+        aria-label={displayName}
         tabIndex={0}
         onMouseEnter={e => { const r = e.currentTarget.getBoundingClientRect(); setTip({ top: r.top, left: r.left + r.width / 2 }); }}
         onMouseLeave={() => setTip(null)}
         style={{ display: 'inline-flex', alignItems: 'center', color: '#69667f', cursor: 'default' }}
       >
-        {Icon ? <Icon size={16} strokeWidth={2} /> : value}
-        <BalloonTooltip visible={!!tip} top={tip?.top} left={tip?.left}>{value}</BalloonTooltip>
+        {Icon ? <Icon size={16} strokeWidth={2} /> : displayName}
+        <BalloonTooltip visible={!!tip} top={tip?.top} left={tip?.left}>{displayName}</BalloonTooltip>
       </span>
     );
   }
@@ -216,7 +218,7 @@ function TypeIconRenderer({ value, colDef, context, data }) {
       fontWeight: 600, color: '#69667f', background: '#e7e6ed', whiteSpace: 'nowrap',
     }}>
       {Icon && <Icon size={12} strokeWidth={2} />}
-      {value}
+      {displayName}
     </span>
   );
 }
@@ -224,6 +226,12 @@ function TypeIconRenderer({ value, colDef, context, data }) {
 function getNestedValue(obj, path) {
   if (!path) return undefined;
   return path.split('.').reduce((o, k) => (o == null ? o : o[k]), obj);
+}
+
+function typeDisplayName(typeName) {
+  if (!typeName) return '';
+  const seg = typeName.split('/').pop();
+  return seg.charAt(0).toUpperCase() + seg.slice(1);
 }
 
 function DateUserRenderer({ value, colDef, context, data }) {
@@ -707,8 +715,21 @@ function PublicationCellRenderer({ data, colDef, context }) {
   );
 }
 
-function InfoIcon({ def, Icon }) {
+function InfoIcon({ def, Icon, data }) {
   const [tip, setTip] = useState(null);
+
+  let pubData = null;
+  if (data && def.condition?.field?.startsWith('publishInfos.')) {
+    const site = def.condition.field.split('.')[1];
+    pubData = data.publishInfos?.[site] ?? null;
+  }
+
+  const fmtDate = (ts) => ts
+    ? new Date(ts).toLocaleString(undefined, { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+    : null;
+  const firstPub = fmtDate(pubData?.liveFirstPublicationDate);
+  const lastMod = fmtDate(pubData?.lastModified);
+
   return (
     <span
       onMouseEnter={e => { const r = e.currentTarget.getBoundingClientRect(); setTip({ top: r.top, left: r.left + r.width / 2 }); }}
@@ -716,25 +737,79 @@ function InfoIcon({ def, Icon }) {
       style={{ display: 'inline-flex', alignItems: 'center', cursor: 'default' }}
     >
       <Icon size={15} strokeWidth={2} style={{ color: '#2563eb' }} />
-      {def.label && (
-        <BalloonTooltip visible={!!tip} top={tip?.top} left={tip?.left}>{def.label}</BalloonTooltip>
+      {(def.label || firstPub || lastMod) && (
+        <BalloonTooltip visible={!!tip} top={tip?.top} left={tip?.left}>
+          {def.label && <div style={{ fontWeight: 700, marginBottom: (firstPub || lastMod) ? '4px' : 0 }}>{def.label}</div>}
+          {firstPub && <div style={{ color: '#c4c1d4' }}>⊙ {firstPub}</div>}
+          {lastMod && <div style={{ color: '#a5b4fc' }}>↻ {lastMod}</div>}
+        </BalloonTooltip>
       )}
     </span>
   );
 }
 
-function LockerInfoIcon({ userName }) {
+function LockerInfoIcon({ lockData, data, context }) {
   const [tip, setTip] = useState(null);
+  const [unlocking, setUnlocking] = useState(false);
+  const hideTimerRef = useRef(null);
+
+  const userName = lockData?.userUpdateRef?.userName ?? lockData?.userUpdateRef?.userId ?? null;
+  const dateStr = lockData?.locked
+    ? new Date(lockData.locked).toLocaleString(undefined, { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+    : null;
+
+  const handleTriggerEnter = (e) => {
+    clearTimeout(hideTimerRef.current);
+    const r = e.currentTarget.getBoundingClientRect();
+    setTip({ top: r.top, left: r.left + r.width / 2 });
+  };
+  const handleTriggerLeave = () => { hideTimerRef.current = setTimeout(() => setTip(null), 150); };
+  const handleTooltipEnter = () => clearTimeout(hideTimerRef.current);
+  const handleTooltipLeave = () => { hideTimerRef.current = setTimeout(() => setTip(null), 150); };
+  const handleUnlock = async (e) => {
+    e.stopPropagation();
+    if (unlocking) return;
+    setUnlocking(true);
+    try {
+      await unlockNode(data.id);
+      setTip(null);
+      document.dispatchEvent(new CustomEvent('neon-unlock-success', { detail: { familyRef: data.id } }));
+    } catch (err) {
+      console.error('[LockerInfoIcon] Unlock failed:', err.message);
+    } finally { setUnlocking(false); }
+  };
+
   return (
     <span
-      onMouseEnter={e => { const r = e.currentTarget.getBoundingClientRect(); setTip({ top: r.top, left: r.left + r.width / 2 }); }}
-      onMouseLeave={() => setTip(null)}
-      style={{ display: 'inline-flex', alignItems: 'center', cursor: 'default', color: '#2563eb' }}
+      onMouseEnter={handleTriggerEnter}
+      onMouseLeave={handleTriggerLeave}
+      style={{ display: 'inline-flex', alignItems: 'center', cursor: 'default', color: '#69667f' }}
     >
       <Lock size={14} strokeWidth={2} />
-      <BalloonTooltip visible={!!tip} top={tip?.top} left={tip?.left}>
-        {userName || 'Locked'}
-      </BalloonTooltip>
+      {tip && (
+        <LockTooltip top={tip.top} left={tip.left}
+          onMouseEnter={handleTooltipEnter}
+          onMouseLeave={handleTooltipLeave}
+        >
+          {dateStr && <div style={{ fontWeight: 700, marginBottom: '2px' }}>{dateStr}</div>}
+          {userName && <div style={{ color: '#a5b4fc', marginBottom: '6px' }}>{userName}</div>}
+          <button
+            onClick={handleUnlock}
+            disabled={unlocking}
+            style={{
+              display: 'block', width: '100%',
+              padding: '3px 8px', borderRadius: '6px',
+              border: '1px solid rgba(255,255,255,0.3)',
+              background: 'rgba(255,255,255,0.12)',
+              color: '#fff', fontSize: '11px', fontWeight: 600,
+              cursor: unlocking ? 'wait' : 'pointer',
+              fontFamily: 'inherit',
+            }}
+          >
+            {unlocking ? '…' : (context?.locales?.unlock || 'Unlock')}
+          </button>
+        </LockTooltip>
+      )}
     </span>
   );
 }
@@ -766,17 +841,18 @@ function ExtendedInfoCellRenderer({ data, colDef, context }) {
         </span>
       );
     } else {
+      const displayName = typeDisplayName(v);
       typeIconEl = (
         <span
           role="img"
-          aria-label={v}
+          aria-label={displayName}
           tabIndex={0}
           onMouseEnter={e => { const r = e.currentTarget.getBoundingClientRect(); setTypeTip({ top: r.top, left: r.left + r.width / 2 }); }}
           onMouseLeave={() => setTypeTip(null)}
           style={{ display: 'inline-flex', alignItems: 'center', color: '#69667f', cursor: 'default' }}
         >
-          {Icon ? <Icon size={16} strokeWidth={2} /> : v}
-          <BalloonTooltip visible={!!typeTip} top={typeTip?.top} left={typeTip?.left}>{v}</BalloonTooltip>
+          {Icon ? <Icon size={16} strokeWidth={2} /> : displayName}
+          <BalloonTooltip visible={!!typeTip} top={typeTip?.top} left={typeTip?.left}>{displayName}</BalloonTooltip>
         </span>
       );
     }
@@ -796,8 +872,7 @@ function ExtendedInfoCellRenderer({ data, colDef, context }) {
 
   let lockEl = null;
   if (showLockerInfo && data?.lockInfos?.USER) {
-    const u = data.lockInfos.USER.userUpdateRef;
-    lockEl = <LockerInfoIcon userName={u?.userName ?? u?.userId ?? null} />;
+    lockEl = <LockerInfoIcon lockData={data.lockInfos.USER} data={data} context={context} />;
   }
 
   if (!typeIconEl && !visibleIcons.length && !lockEl) return null;
@@ -808,7 +883,7 @@ function ExtendedInfoCellRenderer({ data, colDef, context }) {
       {visibleIcons.map((def, i) => {
         const Icon = LUCIDE_ICONS[icons[def.icon]];
         if (!Icon) return null;
-        return <InfoIcon key={i} def={def} Icon={Icon} />;
+        return <InfoIcon key={i} def={def} Icon={Icon} data={data} />;
       })}
       {lockEl}
     </span>
@@ -838,7 +913,7 @@ function InfoCellRenderer({ data, colDef, context }) {
       {visible.map((def, i) => {
         const Icon = LUCIDE_ICONS[icons[def.icon]];
         if (!Icon) return null;
-        return <InfoIcon key={i} def={def} Icon={Icon} />;
+        return <InfoIcon key={i} def={def} Icon={Icon} data={data} />;
       })}
     </span>
   );
