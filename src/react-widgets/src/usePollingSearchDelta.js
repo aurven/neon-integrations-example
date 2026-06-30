@@ -48,14 +48,11 @@ export function usePollingSearchDelta({ fetchFn, idKey = 'id', intervalMs, enabl
   useEffect(() => {
     mountedRef.current = true;
 
-    if (!enabled) {
-      return undefined;
-    }
-
     let cancelled = false;
 
     runInit().then(() => {
       if (cancelled || !mountedRef.current) return;
+      if (!enabled) return;
 
       intervalHandleRef.current = setInterval(() => {
         if (inFlightRef.current) {
