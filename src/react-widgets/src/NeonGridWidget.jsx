@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useRef } from 'react';
+import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import { buildColumnDefs, defaultColDef } from './columns.jsx';
 import { evaluateRowRules } from './row-rules.js';
@@ -122,6 +122,12 @@ export default function NeonGridWidget() {
     onEvent: useCallback(() => { reload(); }, [reload]),
     enabled: false // temporarily disabled
   });
+
+  useEffect(() => {
+    const handleUnlockSuccess = () => { reload(); };
+    document.addEventListener('neon-unlock-success', handleUnlockSuccess);
+    return () => document.removeEventListener('neon-unlock-success', handleUnlockSuccess);
+  }, [reload]);
 
   const handleRefresh = useCallback(() => {
     setLoading(true);

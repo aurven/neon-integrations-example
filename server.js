@@ -253,6 +253,7 @@ fastify.get("/widgets/planning-board", widgetHandlers.planningBoardWidgetHandler
 fastify.get("/widgets/neon-grid", widgetHandlers.neonGridWidgetHandler);
 fastify.get("/api/neon/grid/articles", widgetHandlers.neonGridDataHandler);
 fastify.post("/api/neon/grid/duplicate", widgetHandlers.neonGridDuplicateHandler);
+fastify.post("/api/neon/nodes/unlock", widgetHandlers.neonNodeUnlockHandler);
 fastify.get("/widgets/print-query-board", widgetHandlers.printQueryBoardHandler);
 fastify.get("/api/print-query-board/stories", widgetHandlers.printQueryBoardDataHandler);
 fastify.get("/widgets/neon-create", widgetHandlers.neonCreateWidgetHandler);

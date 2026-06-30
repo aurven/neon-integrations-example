@@ -689,6 +689,20 @@ async function neonCreateHandler(request, reply) {
   }
 }
 
+async function neonNodeUnlockHandler(request, reply) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) return reply.status(401).send({ error: 'Unauthorized' });
+  const { familyRef, unlockMode } = request.body || {};
+  if (!familyRef) return reply.status(400).send({ error: 'familyRef is required' });
+  try {
+    await neonBoApi.unlockNode(familyRef, unlockMode || 'MAJOR');
+    return reply.status(200).send({ success: true });
+  } catch (err) {
+    console.error('[neonNodeUnlockHandler] Unlock failed:', err.message);
+    return reply.status(500).send({ error: 'Failed to unlock node' });
+  }
+}
+
 module.exports = {
   testWidgetHandler,
   dropWidgetHandler,
@@ -707,4 +721,5 @@ module.exports = {
   printQueryBoardDataHandler,
   neonCreateWidgetHandler,
   neonCreateHandler,
+  neonNodeUnlockHandler,
 };

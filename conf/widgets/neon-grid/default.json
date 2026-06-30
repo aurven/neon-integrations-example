@@ -36,6 +36,15 @@
     "video": "video",
     "audio": "mic"
   },
+  "locales": {
+    "loading": "Loading articles…",
+    "refresh": "Refresh",
+    "unlock": "Unlock",
+    "notPublished": "Not published",
+    "selectWorkspace": "Select workspace",
+    "noWorkfolders": "No workfolders available",
+    "actions": "Actions"
+  },
   "actions": [
     { "id": "copy", "label": "Copy", "icon": "copy" },
     { "id": "move", "label": "Move to...", "icon": "move", "actionType": "moveToWorkspace" },
@@ -54,7 +63,8 @@
     { "field": "type", "headerName": "Type", "type": "typeIcon", "width": 90, "sortable": true, "filter": true, "iconOnly": false },
     { "field": "versionInfo.createFamilyTime", "headerName": "Created", "type": "dateUser", "width": 160, "sortable": true,
       "userField": "versionInfo.createFamilyUserRef.userId", "userAliasField": "versionInfo.createFamilyUserRef.alias" },
-    { "field": "lockInfos.USER.locked", "headerName": "Locked", "type": "dateUser", "width": 160, "sortable": false,
+    { "field": "lockInfos.USER.locked", "headerName": "Locked", "type": "dateUser", "width": 70, "sortable": false,
+      "display": "icon", "showUnlock": true,
       "userField": "lockInfos.USER.userUpdateRef.userId", "userAliasField": "lockInfos.USER.userUpdateRef.userName" },
     { "field": "versionInfo.updateVersionTime", "headerName": "Updated", "type": "dateUser", "width": 160, "sortable": true,
       "userField": "versionInfo.updateVersionUserRef.userId", "userAliasField": "versionInfo.updateVersionUserRef.alias" },

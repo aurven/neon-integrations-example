@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { FileText, Image, Video, Mic, Copy, ArrowRight, Send, Zap, Globe, Trophy, Rocket, Rss, Monitor, MoreHorizontal, ChevronRight, ArrowLeft, Lock, Pencil, Eye } from 'lucide-react';
-import { duplicateArticle } from './api.js';
+import { FileText, Image, Video, Mic, Copy, ArrowRight, Send, Zap, Globe, Trophy, Rocket, Rss, Monitor, MoreHorizontal, ChevronRight, ArrowLeft, Lock, LockOpen, Pencil, Eye } from 'lucide-react';
+import { duplicateArticle, unlockNode } from './api.js';
 import { matchesCondition } from './row-rules.js';
 
 function getWorkfolders() {
@@ -181,7 +181,7 @@ function BadgeCellRenderer({ value, colDef }) {
 
 // Registry of Lucide icon components available to the widget.
 // The icons registry in conf (id → lucide name) resolves into this map.
-const LUCIDE_ICONS = { FileText, Image, Video, Mic, Copy, ArrowRight, Send, Zap, Globe, Trophy, Rocket, Rss, Monitor, MoreHorizontal, ChevronRight, ArrowLeft, Lock, Pencil, Eye };
+const LUCIDE_ICONS = { FileText, Image, Video, Mic, Copy, ArrowRight, Send, Zap, Globe, Trophy, Rocket, Rss, Monitor, MoreHorizontal, ChevronRight, ArrowLeft, Lock, LockOpen, Pencil, Eye };
 
 function TypeIconRenderer({ value, colDef, context, data }) {
   const icons = context?.icons || {};
@@ -228,8 +228,10 @@ function getNestedValue(obj, path) {
 
 function DateUserRenderer({ value, colDef, context, data }) {
   const userCache = context?.userCache ?? {};
-  const { userField, userAliasField, locale, dateFormatOptions, datePattern, display } = colDef.cellRendererParams ?? {};
+  const { userField, userAliasField, locale, dateFormatOptions, datePattern, display, showUnlock } = colDef.cellRendererParams ?? {};
   const [tip, setTip] = useState(null);
+  const [unlocking, setUnlocking] = useState(false);
+  const hideTimerRef = useRef(null);
 
   if (!value) return <span style={{ color: '#9ca3af' }}>—</span>;
 
@@ -249,17 +251,73 @@ function DateUserRenderer({ value, colDef, context, data }) {
   const userName = userId ? (userCache[userId] || userAlias || userId) : (userAlias || null);
 
   if (display === 'icon') {
+    const handleTriggerEnter = (e) => {
+      clearTimeout(hideTimerRef.current);
+      const r = e.currentTarget.getBoundingClientRect();
+      setTip({ top: r.top, left: r.left + r.width / 2 });
+    };
+    const handleTriggerLeave = () => {
+      if (showUnlock) {
+        hideTimerRef.current = setTimeout(() => setTip(null), 150);
+      } else {
+        setTip(null);
+      }
+    };
+    const handleTooltipEnter = () => clearTimeout(hideTimerRef.current);
+    const handleTooltipLeave = () => {
+      hideTimerRef.current = setTimeout(() => setTip(null), 150);
+    };
+    const handleUnlock = async (e) => {
+      e.stopPropagation();
+      if (unlocking) return;
+      setUnlocking(true);
+      try {
+        await unlockNode(data.id);
+        setTip(null);
+        document.dispatchEvent(new CustomEvent('neon-unlock-success', { detail: { familyRef: data.id } }));
+      } catch (err) {
+        console.error('[DateUserRenderer] Unlock failed:', err.message);
+      } finally {
+        setUnlocking(false);
+      }
+    };
+
     return (
       <span
-        onMouseEnter={e => { const r = e.currentTarget.getBoundingClientRect(); setTip({ top: r.top, left: r.left + r.width / 2 }); }}
-        onMouseLeave={() => setTip(null)}
+        onMouseEnter={handleTriggerEnter}
+        onMouseLeave={handleTriggerLeave}
         style={{ display: 'inline-flex', alignItems: 'center', cursor: 'default', color: '#69667f' }}
       >
         <Lock size={15} strokeWidth={2} />
-        <BalloonTooltip visible={!!tip} top={tip?.top} left={tip?.left}>
-          <div style={{ fontWeight: 700, marginBottom: '2px' }}>{dateStr}</div>
-          {userName && <div style={{ color: '#a5b4fc' }}>{userName}</div>}
-        </BalloonTooltip>
+        {tip && (
+          <LockTooltip
+            top={tip.top} left={tip.left}
+            onMouseEnter={showUnlock ? handleTooltipEnter : undefined}
+            onMouseLeave={showUnlock ? handleTooltipLeave : undefined}
+          >
+            <div style={{ fontWeight: 700, marginBottom: '2px' }}>{dateStr}</div>
+            {userName && (
+              <div style={{ color: '#a5b4fc', marginBottom: showUnlock ? '6px' : 0 }}>{userName}</div>
+            )}
+            {showUnlock && (
+              <button
+                onClick={handleUnlock}
+                disabled={unlocking}
+                style={{
+                  display: 'block', width: '100%',
+                  padding: '3px 8px', borderRadius: '6px',
+                  border: '1px solid rgba(255,255,255,0.3)',
+                  background: 'rgba(255,255,255,0.12)',
+                  color: '#fff', fontSize: '11px', fontWeight: 600,
+                  cursor: unlocking ? 'wait' : 'pointer',
+                  fontFamily: 'inherit',
+                }}
+              >
+                {unlocking ? '…' : (context?.locales?.unlock || 'Unlock')}
+              </button>
+            )}
+          </LockTooltip>
+        )}
       </span>
     );
   }
@@ -543,6 +601,33 @@ function BalloonTooltip({ visible, top, left, children }) {
       pointerEvents: 'none', whiteSpace: 'nowrap',
       boxShadow: '0 4px 16px rgba(63,60,78,.28)', lineHeight: 1.5,
     }}>
+      {children}
+      <div style={{
+        position: 'absolute', bottom: -5, left: '50%', transform: 'translateX(-50%)',
+        width: 0, height: 0,
+        borderLeft: '5px solid transparent', borderRight: '5px solid transparent',
+        borderTop: '5px solid #3f3c4e',
+      }} />
+    </div>,
+    document.body
+  );
+}
+
+function LockTooltip({ top, left, onMouseEnter, onMouseLeave, children }) {
+  return createPortal(
+    <div
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      style={{
+        position: 'fixed', top, left,
+        transform: 'translate(-50%, calc(-100% - 8px))',
+        background: '#3f3c4e', color: '#fff', borderRadius: '8px',
+        padding: '7px 10px', fontSize: '11px', zIndex: 9999,
+        pointerEvents: onMouseEnter ? 'auto' : 'none',
+        whiteSpace: 'nowrap',
+        boxShadow: '0 4px 16px rgba(63,60,78,.28)', lineHeight: 1.5,
+      }}
+    >
       {children}
       <div style={{
         position: 'absolute', bottom: -5, left: '50%', transform: 'translateX(-50%)',
@@ -889,6 +974,7 @@ export function buildColumnDefs(columns = [], { onAction } = {}) {
             dateFormatOptions: col.dateFormatOptions,
             datePattern: col.datePattern,
             display: col.display,
+            showUnlock: !!col.showUnlock,
           },
         };
       case 'publication':
