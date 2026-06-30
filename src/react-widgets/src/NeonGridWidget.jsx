@@ -305,6 +305,7 @@ export default function NeonGridWidget() {
               defaultColDef={defaultColDef}
               getRowId={params => params.data.id}
               context={{ userCache, icons: gridConfig.icons || {}, typeIcons: gridConfig.typeIcons || {}, typeLabels: gridConfig.typeLabels || {}, gridActions: gridConfig.actions || [], locales: gridConfig.locales || {} }}
+              localeText={gridConfig.locales?.agGrid ?? undefined}
               enableBrowserTooltips={true}
               pagination={true}
               paginationPageSize={25}

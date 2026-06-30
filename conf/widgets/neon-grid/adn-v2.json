@@ -34,7 +34,30 @@
     "notPublished": "Non pubblicato",
     "noWorkfolders": "Nessuna cartella disponibile",
     "actions": "Azioni",
-    "selectWorkspace": "Seleziona cartella"
+    "selectWorkspace": "Seleziona cartella",
+    "agGrid": {
+      "pageSizeSelectorLabel": "Righe per pagina:",
+      "page": "Pagina",
+      "to": "di",
+      "of": "su",
+      "next": "Avanti",
+      "last": "Ultima",
+      "first": "Prima",
+      "previous": "Indietro",
+      "noRowsToShow": "Nessun risultato",
+      "loadingOoo": "Caricamento…",
+      "filterOoo": "Filtra…",
+      "equals": "Uguale",
+      "notEqual": "Diverso",
+      "contains": "Contiene",
+      "notContains": "Non contiene",
+      "startsWith": "Inizia con",
+      "endsWith": "Finisce con",
+      "blank": "Vuoto",
+      "notBlank": "Non vuoto",
+      "andCondition": "E",
+      "orCondition": "O"
+    }
   },
   "fields": [
     { "key": "headline", "source": "title" },
