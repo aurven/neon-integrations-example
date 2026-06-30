@@ -51,7 +51,9 @@ function HeadlineCellRenderer({ data }) {
   );
 }
 
-function TitleCellRenderer({ data }) {
+function TitleCellRenderer({ data, colDef }) {
+  const showTeaser = colDef?.cellRendererParams?.showTeaser;
+  const teaser = showTeaser ? (data?.nodeMeta?.teaser?.title ?? null) : null;
   return (
     <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '100%', gap: '2px' }}>
       {data?.isNew && (
@@ -81,6 +83,20 @@ function TitleCellRenderer({ data }) {
       }}>
         {data?.headline || '—'}
       </span>
+      {teaser && (
+        <span style={{
+          fontSize: '11px',
+          color: '#69667f',
+          lineHeight: '1.3',
+          display: '-webkit-box',
+          WebkitBoxOrient: 'vertical',
+          WebkitLineClamp: 2,
+          overflow: 'hidden',
+          fontStyle: 'italic',
+        }}>
+          {teaser}
+        </span>
+      )}
     </div>
   );
 }
@@ -814,7 +830,13 @@ export function buildColumnDefs(columns = [], { onAction } = {}) {
       case 'headline':
         return { ...base, autoHeight: true, cellRenderer: HeadlineCellRenderer };
       case 'title':
-        return { ...base, autoHeight: true, wrapText: true, cellRenderer: TitleCellRenderer };
+        return {
+          ...base,
+          autoHeight: true,
+          wrapText: true,
+          cellRenderer: TitleCellRenderer,
+          cellRendererParams: { showTeaser: !!col.showTeaser },
+        };
       case 'status':
         return {
           ...base,

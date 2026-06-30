@@ -12,7 +12,8 @@
     { "key": "statusColor", "derived": "statusColor" },
     { "key": "versionInfo", "source": "versionInfo" },
     { "key": "lockInfos", "source": "lockInfos" },
-    { "key": "publishInfos", "source": "publishInfos" }
+    { "key": "publishInfos", "source": "publishInfos" },
+    { "key": "nodeMeta", "source": "nodeMeta" }
   ],
   "icons": {
     "file": "FileText",
