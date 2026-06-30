@@ -29,7 +29,8 @@ function logNeonCall({ callerName, requestConfig, response, error }) {
                 url: requestConfig.url,
                 baseURL: requestConfig.baseURL,
                 params: requestConfig.params,
-                data: requestConfig.data
+                data: requestConfig.data,
+                updateContextId: requestConfig.headers?.['update-context-id']
             },
             response: response ? {
                 status: response.status,
@@ -126,12 +127,17 @@ class NeonClient {
     }
 
     async unlockNode(familyRef, unlockMode = 'MAJOR', force = false, updateContextId = null) {
-        return await this.makeRequest({
-            method: 'put',
-            url: `/contents/nodes/unlock?unlockMode=${unlockMode}${force ? '&force=true' : ''}`,
-            data: [familyRef],
-            ...(updateContextId && { headers: { 'update-context-id': updateContextId } })
-        }, `Node ${familyRef} unlocked`);
+        const originalContextId = this.updateContextId;
+        if (updateContextId) this.updateContextId = updateContextId;
+        try {
+            return await this.makeRequest({
+                method: 'put',
+                url: `/contents/nodes/unlock?unlockMode=${unlockMode}${force ? '&force=true' : ''}`,
+                data: [familyRef]
+            }, `Node ${familyRef} unlocked`);
+        } finally {
+            this.updateContextId = originalContextId;
+        }
     }
 
     async updateNodeContent(familyRef, xmlBodyString) {
@@ -429,7 +435,7 @@ module.exports = {
     getNodeMetadata: (familyRef) => defaultClient.getNodeMetadata(familyRef),
     deleteNode: (familyRef, force) => defaultClient.deleteNode(familyRef, force),
     lockNode: (familyRef) => defaultClient.lockNode(familyRef),
-    unlockNode: (familyRef, unlockMode, force) => defaultClient.unlockNode(familyRef, unlockMode, force),
+    unlockNode: (familyRef, unlockMode, force, updateContextId) => defaultClient.unlockNode(familyRef, unlockMode, force, updateContextId),
     updateNodeContent: (familyRef, xmlBodyString) => defaultClient.updateNodeContent(familyRef, xmlBodyString),
     updateNodeMetadata: (familyRef, xmlBodyString) => defaultClient.updateNodeMetadata(familyRef, xmlBodyString),
     createNewStory: (options) => defaultClient.createNewStory(options),
