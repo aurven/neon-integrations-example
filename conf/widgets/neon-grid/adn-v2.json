@@ -9,6 +9,7 @@
   "locales": {
     "loading": "Caricamento articoli…",
     "refresh": "Aggiorna",
+    "unlock": "Sblocca",
     "notPublished": "Non pubblicato",
     "noWorkfolders": "Nessuna cartella disponibile",
     "actions": "Azioni",
@@ -25,7 +26,8 @@
     { "key": "lockInfos", "source": "lockInfos" },
     { "key": "publishInfos", "source": "publishInfos" },
     { "key": "categories", "source": "categories" },
-    { "key": "workFolder", "source": "metadataGroups.eom.sys_attributes_json.workFolder" }
+    { "key": "workFolder", "source": "metadataGroups.eom.sys_attributes_json.workFolder" },
+    { "key": "nodeMeta", "source": "nodeMeta" }
   ],
   "icons": {
     "file": "FileText",
@@ -83,14 +85,11 @@
     },
     {
       "field": "headline", "headerName": "Titolo", "type": "title",
-      "flex": 4, "minWidth": 200, "sortable": true, "filter": true
+      "flex": 4, "minWidth": 200, "sortable": true, "filter": true, "showTeaser": true
     },
     {
-      "field": "type", "headerName": "Tipo", "type": "typeIcon",
-      "width": 100, "sortable": true, "filter": true, "iconOnly": false
-    },
-    {
-      "field": "publishInfos", "headerName": "Info", "type": "info", "width": 70,
+      "field": "publishInfos", "headerName": "Info", "type": "extendedInfo", "width": 100,
+      "showTypeIcon": true, "typeIconChip": false, "showLockerInfo": true,
       "icons": [
         { "icon": "rss",     "label": "Wire", "condition": { "field": "publishInfos.Wire.liveFirstPublicationDate", "op": "exists" } },
         { "icon": "monitor", "label": "Web",  "condition": { "field": "publishInfos.Web.liveFirstPublicationDate",  "op": "exists" } }
@@ -125,12 +124,6 @@
       "width": 150, "sortable": true, "datePattern": "dd/MM/yyyy HH:mm",
       "userField": "versionInfo.createFamilyUserRef.userId",
       "userAliasField": "versionInfo.createFamilyUserRef.alias"
-    },
-    {
-      "field": "lockInfos.USER.locked", "headerName": "Bloccato", "type": "dateUser",
-      "width": 55, "sortable": false, "display": "icon", "datePattern": "dd/MM/yyyy HH:mm",
-      "userField": "lockInfos.USER.userUpdateRef.userId",
-      "userAliasField": "lockInfos.USER.userUpdateRef.userName"
     },
     {
       "field": "versionInfo.updateVersionTime", "headerName": "Ultima Modifica", "type": "dateUser",
