@@ -1,0 +1,18 @@
+{
+  "buttons": [
+    {
+      "label": "Nuovo articolo",
+      "icon": "article",
+      "createOptions": {
+        "type": "article"
+      }
+    },
+    {
+      "label": "Nuovo flash",
+      "icon": "flash",
+      "createOptions": {
+        "type": "article/flash"
+      }
+    }
+  ]
+}

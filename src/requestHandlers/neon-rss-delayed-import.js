@@ -3,13 +3,26 @@ const delayedImporter = require('../delayed-importer.js');
 const { safeLogRequest } = require('../helpers/utils.js');
 const { authenticate } = require('../helpers/auth.js');
 
-function stripHtml(html) {
-  return (html || '').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+function resolveField(item, fieldName) {
+  switch (fieldName) {
+    case 'title':       return item.title || '';
+    case 'description': return item.contentSnippet || item.description || '';
+    case 'content':     return item.content || item.contentSnippet || item.description || '';
+    case 'link':        return item.link || '';
+    case 'pubDate':     return item.isoDate || item.pubDate || '';
+    case 'dc:creator':  return item.dcCreator || '';
+    case 'author':      return item.author || item.creator || '';
+    default:            return item[fieldName] || '';
+  }
 }
 
-function formatItalianDate(dateStr) {
+function interpolateSuffix(template, vars) {
+  return template.replace(/\$\{(\w+)\}/g, (_, k) => vars[k] ?? '');
+}
+
+function formatDate(dateStr, locale) {
   try {
-    return new Date(dateStr).toLocaleDateString('it-IT', {
+    return new Date(dateStr).toLocaleDateString(locale || 'it-IT', {
       day: 'numeric', month: 'long', year: 'numeric',
     });
   } catch {
@@ -22,21 +35,14 @@ async function fetchRssItems(rssUrl, maxItems) {
     customFields: {
       item: [
         ['dc:creator', 'dcCreator'],
-        ['author',     'authorField'],
+        ['author',     'creator'],
       ],
     },
   });
 
   const feed = await parser.parseURL(rssUrl);
   const slice = maxItems ? feed.items.slice(0, maxItems) : feed.items;
-
-  return slice.map(item => ({
-    title:       item.title       || '',
-    description: item.content     || item.contentSnippet || item.description || '',
-    link:        item.link        || '',
-    pubDate:     item.isoDate     || item.pubDate || '',
-    byline:      item.dcCreator   || item.authorField || item.creator || item.author || '',
-  }));
+  return slice;
 }
 
 async function submitRssDelayedImportHandler(request, reply) {
@@ -60,8 +66,9 @@ async function submitRssDelayedImportHandler(request, reply) {
     maxItems,
     assignTo,
     publish     = false,
-    sourceName,
-    locale      = 'it-IT',
+    fieldMap    = {},
+    contentSuffix,
+    dateLocale  = 'it-IT',
   } = request.body || {};
 
   if (!rssUrl)    return reply.status(400).send({ error: 'rssUrl is required' });
@@ -80,33 +87,26 @@ async function submitRssDelayedImportHandler(request, reply) {
     return reply.status(422).send({ error: 'No items found in RSS feed' });
   }
 
-  let displaySource = sourceName;
-  if (!displaySource) {
-    try { displaySource = new URL(rssUrl).hostname.replace(/^www\./, ''); }
-    catch { displaySource = rssUrl; }
-  }
-
   const items = rssItems.map(item => {
-    const dateLabel = formatItalianDate(item.pubDate);
-    const attribution = `<p>Questo articolo è apparso su ${displaySource} <a href="${item.link}">a questo indirizzo</a> il ${dateLabel}</p>`;
-    const entry = {
-      contentType: 'story',
-      type,
-      title:   item.title,
-      summary: stripHtml(item.description),
-      content: (item.description || '') + attribution,
-    };
-    if (item.byline) entry.byline = item.byline;
+    const entry = { contentType: 'story', type };
+
+    for (const [storyField, rssFieldName] of Object.entries(fieldMap)) {
+      entry[storyField] = resolveField(item, rssFieldName);
+    }
+
+    if (contentSuffix && entry.content !== undefined) {
+      const pubDateFormatted = formatDate(resolveField(item, 'pubDate'), dateLocale);
+      entry.content += interpolateSuffix(contentSuffix, {
+        title:   resolveField(item, 'title'),
+        link:    resolveField(item, 'link'),
+        pubDate: pubDateFormatted,
+      });
+    }
+
     return entry;
   });
 
-  const payload = {
-    site,
-    workspace,
-    duration,
-    publish,
-    items,
-  };
+  const payload = { site, workspace, duration, publish, items };
   if (assignTo) payload.assignTo = assignTo;
 
   const validation = delayedImporter.validatePayload(payload);

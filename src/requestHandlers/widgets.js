@@ -39,6 +39,18 @@ function derivePrintFields(node) {
   return { printPriority, issueDate };
 }
 
+// Load a create-widget config JSON by name (sanitized), falling back to 'default'.
+function loadCreateConfig(name) {
+  const fs = require('fs');
+  const path = require('path');
+  const safe = /^[a-zA-Z0-9_-]+$/.test(name || '') ? name : 'default';
+  const tryFile = (n) => {
+    try { return JSON.parse(fs.readFileSync(path.join(__dirname, '../../conf/widgets/neon-create', `${n}.json`), 'utf8')); }
+    catch { return null; }
+  };
+  return tryFile(safe) || tryFile('default') || { buttons: [] };
+}
+
 // Load a grid config JSON by name (sanitized), falling back to 'default'.
 function loadGridConfig(name) {
   const fs = require('fs');
@@ -626,6 +638,44 @@ async function printQueryBoardDataHandler(request, reply) {
   }
 }
 
+async function neonCreateWidgetHandler(request, reply) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) {
+    return reply.status(401).send({ error: 'Unauthorized' });
+  }
+
+  const configName = /^[a-zA-Z0-9_-]+$/.test(request.query.config || '') ? request.query.config : 'default';
+  const createConfig = loadCreateConfig(configName);
+
+  return reply.view('/src/widgets/neon-create.hbs', {
+    seo: { title: 'Create Content', description: 'Quick content creation widget' },
+    neonAppUrl: process.env.NEON_APP_URL,
+    apiKey: auth.apikey,
+    createConfig: JSON.stringify(createConfig),
+  });
+}
+
+async function neonCreateHandler(request, reply) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) {
+    return reply.status(401).send({ error: 'Unauthorized' });
+  }
+
+  const { createOptions } = request.body || {};
+  if (!createOptions || !createOptions.type) {
+    return reply.status(400).send({ error: 'createOptions.type is required' });
+  }
+
+  try {
+    const node = await neonBoApi.createNewStory(createOptions);
+    console.log('neonCreateHandler << created:', node.familyRef);
+    return reply.status(200).send({ familyRef: node.familyRef });
+  } catch (err) {
+    console.error('neonCreateHandler << error:', err.message);
+    return reply.status(500).send({ error: err.message });
+  }
+}
+
 module.exports = {
   testWidgetHandler,
   dropWidgetHandler,
@@ -642,4 +692,6 @@ module.exports = {
   neonGridDuplicateHandler,
   printQueryBoardHandler,
   printQueryBoardDataHandler,
+  neonCreateWidgetHandler,
+  neonCreateHandler,
 };

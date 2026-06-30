@@ -5,6 +5,12 @@
   "duration": 1,
   "type": "wirestory",
   "publish": false,
-  "sourceName": "Adnkronos.com",
-  "locale": "it-IT"
+  "fieldMap": {
+    "title":   "title",
+    "byline":  "dc:creator",
+    "summary": "description",
+    "content": "description"
+  },
+  "contentSuffix": "<p>Questo articolo è apparso su Adnkronos.com <a href=\"${link}\">a questo indirizzo</a> il ${pubDate}</p>",
+  "dateLocale": "it-IT"
 }
