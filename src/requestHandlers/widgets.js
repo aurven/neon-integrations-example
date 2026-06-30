@@ -507,6 +507,19 @@ async function neonGridDataHandler(request, reply) {
     Object.assign(queryPayload.variables, gridConfig.queryOverrides.variables);
   }
 
+  // Query variable overrides from client switcher
+  const qvRaw = request.query.qv;
+  if (qvRaw) {
+    try {
+      const qv = JSON.parse(qvRaw);
+      if (qv && typeof qv === 'object' && !Array.isArray(qv)) {
+        Object.assign(queryPayload.variables, qv);
+      }
+    } catch {
+      // malformed qv — ignore
+    }
+  }
+
   try {
     const searchResults = await neonBoApi.searchContents(queryPayload, 500, 500);
     const articles = mapNodes(searchResults.nodes || []);

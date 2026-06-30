@@ -39,6 +39,11 @@ const NOTIFIER_EVENTS = [
 export default function NeonGridWidget() {
   const gridConfig = window.CONFIG?.gridConfig ?? { columns: [] };
 
+  const querySwitcher = gridConfig.querySwitcher ?? null;
+  const [queryOptIdx, setQueryOptIdx] = useState(0);
+  const queryOptIdxRef = useRef(0);
+  queryOptIdxRef.current = queryOptIdx;
+
   const [toast, setToast] = useState(null);
   const toastTimerRef = useRef(null);
 
@@ -78,14 +83,15 @@ export default function NeonGridWidget() {
   );
 
   const fetchFn = useCallback(() => {
-    return fetchArticles()
+    const vars = querySwitcher?.options?.[queryOptIdxRef.current]?.variables ?? null;
+    return fetchArticles(vars)
       .then(d => d.articles ?? d)
       .catch(err => {
         setError(err.message);
         setLoading(false);
         return [];
       });
-  }, []);
+  }, [querySwitcher]);
 
   const handleDelta = useCallback((delta) => {
     if (delta.type === 'init') {
@@ -118,6 +124,15 @@ export default function NeonGridWidget() {
   });
 
   const handleRefresh = useCallback(() => {
+    setLoading(true);
+    setError(null);
+    reload();
+  }, [reload]);
+
+  const handleQueryOptChange = useCallback((e) => {
+    const idx = parseInt(e.target.value, 10);
+    queryOptIdxRef.current = idx;
+    setQueryOptIdx(idx);
     setLoading(true);
     setError(null);
     reload();
@@ -185,6 +200,35 @@ export default function NeonGridWidget() {
           }}>
             {rowData.length}
           </span>
+        )}
+        {querySwitcher && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            {querySwitcher.label && (
+              <span style={{ fontSize: '12px', color: '#69667f', fontWeight: 500 }}>
+                {querySwitcher.label}
+              </span>
+            )}
+            <select
+              value={queryOptIdx}
+              onChange={handleQueryOptChange}
+              style={{
+                fontSize: '12px',
+                color: '#3f3c4e',
+                border: '1px solid #dddce5',
+                borderRadius: '8px',
+                padding: '4px 24px 4px 8px',
+                background: '#fff',
+                cursor: 'pointer',
+                fontFamily: 'inherit',
+                outline: 'none',
+                appearance: 'auto',
+              }}
+            >
+              {querySwitcher.options.map((opt, i) => (
+                <option key={i} value={i}>{opt.label}</option>
+              ))}
+            </select>
+          </div>
         )}
         <div style={{ flex: 1 }} />
         <button

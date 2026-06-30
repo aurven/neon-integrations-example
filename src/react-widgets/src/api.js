@@ -21,7 +21,7 @@ async function apiFetch(path) {
   return response.json();
 }
 
-export function fetchArticles() {
+export function fetchArticles(queryVars = null) {
   const demo = window.CONFIG?.demo;
   const config = window.CONFIG?.gridConfigName;
   const query = window.CONFIG?.queryConfigName;
@@ -29,6 +29,7 @@ export function fetchArticles() {
   if (demo) params.set('demo', 'true');
   if (config) params.set('config', config);
   if (query) params.set('query', query);
+  if (queryVars && Object.keys(queryVars).length > 0) params.set('qv', JSON.stringify(queryVars));
   const qs = params.toString();
   return apiFetch(`/api/neon/grid/articles${qs ? `?${qs}` : ''}`);
 }
