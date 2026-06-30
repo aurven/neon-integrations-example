@@ -104,7 +104,8 @@ export default function NeonGridWidget() {
     fetchFn,
     idKey: 'id',
     intervalMs: gridConfig.pollIntervalMs ?? 20000,
-    onDelta: handleDelta
+    onDelta: handleDelta,
+    enabled: false // temporarily disabled
   });
 
   const familyRefs = useMemo(() => rowData.map(r => r.id), [rowData]);
@@ -113,7 +114,7 @@ export default function NeonGridWidget() {
     familyRefs,
     events: NOTIFIER_EVENTS,
     onEvent: useCallback(() => { reload(); }, [reload]),
-    enabled: !window.CONFIG?.demo
+    enabled: false // temporarily disabled
   });
 
   const handleRefresh = useCallback(() => {
