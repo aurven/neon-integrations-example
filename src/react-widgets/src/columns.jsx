@@ -622,6 +622,98 @@ function InfoIcon({ def, Icon }) {
   );
 }
 
+function LockerInfoIcon({ userName }) {
+  const [tip, setTip] = useState(null);
+  return (
+    <span
+      onMouseEnter={e => { const r = e.currentTarget.getBoundingClientRect(); setTip({ top: r.top, left: r.left + r.width / 2 }); }}
+      onMouseLeave={() => setTip(null)}
+      style={{ display: 'inline-flex', alignItems: 'center', cursor: 'default', color: '#2563eb' }}
+    >
+      <Lock size={14} strokeWidth={2} />
+      <BalloonTooltip visible={!!tip} top={tip?.top} left={tip?.left}>
+        {userName || 'Locked'}
+      </BalloonTooltip>
+    </span>
+  );
+}
+
+function ExtendedInfoCellRenderer({ data, colDef, context }) {
+  const icons = context?.icons || {};
+  const typeIcons = context?.typeIcons || {};
+  const iconDefs = colDef.cellRendererParams?.icons || [];
+  const showTypeIcon = colDef.cellRendererParams?.showTypeIcon;
+  const typeIconChip = colDef.cellRendererParams?.typeIconChip;
+  const showLockerInfo = colDef.cellRendererParams?.showLockerInfo;
+  const [typeTip, setTypeTip] = useState(null);
+
+  let typeIconEl = null;
+  if (showTypeIcon && data?.typeName) {
+    const v = data.typeName;
+    const iconId = typeIcons[v.toLowerCase()];
+    const iconName = iconId ? icons[iconId] : null;
+    const Icon = iconName ? LUCIDE_ICONS[iconName] : null;
+    if (typeIconChip) {
+      typeIconEl = (
+        <span style={{
+          display: 'inline-flex', alignItems: 'center', gap: '5px',
+          padding: '2px 8px', borderRadius: '9999px', fontSize: '11px',
+          fontWeight: 600, color: '#69667f', background: '#e7e6ed', whiteSpace: 'nowrap',
+        }}>
+          {Icon && <Icon size={12} strokeWidth={2} />}
+          {v}
+        </span>
+      );
+    } else {
+      typeIconEl = (
+        <span
+          role="img"
+          aria-label={v}
+          tabIndex={0}
+          onMouseEnter={e => { const r = e.currentTarget.getBoundingClientRect(); setTypeTip({ top: r.top, left: r.left + r.width / 2 }); }}
+          onMouseLeave={() => setTypeTip(null)}
+          style={{ display: 'inline-flex', alignItems: 'center', color: '#69667f', cursor: 'default' }}
+        >
+          {Icon ? <Icon size={16} strokeWidth={2} /> : v}
+          <BalloonTooltip visible={!!typeTip} top={typeTip?.top} left={typeTip?.left}>{v}</BalloonTooltip>
+        </span>
+      );
+    }
+  }
+
+  const visibleIcons = iconDefs.filter(def => {
+    if (!def.condition) return true;
+    const { field, op, value } = def.condition;
+    const fieldVal = getNestedValue(data, field);
+    if (op === 'exists')    return fieldVal != null && fieldVal !== '';
+    if (op === 'notExists') return fieldVal == null || fieldVal === '';
+    if (op === 'eq')        return String(fieldVal) === String(value);
+    if (op === 'neq')       return String(fieldVal) !== String(value);
+    if (op === 'contains')  return String(fieldVal ?? '').includes(String(value));
+    return true;
+  });
+
+  let lockEl = null;
+  if (showLockerInfo && data?.lockInfos?.USER) {
+    const u = data.lockInfos.USER.userUpdateRef;
+    lockEl = <LockerInfoIcon userName={u?.userName ?? u?.userId ?? null} />;
+  }
+
+  if (!typeIconEl && !visibleIcons.length && !lockEl) return null;
+
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+      {typeIconEl}
+      {visibleIcons.map((def, i) => {
+        const Icon = LUCIDE_ICONS[icons[def.icon]];
+        if (!Icon) return null;
+        return <InfoIcon key={i} def={def} Icon={Icon} />;
+      })}
+      {lockEl}
+    </span>
+  );
+}
+
 function InfoCellRenderer({ data, colDef, context }) {
   const icons = context?.icons || {};
   const iconDefs = colDef.cellRendererParams?.icons || [];
@@ -784,6 +876,17 @@ export function buildColumnDefs(columns = [], { onAction } = {}) {
           ...base,
           cellRenderer: InfoCellRenderer,
           cellRendererParams: { icons: col.icons || [] },
+        };
+      case 'extendedInfo':
+        return {
+          ...base,
+          cellRenderer: ExtendedInfoCellRenderer,
+          cellRendererParams: {
+            icons: col.icons || [],
+            showTypeIcon: !!col.showTypeIcon,
+            typeIconChip: !!col.typeIconChip,
+            showLockerInfo: !!col.showLockerInfo,
+          },
         };
       case 'section':
         return {
