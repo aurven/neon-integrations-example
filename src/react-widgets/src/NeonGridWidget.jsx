@@ -276,7 +276,7 @@ export default function NeonGridWidget() {
         )}
         {!loading && !error && (
           <div
-            className="ag-theme-alpine"
+            className={isIframe ? 'ag-theme-alpine neon-grid-iframe' : 'ag-theme-alpine'}
             style={{
               height: '100%',
               width: '100%',

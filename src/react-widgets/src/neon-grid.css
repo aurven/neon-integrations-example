@@ -1,3 +1,8 @@
+/* iframe embed: strip all outer borders */
+.neon-grid-iframe .ag-root-wrapper {
+  border: none !important;
+}
+
 /* AG-Grid Neon theme override */
 .ag-theme-alpine {
   --ag-font-family: "Source Sans 3", "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
