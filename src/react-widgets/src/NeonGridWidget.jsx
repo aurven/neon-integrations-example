@@ -40,6 +40,7 @@ const NOTIFIER_EVENTS = [
 
 export default function NeonGridWidget() {
   const gridConfig = window.CONFIG?.gridConfig ?? { columns: [] };
+  const isIframe = window !== window.parent;
 
   const filters = useMemo(() => normalizeFiltersConfig(gridConfig), [gridConfig]);
   const [filterState, setFilterState] = useState(() => buildInitialFilterState(filters));
@@ -248,7 +249,7 @@ export default function NeonGridWidget() {
         </button>
       </div>
 
-      <div style={{ flex: 1, padding: '16px', overflow: 'hidden', minHeight: 0 }}>
+      <div style={{ flex: 1, padding: isIframe ? '0' : '16px', overflow: 'hidden', minHeight: 0 }}>
         {loading && (
           <div style={{
             display: 'flex',
@@ -279,8 +280,8 @@ export default function NeonGridWidget() {
             style={{
               height: '100%',
               width: '100%',
-              border: '1px solid #dddce5',
-              borderRadius: '10px',
+              border: isIframe ? 'none' : '1px solid #dddce5',
+              borderRadius: isIframe ? '0' : '10px',
               overflow: 'hidden',
               boxShadow: 'none'
             }}
