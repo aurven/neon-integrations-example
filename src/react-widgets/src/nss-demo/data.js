@@ -245,7 +245,7 @@ export const SEED_CLIENTS = [
     email: 'tech@meridiano.it',
     type: 'Editore',
     isActive: true,
-    notes: 'Cliente storico, integrazione SFTP push in produzione dal 2024.',
+    notes: 'Destinatario storico, integrazione SFTP push in produzione dal 2024.',
     packageIds: ['pkg-1'],
     channels: [
       {

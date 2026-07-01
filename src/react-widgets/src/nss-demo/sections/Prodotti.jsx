@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { Plus, Trash2, Check } from 'lucide-react';
 import { Card } from '../design-system/components/data/Card.jsx';
 import { TextField } from '../design-system/components/forms/TextField.jsx';
 import { Select } from '../design-system/components/forms/Select.jsx';
@@ -79,7 +80,7 @@ function computeMatchedItemCount(baseCount, rules) {
 function ProductList({ products, selectedProductId, onSelect, onNew }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-      <Button variant="primary" icon="IconAdd" onClick={onNew} style={{ marginBottom: 4 }}>
+      <Button variant="primary" icon={Plus} onClick={onNew} style={{ marginBottom: 4 }}>
         Nuovo Prodotto
       </Button>
       {products.map((p) => (
@@ -195,7 +196,7 @@ function ConditionRow({ condition, onChange, onRemove }) {
           />
         </div>
       </div>
-      <Button variant="tertiary" size="sm" iconOnly icon="IconDelete" aria-label="Rimuovi condizione" onClick={onRemove} />
+      <Button variant="tertiary" size="sm" iconOnly icon={Trash2} aria-label="Rimuovi condizione" onClick={onRemove} />
     </div>
   );
 }
@@ -226,7 +227,7 @@ function RuleGroup({ group, onChange, onRemove }) {
             onChange={(v) => onChange({ ...group, operator: v })}
           />
         </div>
-        <Button variant="tertiary" size="sm" icon="IconDelete" onClick={onRemove}>Rimuovi gruppo</Button>
+        <Button variant="tertiary" size="sm" icon={Trash2} onClick={onRemove}>Rimuovi gruppo</Button>
       </div>
       {group.conditions.map((cond, idx) => (
         <ConditionRow
@@ -237,7 +238,7 @@ function RuleGroup({ group, onChange, onRemove }) {
         />
       ))}
       <div style={{ marginTop: 8 }}>
-        <Button variant="tertiary" size="sm" icon="IconAdd" onClick={addCondition}>+ Aggiungi condizione</Button>
+        <Button variant="tertiary" size="sm" icon={Plus} onClick={addCondition}>+ Aggiungi condizione</Button>
       </div>
     </Card>
   );
@@ -271,7 +272,7 @@ function QueryRuleBuilder({ rules, onChange }) {
           onRemove={() => removeGroup(idx)}
         />
       ))}
-      <Button variant="secondary" size="sm" icon="IconAdd" onClick={addGroup}>+ Aggiungi gruppo</Button>
+      <Button variant="secondary" size="sm" icon={Plus} onClick={addGroup}>+ Aggiungi gruppo</Button>
     </Card>
   );
 }
@@ -364,7 +365,7 @@ function SummaryPanel({ product, draft, matchedItemCount, packages }) {
                   <div key={pkg.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
                     <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-neutral-primary)' }}>{pkg.name}</span>
                     <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-neutral-label)' }}>
-                      {(pkg.assignedClientIds || []).length} clienti
+                      {(pkg.assignedClientIds || []).length} destinatari
                     </span>
                   </div>
                 ))}
@@ -468,7 +469,7 @@ export function Prodotti({ products, setProducts, packages }) {
           <IdentityForm draft={draft} onChange={setDraft} />
           <QueryRuleBuilder rules={draft.rules} onChange={(rules) => setDraft({ ...draft, rules })} />
           <div style={{ display: 'flex', gap: 8 }}>
-            <Button variant="primary" icon="IconCheck" onClick={handleSave}>Salva Prodotto</Button>
+            <Button variant="primary" icon={Check} onClick={handleSave}>Salva Prodotto</Button>
             <Button variant="secondary" onClick={() => {}}>Salva Bozza</Button>
           </div>
         </div>

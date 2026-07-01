@@ -1,5 +1,5 @@
 import React from "react";
-import { Icon } from "../../assets/icons/Icon.jsx";
+import { ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react";
 
 /**
  * Neon data table.
@@ -22,7 +22,9 @@ export function Table({
               <span className="neon-th__inner">
                 {col.header}
                 {col.sortable && (
-                  <Icon name={sortKey === col.key ? (sortDir === "asc" ? "ChevronTop" : "ChevronBottom") : "Sorting"} size={10} />
+                  sortKey === col.key
+                    ? (sortDir === "asc" ? <ChevronUp size={10} /> : <ChevronDown size={10} />)
+                    : <ChevronsUpDown size={10} />
                 )}
               </span>
             </th>

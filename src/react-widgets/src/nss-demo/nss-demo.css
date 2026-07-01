@@ -4,6 +4,9 @@
   display: flex;
   height: 100vh;
   overflow: hidden;
+  font-family: var(--font-sans);
+  color: var(--color-text-neutral-primary);
+  line-height: var(--line-base);
 }
 
 .nss-demo-main {

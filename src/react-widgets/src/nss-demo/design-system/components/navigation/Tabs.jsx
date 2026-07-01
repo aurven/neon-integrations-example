@@ -1,5 +1,4 @@
 import React from "react";
-import { Icon } from "../../assets/icons/Icon.jsx";
 
 /**
  * Neon Tabs. items: [{ value, label, icon? }]
@@ -13,7 +12,7 @@ export function Tabs({ items = [], value, onChange, variant = "primary", classNa
           className={"neon-tab" + (it.value === value ? " neon-tab--selected" : "")}
           disabled={it.disabled}
           onClick={() => onChange && onChange(it.value)}>
-          {it.icon && <Icon className="neon-icon" name={it.icon} size={12} />}
+          {it.icon && <it.icon className="neon-icon" size={12} />}
           {it.label && <span>{it.label}</span>}
         </button>
       ))}

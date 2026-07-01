@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { LayoutDashboard, Database, Package, Building2, Plug, History, Hash, Settings, HelpCircle } from 'lucide-react';
 import { Sidebar } from './design-system/components/navigation/Sidebar.jsx';
 import { SidebarButton } from './design-system/components/navigation/SidebarButton.jsx';
 import { Placeholder } from './shared/Placeholder.jsx';
@@ -11,21 +12,21 @@ import './nss-demo.css';
 
 // Real sections (built out in Tasks 2-5) — each gets its own sidebar key.
 const REAL_SECTIONS = [
-  { key: 'cruscotto', label: 'Cruscotto', icon: 'IconDashboard' },
-  { key: 'prodotti', label: 'Prodotti', icon: 'IconDatabase' },
-  { key: 'pacchetti', label: 'Pacchetti', icon: 'IconBundle' },
-  { key: 'clienti', label: 'Clienti', icon: 'IconCompany' },
+  { key: 'cruscotto', label: 'Cruscotto', icon: LayoutDashboard },
+  { key: 'prodotti', label: 'Prodotti', icon: Database },
+  { key: 'pacchetti', label: 'Pacchetti', icon: Package },
+  { key: 'clienti', label: 'Destinatari', icon: Building2 },
 ];
 
 // Non-functional placeholder sections — always render the shared empty state.
 const PLACEHOLDER_SECTIONS = [
-  { label: 'Destinazioni', icon: 'IconConnectionOn' },
-  { label: 'Log Distribuzione', icon: 'IconHistory' },
-  { label: 'Gestione Tag', icon: 'IconHashtag' },
-  { label: 'Impostazioni', icon: 'IconCustomization' },
+  { label: 'Destinazioni', icon: Plug },
+  { label: 'Log Distribuzione', icon: History },
+  { label: 'Gestione Tag', icon: Hash },
+  { label: 'Impostazioni', icon: Settings },
 ];
 
-const HELP_SECTION = { label: 'Aiuto', icon: 'IconHelp' };
+const HELP_SECTION = { label: 'Aiuto', icon: HelpCircle };
 
 function placeholderKey(label) {
   return `placeholder:${label}`;

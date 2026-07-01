@@ -1,5 +1,5 @@
 import React from "react";
-import { Icon } from "../../assets/icons/Icon.jsx";
+import { X } from "lucide-react";
 
 /**
  * Neon Chip — three kinds:
@@ -14,13 +14,14 @@ export function Chip({
     kind === "filter" && active ? "neon-chip--active" : "",
     kind === "info" ? `neon-chip--${color}` : "",
     className].filter(Boolean).join(" ");
+  const IconComp = icon;
   return (
     <span className={cls} onClick={onClick} {...rest}>
-      {icon && <Icon name={icon} size={10} />}
+      {IconComp && <IconComp size={10} />}
       <span>{children}</span>
       {kind === "input" && (
         <span className="neon-chip__close" onClick={e => { e.stopPropagation(); onRemove && onRemove(); }}>
-          <Icon name="Close" size={8} />
+          <X size={8} />
         </span>
       )}
     </span>

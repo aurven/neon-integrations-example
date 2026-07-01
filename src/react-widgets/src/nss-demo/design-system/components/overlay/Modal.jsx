@@ -1,5 +1,5 @@
 import React from "react";
-import { Icon } from "../../assets/icons/Icon.jsx";
+import { X } from "lucide-react";
 
 /** Neon modal dialog. Render conditionally on `open`. */
 export function Modal({ open = true, title, onClose, footer, children, width, className = "", ...rest }) {
@@ -12,7 +12,7 @@ export function Modal({ open = true, title, onClose, footer, children, width, cl
             <span className="neon-modal__title">{title}</span>
             {onClose && (
               <button className="neon-btn neon-btn--ghost neon-btn--md neon-btn--iconOnly" aria-label="Close" onClick={onClose}>
-                <Icon name="Close" size={12} />
+                <X size={12} />
               </button>
             )}
           </div>

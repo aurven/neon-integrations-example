@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { Plus, Check, Search, CheckSquare, Square } from 'lucide-react';
 import { Card } from '../design-system/components/data/Card.jsx';
 import { KeyValue } from '../design-system/components/data/KeyValue.jsx';
 import { TextField } from '../design-system/components/forms/TextField.jsx';
@@ -6,7 +7,6 @@ import { Select } from '../design-system/components/forms/Select.jsx';
 import { Button } from '../design-system/components/forms/Button.jsx';
 import { Chip } from '../design-system/components/forms/Chip.jsx';
 import { ToggleGroup } from '../design-system/components/forms/ToggleGroup.jsx';
-import { Icon } from '../design-system/assets/icons/Icon.jsx';
 
 const LEVEL_OPTIONS = [
   { value: 'Standard', label: 'Standard' },
@@ -88,7 +88,7 @@ function addedTodayFor(product) {
 function PackageList({ packages, selectedPackageId, onSelect, onNew }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-      <Button variant="primary" icon="IconAdd" onClick={onNew} style={{ marginBottom: 4 }}>
+      <Button variant="primary" icon={Plus} onClick={onNew} style={{ marginBottom: 4 }}>
         Nuovo Pacchetto
       </Button>
       {packages.map((pkg) => (
@@ -216,7 +216,7 @@ function ProductChecklist({ products, selectedProductIds, onToggle }) {
       </div>
       <div style={{ marginBottom: 12 }}>
         <TextField
-          icon="IconFind"
+          icon={Search}
           placeholder="Cerca prodotto per nome…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -244,7 +244,7 @@ function ProductChecklist({ products, selectedProductIds, onToggle }) {
                 cursor: 'pointer',
               }}
             >
-              <Icon name={isSelected ? 'IconCheckSquareOn' : 'IconCheckSquareOff'} size={16} />
+              {isSelected ? <CheckSquare size={16} /> : <Square size={16} />}
               <span style={{ flex: '1 1 0%', fontSize: 'var(--text-sm)', color: 'var(--color-text-neutral-primary)' }}>
                 {p.name}
               </span>
@@ -279,7 +279,7 @@ function SummaryPanel({ pkg, draft, selectedProducts, clients }) {
     { label: 'PRODOTTI', value: draft.selectedProductIds.length },
     { label: 'ELEMENTI TOTALI', value: totalItems.toLocaleString('it-IT') },
     { label: 'AGGIUNTI OGGI', value: addedToday.toLocaleString('it-IT') },
-    { label: 'CLIENTI CHE LO USANO', value: assignedClients.length },
+    { label: 'DESTINATARI CHE LO USANO', value: assignedClients.length },
   ];
 
   return (
@@ -334,11 +334,11 @@ function SummaryPanel({ pkg, draft, selectedProducts, clients }) {
 
       <Card variant="bordered" style={{ marginBottom: 16 }}>
         <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--weight-bold)', color: 'var(--color-text-neutral-primary)', marginBottom: 12 }}>
-          Clienti Assegnati
+          Destinatari Assegnati
         </div>
         {assignedClients.length === 0 ? (
           <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-neutral-label)' }}>
-            Nessun cliente utilizza questo pacchetto.
+            Nessun destinatario utilizza questo pacchetto.
           </div>
         ) : (
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
@@ -475,7 +475,7 @@ export function Pacchetti({ packages, setPackages, products, clients }) {
             onToggle={toggleProduct}
           />
           <div style={{ display: 'flex', gap: 8 }}>
-            <Button variant="primary" icon="IconCheck" onClick={handleSave}>Salva Pacchetto</Button>
+            <Button variant="primary" icon={Check} onClick={handleSave}>Salva Pacchetto</Button>
             <Button variant="secondary" onClick={() => {}}>Salva Bozza</Button>
           </div>
         </div>

@@ -1,5 +1,5 @@
 import React from "react";
-import { Icon } from "../../assets/icons/Icon.jsx";
+import { ChevronDown, Check } from "lucide-react";
 import { Label } from "./Label.jsx";
 
 /**
@@ -26,11 +26,11 @@ export function Select({
         <div className={wrapCls} role="button" tabIndex={disabled ? -1 : 0} id={id}
           onClick={() => !disabled && setOpen(o => !o)}
           onKeyDown={e => { if ((e.key === "Enter" || e.key === " ") && !disabled) { e.preventDefault(); setOpen(o => !o); } }}>
-          {selected?.icon && <span className="neon-input__icon"><Icon name={selected.icon} size={12} /></span>}
+          {selected?.icon && <span className="neon-input__icon"><selected.icon size={12} /></span>}
           <span className={"neon-select__value" + (selected ? "" : " neon-select__value--placeholder")}>
             {selected ? selected.label : placeholder}
           </span>
-          <span className="neon-select__chevron"><Icon name="ChevronBottom" size={12} /></span>
+          <span className="neon-select__chevron"><ChevronDown size={12} /></span>
         </div>
         {open && (
           <div className="neon-menu" role="listbox">
@@ -38,9 +38,9 @@ export function Select({
               <div key={o.value} role="option" aria-selected={o.value === value}
                 className={"neon-option" + (o.value === value ? " neon-option--selected" : "") + (o.disabled ? " neon-option--disabled" : "")}
                 onClick={() => { if (!o.disabled) { onChange && onChange(o.value); setOpen(false); } }}>
-                {o.icon && <span className="neon-option__icon"><Icon name={o.icon} size={12} /></span>}
+                {o.icon && <span className="neon-option__icon"><o.icon size={12} /></span>}
                 <span>{o.label}</span>
-                {o.value === value && <span className="neon-option__check"><Icon name="Check" size={12} /></span>}
+                {o.value === value && <span className="neon-option__check"><Check size={12} /></span>}
               </div>
             ))}
           </div>

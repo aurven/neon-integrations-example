@@ -1,5 +1,5 @@
 import React from "react";
-import { Icon } from "../../assets/icons/Icon.jsx";
+import { X, AlertCircle } from "lucide-react";
 import { Label } from "./Label.jsx";
 
 /**
@@ -16,11 +16,12 @@ export function TextField({
     disabled ? "neon-input--disabled" : "",
   ].filter(Boolean).join(" ");
   const iconSize = size === "sm" ? 10 : 12;
+  const IconComp = icon;
   return (
     <div className={["neon", "neon-field", className].filter(Boolean).join(" ")} {...rest}>
       {label && <Label htmlFor={id} required={required} disabled={disabled}>{label}</Label>}
       <div className={wrapCls}>
-        {icon && <span className="neon-input__icon"><Icon name={icon} size={iconSize} /></span>}
+        {IconComp && <span className="neon-input__icon"><IconComp size={iconSize} /></span>}
         <input
           id={id}
           className="neon-input__control"
@@ -33,11 +34,11 @@ export function TextField({
         {clearable && value ? (
           <button type="button" className="neon-input__clear" aria-label="Clear"
             onClick={() => onChange && onChange({ target: { value: "" } })}>
-            <Icon name="Close" size={12} />
+            <X size={12} />
           </button>
         ) : null}
       </div>
-      {error && <span className="neon-error"><Icon name="Error" size={12} />{error}</span>}
+      {error && <span className="neon-error"><AlertCircle size={12} />{error}</span>}
     </div>
   );
 }
