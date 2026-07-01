@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { Database, Package, Building2, AlertCircle, BarChart3, Download, RefreshCw, Plus, Hash } from 'lucide-react';
 import { Card } from '../design-system/components/data/Card.jsx';
 import { Table } from '../design-system/components/data/Table.jsx';
 import { ProgressBar } from '../design-system/components/feedback/ProgressBar.jsx';
@@ -20,7 +21,7 @@ function CruscottoHeader() {
         </div>
       </div>
       <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
-        <Button variant="ghost" icon="IconDownload" onClick={() => {}}>Esporta log</Button>
+        <Button variant="ghost" icon={Download} onClick={() => {}}>Esporta log</Button>
         <Button variant="secondary" onClick={() => {}}>Aggiungi Destinatario</Button>
         <Button variant="primary" onClick={() => {}}>Modifica cruscotto</Button>
       </div>
@@ -35,7 +36,7 @@ function KpiRow({ products, packages, clients, dashboard }) {
       <div style={{ flex: '1 1 180px' }}>
         <KpiCard
           label="PRODOTTI ATTIVI"
-          icon="IconDatabase"
+          icon={Database}
           value={products.length}
           sublabel="Prodotti in esecuzione"
           trend="+3 vs la settimana scorsa"
@@ -45,7 +46,7 @@ function KpiRow({ products, packages, clients, dashboard }) {
       <div style={{ flex: '1 1 180px' }}>
         <KpiCard
           label="PACCHETTI ATTIVI"
-          icon="IconBundle"
+          icon={Package}
           value={packages.length}
           sublabel="Pacchetti attivi"
           trend="nessun cambiamento questa settimana"
@@ -55,7 +56,7 @@ function KpiRow({ products, packages, clients, dashboard }) {
       <div style={{ flex: '1 1 180px' }}>
         <KpiCard
           label="DESTINATARI ATTIVI"
-          icon="IconCompany"
+          icon={Building2}
           value={clients.length}
           sublabel="Destinatari B2B"
           trend="+1 questo mese"
@@ -65,7 +66,7 @@ function KpiRow({ products, packages, clients, dashboard }) {
       <div style={{ flex: '1 1 180px' }}>
         <KpiCard
           label="ERRORI OGGI"
-          icon="IconError"
+          icon={AlertCircle}
           value={dashboard.errors.length}
           sublabel="Errori di consegna"
           trend="da 7 ieri"
@@ -76,7 +77,7 @@ function KpiRow({ products, packages, clients, dashboard }) {
       <div style={{ flex: '2 1 320px' }}>
         <KpiCard
           label="ELEMENTI CONSEGNATI (ULTIME 24H)"
-          icon="IconChart"
+          icon={BarChart3}
           value="1.842"
           sublabel="Su tutti i canali"
           trend="+214 vs ieri"
@@ -123,7 +124,7 @@ function ErrorStripe({ errors }) {
               <div style={{ flex: '0 0 auto', fontWeight: 'var(--weight-semibold)' }}>{err.packageName}</div>
               <div style={{ flex: '1 1 auto', color: 'var(--color-text-neutral-label)' }}>{err.message}</div>
               <div style={{ flex: '0 0 auto', color: 'var(--color-text-neutral-label)', textAlign: 'right' }}>{err.timestamp}</div>
-              <Button variant="secondary" size="sm" icon="IconConnectionRefresh" onClick={() => {}}>Riprova</Button>
+              <Button variant="secondary" size="sm" icon={RefreshCw} onClick={() => {}}>Riprova</Button>
             </div>
           ))}
         </div>
@@ -197,12 +198,12 @@ function QuickActions() {
         Azioni Rapide
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        <Button variant="primary" icon="IconAdd" onClick={() => {}}>Nuovo Prodotto</Button>
-        <Button variant="secondary" icon="IconAdd" onClick={() => {}}>Nuovo Pacchetto</Button>
-        <Button variant="secondary" icon="IconAdd" onClick={() => {}}>Aggiungi Destinatario</Button>
-        <Button variant="secondary" icon="IconHashtag" onClick={() => {}}>Gestisci Tag</Button>
+        <Button variant="primary" icon={Plus} onClick={() => {}}>Nuovo Prodotto</Button>
+        <Button variant="secondary" icon={Plus} onClick={() => {}}>Nuovo Pacchetto</Button>
+        <Button variant="secondary" icon={Plus} onClick={() => {}}>Aggiungi Destinatario</Button>
+        <Button variant="secondary" icon={Hash} onClick={() => {}}>Gestisci Tag</Button>
         <div style={{ height: 1, background: 'var(--hairline)', margin: '4px 0' }} />
-        <Button variant="ghost" icon="IconDownload" onClick={() => {}}>Esporta Log (CSV)</Button>
+        <Button variant="ghost" icon={Download} onClick={() => {}}>Esporta Log (CSV)</Button>
       </div>
     </Card>
   );

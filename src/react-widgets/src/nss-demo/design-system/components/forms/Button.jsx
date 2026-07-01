@@ -1,5 +1,4 @@
 import React from "react";
-import { Icon } from "../../assets/icons/Icon.jsx";
 
 const ICON_SIZE = { sm: 10, md: 12, lg: 12 };
 
@@ -11,8 +10,8 @@ export function Button({
   children,
   variant = "primary",
   size = "md",
-  icon,            // icon name shown before the label (or the only icon when iconOnly)
-  iconRight,       // icon name shown after the label
+  icon,            // icon component shown before the label (or the only icon when iconOnly)
+  iconRight,       // icon component shown after the label
   iconOnly = false,
   disabled = false,
   className = "",
@@ -26,11 +25,13 @@ export function Button({
     className,
   ].filter(Boolean).join(" ");
   const s = ICON_SIZE[size] || 12;
+  const IconComp = icon;
+  const IconRightComp = iconRight;
   return (
     <button type="button" className={cls} disabled={disabled} {...rest}>
-      {icon && <Icon className="neon-icon" name={icon} size={s} />}
+      {IconComp && <IconComp className="neon-icon" size={s} />}
       {!iconOnly && children != null && <span>{children}</span>}
-      {!iconOnly && iconRight && <Icon className="neon-icon" name={iconRight} size={s} />}
+      {!iconOnly && IconRightComp && <IconRightComp className="neon-icon" size={s} />}
     </button>
   );
 }

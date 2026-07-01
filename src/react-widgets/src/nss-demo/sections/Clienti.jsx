@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { Plus, Search, Check, CheckSquare, Square, ChevronUp, ChevronDown } from 'lucide-react';
 import { Card } from '../design-system/components/data/Card.jsx';
 import { KeyValue } from '../design-system/components/data/KeyValue.jsx';
 import { TextField } from '../design-system/components/forms/TextField.jsx';
@@ -8,7 +9,6 @@ import { Chip } from '../design-system/components/forms/Chip.jsx';
 import { ToggleGroup } from '../design-system/components/forms/ToggleGroup.jsx';
 import { Label } from '../design-system/components/forms/Label.jsx';
 import { Modal } from '../design-system/components/overlay/Modal.jsx';
-import { Icon } from '../design-system/assets/icons/Icon.jsx';
 import { StatusPill } from '../shared/StatusPill.jsx';
 
 // Cross-checked against the exact `type` values used in SEED_CLIENTS
@@ -63,7 +63,7 @@ function draftFromClient(client) {
 function ClientList({ clients, selectedClientId, onSelect, onNew }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-      <Button variant="primary" icon="IconAdd" onClick={onNew} style={{ marginBottom: 4 }}>
+      <Button variant="primary" icon={Plus} onClick={onNew} style={{ marginBottom: 4 }}>
         Nuovo Destinatario
       </Button>
       {clients.map((client) => (
@@ -178,7 +178,7 @@ function PackageChecklist({ packages, selectedPackageIds, onToggle }) {
       </div>
       <div style={{ marginBottom: 12 }}>
         <TextField
-          icon="IconFind"
+          icon={Search}
           placeholder="Cerca pacchetto per nome…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -206,7 +206,7 @@ function PackageChecklist({ packages, selectedPackageIds, onToggle }) {
                 cursor: 'pointer',
               }}
             >
-              <Icon name={isSelected ? 'IconCheckSquareOn' : 'IconCheckSquareOff'} size={16} />
+              {isSelected ? <CheckSquare size={16} /> : <Square size={16} />}
               <span style={{ flex: '1 1 0%', fontSize: 'var(--text-sm)', color: 'var(--color-text-neutral-primary)' }}>
                 {pkg.name}
               </span>
@@ -241,7 +241,7 @@ function ChannelRow({ channel, selectedPackageIds, packagesById, expanded, onTog
           variant="ghost"
           size="sm"
           iconOnly
-          icon={expanded ? 'IconCollapseVertical' : 'IconExpand'}
+          icon={expanded ? ChevronUp : ChevronDown}
           aria-label={expanded ? 'Comprimi' : 'Espandi'}
           onClick={() => onToggleExpand(channel.id)}
         />
@@ -262,7 +262,7 @@ function ChannelRow({ channel, selectedPackageIds, packagesById, expanded, onTog
                 onClick={() => onTogglePackage(channel.id, pkgId)}
                 style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 4px', cursor: 'pointer' }}
               >
-                <Icon name={isIncluded ? 'IconCheckSquareOn' : 'IconCheckSquareOff'} size={16} />
+                {isIncluded ? <CheckSquare size={16} /> : <Square size={16} />}
                 <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-neutral-primary)' }}>
                   {pkg ? pkg.name : pkgId}
                 </span>
@@ -303,7 +303,7 @@ function ChannelAccordion({ channels, selectedPackageIds, packages, expandedChan
       ))}
       <Button
         variant="tertiary"
-        icon="IconAdd"
+        icon={Plus}
         onClick={() => setModalOpen(true)}
         style={{ borderStyle: 'dashed', width: '100%', justifyContent: 'center' }}
       >
@@ -527,7 +527,7 @@ export function Clienti({ clients, setClients, packages }) {
             onTogglePackage={toggleChannelPackage}
           />
           <div style={{ display: 'flex', gap: 8 }}>
-            <Button variant="primary" icon="IconCheck" onClick={handleSave}>Salva Destinatario</Button>
+            <Button variant="primary" icon={Check} onClick={handleSave}>Salva Destinatario</Button>
             <Button variant="secondary" onClick={() => {}}>Salva Bozza</Button>
           </div>
         </div>

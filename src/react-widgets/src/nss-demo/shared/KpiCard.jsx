@@ -1,6 +1,5 @@
 import React from 'react';
 import { Card } from '../design-system/components/data/Card.jsx';
-import { Icon } from '../design-system/assets/icons/Icon.jsx';
 
 const TREND_COLOR = {
   up: 'var(--color-text-feedback-green-dark)',
@@ -10,6 +9,7 @@ const TREND_COLOR = {
 
 /** KPI summary card used on Cruscotto — bordered Card with icon, big value, sublabel and trend. */
 export function KpiCard({ label, value, icon, sublabel, trend, trendDirection = 'flat', error = false }) {
+  const IconComp = icon;
   return (
     <Card
       variant="bordered"
@@ -20,7 +20,7 @@ export function KpiCard({ label, value, icon, sublabel, trend, trendDirection = 
           {label}
         </span>
         <span style={{ display: 'inline-flex', color: 'var(--color-icon-neutral-tertiary)' }}>
-          <Icon name={icon} size={16} />
+          <IconComp size={16} />
         </span>
       </div>
       <div style={{ fontSize: 'var(--text-xl)', fontWeight: 'var(--weight-bold)', color: 'var(--color-text-neutral-primary)', marginTop: 8 }}>
