@@ -20,6 +20,8 @@ const FAMILY_OPTIONS = [
   { value: 'Formato', label: 'Formato' },
   { value: 'Canale', label: 'Canale' },
   { value: 'Lingua', label: 'Lingua' },
+  { value: 'Sezione', label: 'Sezione' },
+  { value: 'Tag', label: 'Tag' },
 ];
 
 const AND_OR_ITEMS = [
