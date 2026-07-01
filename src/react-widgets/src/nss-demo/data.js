@@ -312,9 +312,9 @@ export const SEED_DASHBOARD = {
     { packageName: 'Politica Daily', clientName: 'Corriere della Sera', channel: 'SFTP', lastDeliveryTime: '09:00 · 2h fa', itemCount: 198, status: 'In Pausa' },
   ],
   errors: [
-    { packageName: 'Politica Daily → Il Sole 24 Ore', message: 'Connessione SFTP rifiutata — host sftp.ilsole.it non raggiungibile sulla porta 22', timestamp: '09:14 CET' },
-    { packageName: 'Sport Wire → ANSA Sport', message: 'HTTP 401 Non autorizzato', timestamp: '08:52 CET' },
-    { packageName: 'Economics Bundle → Reuters Italia', message: 'Permesso S3 negato', timestamp: '07:40 CET' },
+    { packageName: 'Politica Daily', clientName: 'Il Sole 24 Ore', message: 'Connessione SFTP rifiutata — host sftp.ilsole.it non raggiungibile sulla porta 22', timestamp: '09:14 CET' },
+    { packageName: 'Sport Wire', clientName: 'ANSA Sport', message: 'HTTP 401 Non autorizzato', timestamp: '08:52 CET' },
+    { packageName: 'Economics Bundle', clientName: 'Reuters Italia', message: 'Permesso S3 negato', timestamp: '07:40 CET' },
   ],
   channelBreakdown: [
     { channelType: 'SFTP', count: 1012, percentage: 55 },
