@@ -42,7 +42,7 @@ const STATUS_ITEMS = [
 ];
 
 const DOT_COLORS = [
-  'var(--color-background-brand)',
+  'var(--color-background-product-primary)',
   'var(--color-background-feedback-green)',
   'var(--color-background-feedback-red)',
   'var(--color-background-feedback-yellow)',

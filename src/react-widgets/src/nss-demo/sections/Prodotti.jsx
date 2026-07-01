@@ -314,7 +314,7 @@ function SummaryPanel({ product, draft, matchedItemCount, packages }) {
                       style={{
                         width: `${Math.round((d.count / maxVolume) * 100)}%`,
                         height: '100%',
-                        background: 'var(--color-background-brand)',
+                        background: 'var(--color-background-product-primary)',
                       }}
                     />
                   </div>
