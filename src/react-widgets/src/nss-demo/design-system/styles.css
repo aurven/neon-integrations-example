@@ -1,0 +1,25 @@
+/* ============================================================
+   Neon Design System — global stylesheet entry point (nss-demo copy-in).
+   Consumers link THIS file. It is an @import manifest only.
+   Mirrors the source claude.ai/design "Neon Design System" project's own
+   styles.css. fig-tokens.css (primitives + semantic aliases) is written
+   separately since it was fetched at ~55KB.
+   ============================================================ */
+
+/* Webfonts */
+@import "./tokens/fonts.css";
+
+/* Foundations */
+@import "./tokens/typography.css";
+@import "./tokens/effects.css";
+
+/* Figma variable tokens (colors, sizes, component tokens) */
+@import "./tokens/fig-tokens.css";
+
+/* Component styles (classes consumed by the React primitives) */
+@import "./components/css/base.css";
+@import "./components/css/forms.css";
+@import "./components/css/navigation.css";
+@import "./components/css/feedback.css";
+@import "./components/css/data.css";
+@import "./components/css/overlay.css";

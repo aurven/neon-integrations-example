@@ -1,0 +1,61 @@
+/* ============================================================
+   Neon — Data display
+   ============================================================ */
+
+/* ---------- Card ---------- */
+.neon-card {
+  background: var(--card-background-rest); border-radius: var(--radius-lg);
+  box-shadow: inset 0 0 0 1px var(--card-stroke-rest);
+  padding: 10px; color: var(--color-text-neutral-primary);
+  transition: box-shadow var(--dur-fast) var(--ease-standard), background-color var(--dur-fast) var(--ease-standard);
+}
+.neon-card--bordered { box-shadow: inset 0 0 0 1px var(--hairline); }
+.neon-card--raised { box-shadow: var(--shadow-1); }
+.neon-card--interactive { cursor: pointer; }
+.neon-card--interactive:hover { box-shadow: var(--shadow-1), inset 0 0 0 1px var(--card-stroke-hover); }
+.neon-card--selected { background: var(--card-background-selected); box-shadow: inset 0 0 0 1px var(--card-stroke-selected); }
+
+/* ---------- Avatar ---------- */
+.neon-avatar {
+  position: relative; display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 999px; overflow: hidden; flex-shrink: 0;
+  background: var(--color-background-product-lightest); color: var(--color-text-product-primary);
+  font-family: var(--font-sans); font-weight: var(--weight-semibold); user-select: none;
+}
+.neon-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.neon-avatar__status {
+  position: absolute; right: 0; bottom: 0; width: 28%; height: 28%; min-width: 8px; min-height: 8px;
+  border-radius: 999px; background: var(--color-background-feedback-green);
+  box-shadow: 0 0 0 2px var(--color-background-neutral-white);
+}
+.neon-avatar__status--away { background: var(--color-background-feedback-yellow); }
+.neon-avatar__status--offline { background: var(--color-background-neutral-quaternary); }
+
+/* ---------- Rating (stars) ---------- */
+.neon-rating { display: inline-flex; align-items: center; gap: 2px; color: var(--color-icon-feedback-warning); }
+.neon-rating__star { display: inline-flex; }
+.neon-rating__star--empty { color: var(--color-icon-neutral-light); }
+.neon-rating--interactive .neon-rating__star { cursor: pointer; }
+
+/* ---------- Table ---------- */
+.neon-table { width: 100%; border-collapse: collapse; font-size: var(--text-md); color: var(--table-text-rest); background: var(--table-background-white-cell); }
+.neon-table th {
+  text-align: left; font-weight: var(--weight-semibold);
+  height: 34px; padding: 5px 10px; white-space: nowrap;
+  color: var(--color-text-neutral-label);
+  box-shadow: inset 0 -1px 0 0 var(--table-stroke-rest);
+  background: var(--color-background-neutral-lightest);
+  user-select: none;
+}
+.neon-table th.neon-th--sortable { cursor: pointer; }
+.neon-table th .neon-th__inner { display: inline-flex; align-items: center; gap: 5px; }
+.neon-table th .neon-icon { color: var(--color-icon-neutral-tertiary); }
+.neon-table td {
+  height: 36px; padding: 5px 10px; vertical-align: middle;
+  box-shadow: inset 0 -1px 0 0 var(--table-stroke-rest);
+}
+.neon-table tbody tr { transition: background-color var(--dur-fast) var(--ease-standard); }
+.neon-table tbody tr:hover { background: var(--color-background-neutral-lightest); }
+.neon-table tbody tr.neon-tr--selected { background: var(--card-background-selected); }
+.neon-table--compact td { height: 26px; }
+.neon-table--compact th { height: 30px; }
