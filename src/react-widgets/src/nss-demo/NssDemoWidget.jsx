@@ -3,6 +3,7 @@ import { Sidebar } from './design-system/components/navigation/Sidebar.jsx';
 import { SidebarButton } from './design-system/components/navigation/SidebarButton.jsx';
 import { Placeholder } from './shared/Placeholder.jsx';
 import { Cruscotto } from './sections/Cruscotto.jsx';
+import { Prodotti } from './sections/Prodotti.jsx';
 import { SEED_PRODUCTS, SEED_PACKAGES, SEED_CLIENTS, SEED_DASHBOARD } from './data.js';
 import './nss-demo.css';
 
@@ -40,7 +41,7 @@ export function NssDemoWidget() {
       <Cruscotto dashboard={SEED_DASHBOARD} products={products} packages={packages} clients={clients} />
     );
   } else if (activeSection === 'prodotti') {
-    mainContent = <div>Prodotti — TODO Task 3</div>;
+    mainContent = <Prodotti products={products} setProducts={setProducts} packages={packages} />;
   } else if (activeSection === 'pacchetti') {
     mainContent = <div>Pacchetti — TODO Task 4</div>;
   } else if (activeSection === 'clienti') {
