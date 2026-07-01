@@ -28,7 +28,7 @@ Config files live in `conf/widgets/neon-grid/` and are loaded at runtime via `wi
     - [publication](#109-publication)
     - [info](#1010-info-new)
     - [actions](#1011-actions)
-11. [Full annotated example — adn-v2.json](#11-full-annotated-example--adn-v2json)
+11. [Full annotated example — adn-demo.json](#11-full-annotated-example--adn-demojson)
 
 ---
 
@@ -574,9 +574,9 @@ No additional column-level properties are needed — all configuration is on the
 
 ---
 
-## 11. Full annotated example — adn-v2.json
+## 11. Full annotated example — adn-demo.json
 
-The following is `conf/widgets/neon-grid/adn-v2.json` reproduced with inline commentary explaining each feature used.
+The following is `conf/widgets/neon-grid/adn-demo.json` reproduced with inline commentary explaining each feature used.
 
 ```jsonc
 {

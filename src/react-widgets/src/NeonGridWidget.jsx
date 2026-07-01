@@ -40,7 +40,7 @@ export default function NeonGridWidget() {
   const gridConfig = window.CONFIG?.gridConfig ?? { columns: [] };
 
   const querySwitcher = gridConfig.querySwitcher ?? null;
-  const [queryOptIdx, setQueryOptIdx] = useState(0);
+  const [queryOptIdx, setQueryOptIdx] = useState(querySwitcher?.defaultIndex ?? 0);
   const queryOptIdxRef = useRef(0);
   queryOptIdxRef.current = queryOptIdx;
 
@@ -304,7 +304,7 @@ export default function NeonGridWidget() {
               columnDefs={columnDefs}
               defaultColDef={defaultColDef}
               getRowId={params => params.data.id}
-              context={{ userCache, icons: gridConfig.icons || {}, typeIcons: gridConfig.typeIcons || {}, typeLabels: gridConfig.typeLabels || {}, gridActions: gridConfig.actions || [], locales: gridConfig.locales || {} }}
+              context={{ userCache, icons: gridConfig.icons || {}, typeIcons: gridConfig.typeIcons || {}, workspaceIcons: gridConfig.workspaceIcons || {}, typeLabels: gridConfig.typeLabels || {}, gridActions: gridConfig.actions || [], locales: gridConfig.locales || {} }}
               localeText={gridConfig.locales?.agGrid ?? undefined}
               enableBrowserTooltips={true}
               pagination={true}

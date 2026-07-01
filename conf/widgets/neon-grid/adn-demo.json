@@ -1,9 +1,10 @@
 {
   "title": "Articoli",
-  "query": "adn-v2",
+  "query": "adn-demo",
 
   "querySwitcher": {
     "label": "Vista:",
+    "defaultIndex": 3,
     "options": [
       {
         "label": "Tutti",
@@ -16,6 +17,42 @@
       {
         "label": "Flash",
         "variables": { "type": ["article/flash"] }
+      },
+      {
+        "label": "Salute",
+        "variables": { "workfolder": ["/wire/salute/"] }
+      },
+      {
+        "label": "Morning",
+        "variables": { "workfolder": ["/wire/morning/"] }
+      },
+      {
+        "label": "Cronaca",
+        "variables": { "workfolder": ["/wire/cronaca/"] }
+      },
+      {
+        "label": "Cultura",
+        "variables": { "workfolder": ["/wire/cultura/"] }
+      },
+      {
+        "label": "Esteri",
+        "variables": { "workfolder": ["/wire/esteri/"] }
+      },
+      {
+        "label": "Politica",
+        "variables": { "workfolder": ["/wire/politica/"] }
+      },
+      {
+        "label": "Economia",
+        "variables": { "workfolder": ["/wire/economia/"] }
+      },
+      {
+        "label": "Servizi",
+        "variables": { "workfolder": ["/wire/servizi/"] }
+      },
+      {
+        "label": "Web",
+        "variables": { "workfolder": ["/web/sport/", "/web/multimedia/", "/web/speciali/", "/web/prometeo/"] }
       }
     ]
   },
@@ -32,6 +69,7 @@
     "teaser": "Teaser:",
     "unlock": "Sblocca",
     "notPublished": "Non pubblicato",
+    "notYetPublished": "Non ancora pubblicato",
     "noWorkfolders": "Nessuna cartella disponibile",
     "actions": "Azioni",
     "selectWorkspace": "Seleziona cartella",
@@ -88,6 +126,10 @@
     "eye": "Eye",
     "live": "CircleDot"
   },
+  "workspaceIcons": {
+    "wire": "rss",
+    "web": "monitor"
+  },
   "typeIcons": {
     "article": "file",
     "article/flash": "zap",
@@ -143,34 +185,25 @@
     },
     {
       "field": "publishInfos", "headerName": "Info", "type": "extendedInfo", "width": 100,
-      "showTypeIcon": true, "typeIconChip": false, "showLockerInfo": true, "datePattern": "dd/MM/yyyy HH:mm",
-      "icons": [
-        { "icon": "rss",     "label": "Wire", "condition": { "field": "publishInfos.Wire.liveFirstPublicationDate", "op": "exists" } },
-        { "icon": "monitor", "label": "Web",  "condition": { "field": "publishInfos.Web.liveFirstPublicationDate",  "op": "exists" } }
-      ]
+      "showTypeIcon": true, "typeIconChip": false, "showLockerInfo": true, "showWorkspaceIcon": true, "datePattern": "dd/MM/yyyy HH:mm"
     },
     {
       "field": "publishInfos", "headerName": "Categoria", "type": "section",
       "site": "TheGlobe", "width": 120, "sortable": false,
       "colors": [
-        { "match": "football",     "background": "#dcfce7", "color": "#15803d" },
-        { "match": "tennis",       "background": "#dcfce7", "color": "#15803d" },
-        { "match": "golf",         "background": "#dcfce7", "color": "#15803d" },
-        { "match": "nba",          "background": "#dcfce7", "color": "#15803d" },
-        { "match": "serie",        "background": "#dcfce7", "color": "#15803d" },
-        { "match": "fighting",     "background": "#fee2e2", "color": "#b91c1c" },
-        { "match": "space",        "background": "#ede9fe", "color": "#6d28d9" },
-        { "match": "ai",           "background": "#dbeafe", "color": "#1d4ed8" },
-        { "match": "earth",        "background": "#ccfbf1", "color": "#0f766e" },
-        { "match": "business",     "background": "#fef9c3", "color": "#854d0e" },
-        { "match": "economy",      "background": "#fef9c3", "color": "#854d0e" },
-        { "match": "culture",      "background": "#fce7f3", "color": "#be185d" },
-        { "match": "books",        "background": "#fce7f3", "color": "#be185d" },
-        { "match": "tv",           "background": "#fce7f3", "color": "#be185d" },
-        { "match": "games",        "background": "#f3e8ff", "color": "#7e22ce" },
-        { "match": "news",         "background": "#f1f5f9", "color": "#475569" },
-        { "match": "north",        "background": "#f1f5f9", "color": "#475569" },
-        {                          "background": "#f1f5f9", "color": "#64748b" }
+        { "match": "cronaca",    "background": "#fef3c7", "color": "#b45309" },
+        { "match": "cultura",    "background": "#f3e8ff", "color": "#7e22ce" },
+        { "match": "economia",   "background": "#dcfce7", "color": "#166534" },
+        { "match": "esteri",     "background": "#dbeafe", "color": "#1d4ed8" },
+        { "match": "morning",    "background": "#fef9c3", "color": "#a16207" },
+        { "match": "multimedia", "background": "#fee2e2", "color": "#b91c1c" },
+        { "match": "politica",   "background": "#fce7f3", "color": "#be185d" },
+        { "match": "prometeo",   "background": "#cffafe", "color": "#0f766e" },
+        { "match": "salute",     "background": "#ccfbf1", "color": "#0f766e" },
+        { "match": "servizi",    "background": "#e0f2fe", "color": "#0369a1" },
+        { "match": "speciali",   "background": "#ede9fe", "color": "#6d28d9" },
+        { "match": "sport",      "background": "#ffedd5", "color": "#c2410c" },
+        {                        "background": "#f1f5f9", "color": "#64748b" }
       ]
     },
     {

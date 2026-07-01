@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { FileText, Image, Video, Mic, Copy, ArrowRight, Send, Zap, Globe, Trophy, Rocket, Rss, Monitor, MoreHorizontal, ChevronRight, ArrowLeft, Lock, LockOpen, Pencil, Eye, CircleDot } from 'lucide-react';
+import { FileText, Image, Video, Mic, Copy, ArrowRight, Send, Zap, Globe, Trophy, Rocket, Rss, Monitor, MoreHorizontal, ChevronRight, ArrowLeft, Lock, LockOpen, Pencil, Eye, CircleDot, FolderOpen } from 'lucide-react';
 import { duplicateArticle, unlockNode } from './api.js';
 import { matchesCondition } from './row-rules.js';
 
@@ -695,6 +695,54 @@ function PublicationIcon({ pub, pubData, iconComponent: Icon, locales }) {
   );
 }
 
+function WorkspacePublicationBadge({ data, icons, workspaceIcons, context, datePattern }) {
+  const [tip, setTip] = useState(null);
+
+  if (!data?.workFolder) return null;
+  const workspaceName = data.workFolder.split('/').filter(Boolean)[0] ?? null;
+  if (!workspaceName) return null;
+
+  const iconId = workspaceIcons[workspaceName.toLowerCase()];
+  const iconName = iconId ? icons[iconId] : null;
+  const Icon = (iconName ? LUCIDE_ICONS[iconName] : null) ?? FolderOpen;
+
+  const firstPub = Object.values(data.publishInfos || {}).find(v => v?.liveFirstPublicationDate) ?? null;
+  const isPublished = !!firstPub;
+
+  const fmtDate = (ts) => {
+    if (!ts) return null;
+    return datePattern
+      ? formatByPattern(ts, datePattern)
+      : new Date(ts).toLocaleString(undefined, { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  };
+
+  const firstPubDate = fmtDate(firstPub?.liveFirstPublicationDate);
+  const lastModDate = fmtDate(firstPub?.lastModified);
+  const userAlias = firstPub?.liveUserRef?.alias || firstPub?.liveUserRef?.userId || null;
+
+  return (
+    <span
+      onMouseEnter={e => { const r = e.currentTarget.getBoundingClientRect(); setTip({ top: r.top, left: r.left + r.width / 2 }); }}
+      onMouseLeave={() => setTip(null)}
+      style={{ display: 'inline-flex', alignItems: 'center', cursor: 'default' }}
+    >
+      <Icon size={16} strokeWidth={2} style={{ color: isPublished ? '#16a34a' : '#d1d0d8' }} />
+      <BalloonTooltip visible={!!tip} top={tip?.top} left={tip?.left}>
+        <div style={{ fontWeight: 700, marginBottom: '2px' }}>{workspaceName}</div>
+        {isPublished ? (
+          <>
+            {firstPubDate && <div style={{ color: '#c4c1d4' }}>⊙ {firstPubDate}</div>}
+            {lastModDate && <div style={{ color: '#a5b4fc' }}>↻ {lastModDate}</div>}
+            {userAlias && <div style={{ color: '#9d9aac' }}>{userAlias}</div>}
+          </>
+        ) : (
+          <div style={{ color: '#9d9aac' }}>{context?.locales?.notYetPublished || 'Not yet published'}</div>
+        )}
+      </BalloonTooltip>
+    </span>
+  );
+}
+
 function PublicationCellRenderer({ data, colDef, context }) {
   const publications = colDef.cellRendererParams?.publications || [];
   const icons = context?.icons || {};
@@ -826,10 +874,12 @@ function LockerInfoIcon({ lockData, data, context }) {
 function ExtendedInfoCellRenderer({ data, colDef, context }) {
   const icons = context?.icons || {};
   const typeIcons = context?.typeIcons || {};
+  const workspaceIcons = context?.workspaceIcons || {};
   const iconDefs = colDef.cellRendererParams?.icons || [];
   const showTypeIcon = colDef.cellRendererParams?.showTypeIcon;
   const typeIconChip = colDef.cellRendererParams?.typeIconChip;
   const showLockerInfo = colDef.cellRendererParams?.showLockerInfo;
+  const showWorkspaceIcon = colDef.cellRendererParams?.showWorkspaceIcon;
   const datePattern = colDef.cellRendererParams?.datePattern ?? null;
   const [typeTip, setTypeTip] = useState(null);
 
@@ -885,11 +935,25 @@ function ExtendedInfoCellRenderer({ data, colDef, context }) {
     lockEl = <LockerInfoIcon lockData={data.lockInfos.USER} data={data} context={context} />;
   }
 
-  if (!typeIconEl && !visibleIcons.length && !lockEl) return null;
+  let workspaceIconEl = null;
+  if (showWorkspaceIcon) {
+    workspaceIconEl = (
+      <WorkspacePublicationBadge
+        data={data}
+        icons={icons}
+        workspaceIcons={workspaceIcons}
+        context={context}
+        datePattern={datePattern}
+      />
+    );
+  }
+
+  if (!typeIconEl && !workspaceIconEl && !visibleIcons.length && !lockEl) return null;
 
   return (
     <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
       {typeIconEl}
+      {workspaceIconEl}
       {visibleIcons.map((def, i) => {
         const Icon = LUCIDE_ICONS[icons[def.icon]];
         if (!Icon) return null;
@@ -1082,6 +1146,7 @@ export function buildColumnDefs(columns = [], { onAction } = {}) {
             showTypeIcon: !!col.showTypeIcon,
             typeIconChip: !!col.typeIconChip,
             showLockerInfo: !!col.showLockerInfo,
+            showWorkspaceIcon: !!col.showWorkspaceIcon,
             datePattern: col.datePattern ?? null,
           },
         };
