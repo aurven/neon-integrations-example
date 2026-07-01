@@ -400,6 +400,24 @@ function welcomeWidgetHandler(request, reply) {
   return reply.view("/src/widgets/welcome-widget.hbs", params);
 }
 
+function nssDemoWidgetHandler(request, reply) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) {
+    return reply.status(401).send({ error: "Unauthorized" });
+  }
+
+  let params = {
+    seo: {
+      title: "NSS Demo — Neon Syndication Service",
+      description: "Walkable demo of the Neon Syndication Service (Adnkronos) — Prodotti, Pacchetti, Clienti with fake data"
+    },
+    neonAppUrl: process.env.NEON_APP_URL,
+    apiKey: auth.apikey,
+    demo: true
+  };
+  return reply.view("/src/widgets/nss-demo.hbs", params);
+}
+
 function planningBoardWidgetHandler(request, reply) {
   const auth = authenticate(request, reply);
   if (!auth.authenticated) {
@@ -717,6 +735,7 @@ module.exports = {
   smartOctoDashboardHandler,
   neonAnalyticsDashboardHandler,
   welcomeWidgetHandler,
+  nssDemoWidgetHandler,
   planningBoardWidgetHandler,
   neonGridWidgetHandler,
   neonGridDataHandler,

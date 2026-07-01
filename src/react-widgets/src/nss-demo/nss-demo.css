@@ -1,0 +1,18 @@
+@import './design-system/styles.css';
+
+.nss-demo-root {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.nss-demo-main {
+  flex: 1 1 auto;
+  overflow: auto;
+  padding: 20px;
+}
+
+/* One-off modifier for placeholder sidebar items (not part of the copied design-system). */
+.neon-sidebar-btn--disabled {
+  opacity: 0.5;
+}
