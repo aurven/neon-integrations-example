@@ -209,6 +209,18 @@
           "type": "contain",
           "path": "allText",
           "term": "*${searchTerm}*"
+        },
+        {
+          "type": "nested",
+          "path": "publishInfos",
+          "bool": {
+            "and": [
+              {
+                "type": "wildcard",
+                "path": "overwrittenLiveFirstPublicationDate"
+              }
+            ]
+          }
         }
       ],
       "or": []
@@ -241,6 +253,9 @@
       "liveblog"
     ],
     "workfolder": [
+      "*"
+    ],
+    "workflow": [
       "*"
     ]
   },

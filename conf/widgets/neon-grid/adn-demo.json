@@ -1,61 +1,50 @@
 {
-  "title": "Articoli",
+  "title": "Ricerca",
   "query": "adn-demo",
 
-  "querySwitcher": {
-    "label": "Vista:",
-    "defaultIndex": 3,
-    "options": [
-      {
-        "label": "Tutti",
-        "variables": {}
-      },
-      {
-        "label": "Articoli",
-        "variables": { "type": ["article"] }
-      },
-      {
-        "label": "Flash",
-        "variables": { "type": ["article/flash"] }
-      },
-      {
-        "label": "Salute",
-        "variables": { "workfolder": ["/wire/salute/"] }
-      },
-      {
-        "label": "Morning",
-        "variables": { "workfolder": ["/wire/morning/"] }
-      },
-      {
-        "label": "Cronaca",
-        "variables": { "workfolder": ["/wire/cronaca/"] }
-      },
-      {
-        "label": "Cultura",
-        "variables": { "workfolder": ["/wire/cultura/"] }
-      },
-      {
-        "label": "Esteri",
-        "variables": { "workfolder": ["/wire/esteri/"] }
-      },
-      {
-        "label": "Politica",
-        "variables": { "workfolder": ["/wire/politica/"] }
-      },
-      {
-        "label": "Economia",
-        "variables": { "workfolder": ["/wire/economia/"] }
-      },
-      {
-        "label": "Servizi",
-        "variables": { "workfolder": ["/wire/servizi/"] }
-      },
-      {
-        "label": "Web",
-        "variables": { "workfolder": ["/web/sport/", "/web/multimedia/", "/web/speciali/", "/web/prometeo/"] }
-      }
-    ]
-  },
+  "filters": [
+    {
+      "id": "tipo",
+      "label": "Tipo:",
+      "type": "multi",
+      "defaultIndices": [  ],
+      "options": [
+        { "label": "Tutti", "variables": {} },
+        { "label": "Articoli", "variables": { "type": ["article"] } },
+        { "label": "Flash", "variables": { "type": ["article/flash"] } },
+        { "label": "Live Blog", "variables": { "type": ["article/liveblog"] } }
+      ]
+    },
+    {
+      "id": "sezione",
+      "label": "Categoria:",
+      "type": "multi",
+      "defaultIndices": [  ],
+      "options": [
+        { "label": "Tutte", "variables": {} },
+        { "label": "Salute", "variables": { "workfolder": ["/wire/salute/"] } },
+        { "label": "Morning", "variables": { "workfolder": ["/wire/morning/"] } },
+        { "label": "Cronaca", "variables": { "workfolder": ["/wire/cronaca/"] } },
+        { "label": "Cultura", "variables": { "workfolder": ["/wire/cultura/"] } },
+        { "label": "Esteri", "variables": { "workfolder": ["/wire/esteri/"] } },
+        { "label": "Politica", "variables": { "workfolder": ["/wire/politica/"] } },
+        { "label": "Economia", "variables": { "workfolder": ["/wire/economia/"] } },
+        { "label": "Servizi", "variables": { "workfolder": ["/wire/servizi/"] } },
+        { "label": "Web", "variables": { "workfolder": ["/web/sport/", "/web/multimedia/", "/web/speciali/", "/web/prometeo/"] } }
+      ]
+    },
+    {
+      "id": "pubblicazione",
+      "label": "Pubblicato:",
+      "type": "single",
+      "defaultIndex": 0,
+      "options": [
+        { "label": "Tutti", "variables": {} },
+        { "label": "Sì", "variables": { "workflow": ["content/pubblicato"] } },
+        { "label": "No", "variables": { "workflow": ["content/privato", "content/in stesura", "content/approvato", "content/in pubblicazione", "content/da verificare", "content/creato"] } }
+      ]
+    }
+  ],
 
   "demoData": "adn-search-results.json",
   "pollIntervalMs": 20000,
@@ -64,7 +53,7 @@
     "article/flash", "article/longform", "article/poll", "hero"
   ],
   "locales": {
-    "loading": "Caricamento articoli…",
+    "loading": "Caricamento oggetti...",
     "refresh": "Aggiorna",
     "teaser": "Teaser:",
     "unlock": "Sblocca",
@@ -145,7 +134,8 @@
     "image": "Immagine",
     "video": "Video",
     "audio": "Audio",
-    "hero": "Hero"
+    "hero": "Hero",
+    "liveblog": "Live Blog"
   },
   "actions": [
     {

@@ -6,6 +6,8 @@ import { fetchArticles, updateMetadata } from './api.js';
 import { buildMetadataChangeFromXpath } from './metadata.js';
 import { usePollingSearchDelta } from './usePollingSearchDelta.js';
 import { useNeonNotifier } from './useNeonNotifier.js';
+import { FilterBar } from './FilterBar.jsx';
+import { normalizeFiltersConfig, buildInitialFilterState, mergeFilterVariables } from './filter-utils.js';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import './neon-grid.css';
@@ -39,10 +41,10 @@ const NOTIFIER_EVENTS = [
 export default function NeonGridWidget() {
   const gridConfig = window.CONFIG?.gridConfig ?? { columns: [] };
 
-  const querySwitcher = gridConfig.querySwitcher ?? null;
-  const [queryOptIdx, setQueryOptIdx] = useState(querySwitcher?.defaultIndex ?? 0);
-  const queryOptIdxRef = useRef(0);
-  queryOptIdxRef.current = queryOptIdx;
+  const filters = useMemo(() => normalizeFiltersConfig(gridConfig), [gridConfig]);
+  const [filterState, setFilterState] = useState(() => buildInitialFilterState(filters));
+  const filterStateRef = useRef(filterState);
+  filterStateRef.current = filterState;
 
   const [toast, setToast] = useState(null);
   const toastTimerRef = useRef(null);
@@ -83,15 +85,15 @@ export default function NeonGridWidget() {
   );
 
   const fetchFn = useCallback(() => {
-    const vars = querySwitcher?.options?.[queryOptIdxRef.current]?.variables ?? null;
-    return fetchArticles(vars)
+    const vars = mergeFilterVariables(filters, filterStateRef.current);
+    return fetchArticles(Object.keys(vars).length > 0 ? vars : null)
       .then(d => d.articles ?? d)
       .catch(err => {
         setError(err.message);
         setLoading(false);
         return [];
       });
-  }, [querySwitcher]);
+  }, [filters]);
 
   const handleDelta = useCallback((delta) => {
     if (delta.type === 'init') {
@@ -135,10 +137,17 @@ export default function NeonGridWidget() {
     reload();
   }, [reload]);
 
-  const handleQueryOptChange = useCallback((e) => {
-    const idx = parseInt(e.target.value, 10);
-    queryOptIdxRef.current = idx;
-    setQueryOptIdx(idx);
+  const handleSingleChange = useCallback((id, idx) => {
+    filterStateRef.current = { ...filterStateRef.current, [id]: idx };
+    setFilterState(s => ({ ...s, [id]: idx }));
+    setLoading(true);
+    setError(null);
+    reload();
+  }, [reload]);
+
+  const handleMultiChange = useCallback((id, newSet) => {
+    filterStateRef.current = { ...filterStateRef.current, [id]: newSet };
+    setFilterState(s => ({ ...s, [id]: newSet }));
     setLoading(true);
     setError(null);
     reload();
@@ -207,35 +216,12 @@ export default function NeonGridWidget() {
             {rowData.length}
           </span>
         )}
-        {querySwitcher && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            {querySwitcher.label && (
-              <span style={{ fontSize: '12px', color: '#69667f', fontWeight: 500 }}>
-                {querySwitcher.label}
-              </span>
-            )}
-            <select
-              value={queryOptIdx}
-              onChange={handleQueryOptChange}
-              style={{
-                fontSize: '12px',
-                color: '#3f3c4e',
-                border: '1px solid #dddce5',
-                borderRadius: '8px',
-                padding: '4px 24px 4px 8px',
-                background: '#fff',
-                cursor: 'pointer',
-                fontFamily: 'inherit',
-                outline: 'none',
-                appearance: 'auto',
-              }}
-            >
-              {querySwitcher.options.map((opt, i) => (
-                <option key={i} value={i}>{opt.label}</option>
-              ))}
-            </select>
-          </div>
-        )}
+        <FilterBar
+          filters={filters}
+          filterState={filterState}
+          onSingleChange={handleSingleChange}
+          onMultiChange={handleMultiChange}
+        />
         <div style={{ flex: 1 }} />
         <button
           onClick={handleRefresh}
