@@ -559,7 +559,7 @@ async function neonGridDuplicateHandler(request, reply) {
 
   const issueDate = new Date().toISOString().split('T')[0];
   const workspaceSuffix = workFolder.split('/').filter(Boolean).pop() ?? '';
-  const duplicateName = workspaceSuffix ? `${name} [${workspaceSuffix}]` : name;
+  const duplicateName = workspaceSuffix ? `${name} ${workspaceSuffix}` : name;
 
   try {
     const result = await neonBoApi.duplicateNode(familyRef, { name: duplicateName, workFolder, type, issueDate });
