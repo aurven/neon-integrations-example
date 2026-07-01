@@ -4,6 +4,7 @@ import { SidebarButton } from './design-system/components/navigation/SidebarButt
 import { Placeholder } from './shared/Placeholder.jsx';
 import { Cruscotto } from './sections/Cruscotto.jsx';
 import { Prodotti } from './sections/Prodotti.jsx';
+import { Pacchetti } from './sections/Pacchetti.jsx';
 import { SEED_PRODUCTS, SEED_PACKAGES, SEED_CLIENTS, SEED_DASHBOARD } from './data.js';
 import './nss-demo.css';
 
@@ -43,7 +44,7 @@ export function NssDemoWidget() {
   } else if (activeSection === 'prodotti') {
     mainContent = <Prodotti products={products} setProducts={setProducts} packages={packages} />;
   } else if (activeSection === 'pacchetti') {
-    mainContent = <div>Pacchetti — TODO Task 4</div>;
+    mainContent = <Pacchetti packages={packages} setPackages={setPackages} products={products} clients={clients} />;
   } else if (activeSection === 'clienti') {
     mainContent = <div>Clienti — TODO Task 5</div>;
   } else if (activeSection.startsWith('placeholder:')) {
