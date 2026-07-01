@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Sidebar } from './design-system/components/navigation/Sidebar.jsx';
 import { SidebarButton } from './design-system/components/navigation/SidebarButton.jsx';
 import { Placeholder } from './shared/Placeholder.jsx';
-import { SEED_PRODUCTS, SEED_PACKAGES, SEED_CLIENTS } from './data.js';
+import { Cruscotto } from './sections/Cruscotto.jsx';
+import { SEED_PRODUCTS, SEED_PACKAGES, SEED_CLIENTS, SEED_DASHBOARD } from './data.js';
 import './nss-demo.css';
 
 // Real sections (built out in Tasks 2-5) — each gets its own sidebar key.
@@ -35,7 +36,9 @@ export function NssDemoWidget() {
 
   let mainContent;
   if (activeSection === 'cruscotto') {
-    mainContent = <div>Cruscotto — TODO Task 2</div>;
+    mainContent = (
+      <Cruscotto dashboard={SEED_DASHBOARD} products={products} packages={packages} clients={clients} />
+    );
   } else if (activeSection === 'prodotti') {
     mainContent = <div>Prodotti — TODO Task 3</div>;
   } else if (activeSection === 'pacchetti') {
