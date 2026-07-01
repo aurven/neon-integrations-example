@@ -5,6 +5,7 @@ import { Placeholder } from './shared/Placeholder.jsx';
 import { Cruscotto } from './sections/Cruscotto.jsx';
 import { Prodotti } from './sections/Prodotti.jsx';
 import { Pacchetti } from './sections/Pacchetti.jsx';
+import { Clienti } from './sections/Clienti.jsx';
 import { SEED_PRODUCTS, SEED_PACKAGES, SEED_CLIENTS, SEED_DASHBOARD } from './data.js';
 import './nss-demo.css';
 
@@ -46,7 +47,7 @@ export function NssDemoWidget() {
   } else if (activeSection === 'pacchetti') {
     mainContent = <Pacchetti packages={packages} setPackages={setPackages} products={products} clients={clients} />;
   } else if (activeSection === 'clienti') {
-    mainContent = <div>Clienti — TODO Task 5</div>;
+    mainContent = <Clienti clients={clients} setClients={setClients} packages={packages} />;
   } else if (activeSection.startsWith('placeholder:')) {
     const label = activeSection.slice('placeholder:'.length);
     const section = PLACEHOLDER_SECTIONS.find((s) => s.label === label) || HELP_SECTION;
