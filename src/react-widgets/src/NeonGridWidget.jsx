@@ -96,25 +96,44 @@ export default function NeonGridWidget() {
       });
   }, [filters]);
 
+  const pollFetchFn = useCallback(() => {
+    const vars = mergeFilterVariables(filters, filterStateRef.current);
+    return fetchArticles(Object.keys(vars).length > 0 ? vars : null, { maxResults: 25 })
+      .then(d => d.articles ?? d)
+      .catch(err => { console.warn('[Neon Grid] Poll error:', err.message); return []; });
+  }, [filters]);
+
   const handleDelta = useCallback((delta) => {
     if (delta.type === 'init') {
       setRowData(delta.items);
       setLoading(false);
       return;
     }
+    if (delta.type === 'poll') {
+      if (!delta.added.length && !delta.updated.length) return;
+      setRowData(prev => {
+        const updMap = new Map(delta.updated.map(u => [u.id, u]));
+        const merged = prev.map(r => updMap.has(r.id) ? { ...updMap.get(r.id), isNew: false } : r);
+        const newItems = delta.added.map(a => ({ ...a, isNew: true }));
+        return [...newItems, ...merged];
+      });
+      return;
+    }
+    // type === 'delta': full-fetch diff (no pollFetchFn)
     const removed = new Set(delta.removedIds);
     setRowData(prev => {
       const kept = prev.filter(r => !removed.has(r.id));
-      return [...kept, ...delta.added.map(a => ({ ...a, isNew: true }))];
+      return [...delta.added.map(a => ({ ...a, isNew: true })), ...kept];
     });
   }, []);
 
   const { reload } = usePollingSearchDelta({
     fetchFn,
+    pollFetchFn,
     idKey: 'id',
     intervalMs: gridConfig.pollIntervalMs ?? 20000,
     onDelta: handleDelta,
-    enabled: false // temporarily disabled
+    enabled: true
   });
 
   const familyRefs = useMemo(() => rowData.map(r => r.id), [rowData]);

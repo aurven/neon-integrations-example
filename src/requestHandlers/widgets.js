@@ -540,8 +540,11 @@ async function neonGridDataHandler(request, reply) {
     }
   }
 
+  const rawMax = parseInt(request.query.maxResults, 10);
+  const maxResults = (Number.isFinite(rawMax) && rawMax > 0 && rawMax <= 500) ? rawMax : 500;
+
   try {
-    const searchResults = await neonBoApi.searchContents(queryPayload, 500, 500);
+    const searchResults = await neonBoApi.searchContents(queryPayload, maxResults, maxResults);
     const articles = mapNodes(searchResults.nodes || []);
     return reply.status(200).send({ articles });
   } catch (error) {
