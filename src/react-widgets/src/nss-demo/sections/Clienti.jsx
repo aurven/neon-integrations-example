@@ -64,7 +64,7 @@ function ClientList({ clients, selectedClientId, onSelect, onNew }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
       <Button variant="primary" icon="IconAdd" onClick={onNew} style={{ marginBottom: 4 }}>
-        Nuovo Cliente
+        Nuovo Destinatario
       </Button>
       {clients.map((client) => (
         <Card
@@ -95,12 +95,12 @@ function ClientForm({ draft, onChange }) {
   return (
     <Card variant="bordered" style={{ marginBottom: 16 }}>
       <div style={{ fontSize: 'var(--text-md)', fontWeight: 'var(--weight-bold)', color: 'var(--color-text-neutral-primary)', marginBottom: 12 }}>
-        Dettagli Cliente
+        Dettagli Destinatario
       </div>
       <div style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
         <div style={{ flex: '1 1 0%' }}>
           <TextField
-            label="Nome cliente"
+            label="Nome destinatario"
             required
             value={draft.name}
             onChange={(e) => onChange({ ...draft, name: e.target.value })}
@@ -123,12 +123,12 @@ function ClientForm({ draft, onChange }) {
             required
             value={draft.email}
             onChange={(e) => onChange({ ...draft, email: e.target.value })}
-            placeholder="Es. tech@cliente.it"
+            placeholder="Es. tech@destinatario.it"
           />
         </div>
         <div style={{ flex: '1 1 0%' }}>
           <Select
-            label="Tipo cliente"
+            label="Tipo destinatario"
             value={draft.type}
             onChange={(v) => onChange({ ...draft, type: v })}
             options={TYPE_OPTIONS}
@@ -250,7 +250,7 @@ function ChannelRow({ channel, selectedPackageIds, packagesById, expanded, onTog
         <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--hairline)', display: 'flex', flexDirection: 'column', gap: 4 }}>
           {selectedPackageIds.length === 0 && (
             <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-neutral-label)' }}>
-              Nessun pacchetto assegnato a questo cliente.
+              Nessun pacchetto assegnato a questo destinatario.
             </div>
           )}
           {selectedPackageIds.map((pkgId) => {
@@ -287,7 +287,7 @@ function ChannelAccordion({ channels, selectedPackageIds, packages, expandedChan
       </div>
       {channels.length === 0 && (
         <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-neutral-label)', marginBottom: 12 }}>
-          Nessun canale configurato per questo cliente.
+          Nessun canale configurato per questo destinatario.
         </div>
       )}
       {channels.map((channel) => (
@@ -334,7 +334,7 @@ function SummaryPanel({ draft, packages }) {
     <div>
       <Card variant="bordered" style={{ marginBottom: 16 }}>
         <div style={{ fontSize: 'var(--text-md)', fontWeight: 'var(--weight-bold)', color: 'var(--color-text-neutral-primary)' }}>
-          {draft.name || 'Nuovo cliente'}
+          {draft.name || 'Nuovo destinatario'}
         </div>
         <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-neutral-label)', marginTop: 2, marginBottom: 10 }}>
           {draft.organization || '—'} · {draft.type}
@@ -496,10 +496,10 @@ export function Clienti({ clients, setClients, packages }) {
     <div>
       <div style={{ marginBottom: 16 }}>
         <div style={{ fontSize: 'var(--text-xl)', fontWeight: 'var(--weight-bold)', color: 'var(--color-text-neutral-primary)' }}>
-          Clienti
+          Destinatari
         </div>
         <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-neutral-label)', marginTop: 4 }}>
-          Gestisci i clienti destinatari e i pacchetti a loro assegnati.
+          Gestisci i destinatari e i pacchetti a loro assegnati.
         </div>
       </div>
       <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
@@ -527,7 +527,7 @@ export function Clienti({ clients, setClients, packages }) {
             onTogglePackage={toggleChannelPackage}
           />
           <div style={{ display: 'flex', gap: 8 }}>
-            <Button variant="primary" icon="IconCheck" onClick={handleSave}>Salva Cliente</Button>
+            <Button variant="primary" icon="IconCheck" onClick={handleSave}>Salva Destinatario</Button>
             <Button variant="secondary" onClick={() => {}}>Salva Bozza</Button>
           </div>
         </div>

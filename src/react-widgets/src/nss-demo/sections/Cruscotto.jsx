@@ -21,7 +21,7 @@ function CruscottoHeader() {
       </div>
       <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
         <Button variant="ghost" icon="IconDownload" onClick={() => {}}>Esporta log</Button>
-        <Button variant="secondary" onClick={() => {}}>Aggiungi Cliente</Button>
+        <Button variant="secondary" onClick={() => {}}>Aggiungi Destinatario</Button>
         <Button variant="primary" onClick={() => {}}>Modifica cruscotto</Button>
       </div>
     </div>
@@ -54,10 +54,10 @@ function KpiRow({ products, packages, clients, dashboard }) {
       </div>
       <div style={{ flex: '1 1 180px' }}>
         <KpiCard
-          label="CLIENTI ATTIVI"
+          label="DESTINATARI ATTIVI"
           icon="IconCompany"
           value={clients.length}
-          sublabel="Clienti B2B"
+          sublabel="Destinatari B2B"
           trend="+1 questo mese"
           trendDirection="up"
         />
@@ -134,7 +134,7 @@ function ErrorStripe({ errors }) {
 
 const DELIVERY_COLUMNS = [
   { key: 'packageName', header: 'Pacchetto', sortable: true },
-  { key: 'clientName', header: 'Cliente' },
+  { key: 'clientName', header: 'Destinatario' },
   { key: 'channel', header: 'Canale', render: (row) => <ChannelChip channel={row.channel} /> },
   { key: 'lastDeliveryTime', header: 'Ultima consegna', sortable: true },
   { key: 'itemCount', header: 'Elementi', sortable: true },
@@ -199,7 +199,7 @@ function QuickActions() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         <Button variant="primary" icon="IconAdd" onClick={() => {}}>Nuovo Prodotto</Button>
         <Button variant="secondary" icon="IconAdd" onClick={() => {}}>Nuovo Pacchetto</Button>
-        <Button variant="secondary" icon="IconAdd" onClick={() => {}}>Aggiungi Cliente</Button>
+        <Button variant="secondary" icon="IconAdd" onClick={() => {}}>Aggiungi Destinatario</Button>
         <Button variant="secondary" icon="IconHashtag" onClick={() => {}}>Gestisci Tag</Button>
         <div style={{ height: 1, background: 'var(--hairline)', margin: '4px 0' }} />
         <Button variant="ghost" icon="IconDownload" onClick={() => {}}>Esporta Log (CSV)</Button>

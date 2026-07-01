@@ -14,7 +14,7 @@ const REAL_SECTIONS = [
   { key: 'cruscotto', label: 'Cruscotto', icon: 'IconDashboard' },
   { key: 'prodotti', label: 'Prodotti', icon: 'IconDatabase' },
   { key: 'pacchetti', label: 'Pacchetti', icon: 'IconBundle' },
-  { key: 'clienti', label: 'Clienti', icon: 'IconCompany' },
+  { key: 'clienti', label: 'Destinatari', icon: 'IconCompany' },
 ];
 
 // Non-functional placeholder sections — always render the shared empty state.

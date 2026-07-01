@@ -364,7 +364,7 @@ function SummaryPanel({ product, draft, matchedItemCount, packages }) {
                   <div key={pkg.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
                     <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-neutral-primary)' }}>{pkg.name}</span>
                     <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-neutral-label)' }}>
-                      {(pkg.assignedClientIds || []).length} clienti
+                      {(pkg.assignedClientIds || []).length} destinatari
                     </span>
                   </div>
                 ))}

@@ -279,7 +279,7 @@ function SummaryPanel({ pkg, draft, selectedProducts, clients }) {
     { label: 'PRODOTTI', value: draft.selectedProductIds.length },
     { label: 'ELEMENTI TOTALI', value: totalItems.toLocaleString('it-IT') },
     { label: 'AGGIUNTI OGGI', value: addedToday.toLocaleString('it-IT') },
-    { label: 'CLIENTI CHE LO USANO', value: assignedClients.length },
+    { label: 'DESTINATARI CHE LO USANO', value: assignedClients.length },
   ];
 
   return (
@@ -334,11 +334,11 @@ function SummaryPanel({ pkg, draft, selectedProducts, clients }) {
 
       <Card variant="bordered" style={{ marginBottom: 16 }}>
         <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--weight-bold)', color: 'var(--color-text-neutral-primary)', marginBottom: 12 }}>
-          Clienti Assegnati
+          Destinatari Assegnati
         </div>
         {assignedClients.length === 0 ? (
           <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-neutral-label)' }}>
-            Nessun cliente utilizza questo pacchetto.
+            Nessun destinatario utilizza questo pacchetto.
           </div>
         ) : (
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
