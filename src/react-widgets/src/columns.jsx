@@ -341,13 +341,13 @@ function DateUserRenderer({ value, colDef, context, data }) {
   );
 }
 
-function WorkspacePicker({ data, onAction, onBack, onClose, workspaceFilter, title, locales }) {
+function WorkspacePicker({ data, onAction, onBack, onClose, workspaceFilter, includeWorkspaceRoot, title, locales }) {
   const allWorkfolders = getWorkfolders();
   const workfolders = workspaceFilter
-    ? allWorkfolders.filter(wf =>
-        wf.workspace === workspaceFilter ||
-        (wf.isWorkspace && wf.label === workspaceFilter)
-      )
+    ? allWorkfolders.filter(wf => {
+        if (wf.isWorkspace) return includeWorkspaceRoot && wf.label === workspaceFilter;
+        return wf.workspace === workspaceFilter;
+      })
     : allWorkfolders;
   const [error, setError] = useState(null);
   const [duplicating, setDuplicating] = useState(null);
@@ -443,6 +443,75 @@ function InlineActionButton({ action, data, icons, onAction }) {
   );
 }
 
+function InlineWorkspaceButton({ action, data, icons, onAction, locales }) {
+  const [open, setOpen] = useState(false);
+  const [pickerPos, setPickerPos] = useState({ top: 0, left: 0 });
+  const [tip, setTip] = useState(null);
+  const btnRef = useRef(null);
+  const pickerRef = useRef(null);
+  const Icon = LUCIDE_ICONS[icons[action.icon]] || MoreHorizontal;
+
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e) => {
+      if (btnRef.current?.contains(e.target)) return;
+      if (pickerRef.current?.contains(e.target)) return;
+      setOpen(false);
+    };
+    const id = setTimeout(() => document.addEventListener('mousedown', handler), 0);
+    return () => { clearTimeout(id); document.removeEventListener('mousedown', handler); };
+  }, [open]);
+
+  const handleClick = (e) => {
+    e.stopPropagation();
+    setTip(null);
+    if (open) { setOpen(false); return; }
+    const rect = btnRef.current?.getBoundingClientRect();
+    if (rect) setPickerPos({ top: rect.bottom + 4, left: rect.left });
+    setOpen(true);
+  };
+
+  return (
+    <>
+      <button
+        ref={btnRef}
+        className="neon-actions-cell"
+        onMouseDown={e => e.stopPropagation()}
+        onClick={handleClick}
+        onMouseEnter={e => { const r = e.currentTarget.getBoundingClientRect(); setTip({ top: r.top, left: r.left + r.width / 2 }); }}
+        onMouseLeave={() => setTip(null)}
+        style={{
+          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+          width: '28px', height: '28px', border: '1px solid #dddce5', borderRadius: '8px',
+          background: open ? '#f6f3f6' : 'none', cursor: 'pointer', color: '#3f3c4e',
+        }}
+      >
+        <Icon size={14} strokeWidth={2} />
+        <BalloonTooltip visible={!!tip && !open} top={tip?.top} left={tip?.left}>{action.label}</BalloonTooltip>
+      </button>
+      {open && createPortal(
+        <div ref={pickerRef} style={{
+          position: 'fixed', top: pickerPos.top, left: pickerPos.left, zIndex: 9999,
+          background: '#ffffff', border: '1px solid #dddce5', borderRadius: '9px',
+          boxShadow: '0 8px 24px rgba(63,60,78,.18)', width: '220px',
+        }}>
+          <WorkspacePicker
+            data={data}
+            onAction={onAction}
+            onBack={() => setOpen(false)}
+            onClose={() => setOpen(false)}
+            workspaceFilter={action.workspaceFilter || null}
+            includeWorkspaceRoot={action.includeWorkspaceRoot ?? false}
+            title={action.label}
+            locales={locales}
+          />
+        </div>,
+        document.body
+      )}
+    </>
+  );
+}
+
 function ActionsCellRenderer({ data, colDef, context }) {
   const [open, setOpen] = useState(false);
   const [menuPos, setMenuPos] = useState({ top: 0, right: 0 });
@@ -531,7 +600,9 @@ function ActionsCellRenderer({ data, colDef, context }) {
   return (
     <span className="neon-actions-cell" style={{ display: 'inline-flex', verticalAlign: 'middle', alignItems: 'center', gap: '4px' }}>
       {inlineActions.map(action => (
-        <InlineActionButton key={action.id} action={action} data={data} icons={icons} onAction={onAction} />
+        action.actionType === 'moveToWorkspace'
+          ? <InlineWorkspaceButton key={action.id} action={action} data={data} icons={icons} onAction={onAction} locales={context?.locales} />
+          : <InlineActionButton key={action.id} action={action} data={data} icons={icons} onAction={onAction} />
       ))}
       {menuActions.length > 0 && (
         <button
@@ -564,6 +635,7 @@ function ActionsCellRenderer({ data, colDef, context }) {
               onBack={() => setSubPanel(null)}
               onClose={closeMenu}
               workspaceFilter={subPanel.workspaceFilter}
+              includeWorkspaceRoot={subPanel.includeWorkspaceRoot ?? false}
               title={subPanel.label}
               locales={context?.locales}
             />
@@ -576,7 +648,7 @@ function ActionsCellRenderer({ data, colDef, context }) {
                   key={action.id}
                   onClick={e => {
                     e.stopPropagation();
-                    if (isMoveToWs) { setSubPanel({ type: 'workspacePicker', workspaceFilter: action.workspaceFilter || null, label: action.label }); }
+                    if (isMoveToWs) { setSubPanel({ type: 'workspacePicker', workspaceFilter: action.workspaceFilter || null, includeWorkspaceRoot: action.includeWorkspaceRoot ?? false, label: action.label }); }
                     else if (action.actionType === 'open') { openNeonAction(action, data); closeMenu(); }
                     else { onAction(action.id, data); closeMenu(); }
                   }}

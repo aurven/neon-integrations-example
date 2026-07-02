@@ -1,5 +1,5 @@
 {
-  "title": "Ricerca",
+  "title": "Filtra",
   "query": "adn-demo",
 
   "filters": [
@@ -22,15 +22,20 @@
       "defaultIndices": [  ],
       "options": [
         { "label": "Tutte", "variables": {} },
-        { "label": "Salute", "variables": { "workfolder": ["/wire/salute/"] } },
-        { "label": "Morning", "variables": { "workfolder": ["/wire/morning/"] } },
-        { "label": "Cronaca", "variables": { "workfolder": ["/wire/cronaca/"] } },
-        { "label": "Cultura", "variables": { "workfolder": ["/wire/cultura/"] } },
-        { "label": "Esteri", "variables": { "workfolder": ["/wire/esteri/"] } },
-        { "label": "Politica", "variables": { "workfolder": ["/wire/politica/"] } },
-        { "label": "Economia", "variables": { "workfolder": ["/wire/economia/"] } },
-        { "label": "Servizi", "variables": { "workfolder": ["/wire/servizi/"] } },
-        { "label": "Web", "variables": { "workfolder": ["/web/sport/", "/web/multimedia/", "/web/speciali/", "/web/prometeo/"] } }
+        { "label": "Wire", "isGroup": true, "groupId": "wire" },
+        { "label": "Salute",   "group": "wire", "variables": { "workfolder": ["/wire/salute/"] } },
+        { "label": "Morning",  "group": "wire", "variables": { "workfolder": ["/wire/morning/"] } },
+        { "label": "Cronaca",  "group": "wire", "variables": { "workfolder": ["/wire/cronaca/"] } },
+        { "label": "Cultura",  "group": "wire", "variables": { "workfolder": ["/wire/cultura/"] } },
+        { "label": "Esteri",   "group": "wire", "variables": { "workfolder": ["/wire/esteri/"] } },
+        { "label": "Politica", "group": "wire", "variables": { "workfolder": ["/wire/politica/"] } },
+        { "label": "Economia", "group": "wire", "variables": { "workfolder": ["/wire/economia/"] } },
+        { "label": "Servizi",  "group": "wire", "variables": { "workfolder": ["/wire/servizi/"] } },
+        { "label": "Web", "isGroup": true, "groupId": "web" },
+        { "label": "Sport",      "group": "web", "variables": { "workfolder": ["/web/sport/"] } },
+        { "label": "Multimedia", "group": "web", "variables": { "workfolder": ["/web/multimedia/"] } },
+        { "label": "Speciali",   "group": "web", "variables": { "workfolder": ["/web/speciali/"] } },
+        { "label": "Prometeo",   "group": "web", "variables": { "workfolder": ["/web/prometeo/"] } }
       ]
     },
     {
@@ -107,6 +112,7 @@
     "mic": "Mic",
     "zap": "Zap",
     "rss": "Rss",
+    "globe": "Globe",
     "monitor": "Monitor",
     "copy": "Copy",
     "move": "ArrowRight",
@@ -117,7 +123,7 @@
   },
   "workspaceIcons": {
     "wire": "rss",
-    "web": "monitor"
+    "web": "globe"
   },
   "typeIcons": {
     "article": "file",
@@ -148,12 +154,12 @@
     },
     {
       "id": "copy-wire", "label": "Invia a Wire", "icon": "rss",
-      "actionType": "moveToWorkspace", "workspaceFilter": "Wire",
+      "actionType": "moveToWorkspace", "workspaceFilter": "Wire", "placement": "inline",
       "showWhen": { "field": "workFolder", "op": "contains", "value": "/Web" }
     },
     {
-      "id": "copy-web", "label": "Invia a Web", "icon": "monitor",
-      "actionType": "moveToWorkspace", "workspaceFilter": "Web",
+      "id": "copy-web", "label": "Invia a Web", "icon": "globe",
+      "actionType": "moveToWorkspace", "workspaceFilter": "Web", "includeWorkspaceRoot": true, "placement": "inline",
       "showWhen": { "field": "workFolder", "op": "contains", "value": "/Wire" }
     }
   ],

@@ -30,6 +30,7 @@ function mergeMultiGroupVariables(filter, selectedSet) {
   if (selectedSet.size === 0) return {};
   const merged = {};
   for (const idx of selectedSet) {
+    if (filter.options[idx]?.isGroup) continue; // group headers carry no variables
     const vars = filter.options[idx]?.variables ?? {};
     for (const [key, val] of Object.entries(vars)) {
       if (!merged[key]) {

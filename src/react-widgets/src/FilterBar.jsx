@@ -45,6 +45,36 @@ function SingleFilter({ filter, value, onChange }) {
   );
 }
 
+function GroupHeaderRow({ label, allChecked, someChecked, onClick }) {
+  const checkboxRef = useRef(null);
+  useEffect(() => {
+    if (checkboxRef.current) {
+      checkboxRef.current.indeterminate = someChecked && !allChecked;
+    }
+  });
+  return (
+    <label
+      style={{
+        display: 'flex', alignItems: 'center', gap: '8px',
+        padding: '5px 10px', borderRadius: '6px', cursor: 'pointer',
+        fontSize: '12px', fontWeight: 600, color: '#3f3c4e',
+        background: 'transparent', userSelect: 'none',
+      }}
+      onMouseEnter={e => { e.currentTarget.style.background = '#f6f3f6'; }}
+      onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
+    >
+      <input
+        ref={checkboxRef}
+        type="checkbox"
+        checked={allChecked}
+        onChange={onClick}
+        style={{ accentColor: '#0a2ee6', width: '13px', height: '13px', flexShrink: 0 }}
+      />
+      {label}
+    </label>
+  );
+}
+
 function MultiSelectFilter({ filter, value, onChange }) {
   const [open, setOpen] = useState(false);
   const containerRef = useRef(null);
@@ -60,11 +90,18 @@ function MultiSelectFilter({ filter, value, onChange }) {
 
   const isAll = value.size === 0;
   const allLabel = filter.options[0]?.label ?? 'All';
+
+  // Build selectionLabel from leaf options only (skip isGroup headers)
+  const leafSelected = filter.options.filter((o, i) => i > 0 && !o.isGroup && value.has(i));
   const selectionLabel = isAll
     ? allLabel
-    : filter.options.filter((_, i) => i > 0 && value.has(i)).map(o => o.label).join(', ');
+    : leafSelected.map(o => o.label).join(', ');
 
   const isActive = !isAll;
+
+  // Helper: get all leaf child indices for a group
+  const getChildIndices = (groupId) =>
+    filter.options.flatMap((o, i) => (o.group === groupId ? [i] : []));
 
   return (
     <div ref={containerRef} style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -97,21 +134,68 @@ function MultiSelectFilter({ filter, value, onChange }) {
           position: 'absolute', top: 'calc(100% + 4px)', left: 0, zIndex: 200,
           background: '#fff', border: '1px solid #dddce5', borderRadius: '8px',
           boxShadow: '0 4px 16px rgba(0,0,0,.10)',
-          minWidth: '160px', maxHeight: '260px', overflowY: 'auto',
+          minWidth: '160px', maxHeight: '300px', overflowY: 'auto',
           padding: '4px',
         }}>
           {filter.options.map((opt, i) => {
-            const isAllOption = i === 0;
-            const checked = isAllOption ? isAll : value.has(i);
+            // "Tutte/All" sentinel at index 0
+            if (i === 0) {
+              return (
+                <label
+                  key={i}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: '8px',
+                    padding: '6px 10px', borderRadius: '6px', cursor: 'pointer',
+                    fontSize: '12px', color: '#3f3c4e',
+                    background: 'transparent', userSelect: 'none',
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.background = '#f6f3f6'; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={isAll}
+                    onChange={() => onChange(new Set())}
+                    style={{ accentColor: '#0a2ee6', width: '13px', height: '13px', flexShrink: 0 }}
+                  />
+                  {opt.label}
+                </label>
+              );
+            }
+
+            // Group header
+            if (opt.isGroup) {
+              const groupId = opt.groupId ?? opt.label.toLowerCase();
+              const childIndices = getChildIndices(groupId);
+              const allChecked = childIndices.length > 0 && childIndices.every(ci => value.has(ci));
+              const someChecked = childIndices.some(ci => value.has(ci));
+              return (
+                <GroupHeaderRow
+                  key={i}
+                  label={opt.label}
+                  allChecked={allChecked}
+                  someChecked={someChecked}
+                  onClick={() => {
+                    const next = new Set(value);
+                    if (allChecked) { childIndices.forEach(ci => next.delete(ci)); }
+                    else { childIndices.forEach(ci => next.add(ci)); }
+                    onChange(next);
+                  }}
+                />
+              );
+            }
+
+            // Child option (indented if belongs to a group)
+            const isChild = !!opt.group;
+            const checked = value.has(i);
             return (
               <label
                 key={i}
                 style={{
                   display: 'flex', alignItems: 'center', gap: '8px',
-                  padding: '6px 10px', borderRadius: '6px', cursor: 'pointer',
+                  padding: '6px 10px 6px ' + (isChild ? '24px' : '10px'), borderRadius: '6px', cursor: 'pointer',
                   fontSize: '12px', color: '#3f3c4e',
-                  background: 'transparent',
-                  userSelect: 'none',
+                  background: 'transparent', userSelect: 'none',
                 }}
                 onMouseEnter={e => { e.currentTarget.style.background = '#f6f3f6'; }}
                 onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
@@ -120,14 +204,10 @@ function MultiSelectFilter({ filter, value, onChange }) {
                   type="checkbox"
                   checked={checked}
                   onChange={() => {
-                    if (isAllOption) {
-                      onChange(new Set());
-                    } else {
-                      const next = new Set(value);
-                      if (next.has(i)) next.delete(i);
-                      else next.add(i);
-                      onChange(next);
-                    }
+                    const next = new Set(value);
+                    if (next.has(i)) next.delete(i);
+                    else next.add(i);
+                    onChange(next);
                   }}
                   style={{ accentColor: '#0a2ee6', width: '13px', height: '13px', flexShrink: 0 }}
                 />
