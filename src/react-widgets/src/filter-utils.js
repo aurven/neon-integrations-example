@@ -17,8 +17,17 @@ export function buildInitialFilterState(filters) {
   const state = {};
   for (const f of filters) {
     if (f.type === 'multi') {
-      const defaults = f.defaultIndices ?? [];
-      state[f.id] = new Set(defaults);
+      const expanded = new Set();
+      for (const idx of (f.defaultIndices ?? [])) {
+        const opt = f.options[idx];
+        if (opt?.isGroup) {
+          const groupId = opt.groupId ?? opt.label?.toLowerCase();
+          f.options.forEach((o, i) => { if (o.group === groupId) expanded.add(i); });
+        } else {
+          expanded.add(idx);
+        }
+      }
+      state[f.id] = expanded;
     } else {
       state[f.id] = f.defaultIndex ?? 0;
     }
