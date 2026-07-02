@@ -101,7 +101,7 @@ function ErrorStripe({ errors }) {
           background: 'var(--color-background-feedback-red-light)',
           padding: '12px 16px',
           cursor: 'pointer',
-          fontWeight: 'var(--weight-semibold)',
+          fontWeight: 'var(--weight-bold)',
           color: 'var(--color-text-neutral-primary)',
         }}
       >

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Plus, Search, Check, CheckSquare, Square, ChevronUp, ChevronDown } from 'lucide-react';
+import { Plus, Search, Check, CheckSquare, Square, ChevronUp, ChevronDown, Trash2 } from 'lucide-react';
 import { Card } from '../design-system/components/data/Card.jsx';
 import { KeyValue } from '../design-system/components/data/KeyValue.jsx';
 import { TextField } from '../design-system/components/forms/TextField.jsx';
@@ -7,7 +7,6 @@ import { Select } from '../design-system/components/forms/Select.jsx';
 import { Button } from '../design-system/components/forms/Button.jsx';
 import { Chip } from '../design-system/components/forms/Chip.jsx';
 import { ToggleGroup } from '../design-system/components/forms/ToggleGroup.jsx';
-import { Label } from '../design-system/components/forms/Label.jsx';
 import { Modal } from '../design-system/components/overlay/Modal.jsx';
 import { StatusPill } from '../shared/StatusPill.jsx';
 
@@ -136,16 +135,14 @@ function ClientForm({ draft, onChange }) {
         </div>
       </div>
       <div style={{ marginBottom: 12 }}>
-        <Label>Note interne</Label>
-        <div className="neon neon-input neon-textarea">
-          <textarea
-            className="neon-input__control"
-            value={draft.notes}
-            onChange={(e) => onChange({ ...draft, notes: e.target.value })}
-            placeholder="Note visibili solo internamente"
-            rows={3}
-          />
-        </div>
+        <TextField
+          label="Note interne"
+          multiline
+          value={draft.notes}
+          onChange={(e) => onChange({ ...draft, notes: e.target.value })}
+          placeholder="Note visibili solo internamente"
+          inputProps={{ rows: 3 }}
+        />
       </div>
       <div>
         <div style={{ fontSize: 'var(--text-xs)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-neutral-label)', marginBottom: 6 }}>
@@ -236,7 +233,7 @@ function ChannelRow({ channel, selectedPackageIds, packagesById, expanded, onTog
         <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-neutral-label)', whiteSpace: 'nowrap' }}>
           {(channel.includedPackageIds || []).length}/{selectedPackageIds.length} inclusi
         </span>
-        <Button variant="ghost" size="sm" onClick={() => {}}>Rimuovi</Button>
+        <Button variant="tertiary" size="sm" icon={Trash2} onClick={() => {}}>Rimuovi</Button>
         <Button
           variant="ghost"
           size="sm"
