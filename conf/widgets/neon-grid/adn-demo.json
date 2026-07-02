@@ -148,12 +148,12 @@
     },
     {
       "id": "copy-wire", "label": "Invia a Wire", "icon": "rss",
-      "actionType": "moveToWorkspace", "workspaceFilter": "Wire", "placement": "inline",
+      "actionType": "moveToWorkspace", "workspaceFilter": "Wire",
       "showWhen": { "field": "workFolder", "op": "contains", "value": "/Web" }
     },
     {
       "id": "copy-web", "label": "Invia a Web", "icon": "monitor",
-      "actionType": "moveToWorkspace", "workspaceFilter": "Web", "placement": "inline",
+      "actionType": "moveToWorkspace", "workspaceFilter": "Web",
       "showWhen": { "field": "workFolder", "op": "contains", "value": "/Wire" }
     }
   ],
