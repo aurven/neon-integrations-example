@@ -260,6 +260,8 @@ fastify.get("/api/print-query-board/stories", widgetHandlers.printQueryBoardData
 fastify.get("/widgets/nss-demo", widgetHandlers.nssDemoWidgetHandler);
 fastify.get("/widgets/neon-create", widgetHandlers.neonCreateWidgetHandler);
 fastify.post("/api/neon/create", widgetHandlers.neonCreateHandler);
+fastify.get("/widgets/flash-rapido", widgetHandlers.flashRapidoWidgetHandler);
+fastify.post("/widgets/flash-rapido/publish", widgetHandlers.flashRapidoPublishHandler);
 
 // Neon live events proxy (client-notifier SSE)
 fastify.post("/api/neon/events/subscribe", neonEventsHandlers.neonEventsSubscribeHandler);

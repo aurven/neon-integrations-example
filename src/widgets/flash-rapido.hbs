@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{seo.title}}</title>
+    <link rel="icon" href="/assets/favicon.ico">
+    <link rel="canonical" href="{{seo.url}}">
+    <meta name="description" content="{{seo.description}}">
+    <link rel="stylesheet" href="/css/tailwind-panels.css">
+    <link rel="stylesheet" href="/neon/api/demo-integration/css/tailwind-panels.css">
+    <script src="/js/panel-api-helper.js"></script>
+    <script src="/neon/api/demo-integration/js/panel-api-helper.js"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: "Source Sans 3", "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            font-size: 13px;
+            background: #f9f9fb;
+            color: #3f3c4e;
+        }
+        .fr-container {
+            padding: 12px;
+            max-width: 600px;
+        }
+        .fr-container.fr-embedded {
+            padding: 8px;
+        }
+        .fr-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .fr-header-icon {
+            width: 32px;
+            height: 32px;
+            background: #fef9c3;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #a16207;
+            flex-shrink: 0;
+        }
+        .fr-header-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #3f3c4e;
+            margin: 0;
+        }
+        .fr-header-subtitle {
+            font-size: 12px;
+            color: #69667f;
+            margin: 0;
+        }
+        .fr-card {
+            background: #fff;
+            border: 1px solid #dddce5;
+            border-radius: 10px;
+            padding: 14px;
+        }
+        .fr-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #69667f;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .fr-input {
+            width: 100%;
+            border: 1px solid #dddce5;
+            border-radius: 8px;
+            padding: 8px 10px;
+            font-size: 13px;
+            font-family: inherit;
+            color: #3f3c4e;
+            outline: none;
+            transition: border-color 120ms;
+        }
+        .fr-input:focus {
+            border-color: #0a2ee6;
+        }
+        .fr-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-family: inherit;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: opacity 120ms;
+        }
+        .fr-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .fr-btn-primary { background: #0a2ee6; color: #fff; width: 100%; justify-content: center; margin-top: 10px; }
+        .fr-btn-primary:not(:disabled):hover { background: #0925c4; }
+        .fr-btn-success { background: #16a34a; color: #fff; }
+        .fr-btn-success:hover { background: #15803d; }
+        .fr-btn-secondary { background: #f1f0f4; color: #3f3c4e; }
+        .fr-btn-secondary:hover { background: #e4e3ec; }
+        .fr-btn-danger { background: #dc2626; color: #fff; }
+        .fr-btn-danger:hover { background: #b91c1c; }
+        .fr-result-card {
+            display: none;
+            background: #fff;
+            border: 1px solid #dddce5;
+            border-radius: 10px;
+            padding: 14px;
+        }
+        .fr-result-card.fr-visible { display: block; }
+        .fr-result-msg {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+        .fr-result-msg.fr-success { color: #16a34a; }
+        .fr-result-msg.fr-error { color: #dc2626; }
+        .fr-result-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+        .fr-spinner {
+            animation: fr-spin 0.8s linear infinite;
+        }
+        @keyframes fr-spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+
+<body>
+    <div id="fr-container" class="fr-container">
+
+        <div id="fr-header" class="fr-header">
+            <div class="fr-header-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="18" height="18">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+            </div>
+            <div>
+                <p class="fr-header-title">Flash Rapido</p>
+                <p class="fr-header-subtitle">Crea e pubblica flash ADNKronos in /Web</p>
+            </div>
+        </div>
+
+        <div id="fr-form-card" class="fr-card">
+            <form id="fr-form">
+                <label class="fr-label" for="fr-headline">Titolo <span style="color:#dc2626">*</span></label>
+                <input
+                    class="fr-input"
+                    type="text"
+                    id="fr-headline"
+                    name="headline"
+                    required
+                    maxlength="255"
+                    placeholder="Inserisci il titolo del flash…"
+                    autocomplete="off"
+                >
+                <button type="submit" id="fr-publish-btn" class="fr-btn fr-btn-primary">
+                    Pubblica Flash
+                </button>
+            </form>
+        </div>
+
+        <div id="fr-result-card" class="fr-result-card" style="margin-top: 10px;">
+            <div id="fr-result-msg" class="fr-result-msg"></div>
+            <div id="fr-result-buttons" class="fr-result-buttons"></div>
+        </div>
+
+    </div>
+
+    <script>
+        const frEmbedded = (typeof PanelAPI !== 'undefined') ? PanelAPI.isEmbedded() : (window.self !== window.top);
+        if (frEmbedded) {
+            document.getElementById('fr-header').style.display = 'none';
+            document.getElementById('fr-container').classList.add('fr-embedded');
+        }
+
+        const neonAppUrl = '{{neonAppUrl}}';
+
+        function frSpinner() {
+            return `<svg class="fr-spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" width="16" height="16">
+                <circle style="opacity:.25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>`;
+        }
+        function frCheck() {
+            return `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>`;
+        }
+        function frCross() {
+            return `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>`;
+        }
+
+        const frResultCard = document.getElementById('fr-result-card');
+        const frResultMsg  = document.getElementById('fr-result-msg');
+        const frResultBtns = document.getElementById('fr-result-buttons');
+
+        function frShowResult(state, html, buttons = []) {
+            frResultCard.className = 'fr-result-card fr-visible';
+            frResultMsg.className  = 'fr-result-msg' + (state ? ' fr-' + state : '');
+            frResultMsg.innerHTML  = html;
+            frResultBtns.innerHTML = '';
+            buttons.forEach(({ label, style, onClick }) => {
+                const btn = document.createElement('button');
+                btn.className = 'fr-btn fr-btn-' + (style || 'secondary');
+                btn.innerHTML = label;
+                btn.onclick = onClick;
+                frResultBtns.appendChild(btn);
+            });
+        }
+        function frHideResult() {
+            frResultCard.className = 'fr-result-card';
+        }
+
+        const frFormCard   = document.getElementById('fr-form-card');
+        const frPublishBtn = document.getElementById('fr-publish-btn');
+
+        function frShowForm() {
+            frFormCard.style.display = '';
+            frPublishBtn.disabled = false;
+            frPublishBtn.innerHTML = 'Pubblica Flash';
+            document.getElementById('fr-headline').focus();
+        }
+        function frHideForm() {
+            frFormCard.style.display = 'none';
+        }
+
+        document.getElementById('fr-form').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const headline = document.getElementById('fr-headline').value.trim();
+            if (!headline) return;
+
+            frPublishBtn.disabled = true;
+            frPublishBtn.innerHTML = frSpinner() + ' Pubblicazione…';
+            frHideForm();
+            frShowResult('', frSpinner() + ' Pubblicazione in corso…');
+
+            try {
+                const formData = new URLSearchParams();
+                formData.append('headline', headline);
+
+                const endpoint = '/widgets/flash-rapido/publish';
+                let response;
+                if (typeof PanelAPI !== 'undefined') {
+                    response = await PanelAPI.apiCall(endpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: formData,
+                    });
+                } else {
+                    response = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: formData,
+                    });
+                }
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    const { familyRef } = result;
+                    frShowResult('success', frCheck() + ' Flash pubblicato con successo!', [
+                        familyRef && neonAppUrl ? {
+                            label: 'Apri',
+                            style: 'success',
+                            onClick: () => window.open(neonAppUrl + '/neon/app/neon.html#open/' + familyRef),
+                        } : null,
+                        {
+                            label: 'Nuovo Flash',
+                            style: 'secondary',
+                            onClick: () => {
+                                document.getElementById('fr-form').reset();
+                                frHideResult();
+                                frShowForm();
+                            },
+                        },
+                    ].filter(Boolean));
+                } else {
+                    frShowResult('error', frCross() + ' ' + (result.message || 'Errore sconosciuto'), [
+                        {
+                            label: 'Riprova',
+                            style: 'danger',
+                            onClick: () => { frHideResult(); frShowForm(); },
+                        },
+                    ]);
+                }
+            } catch (err) {
+                frShowResult('error', frCross() + ' Errore di rete: ' + err.message, [
+                    {
+                        label: 'Riprova',
+                        style: 'danger',
+                        onClick: () => { frHideResult(); frShowForm(); },
+                    },
+                ]);
+            }
+        });
+    </script>
+</body>
+
+</html>

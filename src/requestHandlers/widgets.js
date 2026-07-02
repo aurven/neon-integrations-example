@@ -5,6 +5,7 @@ const storiesPopulator = require("../stories-populator.js");
 const { safeLogRequest } = require("../helpers/utils.js");
 const { authenticate } = require("../helpers/auth.js");
 const neonBoApi = require("../helpers/neon-bo-api-v3.js");
+const neonUtils = require("../helpers/neon-utils.js");
 const neonConfigConnector = require("../connectors/neon-config-connector.js");
 
 // Normalize "yyyymmdd" or "yyyy-mm-dd" into "yyyy-mm-dd" (used by issueDate field).
@@ -728,6 +729,77 @@ async function neonNodeUnlockHandler(request, reply) {
   }
 }
 
+async function flashRapidoWidgetHandler(request, reply) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) return reply.status(401).send({ error: 'Unauthorized' });
+  return reply.view('/src/widgets/flash-rapido.hbs', {
+    seo: { title: 'Flash Rapido', description: 'Crea e pubblica flash ADNKronos' },
+    neonAppUrl: process.env.NEON_APP_URL,
+  });
+}
+
+async function flashRapidoPublishHandler(request, reply) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) return reply.status(401).send({ error: 'Unauthorized' });
+
+  const { headline } = request.body ?? {};
+  if (!headline?.trim()) {
+    return reply.status(400).send({ message: 'Headline obbligatorio.' });
+  }
+
+  try {
+    const safeHeadline = headline.trim()
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+
+    const xmlBody = `<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE doc SYSTEM "/common/rules/EidosMedia.dtd">
+<?EM-dtdExt /common/rules/EidosMedia.dtx?>
+<?EM-templateName /templates/flash.xml?>
+<?xml-stylesheet type="text/css" href="/common/styles/css/main.css"?>
+<doc xml:lang="it">
+    <story>
+        <grouphead>
+            <headline>
+                <p>${safeHeadline}</p>
+            </headline>
+        </grouphead>
+    </story>
+</doc>`;
+
+    const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    const node = await neonBoApi.createNewStory({
+      type: 'article/flash',
+      name: `flash_${Date.now()}.xml`,
+      template: 'flash.xml',
+      issueDate: today,
+      workFolder: '/Web',
+      creationMode: 'AUTO_RENAME',
+      timeSuffix: false,
+      storageFolder: 'SELECTED_WORKFOLDER',
+    });
+    const { familyRef } = node;
+
+    await neonBoApi.updateNodeContent(familyRef, xmlBody);
+    await neonBoApi.unlockNode(familyRef);
+
+    const steps = ['Privato', 'In Stesura', 'In Approvazione', 'Approvato', 'In Pubblicazione', 'Pubblicato'];
+    for (const step of steps) {
+      await neonUtils.workflowTransitionTo({
+        familyRef,
+        targetWorkflowName: 'Content',
+        targetStateName: step,
+      });
+    }
+
+    return reply.send({ message: 'Flash pubblicato.', familyRef });
+  } catch (err) {
+    safeLogRequest(request, err);
+    return reply.status(500).send({ message: 'Errore durante la pubblicazione.', error: err.message });
+  }
+}
+
 module.exports = {
   testWidgetHandler,
   dropWidgetHandler,
@@ -748,4 +820,6 @@ module.exports = {
   neonCreateWidgetHandler,
   neonCreateHandler,
   neonNodeUnlockHandler,
+  flashRapidoWidgetHandler,
+  flashRapidoPublishHandler,
 };
