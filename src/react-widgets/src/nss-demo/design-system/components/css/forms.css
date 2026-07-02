@@ -320,4 +320,5 @@
   transition: background-color var(--dur-fast) var(--ease-standard), color var(--dur-fast) var(--ease-standard);
 }
 .neon-toggle-btn:hover { color: var(--color-text-neutral-primary); }
+.neon-toggle-btn:focus-visible { box-shadow: var(--focus-ring); }
 .neon-toggle-btn--active { background: var(--color-background-neutral-white); color: var(--color-text-product-primary); box-shadow: var(--shadow-inline-button); }

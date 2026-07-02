@@ -7,22 +7,24 @@ import { Label } from "./Label.jsx";
  */
 export function TextField({
   label, required, size = "md", icon, value, onChange, placeholder,
-  error, disabled = false, clearable = false, id, className = "", inputProps = {}, ...rest
+  error, disabled = false, clearable = false, multiline = false, id, className = "", inputProps = {}, ...rest
 }) {
   const wrapCls = [
     "neon", "neon-input",
     size !== "md" ? `neon-input--${size}` : "",
     error ? "neon-input--error" : "",
     disabled ? "neon-input--disabled" : "",
+    multiline ? "neon-textarea" : "",
   ].filter(Boolean).join(" ");
   const iconSize = size === "sm" ? 10 : 12;
   const IconComp = icon;
+  const Control = multiline ? "textarea" : "input";
   return (
     <div className={["neon", "neon-field", className].filter(Boolean).join(" ")} {...rest}>
       {label && <Label htmlFor={id} required={required} disabled={disabled}>{label}</Label>}
       <div className={wrapCls}>
-        {IconComp && <span className="neon-input__icon"><IconComp size={iconSize} /></span>}
-        <input
+        {!multiline && IconComp && <span className="neon-input__icon"><IconComp size={iconSize} /></span>}
+        <Control
           id={id}
           className="neon-input__control"
           value={value}
@@ -31,7 +33,7 @@ export function TextField({
           disabled={disabled}
           {...inputProps}
         />
-        {clearable && value ? (
+        {!multiline && clearable && value ? (
           <button type="button" className="neon-input__clear" aria-label="Clear"
             onClick={() => onChange && onChange({ target: { value: "" } })}>
             <X size={12} />

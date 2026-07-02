@@ -85,6 +85,7 @@
   transition: background-color var(--dur-fast) var(--ease-standard), color var(--dur-fast) var(--ease-standard);
 }
 .neon-sidebar-btn:hover { background: var(--color-background-neutral-lightest); color: var(--color-icon-product-primary); }
+.neon-sidebar-btn:focus-visible { box-shadow: var(--focus-ring); }
 .neon-sidebar-btn--selected { background: var(--color-background-product-primary); color: var(--color-icon-neutral-white); }
 .neon-sidebar-btn--selected:hover { background: var(--color-background-product-dark); color: var(--color-icon-neutral-white); }
 
