@@ -1,0 +1,213 @@
+{
+  "title": "Ricerca",
+  "query": "adn-demo",
+
+  "filters": [
+    {
+      "id": "tipo",
+      "label": "Tipo:",
+      "type": "multi",
+      "defaultIndices": [  ],
+      "options": [
+        { "label": "Tutti", "variables": {} },
+        { "label": "Articoli", "variables": { "type": ["article"] } },
+        { "label": "Flash", "variables": { "type": ["article/flash"] } },
+        { "label": "Live Blog", "variables": { "type": ["article/liveblog"] } }
+      ]
+    },
+    {
+      "id": "sezione",
+      "label": "Categoria:",
+      "type": "multi",
+      "defaultIndices": [ 3 ],
+      "options": [
+        { "label": "Tutte", "variables": {} },
+        { "label": "Salute", "variables": { "workfolder": ["/wire/salute/"] } },
+        { "label": "Morning", "variables": { "workfolder": ["/wire/morning/"] } },
+        { "label": "Cronaca", "variables": { "workfolder": ["/wire/cronaca/"] } },
+        { "label": "Cultura", "variables": { "workfolder": ["/wire/cultura/"] } },
+        { "label": "Esteri", "variables": { "workfolder": ["/wire/esteri/"] } },
+        { "label": "Politica", "variables": { "workfolder": ["/wire/politica/"] } },
+        { "label": "Economia", "variables": { "workfolder": ["/wire/economia/"] } },
+        { "label": "Servizi", "variables": { "workfolder": ["/wire/servizi/"] } },
+        { "label": "Web", "variables": { "workfolder": ["/web/sport/", "/web/multimedia/", "/web/speciali/", "/web/prometeo/"] } }
+      ]
+    },
+    {
+      "id": "pubblicazione",
+      "label": "Pubblicato:",
+      "type": "single",
+      "defaultIndex": 0,
+      "options": [
+        { "label": "Tutti", "variables": {} },
+        { "label": "Sì", "variables": { "workflow": ["content/pubblicato"] } },
+        { "label": "No", "variables": { "workflow": ["content/privato", "content/in stesura", "content/approvato", "content/in pubblicazione", "content/da verificare", "content/creato"] } }
+      ]
+    }
+  ],
+
+  "demoData": "adn-search-results.json",
+  "pollIntervalMs": 20000,
+  "workfolderTypes": [
+    "article", "wirestory", "wirestory/extcontributions", "wirestory/afpwirestory",
+    "article/flash", "article/longform", "article/poll", "hero"
+  ],
+  "locales": {
+    "loading": "Caricamento oggetti...",
+    "refresh": "Aggiorna",
+    "teaser": "Teaser:",
+    "unlock": "Sblocca",
+    "notPublished": "Non pubblicato",
+    "notYetPublished": "Non ancora pubblicato",
+    "noWorkfolders": "Nessuna cartella disponibile",
+    "actions": "Azioni",
+    "selectWorkspace": "Seleziona cartella",
+    "agGrid": {
+      "pageSizeSelectorLabel": "Righe per pagina:",
+      "page": "Pagina",
+      "to": "di",
+      "of": "su",
+      "next": "Avanti",
+      "last": "Ultima",
+      "first": "Prima",
+      "previous": "Indietro",
+      "noRowsToShow": "Nessun risultato",
+      "loadingOoo": "Caricamento…",
+      "filterOoo": "Filtra…",
+      "equals": "Uguale",
+      "notEqual": "Diverso",
+      "contains": "Contiene",
+      "notContains": "Non contiene",
+      "startsWith": "Inizia con",
+      "endsWith": "Finisce con",
+      "blank": "Vuoto",
+      "notBlank": "Non vuoto",
+      "andCondition": "E",
+      "orCondition": "O"
+    }
+  },
+  "fields": [
+    { "key": "headline", "source": "title" },
+    { "key": "summary", "source": "summary" },
+    { "key": "type", "derived": "typeLabel" },
+    { "key": "date", "source": "updateTs" },
+    { "key": "status", "derived": "status" },
+    { "key": "statusColor", "derived": "statusColor" },
+    { "key": "versionInfo", "source": "versionInfo" },
+    { "key": "lockInfos", "source": "lockInfos" },
+    { "key": "publishInfos", "source": "publishInfos" },
+    { "key": "categories", "source": "categories" },
+    { "key": "workFolder", "source": "metadataGroups.eom.sys_attributes_json.workFolder" },
+    { "key": "nodeMeta", "source": "nodeMeta" }
+  ],
+  "icons": {
+    "file": "FileText",
+    "image": "Image",
+    "video": "Video",
+    "mic": "Mic",
+    "zap": "Zap",
+    "rss": "Rss",
+    "monitor": "Monitor",
+    "copy": "Copy",
+    "move": "ArrowRight",
+    "send": "Send",
+    "pencil": "Pencil",
+    "eye": "Eye",
+    "live": "CircleDot"
+  },
+  "workspaceIcons": {
+    "wire": "rss",
+    "web": "monitor"
+  },
+  "typeIcons": {
+    "article": "file",
+    "article/flash": "zap",
+    "article/gallery": "image",
+    "photo": "image",
+    "video": "video",
+    "audio": "mic",
+    "liveblog": "live"
+  },
+  "typeLabels": {
+    "article": "Articolo",
+    "wirestory": "Wire",
+    "image": "Immagine",
+    "video": "Video",
+    "audio": "Audio",
+    "hero": "Hero",
+    "liveblog": "Live Blog"
+  },
+  "actions": [
+    {
+      "id": "openInEdit", "label": "Apri in modifica", "icon": "pencil",
+      "actionType": "open", "readonly": false, "placement": "inline"
+    },
+    {
+      "id": "openInPreview", "label": "Anteprima", "icon": "eye",
+      "actionType": "open", "readonly": true, "placement": "inline"
+    },
+    {
+      "id": "copy-wire", "label": "Copia in Wire", "icon": "rss",
+      "actionType": "moveToWorkspace", "workspaceFilter": "Wire",
+      "showWhen": { "field": "workFolder", "op": "contains", "value": "/Web" }
+    },
+    {
+      "id": "copy-web", "label": "Copia in Web", "icon": "monitor",
+      "actionType": "moveToWorkspace", "workspaceFilter": "Web",
+      "showWhen": { "field": "workFolder", "op": "contains", "value": "/Wire" }
+    }
+  ],
+  "rowColorRules": [
+    {
+      "when": { "field": "typeName", "op": "eq", "value": "article/flash" },
+      "background": "#fef9c3",
+      "label": "flash"
+    }
+  ],
+  "columns": [
+    {
+      "field": "status", "headerName": "Stato", "type": "status",
+      "width": 20, "sortable": true, "filter": true, "display": "dot"
+    },
+    {
+      "field": "headline", "headerName": "Titolo", "type": "title",
+      "flex": 4, "minWidth": 200, "sortable": true, "filter": true, "showTeaser": true
+    },
+    {
+      "field": "publishInfos", "headerName": "Info", "type": "extendedInfo", "width": 100,
+      "showTypeIcon": true, "typeIconChip": false, "showLockerInfo": true, "showWorkspaceIcon": true, "datePattern": "dd/MM/yyyy HH:mm"
+    },
+    {
+      "field": "publishInfos", "headerName": "Categoria", "type": "section",
+      "site": "TheGlobe", "width": 120, "sortable": false,
+      "colors": [
+        { "match": "cronaca",    "background": "#fef3c7", "color": "#b45309" },
+        { "match": "cultura",    "background": "#f3e8ff", "color": "#7e22ce" },
+        { "match": "economia",   "background": "#dcfce7", "color": "#166534" },
+        { "match": "esteri",     "background": "#dbeafe", "color": "#1d4ed8" },
+        { "match": "morning",    "background": "#fef9c3", "color": "#a16207" },
+        { "match": "multimedia", "background": "#fee2e2", "color": "#b91c1c" },
+        { "match": "politica",   "background": "#fce7f3", "color": "#be185d" },
+        { "match": "prometeo",   "background": "#cffafe", "color": "#0f766e" },
+        { "match": "salute",     "background": "#ccfbf1", "color": "#0f766e" },
+        { "match": "servizi",    "background": "#e0f2fe", "color": "#0369a1" },
+        { "match": "speciali",   "background": "#ede9fe", "color": "#6d28d9" },
+        { "match": "sport",      "background": "#ffedd5", "color": "#c2410c" },
+        {                        "background": "#f1f5f9", "color": "#64748b" }
+      ]
+    },
+    {
+      "field": "versionInfo.createFamilyTime", "headerName": "Creato", "type": "dateUser",
+      "width": 150, "sortable": true, "datePattern": "dd/MM/yyyy HH:mm",
+      "userField": "versionInfo.createFamilyUserRef.userId",
+      "userAliasField": "versionInfo.createFamilyUserRef.alias"
+    },
+    {
+      "field": "versionInfo.updateVersionTime", "headerName": "Ultima Modifica", "type": "dateUser",
+      "width": 150, "sortable": true, "datePattern": "dd/MM/yyyy HH:mm",
+      "userField": "versionInfo.updateVersionUserRef.userId",
+      "userAliasField": "versionInfo.updateVersionUserRef.alias"
+    },
+    { "field": "actions", "headerName": "", "type": "actions", "width": 120 }
+  ]
+}
