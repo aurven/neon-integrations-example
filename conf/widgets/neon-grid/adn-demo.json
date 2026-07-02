@@ -17,7 +17,7 @@
     },
     {
       "id": "sezione",
-      "label": "Categoria:",
+      "label": "Redazione:",
       "type": "multi",
       "defaultIndices": [  ],
       "options": [
@@ -147,13 +147,13 @@
       "actionType": "open", "readonly": true, "placement": "inline"
     },
     {
-      "id": "copy-wire", "label": "Copia in Wire", "icon": "rss",
-      "actionType": "moveToWorkspace", "workspaceFilter": "Wire",
+      "id": "copy-wire", "label": "Invia a Wire", "icon": "rss",
+      "actionType": "moveToWorkspace", "workspaceFilter": "Wire", "placement": "inline",
       "showWhen": { "field": "workFolder", "op": "contains", "value": "/Web" }
     },
     {
-      "id": "copy-web", "label": "Copia in Web", "icon": "monitor",
-      "actionType": "moveToWorkspace", "workspaceFilter": "Web",
+      "id": "copy-web", "label": "Invia a Web", "icon": "monitor",
+      "actionType": "moveToWorkspace", "workspaceFilter": "Web", "placement": "inline",
       "showWhen": { "field": "workFolder", "op": "contains", "value": "/Wire" }
     }
   ],
@@ -178,7 +178,7 @@
       "showTypeIcon": true, "typeIconChip": false, "showLockerInfo": true, "showWorkspaceIcon": true, "datePattern": "dd/MM/yyyy HH:mm"
     },
     {
-      "field": "publishInfos", "headerName": "Categoria", "type": "section",
+      "field": "publishInfos", "headerName": "Redazione", "type": "section",
       "site": "TheGlobe", "width": 120, "sortable": false,
       "colors": [
         { "match": "cronaca",    "background": "#fef3c7", "color": "#b45309" },
