@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { FileText, Image, Video, Mic, Copy, ArrowRight, Send, Zap, Globe, Trophy, Rocket, Rss, Monitor, MoreHorizontal, ChevronRight, ArrowLeft, Lock, LockOpen, Pencil, Eye, CircleDot, FolderOpen } from 'lucide-react';
+import { FileText, Image, Video, Mic, Copy, ArrowRight, ArrowUp, Send, Zap, Globe, Trophy, Rocket, Rss, Monitor, MoreHorizontal, ChevronRight, ArrowLeft, Lock, LockOpen, Pencil, Eye, CircleDot, FolderOpen } from 'lucide-react';
 import { duplicateArticle, unlockNode } from './api.js';
 import { matchesCondition } from './row-rules.js';
 
@@ -481,12 +481,22 @@ function InlineWorkspaceButton({ action, data, icons, onAction, locales }) {
         onMouseEnter={e => { const r = e.currentTarget.getBoundingClientRect(); setTip({ top: r.top, left: r.left + r.width / 2 }); }}
         onMouseLeave={() => setTip(null)}
         style={{
+          position: 'relative',
           display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
           width: '28px', height: '28px', border: '1px solid #dddce5', borderRadius: '8px',
           background: open ? '#f6f3f6' : 'none', cursor: 'pointer', color: '#3f3c4e',
         }}
       >
-        <Icon size={14} strokeWidth={2} />
+        <Icon size={13} strokeWidth={2} />
+        <span style={{
+          position: 'absolute', top: '1px', right: '1px',
+          width: '11px', height: '11px',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: '#0a2ee6', borderRadius: '3px', color: '#fff',
+          pointerEvents: 'none',
+        }}>
+          <ArrowUp size={7} strokeWidth={3} />
+        </span>
         <BalloonTooltip visible={!!tip && !open} top={tip?.top} left={tip?.left}>{action.label}</BalloonTooltip>
       </button>
       {open && createPortal(
