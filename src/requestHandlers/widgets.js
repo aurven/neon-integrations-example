@@ -766,7 +766,7 @@ async function flashRapidoPublishHandler(request, reply) {
       name: `flash_${Date.now()}.xml`,
       template: 'flash.xml',
       issueDate: today,
-      workFolder: '/wire/cronaca',
+      workFolder: '/Wire/Cronaca',
       creationMode: 'AUTO_RENAME',
       timeSuffix: false,
       storageFolder: 'SELECTED_WORKFOLDER',
