@@ -766,7 +766,7 @@ async function flashRapidoPublishHandler(request, reply) {
       name: `flash_${Date.now()}.xml`,
       template: 'flash.xml',
       issueDate: today,
-      workFolder: '/Web',
+      workFolder: '/wire/cronaca',
       creationMode: 'AUTO_RENAME',
       timeSuffix: false,
       storageFolder: 'SELECTED_WORKFOLDER',
@@ -785,8 +785,8 @@ async function flashRapidoPublishHandler(request, reply) {
       });
     }
 
-    await neonBoApi.promoteNode(familyRef, { targetSite: 'Web', targetSection: '/ultimora' });
-    await neonBoApi.promoteNode(familyRef, { targetSite: 'Web', targetSection: '/ultimora', mode: 'LIVE' });
+    await neonBoApi.promoteNode(familyRef, { targetSite: 'Wire', targetSection: '/cronaca' });
+    await neonBoApi.promoteNode(familyRef, { targetSite: 'Wire', targetSection: '/cronaca', mode: 'LIVE' });
 
     return reply.send({ message: 'Flash pubblicato.', familyRef });
   } catch (err) {

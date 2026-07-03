@@ -39,14 +39,18 @@
       ]
     },
     {
-      "id": "pubblicazione",
-      "label": "Pubblicato:",
-      "type": "single",
-      "defaultIndex": 0,
+      "id": "stato",
+      "label": "Stato:",
+      "type": "multi",
+      "defaultIndices": [],
       "options": [
         { "label": "Tutti", "variables": {} },
-        { "label": "Sì", "variables": { "workflow": ["content/pubblicato"] } },
-        { "label": "No", "variables": { "workflow": ["content/privato", "content/in stesura", "content/approvato", "content/in pubblicazione", "content/da verificare", "content/creato"] } }
+        { "label": "Privato",          "dot": "#94a3b8", "variables": { "workflow": ["content/privato"] } },
+        { "label": "In Stesura",       "dot": "#fbbf24", "variables": { "workflow": ["content/in stesura"] } },
+        { "label": "Da Approvare",     "dot": "#60a5fa", "variables": { "workflow": ["content/da approvare"] } },
+        { "label": "Approvato",        "dot": "#a78bfa", "variables": { "workflow": ["content/approvato"] } },
+        { "label": "In Pubblicazione", "dot": "#fb923c", "variables": { "workflow": ["content/in pubblicazione"] } },
+        { "label": "Pubblicato",       "dot": "#34d399", "variables": { "workflow": ["content/pubblicato"] } }
       ]
     }
   ],
@@ -119,7 +123,8 @@
     "send": "Send",
     "pencil": "Pencil",
     "eye": "Eye",
-    "live": "CircleDot"
+    "live": "CircleDot",
+    "pin": "Pin"
   },
   "workspaceIcons": {
     "wire": "rss",
@@ -161,6 +166,10 @@
       "id": "copy-web", "label": "Invia a Web", "icon": "globe",
       "actionType": "moveToWorkspace", "workspaceFilter": "Web", "includeWorkspaceRoot": true, "placement": "inline",
       "showWhen": { "field": "workFolder", "op": "contains", "value": "/Wire" }
+    },
+    {
+      "id": "pinboard", "label": "Aggiungi a Pinboard", "icon": "pin",
+      "actionType": "pinboard"
     }
   ],
   "rowColorRules": [

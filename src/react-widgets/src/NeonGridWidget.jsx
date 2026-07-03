@@ -61,6 +61,10 @@ export default function NeonGridWidget() {
       showToast(`Moved "${row?.headline ?? row?.id}" → ${extra.workFolder}`);
       return;
     }
+    if (actionId === 'pinboard') {
+      showToast(`Aggiunto a Pinboard: "${row?.headline ?? row?.id ?? 'row'}"`);
+      return;
+    }
     const label = ACTION_LABELS[actionId] || actionId;
     showToast(`${label} triggered for "${row?.headline ?? row?.id ?? 'row'}"`);
   }, [showToast]);

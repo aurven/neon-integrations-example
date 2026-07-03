@@ -211,6 +211,12 @@ function MultiSelectFilter({ filter, value, onChange }) {
                   }}
                   style={{ accentColor: '#0a2ee6', width: '13px', height: '13px', flexShrink: 0 }}
                 />
+                {opt.dot && (
+                  <span style={{
+                    width: '8px', height: '8px', borderRadius: '50%',
+                    background: opt.dot, flexShrink: 0, display: 'inline-block',
+                  }} />
+                )}
                 {opt.label}
               </label>
             );

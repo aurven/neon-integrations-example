@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { FileText, Image, Video, Mic, Copy, ArrowRight, ArrowUp, Send, Zap, Globe, Trophy, Rocket, Rss, Monitor, MoreHorizontal, ChevronRight, ArrowLeft, Lock, LockOpen, Pencil, Eye, CircleDot, FolderOpen } from 'lucide-react';
+import { FileText, Image, Video, Mic, Copy, ArrowRight, ArrowUp, Send, Zap, Globe, Trophy, Rocket, Rss, Monitor, MoreHorizontal, ChevronRight, ArrowLeft, Lock, LockOpen, Pencil, Eye, CircleDot, FolderOpen, Pin } from 'lucide-react';
 import { duplicateArticle, unlockNode } from './api.js';
 import { matchesCondition } from './row-rules.js';
 
@@ -181,7 +181,7 @@ function BadgeCellRenderer({ value, colDef }) {
 
 // Registry of Lucide icon components available to the widget.
 // The icons registry in conf (id → lucide name) resolves into this map.
-const LUCIDE_ICONS = { FileText, Image, Video, Mic, Copy, ArrowRight, Send, Zap, Globe, Trophy, Rocket, Rss, Monitor, MoreHorizontal, ChevronRight, ArrowLeft, Lock, LockOpen, Pencil, Eye, CircleDot };
+const LUCIDE_ICONS = { FileText, Image, Video, Mic, Copy, ArrowRight, Send, Zap, Globe, Trophy, Rocket, Rss, Monitor, MoreHorizontal, ChevronRight, ArrowLeft, Lock, LockOpen, Pencil, Eye, CircleDot, Pin };
 
 function TypeIconRenderer({ value, colDef, context, data }) {
   const icons = context?.icons || {};
@@ -492,7 +492,7 @@ function InlineWorkspaceButton({ action, data, icons, onAction, locales }) {
           position: 'absolute', top: '1px', right: '1px',
           width: '11px', height: '11px',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          background: '#0a2ee6', borderRadius: '3px', color: '#fff',
+          background: '#8b8a99', borderRadius: '3px', color: '#fff',
           pointerEvents: 'none',
         }}>
           <ArrowUp size={7} strokeWidth={3} />
