@@ -32,6 +32,7 @@
         { "label": "Economia", "group": "wire", "variables": { "workfolder": ["/wire/economia/"] } },
         { "label": "Servizi",  "group": "wire", "variables": { "workfolder": ["/wire/servizi/"] } },
         { "label": "Web", "isGroup": true, "groupId": "web" },
+        { "label": "/",          "group": "web", "variables": { "workfolder": ["/web/"] } },
         { "label": "Sport",      "group": "web", "variables": { "workfolder": ["/web/sport/"] } },
         { "label": "Multimedia", "group": "web", "variables": { "workfolder": ["/web/multimedia/"] } },
         { "label": "Speciali",   "group": "web", "variables": { "workfolder": ["/web/speciali/"] } },
@@ -45,12 +46,15 @@
       "defaultIndices": [],
       "options": [
         { "label": "Tutti", "variables": {} },
-        { "label": "Privato",          "dot": "#94a3b8", "variables": { "workflow": ["content/privato"] } },
-        { "label": "In Stesura",       "dot": "#fbbf24", "variables": { "workflow": ["content/in stesura"] } },
-        { "label": "Da Approvare",     "dot": "#60a5fa", "variables": { "workflow": ["content/da approvare"] } },
-        { "label": "Approvato",        "dot": "#a78bfa", "variables": { "workflow": ["content/approvato"] } },
-        { "label": "In Pubblicazione", "dot": "#fb923c", "variables": { "workflow": ["content/in pubblicazione"] } },
-        { "label": "Pubblicato",       "dot": "#34d399", "variables": { "workflow": ["content/pubblicato"] } }
+        { "label": "Creato",           "dot": "#c8c8c8", "variables": { "workflow": ["content/creato"] } },
+        { "label": "In Stesura",       "dot": "#ffff00", "variables": { "workflow": ["content/in stesura"] } },
+        { "label": "Privato",          "dot": "#f0b450", "variables": { "workflow": ["content/privato"] } },
+        { "label": "Da Approvare",     "dot": "#0000c8", "variables": { "workflow": ["content/da approvare"] } },
+        { "label": "Approvato",        "dot": "#78bedc", "variables": { "workflow": ["content/approvato"] } },
+        { "label": "In Pubblicazione", "dot": "#aaff00", "variables": { "workflow": ["content/in pubblicazione"] } },
+        { "label": "Da Verificare",    "dot": "#ff9600", "variables": { "workflow": ["content/da verificare"] } },
+        { "label": "Pubblicato",       "dot": "#00ff00", "variables": { "workflow": ["content/pubblicato"] } },
+        { "label": "Depubblicato",     "dot": "#000000", "variables": { "workflow": ["content/depubblicato"] } }
       ]
     }
   ],
@@ -223,6 +227,6 @@
       "userField": "versionInfo.updateVersionUserRef.userId",
       "userAliasField": "versionInfo.updateVersionUserRef.alias"
     },
-    { "field": "actions", "headerName": "", "type": "actions", "width": 120 }
+    { "field": "actions", "headerName": "", "type": "actions", "width": 150 }
   ]
 }

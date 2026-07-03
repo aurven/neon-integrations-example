@@ -32,6 +32,7 @@
         { "label": "Economia", "group": "wire", "variables": { "workfolder": ["/wire/economia/"] } },
         { "label": "Servizi",  "group": "wire", "variables": { "workfolder": ["/wire/servizi/"] } },
         { "label": "Web", "isGroup": true, "groupId": "web" },
+        { "label": "/",          "group": "web", "variables": { "workfolder": ["/web/"] } },
         { "label": "Sport",      "group": "web", "variables": { "workfolder": ["/web/sport/"] } },
         { "label": "Multimedia", "group": "web", "variables": { "workfolder": ["/web/multimedia/"] } },
         { "label": "Speciali",   "group": "web", "variables": { "workfolder": ["/web/speciali/"] } },
@@ -39,14 +40,21 @@
       ]
     },
     {
-      "id": "pubblicazione",
-      "label": "Pubblicato:",
-      "type": "single",
-      "defaultIndex": 1,
+      "id": "stato",
+      "label": "Stato:",
+      "type": "multi",
+      "defaultIndices": [],
       "options": [
         { "label": "Tutti", "variables": {} },
-        { "label": "Sì", "variables": { "workflow": ["content/pubblicato"] } },
-        { "label": "No", "variables": { "workflow": ["content/privato", "content/in stesura", "content/approvato", "content/in pubblicazione", "content/da verificare", "content/creato"] } }
+        { "label": "Creato",           "dot": "#c8c8c8", "variables": { "workflow": ["content/creato"] } },
+        { "label": "In Stesura",       "dot": "#ffff00", "variables": { "workflow": ["content/in stesura"] } },
+        { "label": "Privato",          "dot": "#f0b450", "variables": { "workflow": ["content/privato"] } },
+        { "label": "Da Approvare",     "dot": "#0000c8", "variables": { "workflow": ["content/da approvare"] } },
+        { "label": "Approvato",        "dot": "#78bedc", "variables": { "workflow": ["content/approvato"] } },
+        { "label": "In Pubblicazione", "dot": "#aaff00", "variables": { "workflow": ["content/in pubblicazione"] } },
+        { "label": "Da Verificare",    "dot": "#ff9600", "variables": { "workflow": ["content/da verificare"] } },
+        { "label": "Pubblicato",       "dot": "#00ff00", "variables": { "workflow": ["content/pubblicato"] } },
+        { "label": "Depubblicato",     "dot": "#000000", "variables": { "workflow": ["content/depubblicato"] } }
       ]
     }
   ],
@@ -119,7 +127,8 @@
     "send": "Send",
     "pencil": "Pencil",
     "eye": "Eye",
-    "live": "CircleDot"
+    "live": "CircleDot",
+    "pin": "Pin"
   },
   "workspaceIcons": {
     "wire": "rss",
@@ -161,6 +170,10 @@
       "id": "copy-web", "label": "Invia a Web", "icon": "globe",
       "actionType": "moveToWorkspace", "workspaceFilter": "Web", "includeWorkspaceRoot": true, "placement": "inline",
       "showWhen": { "field": "workFolder", "op": "contains", "value": "/Wire" }
+    },
+    {
+      "id": "pinboard", "label": "Aggiungi a Pinboard", "icon": "pin",
+      "actionType": "pinboard"
     }
   ],
   "rowColorRules": [
@@ -214,6 +227,6 @@
       "userField": "versionInfo.updateVersionUserRef.userId",
       "userAliasField": "versionInfo.updateVersionUserRef.alias"
     },
-    { "field": "actions", "headerName": "", "type": "actions", "width": 120 }
+    { "field": "actions", "headerName": "", "type": "actions", "width": 150 }
   ]
 }
