@@ -8,11 +8,18 @@
   <link rel="stylesheet" href="/neon/api/demo-integration/css/tailwind-panels.css">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
     body {
       font-family: "Source Sans 3", "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       font-size: 13px;
       background: #f9f9fb;
       color: #3f3c4e;
+    }
+    body.is-embedded {
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
     .nc-container { padding: 10px; }
     .nc-label-row {
@@ -143,8 +150,7 @@
 
     const embedded = (typeof PanelAPI !== 'undefined') ? PanelAPI.isEmbedded() : (window.self !== window.top);
     if (embedded) {
-      document.getElementById('nc-label-row').style.display = 'none';
-      document.getElementById('nc-container').style.padding = '6px';
+      document.body.classList.add('is-embedded');
     }
 
     async function handleCreate(el, btn) {

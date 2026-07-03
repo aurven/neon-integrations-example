@@ -12,12 +12,18 @@
     <script src="/neon/api/demo-integration/js/panel-api-helper.js"></script>
     <style>
         * { box-sizing: border-box; }
+        html, body { height: 100%; margin: 0; }
         body {
-            margin: 0;
             font-family: "Source Sans 3", "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
             font-size: 13px;
             background: #f9f9fb;
             color: #3f3c4e;
+        }
+        body.is-embedded {
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
         .fr-container {
             padding: 10px;
@@ -151,8 +157,7 @@
     <script>
         const frEmbedded = (typeof PanelAPI !== 'undefined') ? PanelAPI.isEmbedded() : (window.self !== window.top);
         if (frEmbedded) {
-            document.getElementById('fr-label-row').style.display = 'none';
-            document.getElementById('fr-container').style.padding = '6px';
+            document.body.classList.add('is-embedded');
         }
 
         const neonAppUrl = '{{neonAppUrl}}';
