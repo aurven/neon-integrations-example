@@ -758,15 +758,7 @@ async function flashRapidoPublishHandler(request, reply) {
 <?EM-dtdExt /common/rules/EidosMedia.dtx?>
 <?EM-templateName /templates/flash.xml?>
 <?xml-stylesheet type="text/css" href="/common/styles/css/main.css"?>
-<doc xml:lang="it">
-    <story>
-        <grouphead>
-            <headline>
-                <p>${safeHeadline}</p>
-            </headline>
-        </grouphead>
-    </story>
-</doc>`;
+<doc xml:lang="it"><story><grouphead><headline><p>${safeHeadline}</p></headline></grouphead></story></doc>`.trim();
 
     const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
     const node = await neonBoApi.createNewStory({
@@ -784,7 +776,7 @@ async function flashRapidoPublishHandler(request, reply) {
     await neonBoApi.updateNodeContent(familyRef, xmlBody);
     await neonBoApi.unlockNode(familyRef);
 
-    const steps = ['Privato', 'In Stesura', 'In Approvazione', 'Approvato', 'In Pubblicazione', 'Pubblicato'];
+    const steps = ['Privato', 'In Stesura', 'Da Approvare', 'Approvato', 'In Pubblicazione', 'Pubblicato'];
     for (const step of steps) {
       await neonUtils.workflowTransitionTo({
         familyRef,
