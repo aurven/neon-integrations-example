@@ -1,82 +1,89 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{seo.title}}</title>
-  <link rel="stylesheet" href="/css/neon-design-system.css">
-  <link rel="stylesheet" href="/neon/api/demo-integration/css/neon-design-system.css">
+  <link rel="stylesheet" href="/css/tailwind-panels.css">
+  <link rel="stylesheet" href="/neon/api/demo-integration/css/tailwind-panels.css">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: var(--bg-app, #f9f9fb);
-      padding: 16px;
-      overflow: hidden;
+      font-family: "Source Sans 3", "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 13px;
+      background: #f9f9fb;
+      color: #3f3c4e;
     }
-    .create-grid {
+    .nc-container { padding: 10px; }
+    .nc-label-row {
       display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-    .create-btn {
-      display: flex;
-      flex-direction: column;
       align-items: center;
-      justify-content: center;
-      width: 120px;
-      height: 104px;
+      gap: 6px;
+      margin-bottom: 6px;
+      color: #69667f;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .nc-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
       background: #fff;
-      border: 1px solid #e2e8f0;
+      border: 1px solid #dddce5;
       border-radius: 10px;
+      padding: 6px 8px;
+      flex-wrap: wrap;
+    }
+    .nc-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 11px;
+      border-radius: 7px;
+      font-size: 12px;
+      font-family: inherit;
+      font-weight: 600;
+      color: #3f3c4e;
+      background: #f1f0f4;
+      border: 1px solid #dddce5;
       cursor: pointer;
-      gap: 8px;
-      padding: 12px 8px;
-      transition: box-shadow 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
-      user-select: none;
+      white-space: nowrap;
+      transition: background 120ms, border-color 120ms;
       outline: none;
     }
-    .create-btn:hover {
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
-      border-color: #c7d2e1;
-    }
-    .create-btn:active {
-      transform: scale(0.96);
-    }
-    .create-btn:focus-visible {
-      outline: 2px solid #3b82f6;
-      outline-offset: 2px;
-    }
-    .create-btn.busy {
-      opacity: 0.55;
-      pointer-events: none;
-      cursor: default;
-    }
-    .create-btn svg {
-      width: 38px;
-      height: 38px;
-      color: #6b7d8f;
-      flex-shrink: 0;
-    }
-    .create-btn .btn-label {
+    .nc-btn:hover { background: #e4e3ec; border-color: #c8c6d4; }
+    .nc-btn:active { background: #d9d8e8; }
+    .nc-btn.busy { opacity: 0.55; pointer-events: none; }
+    .nc-btn svg { flex-shrink: 0; }
+    .nc-sep { width: 1px; height: 16px; background: #dddce5; flex-shrink: 0; }
+    .nc-status {
+      flex: 1;
+      min-width: 0;
       font-size: 12px;
-      font-weight: 500;
-      color: #334155;
-      text-align: center;
-      line-height: 1.3;
+      color: #b0aec0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
-    .status-bar {
-      margin-top: 10px;
-      font-size: 12px;
-      color: #94a3b8;
-      min-height: 16px;
-    }
-    .status-bar.error { color: #ef4444; }
+    .nc-status.error { color: #dc2626; }
+    .nc-spinner { animation: nc-spin 0.8s linear infinite; }
+    @keyframes nc-spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
-  <div class="create-grid" id="create-grid"></div>
-  <div class="status-bar" id="status-bar"></div>
+  <div class="nc-container" id="nc-container">
+    <div class="nc-label-row" id="nc-label-row">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="13" height="13">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14M5 12h14"/>
+      </svg>
+      Crea contenuto
+    </div>
+    <div class="nc-bar" id="nc-bar">
+      <!-- buttons injected by JS -->
+    </div>
+  </div>
 
   <script>
     window.CONFIG = {
@@ -85,75 +92,83 @@
       createConfig: {{{createConfig}}}
     };
 
+    const ICON_SIZE = 13;
     const ICONS = {
-      article: '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><line x1="10" y1="9" x2="8" y2="9"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>',
-      flash:   '<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>',
-      gallery: '<rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>',
-      video:   '<path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10"/><rect x="2" y="6" width="14" height="12" rx="2"/>',
-      audio:   '<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/>',
-      image:   '<rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>',
-      edit:    '<path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>',
-      file:    '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/>',
+      article: `<path stroke-linecap="round" stroke-linejoin="round" d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"/><path stroke-linecap="round" stroke-linejoin="round" d="M14 2v4a2 2 0 0 0 2 2h4"/><line x1="10" y1="9" x2="8" y2="9"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>`,
+      flash:   `<path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>`,
+      gallery: `<rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path stroke-linecap="round" stroke-linejoin="round" d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>`,
+      video:   `<path stroke-linecap="round" stroke-linejoin="round" d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10"/><rect x="2" y="6" width="14" height="12" rx="2"/>`,
+      audio:   `<path stroke-linecap="round" stroke-linejoin="round" d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/>`,
+      image:   `<rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path stroke-linecap="round" stroke-linejoin="round" d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>`,
+      edit:    `<path stroke-linecap="round" stroke-linejoin="round" d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>`,
+      file:    `<path stroke-linecap="round" stroke-linejoin="round" d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"/><path stroke-linecap="round" stroke-linejoin="round" d="M14 2v4a2 2 0 0 0 2 2h4"/>`,
     };
 
-    const DEFAULT_ICON = ICONS.file;
-
     function makeSvg(iconKey) {
-      const paths = ICONS[iconKey] || DEFAULT_ICON;
-      return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`;
+      const paths = ICONS[iconKey] || ICONS.file;
+      return `<svg width="${ICON_SIZE}" height="${ICON_SIZE}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`;
     }
 
     function escapeHtml(s) {
-      return String(s)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
 
-    const statusBar = document.getElementById('status-bar');
-
-    function setStatus(msg, isError) {
-      statusBar.textContent = msg;
-      statusBar.className = 'status-bar' + (isError ? ' error' : '');
-    }
-
+    const bar = document.getElementById('nc-bar');
     const buttons = (window.CONFIG.createConfig.buttons || []);
 
-    buttons.forEach((btn) => {
+    // Status element appended after buttons
+    const statusEl = document.createElement('div');
+    statusEl.className = 'nc-status';
+    statusEl.id = 'nc-status';
+
+    function spinner() {
+      return `<svg class="nc-spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" width="${ICON_SIZE}" height="${ICON_SIZE}"><circle style="opacity:.25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
+    }
+
+    buttons.forEach((btn, i) => {
+      if (i > 0) {
+        const sep = document.createElement('div');
+        sep.className = 'nc-sep';
+        bar.appendChild(sep);
+      }
       const el = document.createElement('button');
-      el.className = 'create-btn';
-      el.setAttribute('title', btn.label || '');
-      el.innerHTML = makeSvg(btn.icon) + `<span class="btn-label">${escapeHtml(btn.label || '')}</span>`;
+      el.className = 'nc-btn';
+      el.title = btn.label || '';
+      el.innerHTML = makeSvg(btn.icon) + `<span>${escapeHtml(btn.label || '')}</span>`;
       el.addEventListener('click', () => handleCreate(el, btn));
-      document.getElementById('create-grid').appendChild(el);
+      bar.appendChild(el);
     });
+
+    bar.appendChild(statusEl);
+
+    const embedded = (typeof PanelAPI !== 'undefined') ? PanelAPI.isEmbedded() : (window.self !== window.top);
+    if (embedded) {
+      document.getElementById('nc-label-row').style.display = 'none';
+      document.getElementById('nc-container').style.padding = '6px';
+    }
 
     async function handleCreate(el, btn) {
       el.classList.add('busy');
-      setStatus('');
+      statusEl.textContent = '';
+      statusEl.className = 'nc-status';
+
+      const origHtml = el.innerHTML;
+      el.innerHTML = spinner() + `<span>${escapeHtml(btn.label || '')}</span>`;
 
       try {
         const res = await fetch('/api/neon/create', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'apikey': window.CONFIG.apiKey,
-          },
+          headers: { 'Content-Type': 'application/json', 'apikey': window.CONFIG.apiKey },
           body: JSON.stringify({ createOptions: btn.createOptions }),
         });
-
         const data = await res.json();
-
-        if (!res.ok || !data.familyRef) {
-          throw new Error(data.error || `HTTP ${res.status}`);
-        }
-
-        const openUrl = `${window.CONFIG.neonAppUrl}/neon/app/neon.html#open/${data.familyRef}`;
-        window.open(openUrl, '_blank');
+        if (!res.ok || !data.familyRef) throw new Error(data.error || `HTTP ${res.status}`);
+        window.open(`${window.CONFIG.neonAppUrl}/neon/app/neon.html#open/${data.familyRef}`, '_blank');
       } catch (err) {
-        setStatus(err.message, true);
+        statusEl.textContent = err.message;
+        statusEl.className = 'nc-status error';
       } finally {
+        el.innerHTML = origHtml;
         el.classList.remove('busy');
       }
     }
