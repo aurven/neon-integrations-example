@@ -42,6 +42,7 @@
         }
         .fr-label-row svg { flex-shrink: 0; }
         .fr-bar {
+            position: relative;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -49,6 +50,28 @@
             border: 1px solid #dddce5;
             border-radius: 10px;
             padding: 6px 8px;
+        }
+        .fr-confirm {
+            display: none;
+            position: absolute;
+            inset: 0;
+            background: rgba(255,255,255,0.97);
+            border-radius: 10px;
+            align-items: center;
+            gap: 8px;
+            padding: 0 8px;
+            z-index: 10;
+        }
+        .fr-confirm.fr-visible { display: flex; }
+        .fr-confirm-text {
+            flex: 1;
+            min-width: 0;
+            font-size: 12px;
+            font-weight: 600;
+            color: #3f3c4e;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .fr-bar-form {
             display: flex;
@@ -128,6 +151,13 @@
         </div>
 
         <div class="fr-bar">
+            <!-- Confirmation overlay -->
+            <div id="fr-confirm" class="fr-confirm">
+                <span class="fr-confirm-text">Pubblicare il flash?</span>
+                <button id="fr-confirm-ok" type="button" class="fr-btn fr-btn-primary">Conferma</button>
+                <button id="fr-confirm-cancel" type="button" class="fr-btn fr-btn-secondary">Annulla</button>
+            </div>
+
             <!-- Form state -->
             <form id="fr-form" class="fr-bar-form">
                 <input
@@ -181,6 +211,7 @@
         const frMsg     = document.getElementById('fr-result-msg');
         const frActions = document.getElementById('fr-result-actions');
         const frBtn     = document.getElementById('fr-publish-btn');
+        const frConfirm = document.getElementById('fr-confirm');
 
         function frShowResult(state, html, buttons = []) {
             frForm.style.display = 'none';
@@ -205,10 +236,14 @@
             document.getElementById('fr-headline').focus();
         }
 
-        frForm.addEventListener('submit', async function (e) {
-            e.preventDefault();
+        function frShowConfirm() { frConfirm.classList.add('fr-visible'); }
+        function frHideConfirm() { frConfirm.classList.remove('fr-visible'); }
+
+        document.getElementById('fr-confirm-cancel').addEventListener('click', frHideConfirm);
+
+        document.getElementById('fr-confirm-ok').addEventListener('click', async function () {
+            frHideConfirm();
             const headline = document.getElementById('fr-headline').value.trim();
-            if (!headline) return;
 
             frBtn.disabled = true;
             frBtn.innerHTML = frSpinner();
@@ -263,6 +298,12 @@
                     { label: 'Riprova', style: 'danger', onClick: frShowForm },
                 ]);
             }
+        });
+
+        frForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            if (!document.getElementById('fr-headline').value.trim()) return;
+            frShowConfirm();
         });
     </script>
 </body>
