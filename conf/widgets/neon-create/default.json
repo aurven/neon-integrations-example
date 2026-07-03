@@ -4,14 +4,18 @@
       "label": "Nuovo articolo",
       "icon": "article",
       "createOptions": {
-        "type": "article"
+        "type": "article",
+        "workFolder": "/Wire/Cronaca",
+        "template": "article.xml"
       }
     },
     {
       "label": "Nuovo flash",
       "icon": "flash",
       "createOptions": {
-        "type": "article/flash"
+        "type": "article/flash",
+        "workFolder": "/Wire/Cronaca",
+        "template": "flash.xml"
       }
     }
   ]

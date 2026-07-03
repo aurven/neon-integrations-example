@@ -706,7 +706,17 @@ async function neonCreateHandler(request, reply) {
   }
 
   try {
-    const node = await neonBoApi.createNewStory(createOptions);
+    const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    const typeSlug = (createOptions.type || 'article').replace(/\//g, '_');
+    const merged = {
+      creationMode: 'AUTO_RENAME',
+      timeSuffix: false,
+      storageFolder: 'SELECTED_WORKFOLDER',
+      issueDate: today,
+      name: `${typeSlug}_${Date.now()}.xml`,
+      ...createOptions,
+    };
+    const node = await neonBoApi.createNewStory(merged);
     console.log('neonCreateHandler << created:', node.familyRef);
     return reply.status(200).send({ familyRef: node.familyRef });
   } catch (err) {
