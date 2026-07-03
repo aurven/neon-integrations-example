@@ -785,6 +785,9 @@ async function flashRapidoPublishHandler(request, reply) {
       });
     }
 
+    await neonBoApi.promoteNode(familyRef, { targetSite: 'Web', targetSection: '/ultimora' });
+    await neonBoApi.promoteNode(familyRef, { targetSite: 'Web', targetSection: '/ultimora', mode: 'LIVE' });
+
     return reply.send({ message: 'Flash pubblicato.', familyRef });
   } catch (err) {
     safeLogRequest(request, err);
