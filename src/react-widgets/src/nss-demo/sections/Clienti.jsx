@@ -27,12 +27,19 @@ const STATUS_ITEMS = [
   { value: false, label: 'Non attivo' },
 ];
 
+function formatItalianDate(iso) {
+  if (!iso) return '—';
+  const [y, m, d] = iso.split('-');
+  return `${d}/${m}/${y}`;
+}
+
 function blankDraft() {
   return {
     name: '',
     organization: '',
     email: '',
     type: 'Editore',
+    subscriptionExpiry: '',
     notes: '',
     isActive: true,
     selectedPackageIds: [],
@@ -46,6 +53,7 @@ function draftFromClient(client) {
     organization: client.organization,
     email: client.email,
     type: client.type,
+    subscriptionExpiry: client.subscriptionExpiry,
     notes: client.notes,
     isActive: client.isActive,
     // Copies (not shared references) so edits to the draft don't mutate the
@@ -133,6 +141,14 @@ function ClientForm({ draft, onChange }) {
             options={TYPE_OPTIONS}
           />
         </div>
+      </div>
+      <div style={{ marginBottom: 12 }}>
+        <TextField
+          label="Scadenza abbonamento"
+          value={draft.subscriptionExpiry}
+          onChange={(e) => onChange({ ...draft, subscriptionExpiry: e.target.value })}
+          inputProps={{ type: 'date' }}
+        />
       </div>
       <div style={{ marginBottom: 12 }}>
         <TextField
@@ -340,6 +356,7 @@ function SummaryPanel({ draft, packages }) {
           <StatusPill status={draft.isActive ? 'Attivo' : 'Non attivo'} />
         </div>
         <KeyValue label="Email">{draft.email || '—'}</KeyValue>
+        <KeyValue label="Scadenza abbonamento">{formatItalianDate(draft.subscriptionExpiry)}</KeyValue>
       </Card>
 
       <Card variant="bordered" style={{ marginBottom: 16 }}>
@@ -461,6 +478,7 @@ export function Clienti({ clients, setClients, packages }) {
         organization: draft.organization,
         email: draft.email.trim(),
         type: draft.type,
+        subscriptionExpiry: draft.subscriptionExpiry,
         isActive: draft.isActive,
         notes: draft.notes,
         packageIds: draft.selectedPackageIds,
@@ -478,6 +496,7 @@ export function Clienti({ clients, setClients, packages }) {
                 organization: draft.organization,
                 email: draft.email.trim(),
                 type: draft.type,
+                subscriptionExpiry: draft.subscriptionExpiry,
                 isActive: draft.isActive,
                 notes: draft.notes,
                 packageIds: draft.selectedPackageIds,
