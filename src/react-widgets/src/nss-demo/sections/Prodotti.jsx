@@ -30,6 +30,12 @@ const AND_OR_ITEMS = [
   { value: 'OR', label: 'OR' },
 ];
 
+const STATUS_OPTIONS = [
+  { value: 'Bozza', label: 'Bozza' },
+  { value: 'Attivo', label: 'Attivo' },
+  { value: 'Disattivato', label: 'Disattivato' },
+];
+
 function blankCondition() {
   return { family: 'Argomento', matchType: 'is', values: [] };
 }
@@ -42,6 +48,7 @@ function blankDraft() {
   return {
     name: '',
     category: 'News',
+    status: 'Bozza',
     description: '',
     rules: { mode: 'ALL', groups: [blankGroup()] },
   };
@@ -51,6 +58,7 @@ function draftFromProduct(product) {
   return {
     name: product.name,
     category: product.category,
+    status: product.status,
     description: product.description,
     // Deep-clone rules so edits to the draft don't mutate the shared products array
     // until "Salva Prodotto" is clicked.
@@ -99,7 +107,7 @@ function ProductList({ products, selectedProductId, onSelect, onNew }) {
             <Chip kind="info" color="blue">{p.category}</Chip>
           </div>
           <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-neutral-label)', marginTop: 6 }}>
-            {p.matchedItemCount.toLocaleString('it-IT')} elementi
+            {p.matchedItemCount.toLocaleString('it-IT')} elementi · {p.status}
           </div>
         </Card>
       ))}
@@ -139,6 +147,16 @@ function IdentityForm({ draft, onChange }) {
         onChange={(e) => onChange({ ...draft, description: e.target.value })}
         placeholder="Breve descrizione del prodotto"
       />
+      <div style={{ marginTop: 12 }}>
+        <div style={{ fontSize: 'var(--text-xs)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-text-neutral-label)', marginBottom: 6 }}>
+          Stato
+        </div>
+        <ToggleGroup
+          items={STATUS_OPTIONS}
+          value={draft.status}
+          onChange={(v) => onChange({ ...draft, status: v })}
+        />
+      </div>
     </Card>
   );
 }
@@ -418,6 +436,7 @@ export function Prodotti({ products, setProducts, packages }) {
         id: `prod-${Date.now()}`,
         name: draft.name.trim(),
         category: draft.category,
+        status: draft.status,
         description: draft.description,
         matchedItemCount: liveMatchedItemCount,
         lastSaved: new Date().toISOString(),
