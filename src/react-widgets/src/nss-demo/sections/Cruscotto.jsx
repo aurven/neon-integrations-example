@@ -69,9 +69,9 @@ function KpiRow({ products, packages, clients, dashboard }) {
           icon={AlertCircle}
           value={dashboard.errors.length}
           sublabel="Errori di consegna"
-          trend="da 7 ieri"
-          trendDirection="down"
-          error
+          trend={dashboard.errors.length > 0 ? 'da 7 ieri' : 'nessun errore oggi'}
+          trendDirection={dashboard.errors.length > 0 ? 'down' : 'flat'}
+          error={dashboard.errors.length > 0}
         />
       </div>
       <div style={{ flex: '2 1 320px' }}>
