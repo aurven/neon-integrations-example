@@ -107,7 +107,7 @@ function ProductList({ products, selectedProductId, onSelect, onNew }) {
   );
 }
 
-/** Identity fields: Nome Prodotto / Categoria / Descrizione. */
+/** Identity fields: Nome Prodotto / Classificazione / Descrizione. */
 function IdentityForm({ draft, onChange }) {
   return (
     <Card variant="bordered" style={{ marginBottom: 16 }}>
@@ -126,7 +126,7 @@ function IdentityForm({ draft, onChange }) {
         </div>
         <div style={{ flex: '1 1 0%' }}>
           <Select
-            label="Categoria"
+            label="Classificazione"
             value={draft.category}
             onChange={(v) => onChange({ ...draft, category: v })}
             options={CATEGORY_OPTIONS}
@@ -238,13 +238,13 @@ function RuleGroup({ group, onChange, onRemove }) {
         />
       ))}
       <div style={{ marginTop: 8 }}>
-        <Button variant="tertiary" size="sm" icon={Plus} onClick={addCondition}>+ Aggiungi condizione</Button>
+        <Button variant="tertiary" size="sm" icon={Plus} onClick={addCondition}>Aggiungi condizione</Button>
       </div>
     </Card>
   );
 }
 
-/** Full query-rule-builder: list of groups + "+ Aggiungi gruppo". */
+/** Full query-rule-builder: list of groups + "Aggiungi gruppo". */
 function QueryRuleBuilder({ rules, onChange }) {
   function updateGroup(idx, next) {
     const groups = rules.groups.map((g, i) => (i === idx ? next : g));
@@ -272,7 +272,7 @@ function QueryRuleBuilder({ rules, onChange }) {
           onRemove={() => removeGroup(idx)}
         />
       ))}
-      <Button variant="secondary" size="sm" icon={Plus} onClick={addGroup}>+ Aggiungi gruppo</Button>
+      <Button variant="secondary" size="sm" icon={Plus} onClick={addGroup}>Aggiungi gruppo</Button>
     </Card>
   );
 }

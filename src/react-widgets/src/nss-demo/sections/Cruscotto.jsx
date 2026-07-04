@@ -91,6 +91,7 @@ function KpiRow({ products, packages, clients, dashboard }) {
 /** Expandable stripe listing today's delivery errors. */
 function ErrorStripe({ errors }) {
   const [expanded, setExpanded] = useState(false);
+  if (!errors.length) return null;
   return (
     <Card variant="bordered" style={{ marginBottom: 16, padding: 0, overflow: 'hidden' }}>
       <div

@@ -302,8 +302,8 @@ export const SEED_CLIENTS = [
 
 export const SEED_DASHBOARD = {
   deliveries: [
-    { packageName: 'Politica Daily', clientName: 'Il Sole 24 Ore', channel: 'SFTP', lastDeliveryTime: '09:14 · 2h fa', itemCount: 247, status: 'Errore' },
-    { packageName: 'Sport Wire', clientName: 'ANSA Sport', channel: 'HTTP', lastDeliveryTime: '08:52 · 3h fa', itemCount: 89, status: 'Errore' },
+    { packageName: 'Politica Daily', clientName: 'Il Sole 24 Ore', channel: 'SFTP', lastDeliveryTime: '09:14 · 2h fa', itemCount: 247, status: 'OK' },
+    { packageName: 'Sport Wire', clientName: 'ANSA Sport', channel: 'HTTP', lastDeliveryTime: '08:52 · 3h fa', itemCount: 89, status: 'OK' },
     { packageName: 'Economics Bundle', clientName: 'Reuters Italia', channel: 'SFTP', lastDeliveryTime: '11:00 · adesso', itemCount: 512, status: 'OK' },
     { packageName: 'Breaking News RSS', clientName: 'Sky TG24', channel: 'RSS', lastDeliveryTime: '11:02 · adesso', itemCount: 34, status: 'OK' },
     { packageName: 'Italy Digest', clientName: 'AP Italia', channel: 'HTTP', lastDeliveryTime: '10:45 · 19 min fa', itemCount: 178, status: 'Parziale' },
@@ -311,11 +311,7 @@ export const SEED_DASHBOARD = {
     { packageName: 'Finance Wire', clientName: 'Bloomberg Italia', channel: 'HTTP', lastDeliveryTime: '11:04 · adesso', itemCount: 423, status: 'OK' },
     { packageName: 'Politica Daily', clientName: 'Corriere della Sera', channel: 'SFTP', lastDeliveryTime: '09:00 · 2h fa', itemCount: 198, status: 'In Pausa' },
   ],
-  errors: [
-    { packageName: 'Politica Daily', clientName: 'Il Sole 24 Ore', message: 'Connessione SFTP rifiutata — host sftp.ilsole.it non raggiungibile sulla porta 22', timestamp: '09:14 CET' },
-    { packageName: 'Sport Wire', clientName: 'ANSA Sport', message: 'HTTP 401 Non autorizzato', timestamp: '08:52 CET' },
-    { packageName: 'Economics Bundle', clientName: 'Reuters Italia', message: 'Permesso S3 negato', timestamp: '07:40 CET' },
-  ],
+  errors: [],
   channelBreakdown: [
     { channelType: 'SFTP', count: 1012, percentage: 55 },
     { channelType: 'HTTP', count: 690, percentage: 38 },
