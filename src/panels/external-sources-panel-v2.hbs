@@ -208,7 +208,7 @@ function setupPostMessage() {
 function buildProviderDropdown() {
     els.providerDropdown.innerHTML = PROVIDERS.map(p => `
         <div class="es-provider-option" data-key="${esc(p.key)}" role="option">
-            <img src="${esc(p.logo)}" alt="${esc(p.name)}" class="es-provider-option-logo">
+            <img src="${esc(PanelAPI.buildStaticPath(p.logo))}" alt="${esc(p.name)}" class="es-provider-option-logo">
             <span class="es-provider-option-name">${esc(p.name)}</span>
         </div>
     `).join('');
@@ -233,7 +233,7 @@ function closeProviderDropdown() {
 }
 
 function updateProviderUI(provider) {
-    els.providerLogo.src  = provider.logo;
+    els.providerLogo.src  = PanelAPI.buildStaticPath(provider.logo);
     els.providerLogo.alt  = provider.name;
     els.providerName.textContent = provider.name;
 
