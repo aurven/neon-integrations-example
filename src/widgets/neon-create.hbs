@@ -170,6 +170,12 @@
         });
         const data = await res.json();
         if (!res.ok || !data.familyRef) throw new Error(data.error || `HTTP ${res.status}`);
+        // Unlock so the editor opens without a stale lock
+        await fetch('/api/neon/nodes/unlock', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'apikey': window.CONFIG.apiKey },
+          body: JSON.stringify({ familyRef: data.familyRef }),
+        }).catch(() => {/* non-fatal */});
         window.open(`${window.CONFIG.neonAppUrl}/neon/app/neon.html#open/${data.familyRef}`, '_blank');
       } catch (err) {
         statusEl.textContent = err.message;

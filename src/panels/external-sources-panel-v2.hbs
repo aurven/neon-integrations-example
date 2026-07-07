@@ -14,37 +14,20 @@
 <body>
 <div id="es-root">
 
-    <!-- Header: providers + toolbar -->
+    <!-- Header: provider select + search toolbar -->
     <header class="es-header">
-        <!-- Provider row -->
-        <div class="es-providers">
-            <button class="es-provider-btn active" data-source="pexels" title="Pexels">
-                <img src="/assets/logos/pexels.svg" alt="Pexels" class="es-provider-logo">
-            </button>
-            <button class="es-provider-btn" data-source="youtube" title="YouTube">
-                <img src="/assets/logos/youtube.svg" alt="YouTube" class="es-provider-logo">
-            </button>
-            <button class="es-provider-btn" data-source="dailymotion" title="DailyMotion">
-                <img src="/assets/logos/dailymotion.svg" alt="DailyMotion" class="es-provider-logo">
-            </button>
-        </div>
-
-        <!-- Type + search toolbar -->
         <div class="es-toolbar">
-            <!-- Asset-type pill (hidden for video-only sources) -->
-            <div class="es-type-pill" id="esTypePill">
-                <button class="es-type-btn active" data-type="photos">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+
+            <!-- Provider custom select -->
+            <div class="es-provider-select" id="esProviderSelect" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false">
+                <div class="es-provider-current" id="esProviderCurrent">
+                    <img class="es-provider-logo" id="esProviderLogo" src="" alt="">
+                    <span class="es-provider-name" id="esProviderName"></span>
+                    <svg class="es-provider-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"/>
                     </svg>
-                    Photos
-                </button>
-                <button class="es-type-btn" data-type="videos">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/>
-                    </svg>
-                    Videos
-                </button>
+                </div>
+                <div class="es-provider-dropdown" id="esProviderDropdown" role="listbox"></div>
             </div>
 
             <!-- Search -->
@@ -118,34 +101,68 @@
 </div>
 
 <script>
+// ── Provider definitions ───────────────────────────────
+// dragAndDrop: false → cards not draggable, handle hidden
+// insertButton: false → Insert button hidden
+const PROVIDERS = [
+    { key: 'pexels-photos',  source: 'pexels',      type: 'photos', logo: '/assets/logos/pexels.svg',      name: 'Photos',  dragAndDrop: false,  insertButton: true  },
+    { key: 'pexels-videos',  source: 'pexels',      type: 'videos', logo: '/assets/logos/pexels.svg',      name: 'Videos',  dragAndDrop: true,  insertButton: false  },
+    { key: 'youtube',        source: 'youtube',     type: 'videos', logo: '/assets/logos/youtube.svg',     name: 'Videos',  dragAndDrop: true, insertButton: false },
+    { key: 'dailymotion',    source: 'dailymotion', type: 'videos', logo: '/assets/logos/dailymotion.svg', name: 'Videos',  dragAndDrop: true, insertButton: false },
+];
+
 // ── State ──────────────────────────────────────────────
 const state = {
     apiKey: '{{{apiKey}}}',
     neonAppUrl: '{{{neonAppUrl}}}',
     currentSource: 'pexels',
     currentType: 'photos',
+    currentConfig: { dragAndDrop: true, insertButton: true },
     currentQuery: '',
     isLoading: false,
     neonContext: null,
     modalAsset: null
 };
 
+// ── State persistence ──────────────────────────────────
+const STORAGE_KEY = 'es-panel-v2-state';
+
+function persistState() {
+    try {
+        sessionStorage.setItem(STORAGE_KEY, JSON.stringify({
+            providerKey: PROVIDERS.find(p => p.source === state.currentSource && p.type === state.currentType)?.key || 'pexels-photos',
+            currentQuery: state.currentQuery
+        }));
+    } catch(e) {}
+}
+
+function loadPersistedState() {
+    try {
+        const saved = JSON.parse(sessionStorage.getItem(STORAGE_KEY) || '{}');
+        return saved;
+    } catch(e) { return {}; }
+}
+
 // ── DOM refs ───────────────────────────────────────────
 const els = {
-    searchInput:   document.getElementById('esSearchInput'),
-    searchBtn:     document.getElementById('esSearchBtn'),
-    clearBtn:      document.getElementById('esClearBtn'),
-    typePill:      document.getElementById('esTypePill'),
-    grid:          document.getElementById('esGrid'),
-    loading:       document.getElementById('esLoading'),
-    noResults:     document.getElementById('esNoResults'),
-    modalBackdrop: document.getElementById('esModalBackdrop'),
-    modalTitle:    document.getElementById('esModalTitle'),
-    modalMedia:    document.getElementById('esModalMedia'),
-    modalFields:   document.getElementById('esModalFields'),
-    modalInsert:   document.getElementById('esModalInsert'),
-    modalOpen:     document.getElementById('esModalOpen'),
-    modalClose:    document.getElementById('esModalClose')
+    searchInput:     document.getElementById('esSearchInput'),
+    searchBtn:       document.getElementById('esSearchBtn'),
+    clearBtn:        document.getElementById('esClearBtn'),
+    providerSelect:  document.getElementById('esProviderSelect'),
+    providerCurrent: document.getElementById('esProviderCurrent'),
+    providerLogo:    document.getElementById('esProviderLogo'),
+    providerName:    document.getElementById('esProviderName'),
+    providerDropdown:document.getElementById('esProviderDropdown'),
+    grid:            document.getElementById('esGrid'),
+    loading:         document.getElementById('esLoading'),
+    noResults:       document.getElementById('esNoResults'),
+    modalBackdrop:   document.getElementById('esModalBackdrop'),
+    modalTitle:      document.getElementById('esModalTitle'),
+    modalMedia:      document.getElementById('esModalMedia'),
+    modalFields:     document.getElementById('esModalFields'),
+    modalInsert:     document.getElementById('esModalInsert'),
+    modalOpen:       document.getElementById('esModalOpen'),
+    modalClose:      document.getElementById('esModalClose')
 };
 
 // ── Helpers ────────────────────────────────────────────
@@ -177,10 +194,8 @@ function setupPostMessage() {
         const d = e.data;
         if (!d) return;
 
-        // Context handshake
         if (d.key === 'getInfo') { state.neonContext = d.info; return; }
 
-        // Insert operation result from Neon
         if (d.type === 'neonContext' && d.key === 'uploadAndInsertAsset') {
             if (d.success === true) onInsertSuccess();
             else onInsertError();
@@ -189,38 +204,71 @@ function setupPostMessage() {
     window.parent.postMessage({ type: 'panel-ready', info: { op: 'getInfo' } }, window.parent.origin);
 }
 
-// ── Source / type switching ────────────────────────────
-function switchSource(source) {
-    state.currentSource = source;
-    document.querySelectorAll('[data-source]').forEach(b =>
-        b.classList.toggle('active', b.dataset.source === source));
+// ── Provider select ────────────────────────────────────
+function buildProviderDropdown() {
+    els.providerDropdown.innerHTML = PROVIDERS.map(p => `
+        <div class="es-provider-option" data-key="${esc(p.key)}" role="option">
+            <img src="${esc(p.logo)}" alt="${esc(p.name)}" class="es-provider-option-logo">
+            <span class="es-provider-option-name">${esc(p.name)}</span>
+        </div>
+    `).join('');
 
-    const videoOnly = source === 'youtube' || source === 'dailymotion';
-    els.typePill.style.display = videoOnly ? 'none' : '';
-    if (videoOnly) state.currentType = 'videos';
-
-    loadDefaultAssets();
+    els.providerDropdown.querySelectorAll('.es-provider-option').forEach(opt => {
+        opt.addEventListener('click', (e) => {
+            e.stopPropagation();
+            selectProvider(opt.dataset.key);
+            closeProviderDropdown();
+        });
+    });
 }
 
-function switchType(type) {
-    state.currentType = type;
-    document.querySelectorAll('[data-type]').forEach(b =>
-        b.classList.toggle('active', b.dataset.type === type));
-    loadDefaultAssets();
+function openProviderDropdown() {
+    els.providerSelect.classList.add('open');
+    els.providerSelect.setAttribute('aria-expanded', 'true');
+}
+
+function closeProviderDropdown() {
+    els.providerSelect.classList.remove('open');
+    els.providerSelect.setAttribute('aria-expanded', 'false');
+}
+
+function updateProviderUI(provider) {
+    els.providerLogo.src  = provider.logo;
+    els.providerLogo.alt  = provider.name;
+    els.providerName.textContent = provider.name;
+
+    els.providerDropdown.querySelectorAll('.es-provider-option').forEach(opt => {
+        opt.classList.toggle('active', opt.dataset.key === provider.key);
+    });
+}
+
+function selectProvider(key, andSearch = true) {
+    const provider = PROVIDERS.find(p => p.key === key) || PROVIDERS[0];
+    state.currentSource = provider.source;
+    state.currentType   = provider.type;
+    state.currentConfig = {
+        dragAndDrop:  provider.dragAndDrop  !== false,
+        insertButton: provider.insertButton !== false,
+    };
+    updateProviderUI(provider);
+    persistState();
+    if (andSearch) {
+        searchAssets(state.currentQuery);
+    }
 }
 
 // ── Search ─────────────────────────────────────────────
-function loadDefaultAssets() { searchAssets(''); }
-
 function performSearch() {
     state.currentQuery = els.searchInput.value.trim();
+    persistState();
     searchAssets(state.currentQuery);
 }
 
 function clearSearch() {
     els.searchInput.value = '';
     state.currentQuery = '';
-    loadDefaultAssets();
+    persistState();
+    searchAssets('');
 }
 
 async function searchAssets(query) {
@@ -231,17 +279,19 @@ async function searchAssets(query) {
 
     try {
         let assets = [];
-        if (state.currentSource === 'pexels')          assets = await fetchPexels(query);
-        else if (state.currentSource === 'youtube')    assets = await fetchYouTube(query);
+        if (state.currentSource === 'pexels')           assets = await fetchPexels(query);
+        else if (state.currentSource === 'youtube')     assets = await fetchYouTube(query);
         else if (state.currentSource === 'dailymotion') assets = await fetchDailyMotion(query);
 
         if (!assets.length) { els.noResults.style.display = 'flex'; }
         else {
             els.grid.innerHTML = assets.map(renderCard).join('');
-            els.grid.querySelectorAll('.es-card').forEach(card => {
-                card.addEventListener('dragstart', handleCardDragStart);
-                card.addEventListener('dragend', handleCardDragEnd);
-            });
+            if (state.currentConfig.dragAndDrop) {
+                els.grid.querySelectorAll('.es-card').forEach(card => {
+                    card.addEventListener('dragstart', handleCardDragStart);
+                    card.addEventListener('dragend', handleCardDragEnd);
+                });
+            }
         }
     } catch (err) {
         console.error('Search error:', err);
@@ -359,15 +409,29 @@ function renderCard(asset) {
             </svg>
         </div>`;
 
-    return `
-        <div class="es-card" draggable="true" data-asset="${data}">
+    const canDrag   = state.currentConfig.dragAndDrop;
+    const canInsert = state.currentConfig.insertButton;
+
+    const dragHandle = canDrag ? `
             <div class="es-drag-handle" title="Drag to insert">
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
                     <circle cx="3" cy="2" r="1.2"/><circle cx="9" cy="2" r="1.2"/>
                     <circle cx="3" cy="6" r="1.2"/><circle cx="9" cy="6" r="1.2"/>
                     <circle cx="3" cy="10" r="1.2"/><circle cx="9" cy="10" r="1.2"/>
                 </svg>
-            </div>
+            </div>` : '';
+
+    const insertBtn = canInsert ? `
+                <button class="es-card-btn es-card-btn-insert" onclick="cardInsert(this)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                    </svg>
+                    <span class="es-card-btn-label">Insert</span>
+                </button>` : '';
+
+    return `
+        <div class="es-card${canDrag ? '' : ' es-no-drag'}" draggable="${canDrag}" data-asset="${data}">
+            ${dragHandle}
             <div class="es-thumb-wrap">
                 <img class="es-thumb" src="${thumb}" alt="${title}" loading="lazy">
                 ${videoOverlay}
@@ -378,12 +442,7 @@ function renderCard(asset) {
                 <div class="es-card-meta">${meta}</div>
             </div>
             <div class="es-card-actions">
-                <button class="es-card-btn es-card-btn-insert" onclick="cardInsert(this)">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-                    </svg>
-                    <span class="es-card-btn-label">Insert</span>
-                </button>
+                ${insertBtn}
                 <button class="es-card-btn es-card-btn-copy" title="Copy URL" onclick="cardCopyUrl(this)">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
@@ -399,7 +458,6 @@ function renderCard(asset) {
 }
 
 // ── Insert loading state ───────────────────────────────
-// Tracks the currently pending insert button so we can reset it
 let _insertPendingBtn = null;
 let _insertTimeoutId  = null;
 const INSERT_TIMEOUT_MS = 30000;
@@ -409,9 +467,7 @@ function setInsertLoading(btn, loading) {
         _insertPendingBtn = btn;
         btn.disabled = true;
         btn.dataset.originalHtml = btn.innerHTML;
-        btn.innerHTML = `
-            <span class="es-btn-spinner"></span>
-        `;
+        btn.innerHTML = `<span class="es-btn-spinner"></span>`;
         btn.classList.add('es-card-btn-loading');
     } else {
         if (btn) {
@@ -425,7 +481,6 @@ function setInsertLoading(btn, loading) {
 }
 
 function onInsertSuccess() {
-    // Flash green briefly then reset
     if (_insertPendingBtn) {
         _insertPendingBtn.classList.remove('es-card-btn-loading');
         _insertPendingBtn.classList.add('es-card-btn-success');
@@ -452,7 +507,6 @@ function onInsertError() {
             </svg>`;
         _insertPendingBtn = null;
         if (_insertTimeoutId) { clearTimeout(_insertTimeoutId); _insertTimeoutId = null; }
-        // Restore after 2s so the user can retry
         setTimeout(() => setInsertLoading(btn, false), 2000);
     }
 }
@@ -487,7 +541,6 @@ function doInsert(asset, btn) {
 
     if (btn) {
         setInsertLoading(btn, true);
-        // Safety timeout — if no response arrives, reset after 30s
         _insertTimeoutId = setTimeout(() => onInsertError(), INSERT_TIMEOUT_MS);
     }
 
@@ -519,7 +572,6 @@ function handleCardDragEnd(e) {
     const card = e.currentTarget.closest('.es-card');
     card.classList.remove('es-dragging');
 
-    // dropEffect 'none' means no target accepted the drop — fall back to postMessage
     if (e.dataTransfer.dropEffect === 'none' && state.pendingDragUrl) {
         window.parent.postMessage({
             type: 'insert-object',
@@ -537,7 +589,6 @@ function openModal(asset) {
 
     els.modalTitle.textContent = title;
 
-    // Media
     if (isVideo && (state.currentSource === 'youtube' || state.currentSource === 'dailymotion')) {
         els.modalMedia.innerHTML = `<iframe src="${esc(asset.embedUrl)}" allowfullscreen></iframe>`;
     } else if (isVideo && state.currentSource === 'pexels') {
@@ -547,7 +598,6 @@ function openModal(asset) {
         els.modalMedia.innerHTML = `<img src="${esc(getThumb(asset,'large'))}" alt="${esc(title)}">`;
     }
 
-    // Fields
     const rows = [
         ['Source', state.currentSource],
         ['Type', state.currentType.slice(0,-1)]
@@ -566,7 +616,6 @@ function openModal(asset) {
             <span class="es-modal-field-value">${esc(v)}</span>
         </div>`).join('');
 
-    // Open URL for "View original"
     const origUrl = state.currentSource === 'pexels'
         ? getThumb(asset, 'original')
         : (asset.videoUrl || '');
@@ -589,11 +638,31 @@ function setLoading(on) {
 
 // ── Event wiring ───────────────────────────────────────
 function setupEvents() {
-    document.querySelectorAll('[data-source]').forEach(b =>
-        b.addEventListener('click', () => switchSource(b.dataset.source)));
+    // Provider select toggle
+    els.providerSelect.addEventListener('click', (e) => {
+        if (els.providerSelect.classList.contains('open')) {
+            closeProviderDropdown();
+        } else {
+            openProviderDropdown();
+        }
+    });
 
-    document.querySelectorAll('[data-type]').forEach(b =>
-        b.addEventListener('click', () => switchType(b.dataset.type)));
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!els.providerSelect.contains(e.target)) {
+            closeProviderDropdown();
+        }
+    });
+
+    // Keyboard: Escape closes dropdown
+    els.providerSelect.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeProviderDropdown();
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            if (els.providerSelect.classList.contains('open')) closeProviderDropdown();
+            else openProviderDropdown();
+        }
+    });
 
     els.searchBtn.addEventListener('click', performSearch);
     els.searchInput.addEventListener('keypress', e => { if (e.key === 'Enter') performSearch(); });
@@ -610,14 +679,30 @@ function setupEvents() {
 }
 
 // ── Expose globals needed by inline onclick ────────────
-window.cardInsert  = cardInsert;
-window.cardPreview = cardPreview;
+window.cardInsert   = cardInsert;
+window.cardPreview  = cardPreview;
+window.cardCopyUrl  = cardCopyUrl;
 
 // ── Init ───────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+    buildProviderDropdown();
     setupPostMessage();
     setupEvents();
-    loadDefaultAssets();
+
+    // Restore persisted state (survives auto-refresh)
+    const saved = loadPersistedState();
+    const initialKey = saved.providerKey || 'pexels-photos';
+    const initialQuery = saved.currentQuery || '';
+
+    selectProvider(initialKey, false); // set UI without searching yet
+
+    if (initialQuery) {
+        state.currentQuery = initialQuery;
+        els.searchInput.value = initialQuery;
+        searchAssets(initialQuery);
+    } else {
+        searchAssets('');
+    }
 });
 </script>
 </body>
