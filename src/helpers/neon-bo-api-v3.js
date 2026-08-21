@@ -79,6 +79,8 @@ class NeonClient {
 
         const callerName = getCallerName();
 
+        console.log(`➡️  ${config.method?.toUpperCase() || 'REQUEST'} ${config.url} called by ${callerName} with config:`, '\n', JSON.stringify({ baseURL: this.baseUrl, ...restConfig }, null, 2));
+
         try {
             const response = await this.client.request(requestConfig);
             if (successMessage) {
