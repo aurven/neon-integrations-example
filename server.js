@@ -546,6 +546,7 @@ fastify.listen(
     }
     
     console.log(`🚀 Server is running on ${address}`);
+    console.log(`🔗 Neon BO URL: ${process.env.NEON_BO_URL || '(not set)'}`);
 
     // Show additional access information
     const protocol = httpsOptions.https ? 'https' : 'http';
