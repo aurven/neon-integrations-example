@@ -7,6 +7,7 @@
  */
 const context = require('./context.js');
 const { getRegistry } = require('./registry.js');
+const { pickApiKey } = require('./resolve.js');
 
 const DENIED = { error: 'insecure webhook not enabled for this environment' };
 
@@ -14,6 +15,10 @@ function withInsecureEnvParam(handler, { getRegistry: registryOf = getRegistry }
   return async function insecureEnvParamHandler(request, reply) {
     if (request.neonAuth?.authenticated && request.neonEnv) {
       return handler.call(this, request, reply);
+    }
+    // A wrong apikey must not silently fall through to the keyless ?env= path.
+    if (pickApiKey(request) && !request.neonAuth?.authenticated) {
+      return reply.status(401).send({ error: 'Unauthorized' });
     }
     const id = request.query?.env;
     if (!id) return reply.status(400).send({ error: 'env query parameter required' });

@@ -105,4 +105,4 @@ function resolveRequest(req, registry, { selfHosts } = {}) {
   return result(auth, env, extra);
 }
 
-module.exports = { resolveRequest, callerHosts, HOST_HEADERS };
+module.exports = { resolveRequest, callerHosts, HOST_HEADERS, pickApiKey };

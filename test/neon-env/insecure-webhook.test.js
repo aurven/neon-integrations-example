@@ -50,3 +50,17 @@ test('apikey wins over ?env (even for a non-opted-in env)', async () => {
   assert.equal(res.statusCode, 200);
   assert.equal(res.json().env, 'closed');
 });
+
+test('a wrong apikey -> 401, not silently treated as keyless', async () => {
+  const app = await buildApp();
+  const res = await app.inject({ method: 'POST', url: '/in/neon/webhook/legacy?env=open&apikey=totally-wrong', payload: {} });
+  assert.equal(res.statusCode, 401);
+  assert.deepEqual(res.json(), { error: 'Unauthorized' });
+});
+
+test('global admin key + ?env=closed proceeds via normal admin resolution', async () => {
+  const app = await buildApp();
+  const res = await app.inject({ method: 'POST', url: '/in/neon/webhook/legacy?env=closed&apikey=admin-key', payload: {} });
+  assert.equal(res.statusCode, 200);
+  assert.equal(res.json().env, 'closed');
+});
