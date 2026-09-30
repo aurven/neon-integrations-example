@@ -252,15 +252,18 @@ async function importBinaryHandler(request, reply) {
 }
 
 async function importTest(request, reply) {
-  const { apikey } = request.headers?.apikey
-    ? request.headers
-    : { apikey: null };
   const options = request.body;
 
   console.log("importTest << IN:");
   const safeRequest = safeLogRequest(request?.headers || {}, request?.body || {});
   console.log("Request Headers:", JSON.stringify(safeRequest.headers));
   console.log("Request Body:", JSON.stringify(safeRequest.body));
+
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) {
+    console.log("importTest << ERROR: Unauthorized");
+    return reply.status(401).send({ error: "Unauthorized" });
+  }
 
   const pageSize = options.pageSize || null;
   const fromDate = options.fromDate || null;
@@ -270,11 +273,6 @@ async function importTest(request, reply) {
   const targetWorkspace = options.targetWorkspace;
   const originalLanguage = options.originalLanguage;
   const targetTranslation = options.targetTranslation;
-
-  if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
-    console.log("importTest << ERROR: Unauthorized");
-    return reply.status(401).send({ error: "Unauthorized" });
-  }
 
   if (!section || section.length === 0) {
     console.error("importTest << ERROR: No target section provided");
