@@ -34,7 +34,8 @@ async function listJobsHandler(request, reply) {
     return reply.status(401).send({ error: "Unauthorized" });
   }
 
-  return reply.status(200).send({ jobs: delayedImporter.listJobs() });
+  const scope = { envId: request.neonAuth?.global ? null : request.neonEnv?.id };
+  return reply.status(200).send({ jobs: delayedImporter.listJobs(scope) });
 }
 
 async function getJobHandler(request, reply) {
@@ -44,7 +45,8 @@ async function getJobHandler(request, reply) {
     return reply.status(401).send({ error: "Unauthorized" });
   }
 
-  const job = delayedImporter.getJob(request.params.jobId);
+  const scope = { envId: request.neonAuth?.global ? null : request.neonEnv?.id };
+  const job = delayedImporter.getJob(request.params.jobId, scope);
   if (!job) {
     return reply.status(404).send({ error: "Job not found" });
   }
@@ -58,7 +60,8 @@ async function cancelJobHandler(request, reply) {
     return reply.status(401).send({ error: "Unauthorized" });
   }
 
-  const result = delayedImporter.cancelJob(request.params.jobId);
+  const scope = { envId: request.neonAuth?.global ? null : request.neonEnv?.id };
+  const result = delayedImporter.cancelJob(request.params.jobId, scope);
   if (result === null) {
     return reply.status(404).send({ error: "Job not found" });
   }

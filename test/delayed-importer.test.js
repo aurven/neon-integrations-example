@@ -3,6 +3,7 @@ const { test } = require('node:test');
 const assert = require('node:assert/strict');
 
 const delayedImporter = require('../src/delayed-importer.js');
+const context = require('../src/helpers/neon-env/context.js');
 
 function basePayload(overrides = {}) {
   return {
@@ -365,4 +366,41 @@ test('dispatchImageItem: explicit name wins over derived name', async () => {
   );
   assert.equal(received.imageName, 'custom-name');
   assert.equal(out.familyRef, null); // uploadImage returned no familyRef
+});
+
+function fakeEnv(id) { return { id, hosts: [], neon: { bo: { url: `https://${id}` } }, services: {} }; }
+
+test('ticks run inside the job env even when other env requests interleave', async () => {
+  const envs = { a: fakeEnv('a'), b: fakeEnv('b') };
+  const seen = [];
+  const deps = {
+    getEnv: (id) => envs[id] || null,
+    dispatchStory: async () => { seen.push(context.currentEnv()?.id); return { familyRef: 'x' }; },
+  };
+  const { jobId } = context.run(envs.a, () => delayedImporter.createJob(basePayload({ duration: 0.0005 }), deps));
+  // unrelated work in env b while the job ticks
+  await context.run(envs.b, () => new Promise((r) => setTimeout(r, 50)));
+  await new Promise((r) => setTimeout(r, 100));
+  assert.deepEqual(seen, ['a', 'a', 'a']);
+  assert.equal(delayedImporter.getJob(jobId).envId, 'a');
+});
+
+test('job fails when its env is no longer registered', async () => {
+  const deps = { getEnv: () => null, dispatchStory: async () => ({ familyRef: 'x' }) };
+  const { jobId } = delayedImporter.createJob(basePayload(), deps, { envId: 'gone' });
+  await new Promise((r) => setTimeout(r, 10));
+  const job = delayedImporter.getJob(jobId);
+  assert.equal(job.state, 'failed');
+  assert.match(job.error, /env 'gone' no longer registered/);
+});
+
+test('job list and lookup are filtered by env', () => {
+  const deps = { getEnv: () => fakeEnv('a'), dispatchStory: async () => ({}) };
+  const { jobId } = delayedImporter.createJob(basePayload({ duration: 60 }), deps, { envId: 'a' });
+  assert.ok(delayedImporter.listJobs({ envId: 'a' }).some((j) => j.jobId === jobId));
+  assert.ok(!delayedImporter.listJobs({ envId: 'b' }).some((j) => j.jobId === jobId));
+  assert.equal(delayedImporter.getJob(jobId, { envId: 'b' }), null);
+  assert.equal(delayedImporter.cancelJob(jobId, { envId: 'b' }), null);
+  assert.ok(delayedImporter.listJobs().some((j) => j.jobId === jobId && j.envId === 'a'));
+  delayedImporter.cancelJob(jobId);
 });
