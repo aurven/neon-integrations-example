@@ -263,3 +263,4 @@ These refinements came up while writing the implementation plan (`docs/superpowe
 7. **Méthode TLS.** `methode-bo-api.js` keeps its Local-only process-wide TLS flag, because `axios-cookiejar-support` rejects custom `httpsAgent`s. Neon, PDF and Mailjet use per-request agents driven by `neon.insecureTls`.
 8. **Claude chat sessions** are keyed by `<envId>:<sessionId>`.
 9. **SDK client caches** (Anthropic, Sendgrid) are keyed by API key rather than env id, which gives equivalent isolation and simpler invalidation.
+10. **Opt-in insecure webhook fallback.** `POST /in/neon/webhook/legacy?env=<id>` is accepted without an apikey, but only for envs with `"insecureWebhook": true` (a boolean that defaults to false; the legacy env has it true). Unknown and not-enabled envs get the same 403. Each accepted call logs a warning. If an apikey is present, it always takes precedence. The preferred path remains `/in/neon/webhook?apikey=<extApiKey>`.
