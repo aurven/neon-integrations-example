@@ -263,6 +263,50 @@ This application serves as an integration hub with the following components:
 - **SSL Support**: Local HTTPS with mkcert for development
 - **Multi-site Routing**: Webhook handling for different sites (TheGlobe, NextFrontier, SportsArena)
 
+## Multiple Neon Environments
+
+A single deployment can serve multiple Neon environments (e.g., demorc, poc, adn-demo). Each request resolves to exactly one environment.
+
+### Registry
+
+The registry is a JSON file loaded from:
+1. `/etc/secrets/neon-environments.json` (Render Secret File)
+2. `./config/neon-environments.json` (local development; gitignored)
+3. Legacy fallback: synthesized from `NEON_*` env vars (no registry file)
+
+See `config/neon-environments.example.json` for the schema.
+
+### Environment Resolution
+
+For each request, the environment is determined by:
+1. **Env-bound key**: If `apikey` matches an environment's `extApiKey` or `extApiKeyLimited`, that environment is selected.
+2. **Admin key + explicit environment**: If `apikey` equals `adminApiKey`, the environment comes from `x-neon-env` header, `?env=<id>` query param, or `neonEnv` cookie.
+3. **Admin key + caller host**: If no explicit env, use the environment whose `hosts` contain the request's caller host.
+4. **Admin key + default**: Fall back to the default environment.
+
+### Integration Configuration
+
+For each Neon environment in your registry:
+- Set that environment's `extApiKey` as the `apikey` in its panel/widget integration config.
+- Append `?apikey=<extApiKey>` to its webhook URL: `POST /in/neon/webhook?apikey=<extApiKey>`
+
+### Console Logging
+
+- The browser console shows a styled banner on page load: `🟢 [neon-env] <id> (<label>) → bo: <host>`
+- Fetch helpers log `[neon-env] <id> → <METHOD> <path>` on every call.
+- Response headers include `X-Neon-Env: <id>` and `X-Neon-Env-Bo: <bo-host>`.
+
+### Known-Insecure Webhook Fallback
+
+The endpoint `POST /in/neon/webhook/legacy?env=<id>` accepts requests **without an apikey**, but only for environments with `"insecureWebhook": true` in the registry. Unknown environments or those without the flag return 403. This fallback is for legacy Neon iframes that cannot send custom headers; prefer `?apikey=` URLs whenever possible. Each insecure call is logged as a warning.
+
+### Rollout
+
+1. Ship with the legacy fallback only (no Render changes needed).
+2. Use `/debug/headers` probe (admin key only) to identify which headers carry the Neon host.
+3. Add the Secret File with environments and update each environment's panel/widget/webhook config.
+4. Remove legacy Neon env vars from Render.
+
 ## Troubleshooting
 
 ### HTTPS Issues
