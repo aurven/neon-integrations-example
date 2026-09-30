@@ -11,13 +11,15 @@ async function postNeonWebhookHandler(request, reply) {
   console.log("Request Headers:", JSON.stringify(safeRequest.headers));
   console.log("Request Body:", JSON.stringify(safeRequest.body));
 
-  // TODO - Restore when we can add ApiKeys to Webhooks headers
-  // const auth = authenticate(request, reply);
-  // if (!auth.authenticated) {
-  //   console.log("Received call, but no API key was passed.");
-  //   return reply.status(401).send({ error: "Unauthorized" });
-  // }
-  
+  // No Neon environment resolved (file mode, keyless call): reject before any side effect
+  // (e.g. Telegram posting) can run with fallback/global credentials.
+  if (!request.neonEnv) {
+    console.log("postNeonWebhookHandler << ERROR: Unauthorized - no Neon environment");
+    return reply.status(401).send({
+      error: "Unauthorized: no Neon environment. Use /in/neon/webhook?apikey=<env key>, or /in/neon/webhook/legacy?env=<id> for environments with insecureWebhook enabled.",
+    });
+  }
+
   console.log("Neon webhook received:");
   console.log(JSON.stringify(safeRequest.body));
 
@@ -369,13 +371,15 @@ async function postNeonWebhookTest(request, reply) {
   console.log("Request Headers:", JSON.stringify(safeRequest.headers));
   console.log("Request Body:", JSON.stringify(safeRequest.body));
 
-  // TODO - Restore when we can add ApiKeys to Webhooks headers
-  // const auth = authenticate(request, reply);
-  // if (!auth.authenticated) {
-  //   console.log("Received call, but no API key was passed.");
-  //   return reply.status(401).send({ error: "Unauthorized" });
-  // }
-  
+  // Same as postNeonWebhookHandler: this also has side effects (Telegram posting via
+  // processNeonWebhook), so reject before any Neon-env-less run can reach them.
+  if (!request.neonEnv) {
+    console.log("postNeonWebhookTest << ERROR: Unauthorized - no Neon environment");
+    return reply.status(401).send({
+      error: "Unauthorized: no Neon environment. Use /in/neon/webhook?apikey=<env key>, or /in/neon/webhook/legacy?env=<id> for environments with insecureWebhook enabled.",
+    });
+  }
+
   console.log("Neon webhook test received:");
   console.log(JSON.stringify(safeRequest.body));
 
