@@ -1,5 +1,6 @@
 const path = require("path");
 const fs = require('fs');
+const { redactApikeyParam } = require("./src/helpers/redact-url.js");
 
 // Require the fastify framework and instantiate it
 
@@ -22,7 +23,21 @@ if (fs.existsSync(sslCertPath) && fs.existsSync(sslKeyPath)) {
 
 const fastify = require("fastify")({
   // Set this to true for detailed logging:
-  logger: true,
+  logger: {
+    serializers: {
+      // Redact env apikeys (passed as ?apikey=) from the request logger, which otherwise
+      // prints the raw request URL/path on every request.
+      req(request) {
+        return {
+          method: request.method,
+          url: redactApikeyParam(request.url),
+          hostname: request.hostname,
+          remoteAddress: request.ip,
+          remotePort: request.socket ? request.socket.remotePort : undefined,
+        };
+      },
+    },
+  },
   ...httpsOptions
 });
 
