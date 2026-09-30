@@ -1,8 +1,11 @@
 const fs = require('fs').promises;
 const path = require('path');
 const { NeonClient } = require('../helpers/neon-bo-api-v3');
+const { requireEnv, run: runInEnv } = require('../helpers/neon-env/context.js');
 
-const CACHE_DIR = path.join(process.cwd(), 'data', 'neon-config');
+function cacheDir() {
+    return path.join(process.cwd(), 'data', 'neon-config', requireEnv().id);
+}
 
 /**
  * Registry of all cacheable Neon BO configuration types.
@@ -33,13 +36,13 @@ const DEFAULT_TYPE_LABELS = {
     'article/gallery': 'Gallery'
 };
 
-let typeLabels = null;
+const typeLabelsByEnv = new Map();
 
 // ── File I/O ──────────────────────────────────────────────────────────────────
 
 async function saveToCache(type, data) {
-    await fs.mkdir(CACHE_DIR, { recursive: true });
-    const cacheFile = path.join(CACHE_DIR, CONFIGS[type].cacheFile);
+    await fs.mkdir(cacheDir(), { recursive: true });
+    const cacheFile = path.join(cacheDir(), CONFIGS[type].cacheFile);
     await fs.writeFile(cacheFile, JSON.stringify(data, null, 2), 'utf8');
     console.log(`[Neon Config] Saved ${type} to cache`);
 }
@@ -55,7 +58,7 @@ function isCacheUsable(type, data) {
 
 async function loadFromCache(type) {
     try {
-        const cacheFile = path.join(CACHE_DIR, CONFIGS[type].cacheFile);
+        const cacheFile = path.join(cacheDir(), CONFIGS[type].cacheFile);
         const content = await fs.readFile(cacheFile, 'utf8');
         const data = JSON.parse(content);
         if (!isCacheUsable(type, data)) {
@@ -72,7 +75,7 @@ async function loadFromCache(type) {
 
 async function cacheExists(type) {
     try {
-        await fs.access(path.join(CACHE_DIR, CONFIGS[type].cacheFile));
+        await fs.access(path.join(cacheDir(), CONFIGS[type].cacheFile));
         return true;
     } catch {
         return false;
@@ -262,6 +265,26 @@ async function initializeAll() {
 }
 
 /**
+ * Warm the cache for every registered env with warmup !== false, in parallel.
+ * Failures are isolated per env and never reject.
+ */
+async function initializeAllEnvs(registry) {
+    const envs = registry.list().filter((e) => e.warmup);
+    const entries = await Promise.all(envs.map(async (env) => {
+        try {
+            return [env.id, await runInEnv(env, () => initializeAll())];
+        } catch (error) {
+            return [env.id, { error: error.message }];
+        }
+    }));
+    return Object.fromEntries(entries);
+}
+
+function __setTypeLabelsForTest(labels) {
+    typeLabelsByEnv.set(requireEnv().id, labels);
+}
+
+/**
  * Force re-fetch all config types from Neon BO.
  * Returns { refreshed: [], errors: [] }
  */
@@ -300,14 +323,14 @@ async function loadContentTypesConfig() {
     try {
         const config = await getConfig('contentTypes');
         const types = config?.types || [];
-        typeLabels = types.reduce((acc, t) => {
+        typeLabelsByEnv.set(requireEnv().id, types.reduce((acc, t) => {
             if (t?.composedTypeName) acc[t.composedTypeName] = t.typeMeta?.label || t.typeName;
             return acc;
-        }, { ...DEFAULT_TYPE_LABELS });
+        }, { ...DEFAULT_TYPE_LABELS }));
     } catch (error) {
         console.warn(`⚠️ loadContentTypesConfig(): failed to load, keeping defaults (${error.message})`);
     }
-    return typeLabels || DEFAULT_TYPE_LABELS;
+    return typeLabelsByEnv.get(requireEnv().id) || DEFAULT_TYPE_LABELS;
 }
 
 /**
@@ -317,7 +340,7 @@ async function loadContentTypesConfig() {
  */
 function getTypeLabel(composedTypeName) {
     if (!composedTypeName) return null;
-    const labels = typeLabels || DEFAULT_TYPE_LABELS;
+    const labels = typeLabelsByEnv.get(requireEnv().id) || DEFAULT_TYPE_LABELS;
     return labels[composedTypeName] || composedTypeName;
 }
 
@@ -362,6 +385,7 @@ module.exports = {
     cacheExists,
     saveToCache,
     initializeAll,
+    initializeAllEnvs,
     refreshAll,
     refreshConfig,
     getAvailableConfigs,
@@ -369,5 +393,7 @@ module.exports = {
     loadWorkflowsConfig,
     loadWorkfoldersConfig,
     getTypeLabel,
+    cacheDir,
+    __setTypeLabelsForTest,
     CONFIGS
 };

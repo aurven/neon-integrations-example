@@ -2,6 +2,8 @@ const Parser = require('rss-parser');
 const delayedImporter = require('../delayed-importer.js');
 const { safeLogRequest } = require('../helpers/utils.js');
 const { authenticate } = require('../helpers/auth.js');
+const { NoNeonEnvError } = require('../helpers/neon-env/errors.js');
+const { getRegistry } = require('../helpers/neon-env/registry.js');
 
 function resolveField(item, fieldName) {
   switch (fieldName) {
@@ -50,6 +52,10 @@ async function submitRssDelayedImportHandler(request, reply) {
   if (!auth.authenticated) {
     console.log('submitRssDelayedImportHandler << ERROR: Unauthorized');
     return reply.status(401).send({ error: 'Unauthorized' });
+  }
+  if (!request.neonEnv) {
+    console.log('submitRssDelayedImportHandler << ERROR: No Neon environment');
+    return reply.status(400).send({ error: new NoNeonEnvError(getRegistry().ids()).message });
   }
 
   console.log('submitRssDelayedImportHandler << IN:');

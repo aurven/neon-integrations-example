@@ -6,9 +6,8 @@ const dayjs = require('dayjs');
 const images = require('./images-importer.js');
 const { buildPrintFieldOperators, buildUpdateField, setOp, attributePath } = require('./helpers/methode-metadata-utils.js');
 const { findElementByNodeType, extractTextFromElements } = require('./helpers/neon-content-parser.js');
+const { serviceConfig } = require('./helpers/neon-env');
 
-const USERNAME = process.env.EDAPI_USERNAME;
-const PASSWORD = process.env.EDAPI_PASSWORD;
 const TEMPLATE = '/SysConfig/Product/Shared/Templates/Default/story.xml';
 const CHANNEL = '';
 const WORKFOLDER = '/Product/World';
@@ -271,7 +270,7 @@ async function processNeonStoryV2 (model) {
       return { source: info, skipped: true, reason: 'printDiffusion=No' };
     }
 
-    await methodeClient.login({ username: USERNAME, password: PASSWORD });
+    await methodeClient.login({ username: serviceConfig('methode').username, password: serviceConfig('methode').password });
 
     const { loid, isLinkedToPage, isNewStory } = await resolveMethodeStory(methodeClient, { info, name, issueDate, workFolder });
 

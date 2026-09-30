@@ -1,6 +1,6 @@
 const axios = require("axios");
+const { serviceConfig } = require('../helpers/neon-env');
 
-const YOUTUBE_APIKEY = process.env.YOUTUBE_APIKEY;
 const YOUTUBE_URL = 'https://www.googleapis.com/youtube/v3';
 
 /**
@@ -16,7 +16,7 @@ async function searchVideos(query, maxResults = 20) {
     part: 'snippet',
     type: 'video',
     maxResults: maxResults,
-    key: YOUTUBE_APIKEY
+    key: serviceConfig('youtube').apiKey
   };
 
   if (query) {
@@ -94,7 +94,7 @@ async function getVideoDetails(videoIds) {
     params: {
       part: 'snippet,contentDetails,statistics',
       id: videoIds,
-      key: YOUTUBE_APIKEY
+      key: serviceConfig('youtube').apiKey
     },
     headers: {
       'Content-Type': 'application/json'
@@ -127,7 +127,7 @@ async function getPopularVideos(maxResults = 20) {
       part: 'snippet,contentDetails,statistics',
       chart: 'mostPopular',
       maxResults: maxResults,
-      key: YOUTUBE_APIKEY
+      key: serviceConfig('youtube').apiKey
     },
     headers: {
       'Content-Type': 'application/json'

@@ -2,9 +2,11 @@ const axios = require('axios');
 const https = require('https');
 const cheerio = require('cheerio');
 const { getSiteHostname } = require('../helpers/sites-helpers');
+const neonEnv = require('../helpers/neon-env');
 
 async function sendSingleEmail(emailData) {
-  const auth = Buffer.from(`${process.env.MAILJET_APIKEY}:${process.env.MAILJET_APISECRET}`).toString('base64');
+  const mj = neonEnv.serviceConfig('mailjet');
+  const auth = Buffer.from(`${mj.apiKey}:${mj.apiSecret}`).toString('base64');
   
   const config = {
     method: 'post',
@@ -64,7 +66,7 @@ async function fetchNewsletterHtmlFromPage(pageUrl, baseUrl) {
   try {
     const response = await axios.get(pageUrl, {
       timeout: 10000,
-      httpsAgent: process.env.NEON_EXT_LOCATION === 'Local'
+      httpsAgent: neonEnv.insecureTls()
         ? new https.Agent({ rejectUnauthorized: false })
         : undefined
     });

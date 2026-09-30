@@ -1,18 +1,18 @@
 'use strict';
 const axios = require('axios');
+const { serviceConfig, missingServiceFields } = require('../helpers/neon-env');
 
 const THREADS_BASE = 'https://graph.threads.net/v1.0';
-const REQUIRED_VARS = ['THREADS_USER_ID', 'THREADS_ACCESS_TOKEN'];
+const REQUIRED_FIELDS = ['userId', 'accessToken'];
 
 function getStatus() {
-  const missing = REQUIRED_VARS.filter(v => !process.env[v]);
+  const missing = missingServiceFields('threads', REQUIRED_FIELDS);
   if (missing.length > 0) return { configured: false, error: `Missing: ${missing.join(', ')}` };
   return { configured: true };
 }
 
 async function publish(text, options = {}) {
-  const userId = process.env.THREADS_USER_ID;
-  const token = process.env.THREADS_ACCESS_TOKEN;
+  const { userId, accessToken: token } = serviceConfig('threads');
 
   try {
     // Step 1: Create container
@@ -45,7 +45,7 @@ async function publish(text, options = {}) {
 }
 
 async function getMetrics(postId) {
-  const token = process.env.THREADS_ACCESS_TOKEN;
+  const token = serviceConfig('threads').accessToken;
   try {
     const res = await axios.get(`${THREADS_BASE}/${postId}/insights`, {
       params: { metric: 'likes,replies,reposts,quotes', access_token: token }

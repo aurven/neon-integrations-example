@@ -1,39 +1,34 @@
+const { resolveRequest } = require('./neon-env/resolve.js');
+const { getRegistry } = require('./neon-env/registry.js');
+
+const COOKIE_OPTS = {
+  path: '/',
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  maxAge: 24 * 60 * 60 // 24 hours in seconds
+};
+
 /**
- * Authentication helper for API endpoints
- * Checks for API key in headers, query params, or cookies
- * Sets a cookie if authentication is successful
- * Supports multiple API keys with different access levels
+ * Authentication helper for API endpoints.
+ * Uses the result resolved by the neon-env Fastify plugin (request.neonAuth);
+ * falls back to resolving on the spot when the plugin is not registered.
+ * Sets the apikey cookie on success.
  *
- * @param {Object} request - Fastify request object
- * @param {Object} reply - Fastify reply object
- * @returns {Object} - { authenticated: boolean, apikey: string|null, role: 'admin'|'limited'|null }
+ * @returns {Object} - { authenticated, apikey, role: 'admin'|'limited'|null, env: Env|null }
  */
 function authenticate(request, reply) {
-  const apikey = request.headers.apikey || request.query.apikey || request.cookies.apikey;
-
-  // Admin key (full access)
-  if (apikey && apikey === process.env.NEON_EXT_APIKEY) {
-    reply.setCookie('apikey', apikey, {
-      path: '/',
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 24 * 60 * 60 // 24 hours in seconds
-    });
-    return { authenticated: true, apikey, role: 'admin' };
+  const auth = request.neonAuth || resolveRequest(request, getRegistry()).auth;
+  if (!auth.authenticated) {
+    return { authenticated: false, apikey: null, role: null, env: null };
   }
+  reply.setCookie('apikey', auth.apikey, COOKIE_OPTS);
+  return { authenticated: true, apikey: auth.apikey, role: auth.role, env: request.neonEnv || null };
+}
 
-  // Limited key (restricted access)
-  if (apikey && process.env.NEON_EXT_APIKEY_LIMITED && apikey === process.env.NEON_EXT_APIKEY_LIMITED) {
-    reply.setCookie('apikey', apikey, {
-      path: '/',
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 24 * 60 * 60 // 24 hours in seconds
-    });
-    return { authenticated: true, apikey, role: 'limited' };
-  }
-
-  return { authenticated: false, apikey: null, role: null };
+/** True when the request carries an admin-role key (global admin or env-bound admin). */
+function isAdminRequest(request) {
+  const auth = request.neonAuth || resolveRequest(request, getRegistry()).auth;
+  return auth.authenticated && auth.role === 'admin';
 }
 
 // Panels that require admin access
@@ -60,6 +55,7 @@ function shouldShowMaintenance(request, auth, panelName) {
 
 module.exports = {
   authenticate,
+  isAdminRequest,
   shouldShowMaintenance,
   RESTRICTED_PANELS
 };

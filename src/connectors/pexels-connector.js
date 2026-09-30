@@ -1,6 +1,6 @@
 const axios = require("axios");
+const { serviceConfig } = require('../helpers/neon-env');
 
-const PEXELS_APIKEY = process.env.PEXELS_APIKEY;
 const PEXELS_URL = 'https://api.pexels.com';
 
 async function getPhotos(query) {
@@ -15,7 +15,7 @@ async function getPhotos(query) {
       url,
       headers: {
           'Content-Type': 'application/json',
-          'Authorization': PEXELS_APIKEY
+          'Authorization': serviceConfig('pexels').apiKey
       }
   };
 
@@ -37,7 +37,7 @@ async function getVideos(query) {
   const response = await fetch(url, {
     method: 'GET',
     headers: {
-      Authorization: PEXELS_APIKEY,
+      Authorization: serviceConfig('pexels').apiKey,
       "Content-Type": 'application/json',
     },
   });

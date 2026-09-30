@@ -1,7 +1,8 @@
 const axios = require('axios');
+const { serviceConfig } = require('../helpers/neon-env');
 
 async function sendTelegramMessage(chatId, message, options = {}) {
-  const botToken = process.env.TELEGRAM_BOT_TOKEN;
+  const botToken = serviceConfig('telegram').botToken;
   
   if (!botToken) {
     throw new Error('TELEGRAM_BOT_TOKEN environment variable is not set');
@@ -38,7 +39,7 @@ async function sendTelegramMessage(chatId, message, options = {}) {
 }
 
 async function sendTelegramPhoto(chatId, photoUrl, caption = '', options = {}) {
-  const botToken = process.env.TELEGRAM_BOT_TOKEN;
+  const botToken = serviceConfig('telegram').botToken;
   
   if (!botToken) {
     throw new Error('TELEGRAM_BOT_TOKEN environment variable is not set');
@@ -91,7 +92,7 @@ async function postTheGlobeArticleToTelegram(neonModel) {
     
     // Get Telegram channel/chat ID from environment
     // TODO: Change this when you gather model infos - could be site-specific
-    const chatId = process.env.TELEGRAM_THEGLOBE_CHAT_ID || process.env.TELEGRAM_CHAT_ID;
+    const chatId = serviceConfig('telegram').chatIds?.theglobe || serviceConfig('telegram').chatIds?.default;
     
     if (!chatId) {
       throw new Error('Telegram chat ID not configured. Set TELEGRAM_THEGLOBE_CHAT_ID or TELEGRAM_CHAT_ID environment variable');
@@ -168,8 +169,8 @@ async function postTheGlobeArticleUpdate(neonModel) {
     const summary = modelData.summary || "Article has been updated";
     const articleUrl = modelData.url || "#";
     
-    const chatId = process.env.TELEGRAM_THEGLOBE_CHAT_ID || process.env.TELEGRAM_CHAT_ID;
-    
+    const chatId = serviceConfig('telegram').chatIds?.theglobe || serviceConfig('telegram').chatIds?.default;
+
     if (!chatId) {
       throw new Error('Telegram chat ID not configured');
     }
@@ -211,8 +212,8 @@ This is a test message from the Neon-Telegram integration.
 ⏰ Sent at: ${new Date().toLocaleString()}
   `.trim();
   
-  const chatId = process.env.TELEGRAM_THEGLOBE_CHAT_ID || process.env.TELEGRAM_CHAT_ID;
-  
+  const chatId = serviceConfig('telegram').chatIds?.theglobe || serviceConfig('telegram').chatIds?.default;
+
   if (!chatId) {
     throw new Error('Telegram chat ID not configured for testing');
   }

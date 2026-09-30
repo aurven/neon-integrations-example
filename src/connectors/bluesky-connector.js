@@ -1,4 +1,5 @@
 const axios = require('axios');
+const { serviceConfig, missingServiceFields } = require('../helpers/neon-env');
 
 /**
  * Bluesky AT Protocol Connector
@@ -8,31 +9,26 @@ const axios = require('axios');
 
 const BLUESKY_API_URL = 'https://bsky.social/xrpc';
 
-// In-memory session cache
-let sessionCache = {
-  did: null,
-  accessJwt: null,
-  refreshJwt: null,
-  handle: null,
-  expiresAt: null
-};
+// In-memory session cache, keyed by handle so two envs with different
+// Bluesky accounts never share a session
+const sessions = new Map();
 
 /**
  * Authenticate with Bluesky and get session tokens
  * @returns {Promise<Object>} Session with DID and access token
  */
 async function authenticate() {
-  const handle = process.env.BLUESKY_HANDLE;
-  const appPassword = process.env.BLUESKY_APP_PASSWORD;
+  const { handle, appPassword } = serviceConfig('bluesky');
 
   if (!handle || !appPassword) {
     throw new Error('Bluesky credentials not configured. Set BLUESKY_HANDLE and BLUESKY_APP_PASSWORD in .env');
   }
 
   // Check if we have a valid cached session
-  if (sessionCache.accessJwt && sessionCache.expiresAt && Date.now() < sessionCache.expiresAt) {
+  const cached = sessions.get(handle);
+  if (cached && cached.accessJwt && cached.expiresAt && Date.now() < cached.expiresAt) {
     console.log('[Bluesky] Using cached session');
-    return sessionCache;
+    return cached;
   }
 
   try {
@@ -46,17 +42,18 @@ async function authenticate() {
     const session = response.data;
 
     // Cache session (expires in ~2 hours, we'll refresh at 1.5 hours)
-    sessionCache = {
+    const newSession = {
       did: session.did,
       accessJwt: session.accessJwt,
       refreshJwt: session.refreshJwt,
       handle: session.handle,
       expiresAt: Date.now() + (90 * 60 * 1000) // 1.5 hours
     };
+    sessions.set(handle, newSession);
 
     console.log(`[Bluesky] Authenticated successfully as ${session.handle} (${session.did})`);
 
-    return sessionCache;
+    return newSession;
   } catch (error) {
     console.error('[Bluesky] Authentication failed:', error.response?.data || error.message);
     throw new Error(`Bluesky authentication failed: ${error.response?.data?.message || error.message}`);
@@ -68,7 +65,10 @@ async function authenticate() {
  * @returns {Promise<Object>} Refreshed session
  */
 async function refreshSession() {
-  if (!sessionCache.refreshJwt) {
+  const { handle } = serviceConfig('bluesky');
+  const cached = sessions.get(handle);
+
+  if (!cached || !cached.refreshJwt) {
     return await authenticate();
   }
 
@@ -77,22 +77,23 @@ async function refreshSession() {
 
     const response = await axios.post(`${BLUESKY_API_URL}/com.atproto.server.refreshSession`, {}, {
       headers: {
-        'Authorization': `Bearer ${sessionCache.refreshJwt}`
+        'Authorization': `Bearer ${cached.refreshJwt}`
       }
     });
 
     const session = response.data;
 
-    sessionCache = {
-      ...sessionCache,
+    const updatedSession = {
+      ...cached,
       accessJwt: session.accessJwt,
       refreshJwt: session.refreshJwt,
       expiresAt: Date.now() + (90 * 60 * 1000)
     };
+    sessions.set(handle, updatedSession);
 
     console.log('[Bluesky] Session refreshed successfully');
 
-    return sessionCache;
+    return updatedSession;
   } catch (error) {
     console.error('[Bluesky] Session refresh failed, re-authenticating...');
     return await authenticate();
@@ -104,10 +105,12 @@ async function refreshSession() {
  * @returns {Promise<Object>} Valid session
  */
 async function getSession() {
-  if (!sessionCache.accessJwt || Date.now() >= sessionCache.expiresAt) {
+  const { handle } = serviceConfig('bluesky');
+  const cached = sessions.get(handle);
+  if (!cached || !cached.accessJwt || Date.now() >= cached.expiresAt) {
     return await authenticate();
   }
-  return sessionCache;
+  return cached;
 }
 
 /**
@@ -337,21 +340,16 @@ function parseRichText(text) {
  * Clear session cache (for logout or testing)
  */
 function clearSession() {
-  sessionCache = {
-    did: null,
-    accessJwt: null,
-    refreshJwt: null,
-    handle: null,
-    expiresAt: null
-  };
+  const { handle } = serviceConfig('bluesky');
+  sessions.delete(handle);
   console.log('[Bluesky] Session cache cleared');
 }
 
 // Standard connector interface wrappers
 function getStatus() {
-  const missing = ['BLUESKY_HANDLE', 'BLUESKY_APP_PASSWORD'].filter(v => !process.env[v]);
+  const missing = missingServiceFields('bluesky', ['handle', 'appPassword']);
   if (missing.length > 0) return { configured: false, error: `Missing: ${missing.join(', ')}` };
-  return { configured: true, handle: process.env.BLUESKY_HANDLE };
+  return { configured: true, handle: serviceConfig('bluesky').handle };
 }
 
 async function publish(text, options = {}) {

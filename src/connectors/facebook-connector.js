@@ -1,18 +1,18 @@
 'use strict';
 const axios = require('axios');
+const { serviceConfig, missingServiceFields } = require('../helpers/neon-env');
 
 const GRAPH_BASE = 'https://graph.facebook.com/v21.0';
-const REQUIRED_VARS = ['FACEBOOK_PAGE_ID', 'FACEBOOK_PAGE_ACCESS_TOKEN'];
+const REQUIRED_FIELDS = ['pageId', 'pageAccessToken'];
 
 function getStatus() {
-  const missing = REQUIRED_VARS.filter(v => !process.env[v]);
+  const missing = missingServiceFields('facebook', REQUIRED_FIELDS);
   if (missing.length > 0) return { configured: false, error: `Missing: ${missing.join(', ')}` };
-  return { configured: true, pageId: process.env.FACEBOOK_PAGE_ID };
+  return { configured: true, pageId: serviceConfig('facebook').pageId };
 }
 
 async function publish(text, options = {}) {
-  const pageId = process.env.FACEBOOK_PAGE_ID;
-  const token = process.env.FACEBOOK_PAGE_ACCESS_TOKEN;
+  const { pageId, pageAccessToken: token } = serviceConfig('facebook');
   const body = { message: text, access_token: token };
   if (options.articleUrl) body.link = options.articleUrl;
 
@@ -32,7 +32,7 @@ async function publish(text, options = {}) {
 }
 
 async function getMetrics(postId) {
-  const token = process.env.FACEBOOK_PAGE_ACCESS_TOKEN;
+  const token = serviceConfig('facebook').pageAccessToken;
   try {
     const response = await axios.get(`${GRAPH_BASE}/${postId}/insights`, {
       params: {

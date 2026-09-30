@@ -1,4 +1,5 @@
 const neonBoApi = require("../helpers/neon-bo-api-v3.js");
+const { authenticate } = require("../helpers/auth.js");
 
 /**
  * Fetch and prepare articles from Neon CMS
@@ -44,7 +45,10 @@ async function fetchArticles(limit = 10) {
   };
 }
 
-async function getMobileClientHandler(_request, reply) {
+async function getMobileClientHandler(request, reply) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) return reply.status(401).send({ error: 'Unauthorized' });
+
   try {
     // Fetch articles using the centralized function
     const { articles } = await fetchArticles(10);
@@ -62,6 +66,9 @@ async function getMobileClientHandler(_request, reply) {
 }
 
 async function getMobileClientEditorHandler(request, reply) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) return reply.status(401).send({ error: 'Unauthorized' });
+
   try {
     const articleId = request.query.id;
     let article = null;
@@ -94,6 +101,9 @@ async function getMobileClientEditorHandler(request, reply) {
 }
 
 async function postMobileClientSaveHandler(request, reply) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) return reply.status(401).send({ error: 'Unauthorized' });
+
   try {
     const { headline, summary, content, byline, articleId } = request.body;
 
@@ -124,7 +134,10 @@ async function postMobileClientSaveHandler(request, reply) {
   }
 }
 
-async function getMobileClientApiArticlesHandler(_request, reply) {
+async function getMobileClientApiArticlesHandler(request, reply) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) return reply.status(401).send({ error: 'Unauthorized' });
+
   try {
     // Fetch articles using the centralized function
     const { articles, count } = await fetchArticles(10);
@@ -146,6 +159,9 @@ async function getMobileClientApiArticlesHandler(_request, reply) {
 }
 
 async function getMobileClientApiArticleHandler(request, reply) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) return reply.status(401).send({ error: 'Unauthorized' });
+
   try {
     const articleId = request.params.id;
     

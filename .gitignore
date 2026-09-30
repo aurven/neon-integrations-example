@@ -11,3 +11,4 @@ ssl
 .claude
 .superpowers
 .worktrees
+config/neon-environments.json

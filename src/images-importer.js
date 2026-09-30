@@ -5,14 +5,15 @@ const neon = require('./helpers/neon-bo-api-v3.js');
 const utils = require('./helpers/utils.js');
 const siteshelpers = require('./helpers/sites-helpers.js');
 const { findAllElementsByNodeType, findElementByNodeType, extractTextFromElements } = require('./helpers/neon-content-parser.js');
+const { serviceConfig } = require('./helpers/neon-env');
 
 function isTrelloUrl(url) {
     return /^https?:\/\/(www\.)?trello\.com\//.test(url);
 }
 
 async function getTrelloCoverUrl(story) {
-  const apiKey = process.env.TRELLO_APIKEY;
-  const token = process.env.TRELLO_TOKEN;
+  const apiKey = serviceConfig('trello').apiKey;
+  const token = serviceConfig('trello').token;
   const cardId = story.trello.id;
 
   if (!apiKey || !token) {
@@ -34,9 +35,9 @@ async function getTrelloCoverUrl(story) {
 }
 
 async function imageToBase64(url) {
-    const apiKey = process.env.TRELLO_APIKEY;
-    const token = process.env.TRELLO_TOKEN;
-  
+    const apiKey = serviceConfig('trello').apiKey;
+    const token = serviceConfig('trello').token;
+
     const [baseUrl, queryString] = url.split('?');
     const queryParams = queryString ? querystring.parse(queryString) : {};
   
@@ -168,7 +169,6 @@ async function uploadImageFromStory(story) {
 
 async function prepareNeonImage({ siteName, targetId, environment }) {
     try {
-        console.log('prepareNeonImage - process.env.NEON_FO_APIKEY: ' + process.env.NEON_FO_APIKEY); 
         const { node, data } = await siteshelpers.getResourceById({ siteName, targetId, environment });
         // const base64 = Buffer.from(data, 'binary').toString('base64');
         const { fileName, mimeType } = node.files.editorial;

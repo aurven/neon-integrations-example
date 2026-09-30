@@ -1,11 +1,12 @@
 'use strict';
 const axios = require('axios');
+const { serviceConfig, missingServiceFields } = require('../helpers/neon-env');
 
 const GRAPH_BASE = 'https://graph.facebook.com/v21.0';
-const REQUIRED_VARS = ['INSTAGRAM_ACCOUNT_ID', 'INSTAGRAM_ACCESS_TOKEN'];
+const REQUIRED_FIELDS = ['accountId', 'accessToken'];
 
 function getStatus() {
-  const missing = REQUIRED_VARS.filter(v => !process.env[v]);
+  const missing = missingServiceFields('instagram', REQUIRED_FIELDS);
   if (missing.length > 0) return { configured: false, error: `Missing: ${missing.join(', ')}` };
   return { configured: true };
 }
@@ -24,8 +25,7 @@ async function waitForContainer(containerId, token, maxAttempts = 10) {
 
 async function publish(text, options = {}) {
   if (!options.imageUrl) throw new Error('Instagram requires an imageUrl in options');
-  const accountId = process.env.INSTAGRAM_ACCOUNT_ID;
-  const token = process.env.INSTAGRAM_ACCESS_TOKEN;
+  const { accountId, accessToken: token } = serviceConfig('instagram');
 
   try {
     // Step 1: Create media container
@@ -55,7 +55,7 @@ async function publish(text, options = {}) {
 }
 
 async function getMetrics(postId) {
-  const token = process.env.INSTAGRAM_ACCESS_TOKEN;
+  const token = serviceConfig('instagram').accessToken;
   try {
     const res = await axios.get(`${GRAPH_BASE}/${postId}/insights`, {
       params: { metric: 'likes,comments,saved,reach', access_token: token }

@@ -1,23 +1,25 @@
 'use strict';
 const axios = require('axios');
 const crypto = require('crypto');
+const { serviceConfig, missingServiceFields } = require('../helpers/neon-env');
 
 const TWITTER_API_BASE = 'https://api.twitter.com/2';
-const REQUIRED_VARS = ['TWITTER_API_KEY', 'TWITTER_API_SECRET', 'TWITTER_ACCESS_TOKEN', 'TWITTER_ACCESS_SECRET'];
+const REQUIRED_FIELDS = ['apiKey', 'apiSecret', 'accessToken', 'accessSecret'];
 
 function getStatus() {
-  const missing = REQUIRED_VARS.filter(v => !process.env[v]);
+  const missing = missingServiceFields('twitter', REQUIRED_FIELDS);
   if (missing.length > 0) return { configured: false, error: `Missing: ${missing.join(', ')}` };
   return { configured: true };
 }
 
 function buildOAuthHeader(method, baseUrl, queryParams = {}) {
+  const { apiKey, apiSecret, accessToken, accessSecret } = serviceConfig('twitter');
   const oauthParams = {
-    oauth_consumer_key: process.env.TWITTER_API_KEY,
+    oauth_consumer_key: apiKey,
     oauth_nonce: crypto.randomBytes(16).toString('hex'),
     oauth_signature_method: 'HMAC-SHA1',
     oauth_timestamp: Math.floor(Date.now() / 1000).toString(),
-    oauth_token: process.env.TWITTER_ACCESS_TOKEN,
+    oauth_token: accessToken,
     oauth_version: '1.0',
   };
   // Include query params in signature (OAuth 1.0a §3.4.1)
@@ -26,7 +28,7 @@ function buildOAuthHeader(method, baseUrl, queryParams = {}) {
     .map(k => `${encodeURIComponent(k)}=${encodeURIComponent(allParams[k])}`)
     .join('&');
   const sigBase = `${method.toUpperCase()}&${encodeURIComponent(baseUrl)}&${encodeURIComponent(paramString)}`;
-  const sigKey = `${encodeURIComponent(process.env.TWITTER_API_SECRET)}&${encodeURIComponent(process.env.TWITTER_ACCESS_SECRET)}`;
+  const sigKey = `${encodeURIComponent(apiSecret)}&${encodeURIComponent(accessSecret)}`;
   oauthParams.oauth_signature = crypto.createHmac('sha1', sigKey).update(sigBase).digest('base64');
   return 'OAuth ' + Object.keys(oauthParams)
     .map(k => `${encodeURIComponent(k)}="${encodeURIComponent(oauthParams[k])}"`)

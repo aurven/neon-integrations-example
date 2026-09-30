@@ -2,17 +2,19 @@
 
 const Anthropic = require('@anthropic-ai/sdk');
 const { NeonClient } = require('./neon-bo-api-v3.js');
+const { serviceConfig } = require('./neon-env');
+const { currentEnv } = require('./neon-env/context.js');
 const crypto = require('crypto');
 
 // ---------------------------------------------------------------------------
-// Anthropic client (singleton, lazy-initialised)
+// Anthropic client (per-key cache)
 // ---------------------------------------------------------------------------
-let _anthropic = null;
+const anthropicClients = new Map();
 function getAnthropicClient() {
-  if (!_anthropic && process.env.ANTHROPIC_API_KEY) {
-    _anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-  }
-  return _anthropic;
+  const { apiKey } = serviceConfig('anthropic');
+  if (!apiKey) return null;
+  if (!anthropicClients.has(apiKey)) anthropicClients.set(apiKey, new Anthropic({ apiKey }));
+  return anthropicClients.get(apiKey);
 }
 
 // ---------------------------------------------------------------------------
@@ -32,7 +34,12 @@ setInterval(() => {
       console.log(`[Claude Chat] Session ${id} expired and removed`);
     }
   }
-}, 10 * 60 * 1000); // every 10 minutes
+}, 10 * 60 * 1000).unref(); // every 10 minutes
+
+// A chat session never crosses Neon environments: history and tools stay bound to one instance
+function sessionKey(sessionId) {
+  return `${currentEnv()?.id || 'none'}:${sessionId}`;
+}
 
 function getOrCreateSession(sessionId) {
   const now = Date.now();
@@ -278,7 +285,7 @@ async function handleChatTurn({ sessionId, userMessage, neonContext, role, rawRe
     return;
   }
 
-  const session = getOrCreateSession(sessionId);
+  const session = getOrCreateSession(sessionKey(sessionId));
 
   // Initialise system prompt on first turn when we have context
   if (!session.systemPrompt && neonContext) {
@@ -323,7 +330,7 @@ async function handleChatTurn({ sessionId, userMessage, neonContext, role, rawRe
     }));
 
     const requestParams = {
-      model: process.env.CLAUDE_CHAT_MODEL || 'claude-sonnet-4-6',
+      model: serviceConfig('anthropic').chatModel || 'claude-sonnet-4-6',
       max_tokens: 4096,
       system: session.systemPrompt || 'You are a helpful CMS assistant integrated into Neon CMS.',
       messages: session.messages,
@@ -460,5 +467,6 @@ async function handleChatTurn({ sessionId, userMessage, neonContext, role, rawRe
 module.exports = {
   handleChatTurn,
   getOrCreateSession,
-  buildSystemPrompt
+  buildSystemPrompt,
+  sessionKey
 };

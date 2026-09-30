@@ -3,6 +3,7 @@ const {
   getAvailableTaxonomies,
   refreshAll
 } = require('../connectors/iab-taxonomies-connector');
+const { isAdminRequest } = require('../helpers/auth.js');
 
 const {
   getLabel,
@@ -391,13 +392,9 @@ async function refreshTaxonomies(request, reply) {
  * @param {Object} options - Route options
  */
 async function registerRoutes(fastify, options) {
-  const { apikey } = options;
-
   // Middleware for API key authentication
   const authenticate = async (request, reply) => {
-    const requestApiKey = request.headers['apikey'];
-
-    if (!requestApiKey || requestApiKey !== apikey) {
+    if (!isAdminRequest(request)) {
       return reply.status(401).send({
         success: false,
         error: 'Unauthorized: Invalid or missing API key'

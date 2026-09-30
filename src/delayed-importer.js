@@ -8,6 +8,7 @@
  */
 const crypto = require('crypto');
 const dayjs = require('dayjs');
+const context = require('./helpers/neon-env/context.js');
 const storiesPopulator = require('./stories-populator.js');
 const imagesImporter = require('./images-importer.js');
 const utils = require('./helpers/utils.js');
@@ -91,6 +92,8 @@ function publicJob(job) {
     estimatedEndAt: job.estimatedEndAt,
     nextFireAt: job.nextFireAt,
     results: job.results,
+    envId: job.envId,
+    error: job.error,
   };
 }
 
@@ -106,10 +109,21 @@ function finishJob(job, state) {
 async function runTick(job, index, deps) {
   if (job.state !== 'running') return;
 
+  let env = null;
+  if (job.envId) {
+    env = deps.getEnv(job.envId);
+    if (!env) {
+      job.error = `env '${job.envId}' no longer registered`;
+      console.error(`❌ delayed-import ${job.jobId}: ${job.error}`);
+      finishJob(job, 'failed');
+      return;
+    }
+  }
+
   const item = job.items[index];
   try {
     const dispatch = item.contentType === 'story' ? deps.dispatchStory : deps.dispatchImage;
-    const outcome = await dispatch(item, job);
+    const outcome = await context.run(env, () => dispatch(item, job));
     job.results.push({
       index,
       type: item.contentType,
@@ -182,10 +196,11 @@ async function dispatchImageItem(item, job, importer = imagesImporter) {
  * `deps` is for tests only — production callers use the default dispatchers.
  * Returns the submit response: { jobId, itemCount, intervalMs, estimatedEndAt }.
  */
-function createJob(body, deps = {}) {
+function createJob(body, deps = {}, options = {}) {
   const dispatchers = {
     dispatchStory: deps.dispatchStory || dispatchStoryItem,
     dispatchImage: deps.dispatchImage || dispatchImageItem,
+    getEnv: deps.getEnv || ((id) => require('./helpers/neon-env/registry.js').getRegistry().get(id)),
   };
 
   const itemCount = body.items.length;
@@ -208,6 +223,8 @@ function createJob(body, deps = {}) {
     nextFireAt: new Date(now).toISOString(),
     results: [],
     timer: null,
+    envId: options.envId || context.currentEnv()?.id || null,
+    error: null,
   };
   jobs.set(jobId, job);
 
@@ -217,14 +234,19 @@ function createJob(body, deps = {}) {
   return { jobId, itemCount, intervalMs, estimatedEndAt: job.estimatedEndAt };
 }
 
-function getJob(jobId) {
-  const job = jobs.get(jobId);
-  return job ? publicJob(job) : null;
+function visible(job, envId) {
+  return !!job && (envId === undefined || envId === null || job.envId === envId);
 }
 
-function listJobs() {
-  return Array.from(jobs.values()).map((job) => ({
+function getJob(jobId, { envId } = {}) {
+  const job = jobs.get(jobId);
+  return visible(job, envId) ? publicJob(job) : null;
+}
+
+function listJobs({ envId } = {}) {
+  return Array.from(jobs.values()).filter((job) => visible(job, envId)).map((job) => ({
     jobId: job.jobId,
+    envId: job.envId,
     state: job.state,
     done: job.results.length,
     total: job.items.length,
@@ -236,9 +258,9 @@ function listJobs() {
  * Returns null if unknown, { error } if already finished,
  * otherwise the cancelled job snapshot. Imported items are not rolled back.
  */
-function cancelJob(jobId) {
+function cancelJob(jobId, { envId } = {}) {
   const job = jobs.get(jobId);
-  if (!job) return null;
+  if (!visible(job, envId)) return null;
   if (job.state !== 'running') return { error: 'Job already finished' };
   finishJob(job, 'cancelled');
   console.log(`delayed-import ${jobId}: cancelled after ${job.results.length} items`);

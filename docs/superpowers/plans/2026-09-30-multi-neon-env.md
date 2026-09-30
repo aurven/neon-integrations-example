@@ -29,7 +29,8 @@
 - Service fallback is **per block, never per field**.
 - Legacy mode (no registry file) must behave exactly like today, including keyless routes (webhooks) reaching Neon.
 - No new validation library. Tests use `node:test` + `node:assert/strict` (see `test/delayed-importer.test.js` for style).
-- Commit after each task. Stay on the current branch, and do not push.
+- `POST /in/neon/webhook/legacy?env=<id>` (keyless) is accepted ONLY for envs with `"insecureWebhook": true`; unknown and not-enabled envs get the identical 403.
+- Work happens on branch `develop` (worktree `.claude/worktrees/develop`). Commit after each task. Do not push.
 
 ## Review Focus
 
@@ -2316,6 +2317,7 @@ Add a section "Multiple Neon environments" covering:
 - how an environment is resolved: env-bound key; admin key + `?env=` / `x-neon-env` / cookie; admin key + caller host; default;
 - the console banner and `X-Neon-Env` headers;
 - for each Neon environment, set that env's `extApiKey` as the `apikey` in its panel/widget integration config and append `?apikey=<extApiKey>` to its webhook URL `/in/neon/webhook`;
+- the known-insecure fallback `POST /in/neon/webhook/legacy?env=<id>` (keyless), enabled per env with `"insecureWebhook": true`, and why to prefer the `?apikey=` URL;
 - the rollout steps from spec §10.
 
 - [ ] **Step 4: Full test run**
@@ -2332,9 +2334,178 @@ git commit -m "docs: multi-Neon-environment registry, resolution and rollout"
 
 ---
 
+### Task 14: Opt-in insecure legacy webhook endpoint
+
+**Why:** Neon webhooks cannot send custom headers (see the TODO in `src/requestHandlers/neon-webhooks.js:15`). The secure path is the main endpoint with the key in the URL: `/in/neon/webhook?apikey=<extApiKey>`. As a known, deliberately insecure fallback, `POST /in/neon/webhook/legacy?env=<id>` accepts an env id **without a key**. It works only for envs that opt in with `"insecureWebhook": true` in the registry, and every accepted call logs a warning.
+
+**Files:**
+- Create: `src/helpers/neon-env/insecure-webhook.js`, `test/neon-env/insecure-webhook.test.js`
+- Modify: `src/helpers/neon-env/registry.js` (`normalize`, `buildLegacyEnv`, `validateEntry`), `test/neon-env/registry.test.js`, `server.js` (webhook routes, `:368-371`), `config/neon-environments.example.json`
+
+**Interfaces:**
+- Consumes: `Registry`, `Env` (Task 1), `context.run` (Task 2), and the Fastify plugin's `request.neonAuth` / `request.neonEnv` (Task 4)
+- Produces:
+  - `Env.insecureWebhook: boolean` (file entries default `false`; the legacy env is `true` to keep today's keyless behaviour)
+  - `withInsecureEnvParam(handler, { getRegistry? }) → fastify handler`
+
+Behaviour of the wrapper:
+1. If the plugin already resolved an env from an apikey (`request.neonAuth.authenticated && request.neonEnv`), call `handler` unchanged. A key always wins.
+2. Otherwise read `request.query.env`. If it's missing, return 400 `env query parameter required`.
+3. If the env is unknown **or** its `insecureWebhook !== true`, return 403 `insecure webhook not enabled for this environment`. Both cases return the same response, so env ids can't be probed.
+4. Otherwise, log `[neon-env] ⚠️ insecure webhook accepted env=<id> (env from query, no apikey)`, set `request.neonEnv = env` and the `X-Neon-Env` header, and run `handler` inside `context.run(env, …)`.
+
+- [ ] **Step 1: Write failing tests**
+
+Append to `test/neon-env/registry.test.js`:
+```js
+test('insecureWebhook defaults false for file envs, true for legacy', () => {
+  const reg = buildRegistry({ json: registryJson([envJson('a'), envJson('b', { insecureWebhook: true })]), envVars: {} });
+  assert.equal(reg.get('a').insecureWebhook, false);
+  assert.equal(reg.get('b').insecureWebhook, true);
+  assert.equal(buildRegistry({ json: null, envVars: {} }).get('legacy').insecureWebhook, true);
+});
+
+test('insecureWebhook must be boolean', () => {
+  const reg = buildRegistry({ json: registryJson([envJson('a', { insecureWebhook: 'yes' })]), envVars: {} });
+  assert.deepEqual(reg.ids(), []);
+});
+```
+
+`test/neon-env/insecure-webhook.test.js`:
+```js
+'use strict';
+const { test } = require('node:test');
+const assert = require('node:assert/strict');
+const Fastify = require('fastify');
+const { buildRegistry } = require('../../src/helpers/neon-env/registry.js');
+const { currentEnv } = require('../../src/helpers/neon-env/context.js');
+const { withInsecureEnvParam } = require('../../src/helpers/neon-env/insecure-webhook.js');
+const { envJson, registryJson } = require('./fixtures.js');
+
+const reg = buildRegistry({ json: registryJson([envJson('open', { insecureWebhook: true }), envJson('closed')]), envVars: {} });
+
+async function buildApp() {
+  const app = Fastify();
+  await app.register(require('@fastify/cookie'));
+  await app.register(require('../../src/helpers/neon-env/fastify-plugin.js'), { getRegistry: () => reg });
+  const handler = async (request) => {
+    await new Promise((r) => setTimeout(r, 5));
+    return { env: currentEnv()?.id || null };
+  };
+  app.post('/in/neon/webhook/legacy', withInsecureEnvParam(handler, { getRegistry: () => reg }));
+  return app;
+}
+
+test('opted-in env accepted via ?env without key, context bound', async () => {
+  const app = await buildApp();
+  const res = await app.inject({ method: 'POST', url: '/in/neon/webhook/legacy?env=open', payload: {} });
+  assert.equal(res.statusCode, 200);
+  assert.equal(res.json().env, 'open');
+  assert.equal(res.headers['x-neon-env'], 'open');
+});
+
+test('env not opted in and unknown env get the same 403', async () => {
+  const app = await buildApp();
+  const closed = await app.inject({ method: 'POST', url: '/in/neon/webhook/legacy?env=closed', payload: {} });
+  const unknown = await app.inject({ method: 'POST', url: '/in/neon/webhook/legacy?env=nope', payload: {} });
+  assert.equal(closed.statusCode, 403);
+  assert.equal(unknown.statusCode, 403);
+  assert.deepEqual(closed.json(), unknown.json());
+});
+
+test('missing env -> 400', async () => {
+  const app = await buildApp();
+  const res = await app.inject({ method: 'POST', url: '/in/neon/webhook/legacy', payload: {} });
+  assert.equal(res.statusCode, 400);
+});
+
+test('apikey wins over ?env (even for a non-opted-in env)', async () => {
+  const app = await buildApp();
+  const res = await app.inject({ method: 'POST', url: '/in/neon/webhook/legacy?env=open&apikey=key-closed', payload: {} });
+  assert.equal(res.statusCode, 200);
+  assert.equal(res.json().env, 'closed');
+});
+```
+
+- [ ] **Step 2: Run, verify fail**
+
+Run: `node --test test/neon-env/registry.test.js test/neon-env/insecure-webhook.test.js`
+Expected: FAIL (`insecureWebhook` undefined; `Cannot find module …/insecure-webhook.js`)
+
+- [ ] **Step 3: Registry changes**
+
+In `validateEntry`, add:
+```js
+  if (raw.insecureWebhook !== undefined && typeof raw.insecureWebhook !== 'boolean') errors.push('insecureWebhook must be a boolean');
+```
+In `normalize`, add `insecureWebhook: raw.insecureWebhook === true,` after `warmup`.
+In `buildLegacyEnv`, add `insecureWebhook: true,` after `warmup: true,`, with the comment `// legacy mode: keyless webhooks keep working as today`.
+Add `"insecureWebhook": false` to the env entry in `config/neon-environments.example.json`, with a neighbouring `"_insecureWebhook": "true = POST /in/neon/webhook/legacy?env=<id> accepted WITHOUT apikey (known insecure fallback)"` note key.
+
+- [ ] **Step 4: Implement `insecure-webhook.js`**
+
+```js
+'use strict';
+/**
+ * Known-insecure fallback for Neon webhooks, which cannot send custom headers:
+ * POST /in/neon/webhook/legacy?env=<id> is accepted WITHOUT an apikey, but only for
+ * environments that opt in with "insecureWebhook": true in the registry.
+ * Prefer /in/neon/webhook?apikey=<extApiKey>.
+ */
+const context = require('./context.js');
+const { getRegistry } = require('./registry.js');
+
+const DENIED = { error: 'insecure webhook not enabled for this environment' };
+
+function withInsecureEnvParam(handler, { getRegistry: registryOf = getRegistry } = {}) {
+  return async function insecureEnvParamHandler(request, reply) {
+    if (request.neonAuth?.authenticated && request.neonEnv) {
+      return handler.call(this, request, reply);
+    }
+    const id = request.query?.env;
+    if (!id) return reply.status(400).send({ error: 'env query parameter required' });
+
+    const env = registryOf().get(String(id));
+    if (!env || env.insecureWebhook !== true) return reply.status(403).send(DENIED);
+
+    console.warn(`[neon-env] ⚠️ insecure webhook accepted env=${env.id} (env from query, no apikey)`);
+    request.neonEnv = env;
+    reply.header('X-Neon-Env', env.id);
+    reply.header('X-Neon-Env-Bo', env.neon.bo.host || '');
+    return context.run(env, () => handler.call(this, request, reply));
+  };
+}
+
+module.exports = { withInsecureEnvParam };
+```
+
+- [ ] **Step 5: Wire the route in `server.js`**
+
+After `fastify.post("/in/neon/webhook", neonWebhookHandlers.postNeonWebhookHandler);`, add:
+```js
+// Known-insecure fallback (opt-in per env via "insecureWebhook": true): env from ?env=, no apikey
+const { withInsecureEnvParam } = require("./src/helpers/neon-env/insecure-webhook.js");
+fastify.post("/in/neon/webhook/legacy", withInsecureEnvParam(neonWebhookHandlers.postNeonWebhookHandler));
+```
+Also add a `/services` dashboard row next to the existing webhook entry: `{ name: "Neon Webhook (legacy, insecure)", endpoint: "POST /in/neon/webhook/legacy?env=<id>", description: "Keyless fallback, only for environments with insecureWebhook: true. Prefer /in/neon/webhook?apikey=<env key>" }`.
+
+- [ ] **Step 6: Run tests**
+
+Run: `npm test`
+Expected: PASS
+
+- [ ] **Step 7: Commit**
+
+```bash
+git add src/helpers/neon-env/insecure-webhook.js src/helpers/neon-env/registry.js server.js config/neon-environments.example.json test/neon-env/registry.test.js test/neon-env/insecure-webhook.test.js
+git commit -m "feat(webhooks): opt-in insecure legacy webhook endpoint with env from query"
+```
+
+---
+
 ## After implementation (manual rollout, not a task for subagents)
 
 1. Deploy (legacy mode). Render needs no changes.
 2. Probe: from the demorc iframe (DevTools console inside the iframe), run `fetch('/neon/api/demo-integration/debug/headers').then(r => r.json()).then(console.log)`. Record which header carries the Neon host and whether `X-Neon-Env` survives the proxy on the response. Adjust `HOST_HEADERS` in `resolve.js` if needed, then delete the `/debug/headers` route.
-3. Create the Render Secret File `neon-environments.json` with 2 environments. Switch each Neon environment's integration apikey and webhook URL to that env's `extApiKey`.
+3. Create the Render Secret File `neon-environments.json` with 2 environments. Switch each Neon environment's integration apikey to that env's `extApiKey`, and its webhook URL to `/in/neon/webhook?apikey=<extApiKey>`. If Neon rejects that URL, set `"insecureWebhook": true` for the env and use `/in/neon/webhook/legacy?env=<id>`.
 4. Remove the legacy `NEON_*` Neon vars from Render.

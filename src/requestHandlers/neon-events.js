@@ -9,10 +9,11 @@ async function neonEventsSubscribeHandler(request, reply) {
     return reply.status(401).send({ error: 'Unauthorized' });
   }
 
-  const neonAppUrl = process.env.NEON_APP_URL;
-  const neonBoApiKey = process.env.NEON_BO_APIKEY;
+  const env = request.neonEnv;
+  const neonAppUrl = env?.neon.app.url;
+  const neonBoApiKey = env?.neon.bo.apiKey;
   if (!neonAppUrl || !neonBoApiKey) {
-    return reply.status(503).send({ error: 'Neon not configured: NEON_APP_URL or NEON_BO_APIKEY missing' });
+    return reply.status(503).send({ error: `Neon not configured for env ${env?.id || '(none)'}: app url or BO api key missing` });
   }
 
   const { subscriptions, startingPoint } = request.body || {};

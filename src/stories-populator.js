@@ -4,6 +4,7 @@ const neonUtils = require('./helpers/neon-utils.js');
 const neon = require('./helpers/neon-bo-api-v3.js');
 const deepl = require('deepl-node');
 const images = require('./images-importer.js');
+const { serviceConfig } = require('./helpers/neon-env');
 
 utils.polyfills();
 
@@ -116,7 +117,7 @@ async function translateStory(story) {
   
   const storyOptions = getOptionsFromData(story);
   
-  const translator = new deepl.Translator(process.env.DEEPL_APIKEY);
+  const translator = new deepl.Translator(serviceConfig('deepl').apiKey);
   
   const translatedStory = {
     caption:    await translator.translateText(storyOptions.caption, source, target),

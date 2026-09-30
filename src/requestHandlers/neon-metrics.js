@@ -9,6 +9,9 @@ const path = require('path');
  * GET /neon/api/core/metrics
  */
 async function getMetricsReportsHandler(request, reply) {
+    const auth = authenticate(request, reply);
+    if (!auth.authenticated) return reply.status(401).send({ error: 'Unauthorized' });
+
     console.log("getMetricsReportsHandler << IN:");
     const safeRequest = safeLogRequest(request?.headers || {}, {});
     console.log("Request Headers:", JSON.stringify(safeRequest.headers));
@@ -69,6 +72,9 @@ async function getMetricsReportsHandler(request, reply) {
  * GET /neon/api/core/metrics/* (supports reportId with slashes like "outgoingCalls/test")
  */
 async function getMetricsDataHandler(request, reply) {
+    const auth = authenticate(request, reply);
+    if (!auth.authenticated) return reply.status(401).send({ error: 'Unauthorized' });
+
     const reportId = request.params['*'];
 
     console.log("getMetricsDataHandler << IN:");

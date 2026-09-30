@@ -1,5 +1,6 @@
 const path = require("path");
 const fs = require('fs');
+const { redactApikeyParam } = require("./src/helpers/redact-url.js");
 
 // Require the fastify framework and instantiate it
 
@@ -22,7 +23,21 @@ if (fs.existsSync(sslCertPath) && fs.existsSync(sslKeyPath)) {
 
 const fastify = require("fastify")({
   // Set this to true for detailed logging:
-  logger: true,
+  logger: {
+    serializers: {
+      // Redact env apikeys (passed as ?apikey=) from the request logger, which otherwise
+      // prints the raw request URL/path on every request.
+      req(request) {
+        return {
+          method: request.method,
+          url: redactApikeyParam(request.url),
+          hostname: request.hostname,
+          remoteAddress: request.ip,
+          remotePort: request.socket ? request.socket.remotePort : undefined,
+        };
+      },
+    },
+  },
   ...httpsOptions
 });
 
@@ -43,6 +58,15 @@ fastify.register(require("@fastify/cookie"), {
   secret: process.env.NEON_EXT_APIKEY,
   parseOptions: {}
 });
+
+// Neon environment resolution (per-request env context, X-Neon-Env headers, console banner)
+const neonEnv = require("./src/helpers/neon-env");
+const { printRegistrySummary } = require("./src/helpers/neon-env/registry.js");
+fastify.register(require("./src/helpers/neon-env/fastify-plugin.js"));
+printRegistrySummary(neonEnv.getRegistry());
+
+const { authenticate, isAdminRequest } = require("./src/helpers/auth.js");
+const { servicesRegistryView } = require("./src/helpers/neon-env/services-view.js");
 
 // View is a templating manager for fastify
 const handlebars = require("handlebars");
@@ -92,7 +116,7 @@ fastify.get("/", function (request, reply) {
 });
 
 // Services dashboard
-fastify.get("/services", function (request, reply) {
+fastify.get("/services", async function handler(request, reply) {
   const integrations = {
     inbound: [
       { name: "Generic Import", endpoint: "POST /in/neon", description: "Import items from external sources to Neon CMS" },
@@ -153,6 +177,7 @@ fastify.get("/services", function (request, reply) {
     ],
     webhooks: [
       { name: "Neon Webhook Handler", endpoint: "POST /in/neon/webhook", description: "Process incoming Neon CMS webhooks with multi-site routing" },
+      { name: "Neon Webhook (legacy, insecure)", endpoint: "POST /in/neon/webhook/legacy?env=<id>", description: "Keyless fallback, only for environments with insecureWebhook: true. Prefer /in/neon/webhook?apikey=<env key>" },
       { name: "Neon Webhook Test", endpoint: "POST /in/neon/webhook/test", description: "Test webhook handler with sample data" },
       { name: "Telegram Integration", endpoint: "N/A", description: "Automatic posting to Telegram channels for TheGlobe articles" }
     ],
@@ -191,10 +216,18 @@ fastify.get("/services", function (request, reply) {
     ]
   };
 
-  let params = { 
-    seo: seo, 
+  const { neonEnvs, registryWarning } = servicesRegistryView(
+    neonEnv.getRegistry(),
+    isAdminRequest(request),
+    request.neonEnv?.id || null
+  );
+
+  let params = {
+    seo: seo,
     integrations: integrations,
-    location: process.env.NEON_EXT_LOCATION || "Unknown",
+    location: request.neonEnv?.label || "No environment",
+    neonEnvs,
+    registryWarning,
     version: appVersion
   };
 
@@ -203,19 +236,25 @@ fastify.get("/services", function (request, reply) {
 
 // Example
 fastify.get("/test", async function handler(request, reply) {
-  const { apikey } = request.headers?.apikey
-    ? request.headers
-    : { apikey: null };
-
-  if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) {
     return reply.status(401).send({ error: "Unauthorized" });
   }
 
   return reply.status(200).send({
     message: "Neon Integrations Up and Running",
     version: appVersion,
-    location: process.env.NEON_EXT_LOCATION || "Unknown",
+    location: request.neonEnv?.label || "No environment",
+    neonEnv: request.neonEnv?.id || null,
   });
+});
+
+// TEMPORARY probe (spec §10 step 2): which headers does the Neon proxy forward? Remove after rollout step 2.
+fastify.get("/debug/headers", async function handler(request, reply) {
+  if (!isAdminRequest(request)) return reply.status(401).send({ error: "Unauthorized" });
+  const redacted = { ...request.headers };
+  for (const k of ["apikey", "cookie", "authorization"]) if (redacted[k]) redacted[k] = "[redacted]";
+  return { headers: redacted, resolvedEnv: request.neonEnv?.id || null, role: request.neonAuth.role, global: request.neonAuth.global };
 });
 
 // Utilities
@@ -369,6 +408,9 @@ const neonWebhookHandlers = require("./src/requestHandlers/neon-webhooks.js");
 fastify.get("/in/neon/webhook", neonWebhookHandlers.getNeonWebhookHandler);
 fastify.post("/in/neon/webhook", neonWebhookHandlers.postNeonWebhookHandler);
 fastify.post("/in/neon/webhook/test", neonWebhookHandlers.postNeonWebhookTest);
+// Known-insecure fallback (opt-in per env via "insecureWebhook": true): env from ?env=, no apikey
+const { withInsecureEnvParam } = require("./src/helpers/neon-env/insecure-webhook.js");
+fastify.post("/in/neon/webhook/legacy", withInsecureEnvParam(neonWebhookHandlers.postNeonWebhookHandler));
 
 /**
  *
@@ -471,23 +513,18 @@ fastify.register(async function (fastify) {
 });
 
 // Initialize Neon config cache on startup (non-blocking)
-const { initializeAll: initializeNeonConfig } = require("./src/connectors/neon-config-connector");
+const { initializeAllEnvs: initializeNeonConfigAllEnvs } = require("./src/connectors/neon-config-connector");
 setImmediate(async () => {
   try {
-    console.log('[Neon Config] Initializing cache...');
-    const results = await initializeNeonConfig();
-
-    if (results.initialized.length > 0) {
-      console.log(`[Neon Config] ✓ Fetched and cached: ${results.initialized.join(', ')}`);
-    }
-    if (results.cached.length > 0) {
-      console.log(`[Neon Config] ✓ Already cached: ${results.cached.join(', ')}`);
-    }
-    if (results.errors.length > 0) {
-      console.error(`[Neon Config] ✗ Errors: ${results.errors.length}`);
-      results.errors.forEach(err => {
-        console.error(`  - ${err.type}: ${err.error}`);
-      });
+    console.log('[Neon Config] Initializing cache for all environments...');
+    const byEnv = await initializeNeonConfigAllEnvs(neonEnv.getRegistry());
+    for (const [envId, results] of Object.entries(byEnv)) {
+      if (results.error) {
+        console.error(`[Neon Config] [env=${envId}] ✗ ${results.error}`);
+        continue;
+      }
+      console.log(`[Neon Config] [env=${envId}] ✓ fetched: ${results.initialized.join(', ') || '-'} | cached: ${results.cached.join(', ') || '-'}`);
+      results.errors.forEach(err => console.error(`[Neon Config] [env=${envId}]   - ${err.type}: ${err.error}`));
     }
   } catch (error) {
     console.error('[Neon Config] Failed to initialize:', error.message);
@@ -546,7 +583,7 @@ fastify.listen(
     }
     
     console.log(`🚀 Server is running on ${address}`);
-    console.log(`🔗 Neon BO URL: ${process.env.NEON_BO_URL || '(not set)'}`);
+    console.log(`🔗 Neon environments: ${neonEnv.getRegistry().ids().join(', ') || '(none)'}`);
 
     // Show additional access information
     const protocol = httpsOptions.https ? 'https' : 'http';

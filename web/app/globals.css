@@ -1,0 +1,101 @@
+/* Source Sans Pro is shipped by Google Fonts as "Source Sans 3" (same
+   metrics, near-identical glyphs). Must precede all other @import/rules. */
+@import url("https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,300;0,400;0,500;0,600;0,700;0,900;1,400&family=Nunito:wght@400;500;600;700;800&display=swap");
+@import "tailwindcss";
+@import "./neon-design-system.css";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+/* NOTE on cascade layers: neon-design-system.css (imported above) declares
+   --font-sans, --font-mono, --radius-*, and --shadow-* as plain, unlayered
+   :root custom properties. Tailwind v4 compiles @theme/@theme inline blocks
+   (including the --font-sans/--font-mono mappings above) into @layer theme.
+   Per CSS cascade-layer rules, unlayered declarations always win over
+   @layer theme declarations regardless of source order, so the
+   neon-design-system.css values take precedence for the font-sans,
+   font-mono, rounded-*, and shadow-* utilities (overriding the Geist font
+   wiring and Tailwind's defaults). This is intentional: Neon design tokens
+   should drive these utilities app-wide. */
+
+/* Custom design-system tokens ported from the root tailwind.config.js (v3).
+   Tailwind v4 generates utility classes from @theme variables:
+   --color-<name>-<shade> -> bg-<name>-<shade>, text-<name>-<shade>, etc.
+   --breakpoint-<name>    -> <name>:utility responsive variant. */
+@theme {
+  /* gray-50 override (matches Tailwind v3 config.theme.extend.colors.gray.50) */
+  --color-gray-50: rgb(246 243 246);
+
+  /* Custom breakpoint, added before the default scale in the v3 config */
+  --breakpoint-xs: 360px;
+
+  /* primary (blue) scale */
+  --color-primary-50: #eef2fe;
+  --color-primary-100: #dce5fd;
+  --color-primary-200: #b9cbfb;
+  --color-primary-300: #96b1f9;
+  --color-primary-400: #7397f7;
+  --color-primary-500: #507df5;
+  --color-primary-600: #2847E2;
+  --color-primary-700: #1e3bc4;
+  --color-primary-800: #192e9d;
+  --color-primary-900: #142275;
+
+  /* methode (teal) scale */
+  --color-methode-50: #E6F3F7;
+  --color-methode-100: #CCE7EF;
+  --color-methode-200: #99CFE0;
+  --color-methode-300: #689DAD;
+  --color-methode-400: #1A7F9E;
+  --color-methode-500: #00526B;
+  --color-methode-600: #003F52;
+  --color-methode-700: #00232E;
+  --color-methode-800: #001820;
+  --color-methode-900: #000D12;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Custom scrollbar styles (used by multiple panels), ported from
+   src/styles/tailwind-source.css */
+.scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e0 transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+    background: #cbd5e0;
+    border-radius: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: #a0aec0;
+}
