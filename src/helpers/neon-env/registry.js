@@ -74,6 +74,7 @@ function validateEntry(raw) {
   if (raw.services !== undefined && (typeof raw.services !== 'object' || Array.isArray(raw.services) || raw.services === null)) {
     errors.push('services must be an object');
   }
+  if (raw.insecureWebhook !== undefined && typeof raw.insecureWebhook !== 'boolean') errors.push('insecureWebhook must be a boolean');
   return errors;
 }
 
@@ -95,6 +96,7 @@ function normalize(raw, keySource) {
     extApiKey: raw.extApiKey,
     extApiKeyLimited: raw.extApiKeyLimited || null,
     warmup: raw.warmup !== false,
+    insecureWebhook: raw.insecureWebhook === true,
     keySource,
     neon: {
       insecureTls: raw.neon.insecureTls === true,
@@ -139,6 +141,7 @@ function buildLegacyEnv(envVars) {
     extApiKey: envVars.NEON_EXT_APIKEY || null,
     extApiKeyLimited: envVars.NEON_EXT_APIKEY_LIMITED || null,
     warmup: true,
+    insecureWebhook: true, // legacy mode: keyless webhooks keep working as today
     keySource: 'legacy',
     neon: {
       insecureTls: envVars.NEON_EXT_LOCATION === 'Local',

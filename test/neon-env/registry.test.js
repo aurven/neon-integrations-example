@@ -117,3 +117,15 @@ test('unsupported version falls back to legacy', () => {
   assert.equal(reg.source, 'legacy');
   assert.match(reg.loadError, /version/);
 });
+
+test('insecureWebhook defaults false for file envs, true for legacy', () => {
+  const reg = buildRegistry({ json: registryJson([envJson('a'), envJson('b', { insecureWebhook: true })]), envVars: {} });
+  assert.equal(reg.get('a').insecureWebhook, false);
+  assert.equal(reg.get('b').insecureWebhook, true);
+  assert.equal(buildRegistry({ json: null, envVars: {} }).get('legacy').insecureWebhook, true);
+});
+
+test('insecureWebhook must be boolean', () => {
+  const reg = buildRegistry({ json: registryJson([envJson('a', { insecureWebhook: 'yes' })]), envVars: {} });
+  assert.deepEqual(reg.ids(), []);
+});

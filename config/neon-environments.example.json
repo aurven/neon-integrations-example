@@ -10,6 +10,8 @@
       "extApiKey": "env:DEMORC_EXT_APIKEY",
       "extApiKeyLimited": "env:DEMORC_EXT_APIKEY_LIMITED",
       "warmup": true,
+      "insecureWebhook": false,
+      "_insecureWebhook": "true = POST /in/neon/webhook/legacy?env=<id> accepted WITHOUT apikey (known insecure fallback)",
       "neon": {
         "insecureTls": false,
         "app": {

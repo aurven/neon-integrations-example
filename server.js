@@ -161,6 +161,7 @@ fastify.get("/services", async function handler(request, reply) {
     ],
     webhooks: [
       { name: "Neon Webhook Handler", endpoint: "POST /in/neon/webhook", description: "Process incoming Neon CMS webhooks with multi-site routing" },
+      { name: "Neon Webhook (legacy, insecure)", endpoint: "POST /in/neon/webhook/legacy?env=<id>", description: "Keyless fallback, only for environments with insecureWebhook: true. Prefer /in/neon/webhook?apikey=<env key>" },
       { name: "Neon Webhook Test", endpoint: "POST /in/neon/webhook/test", description: "Test webhook handler with sample data" },
       { name: "Telegram Integration", endpoint: "N/A", description: "Automatic posting to Telegram channels for TheGlobe articles" }
     ],
@@ -385,6 +386,9 @@ const neonWebhookHandlers = require("./src/requestHandlers/neon-webhooks.js");
 fastify.get("/in/neon/webhook", neonWebhookHandlers.getNeonWebhookHandler);
 fastify.post("/in/neon/webhook", neonWebhookHandlers.postNeonWebhookHandler);
 fastify.post("/in/neon/webhook/test", neonWebhookHandlers.postNeonWebhookTest);
+// Known-insecure fallback (opt-in per env via "insecureWebhook": true): env from ?env=, no apikey
+const { withInsecureEnvParam } = require("./src/helpers/neon-env/insecure-webhook.js");
+fastify.post("/in/neon/webhook/legacy", withInsecureEnvParam(neonWebhookHandlers.postNeonWebhookHandler));
 
 /**
  *
