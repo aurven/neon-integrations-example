@@ -74,11 +74,11 @@
                         </div>
                     </div>
                     <div class="flex items-center space-x-2">
-                        <button id="swing-btn" class="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-methode-500 hover:bg-methode-600 rounded-md transition-colors" title="Open in Swing">
+                        <button id="swing-btn" class="inline-flex items-center px-2 py-1 text-xs font-medium text-white bg-methode-500 hover:bg-methode-600 rounded-md transition-colors" title="Open in Swing">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
                             </svg>
-                            Swing
+                            Open in Swing
                         </button>
                     </div>
                 </div>
@@ -102,11 +102,17 @@
                 <!-- Tab Navigation -->
                 <div class="border-b border-gray-200">
                     <nav class="flex -mb-px">
-                        <button id="tab-metadata" class="tab-button active flex-1 py-3 px-4 text-center border-b-2 border-methode-500 text-methode-600 font-medium text-sm transition-colors" data-tab="metadata">
+                        <button id="tab-info" class="tab-button active flex-1 py-3 px-4 text-center border-b-2 border-methode-500 text-methode-600 font-medium text-sm transition-colors" data-tab="info">
+                            <svg class="w-4 h-4 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Info
+                        </button>
+                        <button id="tab-print" class="tab-button hidden flex-1 py-3 px-4 text-center border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-sm transition-colors" data-tab="print">
                             <svg class="w-4 h-4 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
                             </svg>
-                            PRINT
+                            Print
                         </button>
                         <button id="tab-preview" class="tab-button flex-1 py-3 px-4 text-center border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-sm transition-colors" data-tab="preview">
                             <svg class="w-4 h-4 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -120,64 +126,90 @@
 
                 <!-- Tab Content -->
                 <div class="p-6">
-                    <!-- Metadata Tab Content -->
-                    <div id="content-metadata" class="tab-content">
-                        <div class="space-y-4">
-                            <!-- Position -->
-                            <div class="flex items-center">
-                                <label for="meta-position" class="w-32 text-sm font-medium text-gray-700">Position</label>
-                                <select id="meta-position" class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-methode-500 focus:border-methode-500 text-sm">
-                                    <option value="AboveFold">AboveFold</option>
-                                    <option value="BelowFold">BelowFold</option>
-                                    <option value="Inside">Inside</option>
+                    <!-- Info Tab Content (default, read-only Méthode AutoLayout values) -->
+                    <div id="content-info" class="tab-content">
+                        <div class="grid grid-cols-2 gap-x-6 gap-y-4">
+                            <div>
+                                <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Layout Priority</p>
+                                <p id="info-layout-prio" class="mt-1">—</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Boost Priority</p>
+                                <p id="info-boost-prio" class="mt-1">—</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Work Folder</p>
+                                <p id="info-work-folder" class="mt-1 text-sm text-gray-800 font-mono break-all">—</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Issue Date</p>
+                                <p id="info-issue-date" class="mt-1 text-sm text-gray-800">—</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Story Type</p>
+                                <p id="info-story-type" class="mt-1 text-sm text-gray-800 font-mono">—</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Diffusion</p>
+                                <p id="info-diffusion" class="mt-1">—</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Print Tab Content -->
+                    <div id="content-print" class="tab-content hidden">
+                        <div class="space-y-5">
+
+                            <!-- Diffusion -->
+                            <div class="flex items-start gap-4">
+                                <label for="meta-diffusion" class="w-32 pt-2 text-sm font-medium text-gray-700 flex-shrink-0">Diffusion</label>
+                                <div class="flex-1">
+                                    <select id="meta-diffusion" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-methode-500 focus:border-methode-500 text-sm">
+                                        <option value="">— not set —</option>
+                                        <option value="Yes">Yes</option>
+                                        <option value="No">No</option>
+                                    </select>
+                                    <p id="diffusion-warning" class="hidden mt-1.5 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded px-2 py-1.5">
+                                        ⚠ Setting Diffusion to <strong>No</strong> will block any further updates to Méthode when this article is published.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Section -->
+                            <div class="flex items-center gap-4">
+                                <label for="meta-section" class="w-32 text-sm font-medium text-gray-700 flex-shrink-0">Section</label>
+                                <select id="meta-section" class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-methode-500 focus:border-methode-500 text-sm">
+                                    <option value="">— not set —</option>
                                 </select>
                             </div>
 
                             <!-- Priority -->
-                            <div class="flex items-center">
-                                <label for="meta-priority" class="w-32 text-sm font-medium text-gray-700">Priority</label>
+                            <div class="flex items-center gap-4">
+                                <label for="meta-priority" class="w-32 text-sm font-medium text-gray-700 flex-shrink-0">Priority</label>
                                 <select id="meta-priority" class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-methode-500 focus:border-methode-500 text-sm">
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3" selected>3</option>
-                                    <option value="4">4</option>
-                                    <option value="5">5</option>
+                                    <option value="">— not set —</option>
+                                    <option value="1">P1 · Breaking</option>
+                                    <option value="2">P2 · High</option>
+                                    <option value="3">P3 · Standard</option>
+                                    <option value="4">P4 · Low</option>
+                                    <option value="5">P5 · Filler</option>
                                 </select>
                             </div>
 
                             <!-- Issue Date -->
-                            <div class="flex items-center">
-                                <label for="meta-issue-date" class="w-32 text-sm font-medium text-gray-700">Issue Date</label>
-                                <input type="text" id="meta-issue-date" placeholder="Tomorrow" class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-methode-500 focus:border-methode-500 text-sm">
+                            <div class="flex items-center gap-4">
+                                <label for="meta-issue-date" class="w-32 text-sm font-medium text-gray-700 flex-shrink-0">Issue Date</label>
+                                <input type="date" id="meta-issue-date" class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-methode-500 focus:border-methode-500 text-sm">
                             </div>
 
-                            <!-- Include Image -->
-                            <div class="flex items-center">
-                                <label for="meta-include-image" class="w-32 text-sm font-medium text-gray-700">Include Image</label>
-                                <select id="meta-include-image" class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-methode-500 focus:border-methode-500 text-sm">
-                                    <option value="Yes">Yes</option>
-                                    <option value="No">No</option>
-                                </select>
+                            <!-- Save -->
+                            <div class="flex items-center justify-end gap-3 pt-2">
+                                <p id="save-status" class="hidden text-xs"></p>
+                                <button id="save-print-btn" disabled class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-methode-500 hover:bg-methode-600 rounded-md transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+                                    Save
+                                </button>
                             </div>
 
-                            <!-- Image Size -->
-                            <div class="flex items-center">
-                                <label for="meta-image-size" class="w-32 text-sm font-medium text-gray-700">Image Size</label>
-                                <select id="meta-image-size" class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-methode-500 focus:border-methode-500 text-sm">
-                                    <option value="Small">Small</option>
-                                    <option value="Medium" selected>Medium</option>
-                                    <option value="Large">Large</option>
-                                </select>
-                            </div>
-
-                            <!-- Adjacent Ads -->
-                            <div class="flex items-center">
-                                <label for="meta-adjacent-ads" class="w-32 text-sm font-medium text-gray-700">Adjacent Ads</label>
-                                <select id="meta-adjacent-ads" class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-methode-500 focus:border-methode-500 text-sm">
-                                    <option value="Yes">Yes</option>
-                                    <option value="No">No</option>
-                                </select>
-                            </div>
                         </div>
                     </div>
 
@@ -263,6 +295,16 @@
     </div>
 
     <script>
+        // Static config injected server-side
+        const PRINT_CONFIG = {{{printConfig}}};
+
+        const METADATA_XPATHS = {
+            printSection:   '/ObjectMetadata/DistributionChannels/Print/PrintSection',
+            printPriority:  '/ObjectMetadata/DistributionChannels/Print/PrintPriority',
+            printIssueDate: '/ObjectMetadata/DistributionChannels/Print/PrintIssueDate',
+            printDiffusion: '/ObjectMetadata/Diffusion/Diff_Print',
+        };
+
         // Global state
         let state = {
             apiKey: '{{{apiKey}}}',
@@ -276,7 +318,9 @@
             neonContext: null,
             siteId: null,
             methodeHookData: null,
-            currentPreviewUrl: null
+            currentPreviewUrl: null,
+            familyRef: null,
+            activeTab: 'info',
         };
 
         // Utility functions
@@ -313,7 +357,6 @@
             document.getElementById('update-time').textContent = formatDate(new Date());
         }
 
-        // Create story preview using edapi-utils.js
         async function createStoryPreview() {
             if (!state.methodeId) {
                 console.log('No methodeId available for preview generation');
@@ -331,7 +374,6 @@
 
                 console.log('Preview payload:', previewPayload);
 
-                // Call the backend API to create story preview using edapi-utils
                 const previewResult = await apiCall('preview/create', 'POST', previewPayload);
 
                 console.log('Preview creation result:', previewResult);
@@ -389,13 +431,20 @@
                             state.neonContext = event.data.info;
                             console.log('Neon context updated:', state.neonContext);
 
+                            // Capture familyRef for metadata saves
+                            state.familyRef = state.neonContext?.originalNode?.familyRef || null;
+
+                            // Populate Info and Print tabs from node metadata
+                            const nodeMeta = state.neonContext?.originalNode?.nodeMeta;
+                            populateInfoTab(nodeMeta);
+                            setPrintFieldsFromAttributes(nodeMeta);
+
                             // Extract methodeHook from publishInfos
                             const publishInfos = state.neonContext?.originalNode?.publishInfos;
                             let methodeHook = null;
                             let siteFound = null;
 
                             if (publishInfos) {
-                                // Search through all sites to find one with methodeHook
                                 for (const [siteId, publishInfo] of Object.entries(publishInfos)) {
                                     if (publishInfo.webhookData?.methodeHook) {
                                         methodeHook = publishInfo.webhookData.methodeHook;
@@ -407,7 +456,6 @@
                             }
 
                             if (methodeHook && methodeHook.storyId) {
-                                // We found methodeHook data, use the storyId as methodeId
                                 state.methodeId = methodeHook.storyId;
                                 state.siteId = siteFound;
                                 state.methodeHookData = methodeHook;
@@ -460,8 +508,8 @@
                 state.currentObject = newObjectData;
                 updateTimestamp();
 
-                // Generate preview asynchronously after object is loaded
-                generatePreviewAsync();
+                // Preview is lazy — only generated when the Preview tab is active
+                if (state.activeTab === 'preview') generatePreviewAsync();
             } catch (error) {
                 console.error('Error loading object:', error);
                 if (!state.currentObject) {
@@ -782,9 +830,11 @@
             tabButtons.forEach(button => {
                 button.addEventListener('click', () => {
                     const tabName = button.dataset.tab;
+                    state.activeTab = tabName;
 
-                    // Update button states
+                    // Update button states (skip hidden tabs)
                     tabButtons.forEach(btn => {
+                        if (btn.classList.contains('hidden')) return;
                         if (btn.dataset.tab === tabName) {
                             btn.classList.add('border-methode-500', 'text-methode-600');
                             btn.classList.remove('border-transparent', 'text-gray-500');
@@ -803,48 +853,177 @@
                         }
                     });
 
-                    // If switching to preview tab for the first time and no preview loaded yet
-                    if (tabName === 'preview' && !state.currentPreviewUrl && state.currentObject) {
+                    // Lazy-load preview only when tab becomes active
+                    if (tabName === 'preview' && state.currentObject) {
                         generatePreviewAsync();
                     }
                 });
             });
         }
 
-        // Get metadata values from form
-        function getMetadataValues() {
-            return {
-                position: document.getElementById('meta-position')?.value || 'AboveFold',
-                priority: document.getElementById('meta-priority')?.value || '3',
-                issueDate: document.getElementById('meta-issue-date')?.value || '',
-                includeImage: document.getElementById('meta-include-image')?.value || 'Yes',
-                imageSize: document.getElementById('meta-image-size')?.value || 'Medium',
-                adjacentAds: document.getElementById('meta-adjacent-ads')?.value || 'Yes'
-            };
+        // ── Info tab (read-only AutoLayout values) ────────────────────────────
+
+        function mapLayoutPrio(p) {
+            const n = (p === null || p === undefined || p === '') ? null : Number(p);
+            if (n === 1 || n === 2 || n === 3) return 'A';
+            if (n === 4 || n === null) return 'B';
+            return 'C';
         }
 
-        // Set metadata values in form
-        function setMetadataValues(metadata) {
-            if (!metadata) return;
+        function mapBoostPriority(p) {
+            const n = (p === null || p === undefined || p === '') ? null : Number(p);
+            if (n === 1) return '2';
+            if (n === 2) return '1';
+            if (n === 3) return '0';
+            return '0';
+        }
 
-            if (metadata.position) {
-                document.getElementById('meta-position').value = metadata.position;
+        function chip(label, bg, text) {
+            return `<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold ${bg} ${text}">${label}</span>`;
+        }
+
+        const LAYOUT_PRIO_CHIP = {
+            A: chip('A · High',   'bg-green-100', 'text-green-700'),
+            B: chip('B · Mid',    'bg-amber-100', 'text-amber-700'),
+            C: chip('C · Low',    'bg-red-100',   'text-red-600'),
+        };
+
+        const BOOST_PRIO_CHIP = {
+            '2': chip('2 · High',    'bg-green-100', 'text-green-700'),
+            '1': chip('1 · Medium',  'bg-blue-100',  'text-blue-700'),
+            '0': chip('0 · Neutral', 'bg-gray-100',  'text-gray-600'),
+        };
+
+        function populateInfoTab(nodeMeta) {
+            if (!nodeMeta) return;
+
+            const setHtml = (id, html) => {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = html;
+            };
+            const setText = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = val || '—';
+            };
+
+            const lp = mapLayoutPrio(nodeMeta.printPriority);
+            setHtml('info-layout-prio', LAYOUT_PRIO_CHIP[lp] || `<span class="text-sm text-gray-400">—</span>`);
+
+            const bp = mapBoostPriority(nodeMeta.printPriority);
+            setHtml('info-boost-prio', BOOST_PRIO_CHIP[bp] || `<span class="text-sm text-gray-400">—</span>`);
+
+            setText('info-work-folder', nodeMeta.printSection || '—');
+            setText('info-story-type',  'Standard_Variants');
+
+            const raw = nodeMeta.printIssueDate;
+            if (raw && raw.length === 8) {
+                const d = new Date(`${raw.slice(0,4)}-${raw.slice(4,6)}-${raw.slice(6,8)}`);
+                setText('info-issue-date', isNaN(d) ? raw : d.toLocaleDateString('en-GB'));
+            } else {
+                setText('info-issue-date', '—');
             }
-            if (metadata.priority) {
-                document.getElementById('meta-priority').value = metadata.priority;
+
+            const diff = nodeMeta.printDiffusion;
+            setHtml('info-diffusion', diff === 'No'
+                ? chip('No · Blocked', 'bg-amber-100', 'text-amber-700')
+                : diff === 'Yes'
+                    ? chip('Yes', 'bg-green-100', 'text-green-700')
+                    : `<span class="text-sm text-gray-400">—</span>`);
+        }
+
+        // ── Print field helpers ───────────────────────────────────────────────
+
+        function buildSectionOptions() {
+            const sel = document.getElementById('meta-section');
+            (PRINT_CONFIG.sectionsAndBooks || []).forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s.printSection;
+                opt.textContent = s.label;
+                sel.appendChild(opt);
+            });
+        }
+
+        // YYYYMMDD → yyyy-mm-dd (for <input type="date">)
+        function neonDateToInput(v) {
+            if (!v || v.length !== 8) return '';
+            return `${v.slice(0,4)}-${v.slice(4,6)}-${v.slice(6,8)}`;
+        }
+
+        // yyyy-mm-dd → YYYYMMDD (for Neon metadata xpath value)
+        function inputDateToNeon(v) {
+            return v ? v.replace(/-/g, '') : '';
+        }
+
+        function setPrintFieldsFromAttributes(attrs) {
+            if (!attrs) return;
+            document.getElementById('meta-diffusion').value = attrs.printDiffusion || '';
+            document.getElementById('meta-section').value   = attrs.printSection   || '';
+            document.getElementById('meta-priority').value  = attrs.printPriority  || '';
+            document.getElementById('meta-issue-date').value = neonDateToInput(attrs.printIssueDate);
+            updateDiffusionWarning();
+            document.getElementById('save-print-btn').disabled = false;
+        }
+
+        function updateDiffusionWarning() {
+            const val = document.getElementById('meta-diffusion').value;
+            document.getElementById('diffusion-warning').classList.toggle('hidden', val !== 'No');
+        }
+
+        function buildMetadataChange(field, value) {
+            const xpath = METADATA_XPATHS[field];
+            if (!xpath) return null;
+            if (value === null || value === undefined || value === '')
+                return { xpath, action: 'unset' };
+            return { xpath, action: 'set', value: String(value) };
+        }
+
+        async function savePrintFields() {
+            const btn = document.getElementById('save-print-btn');
+            const status = document.getElementById('save-status');
+
+            if (!state.familyRef) {
+                showSaveStatus('error', 'No familyRef — cannot save.');
+                return;
             }
-            if (metadata.issueDate) {
-                document.getElementById('meta-issue-date').value = metadata.issueDate;
+
+            const rawDate = document.getElementById('meta-issue-date').value;
+            const changes = [
+                buildMetadataChange('printDiffusion', document.getElementById('meta-diffusion').value),
+                buildMetadataChange('printSection',   document.getElementById('meta-section').value),
+                buildMetadataChange('printPriority',  document.getElementById('meta-priority').value),
+                buildMetadataChange('printIssueDate', inputDateToNeon(rawDate)),
+            ].filter(Boolean);
+
+            btn.disabled = true;
+            btn.textContent = 'Saving…';
+            status.classList.add('hidden');
+
+            try {
+                await apiCall('neon/metadata/update', 'POST', { familyRef: state.familyRef, changes });
+                showSaveStatus('ok', 'Saved.');
+            } catch (err) {
+                console.error('Print fields save failed:', err);
+                showSaveStatus('error', 'Save failed — see console.');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Save';
             }
-            if (metadata.includeImage) {
-                document.getElementById('meta-include-image').value = metadata.includeImage;
-            }
-            if (metadata.imageSize) {
-                document.getElementById('meta-image-size').value = metadata.imageSize;
-            }
-            if (metadata.adjacentAds) {
-                document.getElementById('meta-adjacent-ads').value = metadata.adjacentAds;
-            }
+        }
+
+        function showSaveStatus(type, msg) {
+            const el = document.getElementById('save-status');
+            el.textContent = msg;
+            el.className = type === 'ok'
+                ? 'text-xs text-green-700'
+                : 'text-xs text-red-600';
+            el.classList.remove('hidden');
+            setTimeout(() => el.classList.add('hidden'), 4000);
+        }
+
+        function setupPrintTab() {
+            buildSectionOptions();
+            document.getElementById('meta-diffusion').addEventListener('change', updateDiffusionWarning);
+            document.getElementById('save-print-btn').addEventListener('click', savePrintFields);
         }
 
         // Initialize
@@ -852,6 +1031,7 @@
             console.log('Document loaded, initializing Méthode panel...');
             setupPostMessageApi();
             setupTabs();
+            setupPrintTab();
             
             // Check if we have a direct methodeId (from URL parameter)
             if (state.methodeId && state.methodeId !== 'null' && state.methodeId !== '') {

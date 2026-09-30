@@ -1,4 +1,6 @@
 const axios = require('axios');
+const https = require('https');
+const cheerio = require('cheerio');
 const { getSiteHostname } = require('../helpers/sites-helpers');
 
 async function sendSingleEmail(emailData) {
@@ -52,7 +54,49 @@ async function sendTest() {
   return await sendSingleEmail(emailData);
 }
 
-async function sendNewsletter(neonModel) {
+/**
+ * Fetch a rendered Neon newsletter webpage and extract its email-ready table
+ * @param {string} pageUrl - Absolute URL of the rendered newsletter page
+ * @param {string} baseUrl - Site base URL, used to make relative links/images absolute
+ * @returns {Promise<{htmlContent: string, textContent: string}|null>} - Extracted content, or null if not found
+ */
+async function fetchNewsletterHtmlFromPage(pageUrl, baseUrl) {
+  try {
+    const response = await axios.get(pageUrl, {
+      timeout: 10000,
+      httpsAgent: process.env.NEON_EXT_LOCATION === 'Local'
+        ? new https.Agent({ rejectUnauthorized: false })
+        : undefined
+    });
+
+    const $ = cheerio.load(response.data);
+    const $table = $('#neon-newsletter-table');
+
+    if ($table.length === 0) {
+      console.warn(`fetchNewsletterHtmlFromPage: no #neon-newsletter-table found at ${pageUrl}`);
+      return null;
+    }
+
+    $table.find('img[src], a[href]').each((_, el) => {
+      const $el = $(el);
+      const attr = $el.is('img') ? 'src' : 'href';
+      const value = $el.attr(attr);
+      if (value && value.startsWith('/') && !value.startsWith('//')) {
+        $el.attr(attr, baseUrl + value);
+      }
+    });
+
+    const htmlContent = `<!DOCTYPE html><html><body>${$.html($table)}</body></html>`;
+    const textContent = $table.text().replace(/\s+/g, ' ').trim();
+
+    return { htmlContent, textContent };
+  } catch (error) {
+    console.error(`fetchNewsletterHtmlFromPage: failed to fetch ${pageUrl}:`, error.message);
+    return null;
+  }
+}
+
+async function sendNewsletter(neonModel, options = {}) {
   const contentData = neonModel.contentData || {};
   const model = neonModel.model || neonModel;
   const newsletterTitle = contentData.data.title || model.data?.title || "Latest News Updates";
@@ -67,7 +111,45 @@ async function sendNewsletter(neonModel) {
     // Final fallback to a default public URL
     baseUrl = 'https://theglobe-demo.neon.eks-dev.dev.eidosmedia.io';
   }
-  
+
+  const mode = options.mode === 'webpage' ? 'webpage' : 'generated';
+
+  if (mode === 'webpage') {
+    const pageUrl = contentData.data?.url || model.data?.url;
+
+    if (!pageUrl) {
+      console.warn('sendNewsletter: mode=webpage but no page url found on the model, falling back to generated mode');
+    } else {
+      const fetched = await fetchNewsletterHtmlFromPage(baseUrl + pageUrl, baseUrl);
+
+      if (fetched) {
+        const emailData = {
+          "Messages": [
+            {
+              "From": {
+                "Email": "aureliano.ventrella@eidosmedia.com",
+                "Name": "TheGlobe Newsletter"
+              },
+              "To": [
+                {
+                  "Email": "aureliano.ventrella@gmail.com",
+                  "Name": "Newsletter Subscriber"
+                }
+              ],
+              "Subject": `${newsletterTitle} - Latest Updates`,
+              "TextPart": fetched.textContent,
+              "HTMLPart": fetched.htmlContent
+            }
+          ]
+        };
+
+        return await sendSingleEmail(emailData);
+      }
+
+      console.warn(`sendNewsletter: could not fetch newsletter table from ${baseUrl + pageUrl}, falling back to generated mode`);
+    }
+  }
+
   // Extract linked articles from the model
   const articleIds = contentData.data?.links?.pagelink?.main || model.data?.links?.pagelink?.main || [];
   const articles = [];

@@ -6,7 +6,7 @@
   "assignTo": "62038d84-f161-3579-a5f1-7aba053f999a",
   "items": [
     {
-      "type": "story",
+      "contentType": "story",
       "title": "ESA Greenlights Ramses Mission to Asteroid Apophis Ahead of 2029 Flyby",
       "summary": "The European Space Agency has approved full development of the Ramses spacecraft, which will rendezvous with asteroid Apophis before its historic close approach to Earth in April 2029.",
       "byline": "Elena Marchetti",
@@ -17,7 +17,7 @@
       }
     },
     {
-      "type": "story",
+      "contentType": "story",
       "title": "Ariane 6 Upper Stage Upgrade Promises Double Payload to Lunar Orbit",
       "summary": "ArianeGroup unveils the Astris kick stage for Ariane 6, targeting direct injections to lunar orbit and a European answer to the growing cislunar logistics market.",
       "byline": "Tomas Lindqvist",
@@ -28,7 +28,7 @@
       }
     },
     {
-      "type": "story",
+      "contentType": "story",
       "title": "JUICE Probe Confirms Subsurface Ocean Signature During Second Ganymede Pass",
       "summary": "Data from ESA's JUICE spacecraft strengthens the case for a salty ocean beneath Ganymede's icy crust, with magnetometer readings matching decade-old predictions to within a few percent.",
       "byline": "Priya Raghavan",

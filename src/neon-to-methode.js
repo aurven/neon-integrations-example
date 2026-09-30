@@ -1,13 +1,10 @@
-const unorm = require('unorm');
-const { remove } = require('remove-accents');
 const { jsonToXml } = require('./helpers/json-to-xml.js');
 //const {XMLParser, XMLBuilder, XMLValidator} = require('fast-xml-parser');
 const utils = require('./helpers/utils.js');
 const cheerio = require('cheerio');
-const edapi = require('./helpers/edapi-utils.js');
 const dayjs = require('dayjs');
 const images = require('./images-importer.js');
-const { buildPrintFieldOperators, buildUpdateField } = require('./helpers/methode-metadata-utils.js');
+const { buildPrintFieldOperators, buildUpdateField, setOp, attributePath } = require('./helpers/methode-metadata-utils.js');
 const { findElementByNodeType, extractTextFromElements } = require('./helpers/neon-content-parser.js');
 
 const USERNAME = process.env.EDAPI_USERNAME;
@@ -47,34 +44,6 @@ const processWebhookData = async (model) => {
       pubInfo: model.pubInfo,
       attributes: model.attributes,
     };
-  };
-
-  const generateNameFromModel = (model) => {
-    function normalizeToPlainText(input) {
-      // Normalize the string to NFC form (decomposes characters with diacritics)
-      let normalized = unorm.nfd(input);
-
-      // Remove diacritical marks and accents
-      normalized = remove(normalized);
-
-      // Remove non-Latin characters (anything not a-z, A-Z, and spaces)
-      normalized = normalized.replace(/[^a-zA-Z\s]/g, '');
-
-      // Replace multiple spaces with a single space
-      normalized = normalized.replace(/\s+/g, ' ');
-
-      // Replace spaces with dashes
-      normalized = normalized.replace(/\s/g, '-');
-
-      console.log(normalized);
-      return normalized;
-    }
-
-    const title = model.title;
-    const normalizedTitle = normalizeToPlainText(title);
-    const newName = `${normalizedTitle}.xml`;
-
-    return newName;
   };
 
   const generateContentFromModel = async (model) => {
@@ -124,7 +93,6 @@ const processWebhookData = async (model) => {
   };
 
   const info = generateInfoFromModel(model);
-  //const name = generateNameFromModel(model);
   const name = `neon_${info.id}.xml`;
   const { content, xmlDeclarations, $doc } = await generateContentFromModel(model);
 
@@ -209,39 +177,6 @@ function addPrintImageGroup($doc, methodeImage) {
   $doc('story').prepend(groupElement);
 }
 
-async function processNeonStory(model) {
-  try {
-    const { info, name, content } = await processWebhookData(model);
-
-    const issueDate = dayjs().add(1, 'day').format('YYYYMMDD');
-
-    await edapi.login({
-      username: USERNAME,
-      password: PASSWORD,
-    });
-    const loid = await edapi.createStory({
-      name,
-      issueDate,
-      template: TEMPLATE,
-      channel: CHANNEL,
-      workFolder: WORKFOLDER,
-      attributes: info.attributes,
-    });
-    loid && (await edapi.putContentToStory(loid, content));
-    await edapi.logout();
-    console.log('Neon item imported successfully!');
-
-    return {
-      source: info,
-      target: {
-        id: loid,
-      },
-    };
-  } catch (error) {
-    console.error(error);
-  }
-};
-
 // Check if a Méthode story is linked to a print page, and ensure it has a Tabloid
 // channel copy if so. Returns whether the story is linked to a page.
 async function ensureTabloidChannelCopy(methodeClient, storyId) {
@@ -266,14 +201,17 @@ async function ensureTabloidChannelCopy(methodeClient, storyId) {
     role => role.bundleChildChannel === 'Tabloid' || role.channel === 'Tabloid'
   );
 
-  if (hasTabloidCopy) {
-    console.log(`[${storyId}] Tabloid channel copy already exists.`);
-  } else {
-    console.log(`[${storyId}] No Tabloid channel copy found — creating one...`);
-    await methodeClient.createChannelCopy(storyId, 'Tabloid', 'none');
-  }
+  return true; // Return true to indicate the story is linked to a page, regardless of Tabloid copy existence
 
-  return true;
+  // If you want to create a Tabloid channel copy if it doesn't exist, uncomment the following lines:
+  // if (hasTabloidCopy) {
+  //   console.log(`[${storyId}] Tabloid channel copy already exists.`);
+  // } else {
+  //   console.log(`[${storyId}] No Tabloid channel copy found — creating one...`);
+  //   await methodeClient.createChannelCopy(storyId, 'Tabloid', 'none');
+  // }
+
+  // return true;
 }
 
 // Resolve the Méthode story to write to: reuse the one from a prior methodeHook
@@ -296,7 +234,7 @@ async function resolveMethodeStory(methodeClient, { info, name, issueDate, workF
     if (existingStory) {
       console.log(`[${existingStoryId}] Story exists — will update.`);
       const isLinkedToPage = await ensureTabloidChannelCopy(methodeClient, existingStoryId);
-      return { loid: existingStoryId, isLinkedToPage };
+      return { loid: existingStoryId, isLinkedToPage, isNewStory: false };
     }
 
     console.log(`[${existingStoryId}] Story not found in Méthode — creating a new story.`);
@@ -312,7 +250,7 @@ async function resolveMethodeStory(methodeClient, { info, name, issueDate, workF
   });
   console.log(`[${loid}] New story created in Méthode.`);
 
-  return { loid, isLinkedToPage: false };
+  return { loid, isLinkedToPage: false, isNewStory: true };
 }
 
 async function processNeonStoryV2 (model) {
@@ -324,6 +262,10 @@ async function processNeonStoryV2 (model) {
 
     const { workFolder, issueDate, printDiffusion } = resolvePrintFields(info.attributes);
 
+    console.log(`[${info.id}] Resolved print fields:`)
+    console.log(`    workFolder     -> "${workFolder}"`)
+    console.log(`    issueDate      -> "${issueDate}"`)
+    console.log(`    printDiffusion -> "${printDiffusion}"`);
     if (printDiffusion === 'No') {
       console.log(`[${info.id}] printDiffusion="No" — skipping Méthode export.`);
       return { source: info, skipped: true, reason: 'printDiffusion=No' };
@@ -331,7 +273,7 @@ async function processNeonStoryV2 (model) {
 
     await methodeClient.login({ username: USERNAME, password: PASSWORD });
 
-    const { loid, isLinkedToPage } = await resolveMethodeStory(methodeClient, { info, name, issueDate, workFolder });
+    const { loid, isLinkedToPage, isNewStory } = await resolveMethodeStory(methodeClient, { info, name, issueDate, workFolder });
 
     const imageReferences = await images.modelImagesToMethode(
       methodeClient,
@@ -354,6 +296,11 @@ async function processNeonStoryV2 (model) {
     console.log(`[${loid}] Content updated.`);
 
     const printFieldOperators = buildPrintFieldOperators(info.attributes);
+
+    if (isNewStory) {
+      printFieldOperators.push(setOp(attributePath('/metadata/AutoLayout/StoryType'), 'Standard_Variants'));
+    }
+
     const printFieldsBody = { sourceIds: [ loid ], operators: printFieldOperators };
     const updateFields = buildUpdateField(printFieldsBody);
 
@@ -388,28 +335,6 @@ async function processNeonStoryV2 (model) {
   }
 };
 
-async function processNeonImages(model) {
-  try {
-    const { info, name, content } = await processWebhookData(model);
-
-    const issueDate = dayjs().add(1, 'day').format('YYYYMMDD');
-
-    await edapi.login({
-      username: USERNAME,
-      password: PASSWORD,
-    });
-    const imageReferences = await images.modelImagesToMethode(model, { channel: CHANNEL, workFolder: WORKFOLDER, issueDate })
-    await edapi.logout();
-    console.log('Neon item imported successfully!');
-
-    return {
-      imageReferences
-    };
-  } catch (error) {
-    console.error(error);
-  }
-};
-
 /**
  * Simplifies the imageReferences structure to contain only loid and uuid
  * @param {Object} imageReferences - The complex imageReferences object
@@ -435,7 +360,5 @@ function simplifyImageReferences(imageReferences) {
 }
 
 module.exports = {
-  processNeonStory,
   processNeonStoryV2,
-  processNeonImages
 };

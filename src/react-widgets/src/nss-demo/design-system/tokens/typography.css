@@ -1,0 +1,36 @@
+/* Neon Design System — typography tokens
+   Primary UI face: Source Sans 3 (a.k.a. Source Sans Pro in the source file).
+   Base UI size is 14px / line-height 1.4. Small controls step to 12px.
+   Inter is used for dense labels and numeric/monospace-ish contexts.
+   Quicksand is reserved for the Neon wordmark. */
+:root {
+  /* Font families */
+  --font-sans: "Source Sans 3", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-ui: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Quicksand", "Source Sans 3", sans-serif;
+
+  /* Line height — the source uses 1.4 almost everywhere */
+  --line-tight: 1.2; /* @kind other */
+  --line-base: 1.4; /* @kind other */
+
+  /* Weights */
+  --weight-regular: 400;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --weight-black: 900;
+
+  /* Type scale (px, from the source's real sizes) */
+  --text-2xs: 10px;   /* dense Inter labels */
+  --text-xs: 11px;
+  --text-sm: 12px;    /* small controls, captions */
+  --text-md: 14px;    /* base UI text, buttons, inputs */
+  --text-lg: 16px;
+  --text-xl: 18px;    /* section titles */
+  --text-2xl: 24px;   /* headings */
+  --text-3xl: 30px;
+  --text-display: 80px;
+
+  /* Letter spacing — buttons carry a slight positive tracking */
+  --tracking-normal: 0;
+  --tracking-wide: 0.01em;
+}

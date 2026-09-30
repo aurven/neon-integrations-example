@@ -5,6 +5,7 @@ const storiesPopulator = require("../stories-populator.js");
 const { safeLogRequest } = require("../helpers/utils.js");
 const { authenticate } = require("../helpers/auth.js");
 const neonBoApi = require("../helpers/neon-bo-api-v3.js");
+const neonUtils = require("../helpers/neon-utils.js");
 const neonConfigConnector = require("../connectors/neon-config-connector.js");
 
 // Normalize "yyyymmdd" or "yyyy-mm-dd" into "yyyy-mm-dd" (used by issueDate field).
@@ -39,6 +40,18 @@ function derivePrintFields(node) {
   return { printPriority, issueDate };
 }
 
+// Load a create-widget config JSON by name (sanitized), falling back to 'default'.
+function loadCreateConfig(name) {
+  const fs = require('fs');
+  const path = require('path');
+  const safe = /^[a-zA-Z0-9_-]+$/.test(name || '') ? name : 'default';
+  const tryFile = (n) => {
+    try { return JSON.parse(fs.readFileSync(path.join(__dirname, '../../conf/widgets/neon-create', `${n}.json`), 'utf8')); }
+    catch { return null; }
+  };
+  return tryFile(safe) || tryFile('default') || { buttons: [] };
+}
+
 // Load a grid config JSON by name (sanitized), falling back to 'default'.
 function loadGridConfig(name) {
   const fs = require('fs');
@@ -51,9 +64,43 @@ function loadGridConfig(name) {
   return tryFile(safe) || tryFile('default') || { fields: [], columns: [] };
 }
 
+// Load a query config JSON (queryStatement + variables + options) by name (sanitized),
+// for the given widget dir (e.g. 'neon-grid', 'print-query-board'), falling back to 'default'.
+function loadQueryConfig(widgetDir, name) {
+  const fs = require('fs');
+  const path = require('path');
+  const safe = /^[a-zA-Z0-9_-]+$/.test(name || '') ? name : 'default';
+  const tryFile = (n) => {
+    try { return JSON.parse(fs.readFileSync(path.join(__dirname, '../../conf/widgets', widgetDir, 'queries', `${n}.json`), 'utf8')); }
+    catch { return null; }
+  };
+  return tryFile(safe) || tryFile('default') || { queryStatement: { bool: { and: [], or: [] } }, variables: {}, options: {} };
+}
+
 // Resolve a dotted path (e.g. "nodeMeta.printSection") against an object.
 function getByPath(obj, pathStr) {
   return pathStr.split('.').reduce((o, k) => (o == null ? o : o[k]), obj);
+}
+
+// Demo-mode reveal simulation: tracks how much of a static fixture has been
+// "revealed" so far per cache key, so repeated polling requests against the
+// same demo data show a growing slice instead of the exact same payload every
+// time. Module-scope in-memory state, same convention as `typeLabels` in
+// src/connectors/neon-config-connector.js (no session/db involved).
+const demoRevealState = new Map(); // key -> { revealCount }
+
+function getDemoRevealSlice(key, totalLength, { initialSize = 20, stepSize = 3 } = {}) {
+  const initial = Math.min(initialSize, totalLength);
+  const state = demoRevealState.get(key);
+  if (!state) {
+    demoRevealState.set(key, { revealCount: initial });
+    return initial;
+  }
+  state.revealCount += stepSize;
+  if (state.revealCount > totalLength) {
+    state.revealCount = initial;
+  }
+  return state.revealCount;
 }
 
 function testWidgetHandler(request, reply) {
@@ -354,6 +401,24 @@ function welcomeWidgetHandler(request, reply) {
   return reply.view("/src/widgets/welcome-widget.hbs", params);
 }
 
+function nssDemoWidgetHandler(request, reply) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) {
+    return reply.status(401).send({ error: "Unauthorized" });
+  }
+
+  let params = {
+    seo: {
+      title: "NSS Demo — Neon Syndication Service",
+      description: "Walkable demo of the Neon Syndication Service (Adnkronos) — Prodotti, Pacchetti, Clienti with fake data"
+    },
+    neonAppUrl: process.env.NEON_APP_URL,
+    apiKey: auth.apikey,
+    demo: true
+  };
+  return reply.view("/src/widgets/nss-demo.hbs", params);
+}
+
 function planningBoardWidgetHandler(request, reply) {
   const auth = authenticate(request, reply);
   if (!auth.authenticated) {
@@ -370,7 +435,7 @@ function planningBoardWidgetHandler(request, reply) {
   return reply.view("/src/widgets/planning-board.hbs", params);
 }
 
-function neonGridWidgetHandler(request, reply) {
+async function neonGridWidgetHandler(request, reply) {
   const auth = authenticate(request, reply);
   if (!auth.authenticated) {
     return reply.status(401).send({ error: "Unauthorized" });
@@ -378,6 +443,18 @@ function neonGridWidgetHandler(request, reply) {
 
   const configName = /^[a-zA-Z0-9_-]+$/.test(request.query.config || '') ? request.query.config : 'default';
   const gridConfig = loadGridConfig(configName);
+  const configDefaultQuery = /^[a-zA-Z0-9_-]+$/.test(gridConfig.query || '') ? gridConfig.query : 'default';
+  const queryName = /^[a-zA-Z0-9_-]+$/.test(request.query.query || '') ? request.query.query : configDefaultQuery;
+
+  // Optional fast-QA override: ?pollMs=4000 lets a manual tester shorten the
+  // poll interval without editing the config JSON. Works in demo and live mode.
+  const pollMsOverride = parseInt(request.query.pollMs, 10);
+  if (Number.isInteger(pollMsOverride) && pollMsOverride > 0) {
+    gridConfig.pollIntervalMs = pollMsOverride;
+  }
+
+  // Embed cached workfolders so the client never needs to fetch them live
+  gridConfig.workfolders = await neonConfigConnector.loadWorkfoldersConfig();
 
   let params = {
     seo: {
@@ -388,7 +465,8 @@ function neonGridWidgetHandler(request, reply) {
     apiKey: auth.apikey,
     demo: request.query.demo === 'true',
     gridConfig: JSON.stringify(gridConfig),
-    gridConfigName: configName
+    gridConfigName: configName,
+    queryConfigName: queryName
   };
   return reply.view("/src/widgets/neon-grid.hbs", params);
 }
@@ -402,6 +480,8 @@ async function neonGridDataHandler(request, reply) {
   const demoMode = request.query.demo === 'true';
   const configName = /^[a-zA-Z0-9_-]+$/.test(request.query.config || '') ? request.query.config : 'default';
   const gridConfig = loadGridConfig(configName);
+  const configDefaultQuery = /^[a-zA-Z0-9_-]+$/.test(gridConfig.query || '') ? gridConfig.query : 'default';
+  const queryName = /^[a-zA-Z0-9_-]+$/.test(request.query.query || '') ? request.query.query : configDefaultQuery;
 
   await neonConfigConnector.loadContentTypesConfig();
 
@@ -414,7 +494,7 @@ async function neonGridDataHandler(request, reply) {
       status: node.versionInfo?.workflowInfo?.workflow || 'Unknown',
       statusColor: node.versionInfo?.workflowInfo?.color || null,
     };
-    const row = { id: node.familyRef };
+    const row = { id: node.familyRef, typeName: node.typeName ?? null };
     for (const f of gridConfig.fields) {
       row[f.key] = f.derived ? (derivedMap[f.derived] ?? null) : (getByPath(node, f.source) ?? null);
     }
@@ -426,175 +506,72 @@ async function neonGridDataHandler(request, reply) {
       const fs = require('fs');
       const path = require('path');
       const demoData = JSON.parse(fs.readFileSync(path.join(__dirname, '../../examples', gridConfig.demoData || 'search-results.json'), 'utf8'));
-      return reply.status(200).send({ articles: mapNodes(demoData.nodes || []) });
+      const nodes = demoData.nodes || [];
+      const revealKey = `grid:${configName}:${queryName}`;
+      const revealCount = getDemoRevealSlice(revealKey, nodes.length);
+      return reply.status(200).send({ articles: mapNodes(nodes.slice(0, revealCount)) });
     } catch (error) {
       console.error('neonGridDataHandler demo error:', error);
       return reply.status(500).send({ error: 'Failed to load demo data' });
     }
   }
 
+  const queryConfig = loadQueryConfig('neon-grid', queryName);
+
   const queryPayload = {
-    queryStatement: {
-      "bool": {
-        "and": [
-          {
-            "type": "match",
-            "path": "typeName",
-            "match": "${type}*"
-          },
-          {
-            "type": "in",
-            "path": "baseType",
-            "terms": [
-              "${availableTypes}"
-            ]
-          },
-          {
-            "type": "stringBetween",
-            "path": "updateTs",
-            "low": "${dateLow}",
-            "high": "${dateHigh}"
-          },
-          {
-            "type": "in",
-            "path": "workspaceLinkInfo.workspaceFolderPath",
-            "terms": [
-              "${workfolder}"
-            ]
-          },
-          {
-            "type": "match",
-            "path": "versionInfo.workflowInfo.workflow",
-            "match": "${workflow}"
-          },
-          {
-            "type": "match",
-            "path": "lockInfos",
-            "match": "${Lock}"
-          },
-          {
-            "type": "match",
-            "path": "versionInfo.workflowInfo.assigmentInfo.priority",
-            "match": "${priority}"
-          },
-          {
-            "type": "match",
-            "path": "versionInfo.workflowInfo.assigmentInfo.assignees.alias",
-            "match": "${assignees}"
-          },
-          {
-            "type": "match",
-            "path": "versionInfo.workflowInfo.assigmentInfo.assigner.alias",
-            "match": "${assigner}"
-          },
-          {
-            "type": "match",
-            "path": "versionInfo.workflowInfo.assigmentInfo.dueDate",
-            "match": "${dueDate}"
-          },
-          {
-            "type": "match",
-            "path": "versionInfo.workflowInfo.assigmentInfo.assignmentDate",
-            "match": "${assignmentDate}"
-          },
-          {
-            "type": "match",
-            "path": "versionInfo.updateVersionUserRef.alias",
-            "match": "${last Modifier}"
-          },
-          {
-            "type": "match",
-            "path": "versionInfo.createFamilyUserRef.alias",
-            "match": "${createdBy}"
-          },
-          {
-            "type": "match",
-            "path": "nodeMeta.credit",
-            "match": "${image credit}"
-          },
-          {
-            "type": "match",
-            "path": "nodeMeta.source",
-            "match": "${image source}"
-          },
-          {
-            "type": "match",
-            "path": "metadataGroups.eom.sys_attributes.props.productInfo.edition",
-            "match": "${edition}"
-          },
-          {
-            "type": "match",
-            "path": "nodeMeta.printSection",
-            "match": "${print section}"
-          },
-          {
-            "type": "match",
-            "path": "nodeMeta.printPriority",
-            "match": "${print priority}"
-          },
-          {
-            "type": "match",
-            "path": "nodeMeta.printIssueDate",
-            "match": "${print issue date}"
-          },
-          {
-            "type": "contain",
-            "path": "allText",
-            "term": "*${searchTerm}*"
-          },
-          {
-            "type": "nested",
-            "path": "publishInfos",
-            "bool": {
-              "and": [
-                {
-                  "type": "exists",
-                  "path": "overwrittenLiveFirstPublicationDate"
-                }
-              ]
-            }
-          }
-        ],
-        "or": []
-      },
-      "sort": {
-        "type": "fields",
-        "sorts": [
-          {
-            "path": "versionInfo.createFamilyTime",
-            "order": "DESC"
-          }
-        ]
-      },
-      "properties": { "trackTotalHitsCount": 10000 },
-      "sort": {
-        "type": "fields",
-        "sorts": [ { "path": "versionInfo.createFamilyTime", "order": "DESC" } ]
-      }
-    },
-    "variables": {
-      "domain": ["editorial"],
-      "searchTerm": [""],
-      "type": ["article"],
-      "workflow": ["story/ready"]
-    },
-    "options": {
-      "showLoadPublishInfo": true,
-      "showSystemAttributes": true
-    }
+    queryStatement: queryConfig.queryStatement,
+    variables: { ...queryConfig.variables },
+    options: queryConfig.options || { showLoadPublishInfo: true, showSystemAttributes: true }
   };
 
   if (gridConfig.queryOverrides?.variables) {
     Object.assign(queryPayload.variables, gridConfig.queryOverrides.variables);
   }
 
+  // Query variable overrides from client switcher
+  const qvRaw = request.query.qv;
+  if (qvRaw) {
+    try {
+      const qv = JSON.parse(qvRaw);
+      if (qv && typeof qv === 'object' && !Array.isArray(qv)) {
+        Object.assign(queryPayload.variables, qv);
+      }
+    } catch {
+      // malformed qv — ignore
+    }
+  }
+
+  const rawMax = parseInt(request.query.maxResults, 10);
+  const maxResults = (Number.isFinite(rawMax) && rawMax > 0 && rawMax <= 500) ? rawMax : 500;
+
   try {
-    const searchResults = await neonBoApi.searchContents(queryPayload, 50, 50);
+    const searchResults = await neonBoApi.searchContents(queryPayload, maxResults, maxResults);
     const articles = mapNodes(searchResults.nodes || []);
     return reply.status(200).send({ articles });
   } catch (error) {
     console.error('neonGridDataHandler error:', error);
     return reply.status(500).send({ error: 'Failed to fetch articles from Neon' });
+  }
+}
+
+async function neonGridDuplicateHandler(request, reply) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) return reply.status(401).send({ error: 'Unauthorized' });
+
+  const { familyRef, workFolder, name, type } = request.body || {};
+  if (!familyRef || !workFolder) return reply.status(400).send({ error: 'familyRef and workFolder are required' });
+
+  const issueDate = new Date().toISOString().split('T')[0];
+  const workspaceSuffix = workFolder.split('/').filter(Boolean).pop() ?? '';
+  const duplicateName = workspaceSuffix ? `${name} ${workspaceSuffix}` : name;
+
+  try {
+    const result = await neonBoApi.duplicateNode(familyRef, { name: duplicateName, workFolder, type, issueDate });
+    return reply.status(200).send(result);
+  } catch (error) {
+    console.error('neonGridDuplicateHandler error:', error);
+    const status = error.response?.status || 500;
+    return reply.status(status).send({ error: `Duplicate failed: ${error.message}` });
   }
 }
 
@@ -611,12 +588,22 @@ function printQueryBoardHandler(request, reply) {
     console.error('printQueryBoardHandler config error:', error);
   }
 
+  const queryName = /^[a-zA-Z0-9_-]+$/.test(request.query.query || '') ? request.query.query : 'default';
+
+  // Optional fast-QA override: ?pollMs=4000 lets a manual tester shorten the
+  // poll interval without editing the config JSON. Works in demo and live mode.
+  const pollMsOverride = parseInt(request.query.pollMs, 10);
+  if (Number.isInteger(pollMsOverride) && pollMsOverride > 0) {
+    printConfig.pollIntervalMs = pollMsOverride;
+  }
+
   return reply.view('/src/widgets/print-query-board.hbs', {
     seo: { title: 'Print Query Board', description: 'Kanban board for planning print edition stories by section, priority, desk, or access' },
     neonAppUrl: process.env.NEON_APP_URL,
     apiKey: auth.apikey,
     demo: request.query.demo === 'true',
-    printConfig: JSON.stringify(printConfig)
+    printConfig: JSON.stringify(printConfig),
+    queryConfigName: queryName
   });
 }
 
@@ -627,6 +614,7 @@ async function printQueryBoardDataHandler(request, reply) {
   }
 
   const demoMode = request.query.demo === 'true';
+  const queryName = /^[a-zA-Z0-9_-]+$/.test(request.query.query || '') ? request.query.query : 'default';
 
   await neonConfigConnector.loadContentTypesConfig();
 
@@ -661,66 +649,22 @@ async function printQueryBoardDataHandler(request, reply) {
       const fs = require('fs');
       const path = require('path');
       const demoData = JSON.parse(fs.readFileSync(path.join(__dirname, '../../examples/search-results.json'), 'utf8'));
-      return reply.status(200).send({ stories: mapStories(demoData.nodes || []) });
+      const nodes = demoData.nodes || [];
+      const revealKey = `board:${queryName}`;
+      const revealCount = getDemoRevealSlice(revealKey, nodes.length);
+      return reply.status(200).send({ stories: mapStories(nodes.slice(0, revealCount)) });
     } catch (error) {
       console.error('printQueryBoardDataHandler demo error:', error);
       return reply.status(500).send({ error: 'Failed to load demo data' });
     }
   }
 
+  const queryConfig = loadQueryConfig('print-query-board', queryName);
+
   const queryPayload = {
-    queryStatement: {
-      "bool": {
-        "and": [
-          {
-            "type": "match",
-            "path": "typeName",
-            "match": "${type}*"
-          },
-          {
-            "type": "match",
-            "path": "versionInfo.workflowInfo.workflow",
-            "match": "${workflow}"
-          },
-          {
-            "type": "match",
-            "path": "nodeMeta.printSection",
-            "match": "${print section}"
-          },
-          {
-            "type": "match",
-            "path": "nodeMeta.printPriority",
-            "match": "${print priority}"
-          },
-          {
-            "type": "match",
-            "path": "nodeMeta.printIssueDate",
-            "match": "${print issue date}"
-          },
-          {
-            "type": "contain",
-            "path": "allText",
-            "term": "*${searchTerm}*"
-          }
-        ],
-        "or": []
-      },
-      "sort": {
-        "type": "fields",
-        "sorts": [ { "path": "versionInfo.createFamilyTime", "order": "DESC" } ]
-      },
-      "properties": { "trackTotalHitsCount": 10000 }
-    },
-    "variables": {
-      "domain": ["editorial"],
-      "searchTerm": [""],
-      "type": ["article"],
-      "workflow": ["story/ready"]
-    },
-    "options": {
-      "showLoadPublishInfo": true,
-      "showSystemAttributes": true
-    }
+    queryStatement: queryConfig.queryStatement,
+    variables: { ...queryConfig.variables },
+    options: queryConfig.options || { showLoadPublishInfo: true, showSystemAttributes: true }
   };
 
   try {
@@ -730,6 +674,134 @@ async function printQueryBoardDataHandler(request, reply) {
   } catch (error) {
     console.error('printQueryBoardDataHandler error:', error);
     return reply.status(500).send({ error: 'Failed to fetch stories from Neon' });
+  }
+}
+
+async function neonCreateWidgetHandler(request, reply) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) {
+    return reply.status(401).send({ error: 'Unauthorized' });
+  }
+
+  const configName = /^[a-zA-Z0-9_-]+$/.test(request.query.config || '') ? request.query.config : 'default';
+  const createConfig = loadCreateConfig(configName);
+
+  return reply.view('/src/widgets/neon-create.hbs', {
+    seo: { title: 'Create Content', description: 'Quick content creation widget' },
+    neonAppUrl: process.env.NEON_APP_URL,
+    apiKey: auth.apikey,
+    createConfig: JSON.stringify(createConfig),
+  });
+}
+
+async function neonCreateHandler(request, reply) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) {
+    return reply.status(401).send({ error: 'Unauthorized' });
+  }
+
+  const { createOptions } = request.body || {};
+  if (!createOptions || !createOptions.type) {
+    return reply.status(400).send({ error: 'createOptions.type is required' });
+  }
+
+  try {
+    const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    const typeSlug = (createOptions.type || 'article').replace(/\//g, '_');
+    const merged = {
+      creationMode: 'AUTO_RENAME',
+      timeSuffix: false,
+      storageFolder: 'SELECTED_WORKFOLDER',
+      issueDate: today,
+      name: `${typeSlug}_${Date.now()}.xml`,
+      ...createOptions,
+    };
+    const node = await neonBoApi.createNewStory(merged);
+    console.log('neonCreateHandler << created:', node.familyRef);
+    return reply.status(200).send({ familyRef: node.familyRef });
+  } catch (err) {
+    console.error('neonCreateHandler << error:', err.message);
+    return reply.status(500).send({ error: err.message });
+  }
+}
+
+async function neonNodeUnlockHandler(request, reply) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) return reply.status(401).send({ error: 'Unauthorized' });
+  const { familyRef, unlockMode, updateContextId } = request.body || {};
+  if (!familyRef) return reply.status(400).send({ error: 'familyRef is required' });
+  try {
+    await neonBoApi.unlockNode(familyRef, unlockMode || 'MAJOR', true, updateContextId || null);
+    return reply.status(200).send({ success: true });
+  } catch (err) {
+    console.error('[neonNodeUnlockHandler] Unlock failed:', err.message);
+    return reply.status(500).send({ error: 'Failed to unlock node' });
+  }
+}
+
+async function flashRapidoWidgetHandler(request, reply) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) return reply.status(401).send({ error: 'Unauthorized' });
+  return reply.view('/src/widgets/flash-rapido.hbs', {
+    seo: { title: 'Flash Rapido', description: 'Crea e pubblica flash ADNKronos' },
+    neonAppUrl: process.env.NEON_APP_URL,
+  });
+}
+
+async function flashRapidoPublishHandler(request, reply) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) return reply.status(401).send({ error: 'Unauthorized' });
+
+  const { headline } = request.body ?? {};
+  if (!headline?.trim()) {
+    return reply.status(400).send({ message: 'Headline obbligatorio.' });
+  }
+
+  try {
+    const safeHeadline = headline.trim()
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+
+    const xmlBody = `<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE doc SYSTEM "/common/rules/EidosMedia.dtd">
+<?EM-dtdExt /common/rules/EidosMedia.dtx?>
+<?EM-templateName /templates/flash.xml?>
+<?xml-stylesheet type="text/css" href="/common/styles/css/main.css"?>
+<doc xml:lang="it"><story><grouphead><headline><p>${safeHeadline}</p></headline></grouphead></story></doc>`.trim();
+
+    const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    const node = await neonBoApi.createNewStory({
+      type: 'article/flash',
+      name: `flash_${Date.now()}.xml`,
+      template: 'flash.xml',
+      issueDate: today,
+      workFolder: '/Wire/Cronaca',
+      creationMode: 'AUTO_RENAME',
+      timeSuffix: false,
+      storageFolder: 'SELECTED_WORKFOLDER',
+    });
+    const { familyRef } = node;
+
+    await neonBoApi.updateNodeContent(familyRef, xmlBody);
+    await neonBoApi.unlockNode(familyRef);
+
+    const steps = ['Privato', 'In Stesura', 'Da Approvare', 'Approvato', 'In Pubblicazione', 'Pubblicato'];
+    for (const step of steps) {
+      await neonUtils.workflowTransitionTo({
+        familyRef,
+        targetWorkflowName: 'Content',
+        targetStateName: step,
+      });
+    }
+
+    await neonBoApi.promoteNode(familyRef, { targetSite: 'Wire', targetSection: '/cronaca' });
+    await neonBoApi.promoteNode(familyRef, { targetSite: 'Wire', targetSection: '/cronaca', mode: 'LIVE' });
+
+    return reply.send({ message: 'Flash pubblicato.', familyRef });
+  } catch (err) {
+    safeLogRequest(request, err);
+    return reply.status(500).send({ message: 'Errore durante la pubblicazione.', error: err.message });
   }
 }
 
@@ -743,9 +815,16 @@ module.exports = {
   smartOctoDashboardHandler,
   neonAnalyticsDashboardHandler,
   welcomeWidgetHandler,
+  nssDemoWidgetHandler,
   planningBoardWidgetHandler,
   neonGridWidgetHandler,
   neonGridDataHandler,
+  neonGridDuplicateHandler,
   printQueryBoardHandler,
   printQueryBoardDataHandler,
+  neonCreateWidgetHandler,
+  neonCreateHandler,
+  neonNodeUnlockHandler,
+  flashRapidoWidgetHandler,
+  flashRapidoPublishHandler,
 };

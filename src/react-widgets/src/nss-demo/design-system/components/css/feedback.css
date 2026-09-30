@@ -1,0 +1,88 @@
+/* ============================================================
+   Neon — Feedback
+   ============================================================ */
+
+/* ---------- Badge (dot / count) ---------- */
+.neon-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 16px; height: 16px; padding: 0 4px; border-radius: 999px;
+  background: var(--color-background-product-primary); color: var(--color-text-neutral-white);
+  font-family: var(--font-ui); font-size: var(--text-2xs); font-weight: var(--weight-semibold); line-height: 1;
+}
+.neon-badge--dot { min-width: 8px; width: 8px; height: 8px; padding: 0; }
+.neon-badge--red { background: var(--color-background-feedback-red); }
+.neon-badge--green { background: var(--color-background-feedback-green); }
+.neon-badge--yellow { background: var(--color-background-feedback-yellow); color: var(--color-text-feedback-yellow-dark); }
+.neon-badge--grey { background: var(--color-background-neutral-quaternary); }
+
+/* status dot with label (WF status style) */
+.neon-status { display: inline-flex; align-items: center; gap: 6px; font-size: var(--text-md); color: var(--color-text-neutral-primary); }
+.neon-status__dot { width: 8px; height: 8px; border-radius: 999px; background: var(--color-background-feedback-green); flex-shrink: 0; }
+
+/* ---------- Snackbar ---------- */
+.neon-snackbar {
+  display: inline-flex; align-items: center; gap: 10px;
+  min-height: 32px; padding: 8px 15px; border-radius: var(--radius-xs);
+  background: var(--snackbar-background-default); color: var(--snackbar-text-default);
+  box-shadow: var(--shadow-1); font-size: var(--text-md);
+  min-width: 180px; max-width: 530px;
+}
+.neon-snackbar__icon { display: inline-flex; color: var(--snackbar-color-icon-default); flex-shrink: 0; }
+.neon-snackbar__msg { flex: 1 1 auto; }
+.neon-snackbar__action { color: var(--color-text-neutral-white); font-weight: var(--weight-semibold); background: none; border: 0; cursor: pointer; padding: 0; font-size: var(--text-md); }
+.neon-snackbar__close { display: inline-flex; color: var(--snackbar-color-icon-close); background: none; border: 0; cursor: pointer; padding: 0; opacity: .8; }
+.neon-snackbar__close:hover { opacity: 1; }
+.neon-snackbar--success { background: var(--snackbar-background-success); }
+.neon-snackbar--error { background: var(--snackbar-background-error); }
+.neon-snackbar--warning { background: var(--snackbar-background-warning); color: var(--color-text-feedback-yellow-dark); }
+.neon-snackbar--warning .neon-snackbar__icon, .neon-snackbar--warning .neon-snackbar__close { color: var(--color-icon-feedback-warningdark); }
+
+/* ---------- Spinner ---------- */
+.neon-spinner { display: inline-block; color: var(--color-icon-product-primary); animation: neon-spin 0.8s linear infinite; }
+.neon-spinner__track { stroke: var(--spinner-stroke-remaining); }
+.neon-spinner__head { stroke: currentColor; }
+@keyframes neon-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .neon-spinner { animation-duration: 2s; } }
+
+/* ---------- Progress bar ---------- */
+.neon-progress { width: 100%; height: 6px; border-radius: 999px; background: var(--color-background-neutral-light); overflow: hidden; }
+.neon-progress--sm { height: 4px; }
+.neon-progress__fill { height: 100%; border-radius: 999px; background: var(--color-background-product-primary); transition: width var(--dur-base) var(--ease-standard); }
+.neon-progress--indeterminate .neon-progress__fill { width: 40% !important; animation: neon-progress-slide 1.2s var(--ease-standard) infinite; }
+@keyframes neon-progress-slide { 0% { margin-left: -40%; } 100% { margin-left: 100%; } }
+
+/* ---------- Tooltip ---------- */
+.neon-tooltip-wrap { position: relative; display: inline-flex; }
+.neon-tooltip {
+  position: absolute; z-index: 60; left: 50%; transform: translateX(-50%);
+  bottom: calc(100% + 6px);
+  background: var(--color-background-neutral-primary); color: var(--color-text-neutral-white);
+  font-size: var(--text-sm); line-height: var(--line-base);
+  padding: 5px 10px; border-radius: var(--radius-xs);
+  white-space: nowrap; box-shadow: var(--shadow-1);
+  opacity: 0; visibility: hidden; transition: opacity var(--dur-fast) var(--ease-standard);
+  pointer-events: none;
+}
+.neon-tooltip::after { content: ""; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 4px solid transparent; border-top-color: var(--color-background-neutral-primary); }
+.neon-tooltip-wrap:hover .neon-tooltip { opacity: 1; visibility: visible; }
+.neon-tooltip--bottom { bottom: auto; top: calc(100% + 6px); }
+.neon-tooltip--bottom::after { top: auto; bottom: 100%; border-top-color: transparent; border-bottom-color: var(--color-background-neutral-primary); }
+
+/* ---------- Progress indicator / wizard ---------- */
+.neon-wizard { display: inline-flex; align-items: center; }
+.neon-wizard--vertical { flex-direction: column; align-items: flex-start; }
+.neon-wizard__step { display: inline-flex; align-items: center; gap: 8px; }
+.neon-wizard__num {
+  width: 24px; height: 24px; border-radius: 999px; flex-shrink: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: var(--text-sm); font-weight: var(--weight-semibold);
+  background: var(--color-background-neutral-lighter); color: var(--color-text-neutral-label);
+  box-shadow: inset 0 0 0 1px var(--hairline);
+}
+.neon-wizard__label { font-size: var(--text-md); color: var(--color-text-neutral-label); }
+.neon-wizard__line { width: 40px; height: 2px; background: var(--color-background-neutral-light); margin: 0 8px; }
+.neon-wizard__step--done .neon-wizard__num { background: var(--color-background-product-primary); color: var(--color-text-neutral-white); box-shadow: none; }
+.neon-wizard__step--done .neon-wizard__label { color: var(--color-text-neutral-primary); }
+.neon-wizard__step--active .neon-wizard__num { background: var(--color-background-product-primary); color: var(--wizard-text-selected-number); box-shadow: 0 0 0 3px var(--color-background-product-lightest); }
+.neon-wizard__step--active .neon-wizard__label { color: var(--color-text-product-primary); font-weight: var(--weight-semibold); }
+.neon-wizard__step--done + .neon-wizard__line { background: var(--color-background-product-primary); }

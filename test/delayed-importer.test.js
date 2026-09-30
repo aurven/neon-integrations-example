@@ -10,9 +10,9 @@ function basePayload(overrides = {}) {
     site: 'demo-site',
     workspace: 'Demo Workspace',
     items: [
-      { type: 'story', title: 'A', content: '<p>a</p>' },
-      { type: 'story', title: 'B', content: '<p>b</p>' },
-      { type: 'story', title: 'C', content: '<p>c</p>' },
+      { contentType: 'story', title: 'A', content: '<p>a</p>' },
+      { contentType: 'story', title: 'B', content: '<p>b</p>' },
+      { contentType: 'story', title: 'C', content: '<p>c</p>' },
     ],
     ...overrides,
   };
@@ -21,8 +21,8 @@ function basePayload(overrides = {}) {
 test('validatePayload accepts a valid mixed payload', () => {
   const payload = basePayload({
     items: [
-      { type: 'story', title: 'A', content: '<p>a</p>' },
-      { type: 'image', url: 'https://example.com/pic.jpg' },
+      { contentType: 'story', title: 'A', content: '<p>a</p>' },
+      { contentType: 'image', url: 'https://example.com/pic.jpg' },
     ],
   });
   assert.deepEqual(delayedImporter.validatePayload(payload), { valid: true });
@@ -53,8 +53,8 @@ test('validatePayload rejects empty or missing items', () => {
 test('validatePayload rejects invalid item type with index in message', () => {
   const payload = basePayload({
     items: [
-      { type: 'story', title: 'A', content: '<p>a</p>' },
-      { type: 'video', url: 'https://example.com/x' },
+      { contentType: 'story', title: 'A', content: '<p>a</p>' },
+      { contentType: 'video', url: 'https://example.com/x' },
     ],
   });
   const result = delayedImporter.validatePayload(payload);
@@ -67,7 +67,7 @@ test('validatePayload accepts assignTo as string or array, job-level and per-ite
   assert.deepEqual(delayedImporter.validatePayload(basePayload({ assignTo: ['62038d84-f161-3579-a5f1-7aba053f999a', 'jane.doe'] })), { valid: true });
   assert.deepEqual(
     delayedImporter.validatePayload(
-      basePayload({ items: [{ type: 'story', title: 'A', content: '<p>a</p>', assignTo: 'jane.doe' }] })
+      basePayload({ items: [{ contentType: 'story', title: 'A', content: '<p>a</p>', assignTo: 'jane.doe' }] })
     ),
     { valid: true }
   );
@@ -79,7 +79,7 @@ test('validatePayload rejects invalid assignTo', () => {
   assert.match(delayedImporter.validatePayload(basePayload({ assignTo: 123 })).error, /assignTo/);
   assert.match(
     delayedImporter.validatePayload(
-      basePayload({ items: [{ type: 'story', title: 'A', content: '<p>a</p>', assignTo: 5 }] })
+      basePayload({ items: [{ contentType: 'story', title: 'A', content: '<p>a</p>', assignTo: 5 }] })
     ).error,
     /items\[0\]: assignTo/
   );
@@ -87,15 +87,15 @@ test('validatePayload rejects invalid assignTo', () => {
 
 test('validatePayload enforces per-type required fields', () => {
   assert.match(
-    delayedImporter.validatePayload(basePayload({ items: [{ type: 'story', content: '<p>a</p>' }] })).error,
+    delayedImporter.validatePayload(basePayload({ items: [{ contentType: 'story', content: '<p>a</p>' }] })).error,
     /items\[0\].*title/
   );
   assert.match(
-    delayedImporter.validatePayload(basePayload({ items: [{ type: 'story', title: 'A' }] })).error,
+    delayedImporter.validatePayload(basePayload({ items: [{ contentType: 'story', title: 'A' }] })).error,
     /items\[0\].*content/
   );
   assert.match(
-    delayedImporter.validatePayload(basePayload({ items: [{ type: 'image' }] })).error,
+    delayedImporter.validatePayload(basePayload({ items: [{ contentType: 'image' }] })).error,
     /items\[0\].*url/
   );
 });
@@ -233,8 +233,8 @@ test('image items route to dispatchImage', async (t) => {
   };
   const payload = basePayload({
     items: [
-      { type: 'image', url: 'https://example.com/a.jpg' },
-      { type: 'story', title: 'A', content: '<p>a</p>' },
+      { contentType: 'image', url: 'https://example.com/a.jpg' },
+      { contentType: 'story', title: 'A', content: '<p>a</p>' },
     ],
   });
   delayedImporter.createJob(payload, deps);
@@ -255,7 +255,7 @@ test('dispatchStoryItem maps item fields to populator story shape', async () => 
   };
   const job = { site: 'demo-site', workspace: 'Demo Workspace', workfolder: '/Demo/Imports', publish: false };
   const item = {
-    type: 'story',
+    contentType: 'story',
     title: 'Headline',
     content: '<p>body</p>',
     summary: 'Standfirst',
@@ -275,10 +275,23 @@ test('dispatchStoryItem maps item fields to populator story shape', async () => 
   assert.deepEqual(received.story.metadata, { seoTitle: 'seo' });
   assert.equal(received.story.tgtSite, 'demo-site');
   assert.equal(received.story.tgtWorkspace, '/Demo/Imports');
-  // must NOT leak item.type: getCreationOptions would use it as the Neon node type
+  // no item.type set: getCreationOptions defaults story.type to 'article'
   assert.equal(received.story.type, undefined);
   // no figureUrl: uploadImageFromStory must no-op
   assert.equal(received.story.figureUrl, undefined);
+});
+
+test('dispatchStoryItem: item.type passed through as the Neon content type', async () => {
+  let received;
+  const fakePopulator = { newNodeFromStory: async (story) => { received = story; return 'x'; } };
+  const job = { site: 's', workspace: 'ws', workfolder: null, publish: false };
+
+  await delayedImporter.dispatchStoryItem(
+    { contentType: 'story', type: 'wirestory', title: 'T', content: 'c' },
+    job,
+    fakePopulator
+  );
+  assert.equal(received.type, 'wirestory');
 });
 
 test('dispatchStoryItem: item workfolder overrides job workfolder', async () => {
@@ -287,7 +300,7 @@ test('dispatchStoryItem: item workfolder overrides job workfolder', async () => 
   const job = { site: 's', workspace: 'ws', workfolder: '/job-wf', publish: false };
 
   await delayedImporter.dispatchStoryItem(
-    { type: 'story', title: 'T', content: 'c', workfolder: '/item-wf' },
+    { contentType: 'story', title: 'T', content: 'c', workfolder: '/item-wf' },
     job,
     fakePopulator
   );
@@ -299,7 +312,7 @@ test('dispatchStoryItem: job-level assignTo passed through to populator', async 
   const fakePopulator = { newNodeFromStory: async (story) => { received = story; return 'x'; } };
   const job = { site: 's', workspace: 'ws', workfolder: null, assignTo: '62038d84-f161-3579-a5f1-7aba053f999a', publish: false };
 
-  await delayedImporter.dispatchStoryItem({ type: 'story', title: 'T', content: 'c' }, job, fakePopulator);
+  await delayedImporter.dispatchStoryItem({ contentType: 'story', title: 'T', content: 'c' }, job, fakePopulator);
   assert.equal(received.assignTo, '62038d84-f161-3579-a5f1-7aba053f999a');
 });
 
@@ -309,7 +322,7 @@ test('dispatchStoryItem: item assignTo overrides job assignTo', async () => {
   const job = { site: 's', workspace: 'ws', workfolder: null, assignTo: '62038d84-f161-3579-a5f1-7aba053f999a', publish: false };
 
   await delayedImporter.dispatchStoryItem(
-    { type: 'story', title: 'T', content: 'c', assignTo: 'jane.doe' },
+    { contentType: 'story', title: 'T', content: 'c', assignTo: 'jane.doe' },
     job,
     fakePopulator
   );
@@ -326,7 +339,7 @@ test('dispatchImageItem maps item to uploadImage options with workspace fallback
   };
   const job = { site: 's', workspace: 'Demo Workspace', workfolder: null, publish: false };
   const item = {
-    type: 'image',
+    contentType: 'image',
     url: 'https://example.com/photos/sunset.jpg',
     metadata: { caption: 'A sunset', credit: 'Jane' },
   };
@@ -346,7 +359,7 @@ test('dispatchImageItem: explicit name wins over derived name', async () => {
   const job = { site: 's', workspace: 'ws', workfolder: null, publish: false };
 
   const out = await delayedImporter.dispatchImageItem(
-    { type: 'image', url: 'https://example.com/a.jpg', name: 'custom-name' },
+    { contentType: 'image', url: 'https://example.com/a.jpg', name: 'custom-name' },
     job,
     fakeImporter
   );

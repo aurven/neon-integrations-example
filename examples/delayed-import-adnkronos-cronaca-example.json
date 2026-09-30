@@ -1,0 +1,24 @@
+{
+  "site": "Wire",
+  "workspace": "wire/cronaca",
+  "duration": 1,
+  "publish": false,
+  "items": [
+    {
+      "contentType": "story",
+      "type": "wirestory",
+      "title": "Rapina in centro a Milano, fermati due giovani",
+      "byline": "Adnkronos",
+      "summary": "Due giovani di 19 e 22 anni sono stati fermati dalla polizia dopo una rapina avvenuta in pieno centro a Milano nel pomeriggio di giovedì.",
+      "content": "<p>Due giovani di 19 e 22 anni sono stati fermati dalla polizia dopo una rapina avvenuta in pieno centro a Milano nel pomeriggio di giovedì.</p><p>Questo articolo è apparso su Adnkronos.com <a href=\"https://www.adnkronos.com/rapina-milano-123456\">a questo indirizzo</a> il 29 giugno 2026</p>"
+    },
+    {
+      "contentType": "story",
+      "type": "wirestory",
+      "title": "Incidente stradale sull'A1, tre feriti",
+      "byline": "Adnkronos",
+      "summary": "Un incidente coinvolgente tre veicoli si è verificato sull'autostrada A1 tra Bologna e Firenze. Sul posto sono intervenuti i soccorritori del 118.",
+      "content": "<p>Un incidente coinvolgente tre veicoli si è verificato sull'autostrada A1 tra Bologna e Firenze. Sul posto sono intervenuti i soccorritori del 118.</p><p>Questo articolo è apparso su Adnkronos.com <a href=\"https://www.adnkronos.com/incidente-a1-654321\">a questo indirizzo</a> il 29 giugno 2026</p>"
+    }
+  ]
+}

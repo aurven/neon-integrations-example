@@ -29,7 +29,8 @@ function logNeonCall({ callerName, requestConfig, response, error }) {
                 url: requestConfig.url,
                 baseURL: requestConfig.baseURL,
                 params: requestConfig.params,
-                data: requestConfig.data
+                data: requestConfig.data,
+                updateContextId: requestConfig.headers?.['update-context-id']
             },
             response: response ? {
                 status: response.status,
@@ -78,6 +79,8 @@ class NeonClient {
 
         const callerName = getCallerName();
 
+        console.log(`➡️  ${config.method?.toUpperCase() || 'REQUEST'} ${config.url} called by ${callerName} with config:`, '\n', JSON.stringify({ baseURL: this.baseUrl, ...restConfig }, null, 2));
+
         try {
             const response = await this.client.request(requestConfig);
             if (successMessage) {
@@ -125,12 +128,18 @@ class NeonClient {
         }, `Node ${familyRef} locked`, true);
     }
 
-    async unlockNode(familyRef, unlockMode = 'MAJOR') {
-        return await this.makeRequest({
-            method: 'put',
-            url: `/contents/nodes/unlock?unlockMode=${unlockMode}`,
-            data: [familyRef]
-        }, `Node ${familyRef} unlocked`);
+    async unlockNode(familyRef, unlockMode = 'MAJOR', force = false, updateContextId = null) {
+        const originalContextId = this.updateContextId;
+        if (updateContextId) this.updateContextId = updateContextId;
+        try {
+            return await this.makeRequest({
+                method: 'put',
+                url: `/contents/nodes/unlock?unlockMode=${unlockMode}${force ? '&force=true' : ''}`,
+                data: [familyRef]
+            }, `Node ${familyRef} unlocked`);
+        } finally {
+            this.updateContextId = originalContextId;
+        }
     }
 
     async updateNodeContent(familyRef, xmlBodyString) {
@@ -315,25 +324,14 @@ class NeonClient {
         }, `Assigned new workflow step to ${familyRef}`);
     }
 
-    async getWorkflowDefinitions() {
-        try {
-            return await this.makeRequest({
-                method: 'get',
-                url: '/workflow/definitions'
-            }, 'Workflow definitions retrieved', true);
-        } catch (error) {
-            console.warn(`⚠️ getWorkflowDefinitions(): endpoint unavailable (${error.response?.status || error.code}), returning stub`);
-            // TODO: remove stub when a real workflow-list endpoint is confirmed on this Neon BO version
-            return {
-                workflows: [
-                    { name: 'Story/Created'   },
-                    { name: 'Story/Edit'      },
-                    { name: 'Story/Ready'     },
-                    { name: 'Story/Published' },
-                    { name: 'Story/Archived'  }
-                ]
-            };
-        }
+    async getWorkflowGraph(name, version) {
+        const params = { name };
+        if (version != null) params.version = version;
+        return await this.makeRequest({
+            method: 'get',
+            url: '/workflow/process/graph',
+            params
+        }, `Workflow graph for "${name}" retrieved`, true);
     }
 
     async getContentTypesConfig() {
@@ -410,6 +408,23 @@ class NeonClient {
             params: queryParams
         }, `Metrics data for ${reportId} retrieved`, true);
     }
+
+    async getWorkfolders(types = []) {
+        return await this.makeRequest({
+            method: 'post',
+            url: '/contents/conf/workfolder',
+            data: { types }
+        }, 'Workfolders retrieved', true);
+    }
+
+    async duplicateNode(familyRef, { name, workFolder, type, issueDate }) {
+        if (!familyRef) throw new Error('familyRef is required');
+        return await this.makeRequest({
+            method: 'post',
+            url: `/contents/nodes/${familyRef}/duplicate`,
+            data: { name, workFolder, type, issueDate, retrieveOptions: {} }
+        }, `Node ${familyRef} duplicated to ${workFolder}`, true);
+    }
 }
 
 const defaultClient = new NeonClient();
@@ -422,7 +437,7 @@ module.exports = {
     getNodeMetadata: (familyRef) => defaultClient.getNodeMetadata(familyRef),
     deleteNode: (familyRef, force) => defaultClient.deleteNode(familyRef, force),
     lockNode: (familyRef) => defaultClient.lockNode(familyRef),
-    unlockNode: (familyRef, unlockMode) => defaultClient.unlockNode(familyRef, unlockMode),
+    unlockNode: (familyRef, unlockMode, force, updateContextId) => defaultClient.unlockNode(familyRef, unlockMode, force, updateContextId),
     updateNodeContent: (familyRef, xmlBodyString) => defaultClient.updateNodeContent(familyRef, xmlBodyString),
     updateNodeMetadata: (familyRef, xmlBodyString) => defaultClient.updateNodeMetadata(familyRef, xmlBodyString),
     createNewStory: (options) => defaultClient.createNewStory(options),
@@ -441,12 +456,14 @@ module.exports = {
     createBasefolder: (options) => defaultClient.createBasefolder(options),
     getNextSteps: (familyRef) => defaultClient.getNextSteps(familyRef),
     nextStepAssignment: (familyRef, options) => defaultClient.nextStepAssignment(familyRef, options),
-    getWorkflowDefinitions: () => defaultClient.getWorkflowDefinitions(),
+    getWorkflowGraph: (name, version) => defaultClient.getWorkflowGraph(name, version),
     getContentTypesConfig: () => defaultClient.getContentTypesConfig(),
     promoteNode: (familyRef, params) => defaultClient.promoteNode(familyRef, params),
     promoteNodeEverywhere: (familyRef, params) => defaultClient.promoteNodeEverywhere(familyRef, params),
     discoveryServices: () => defaultClient.discoveryServices(),
     searchContents: (queryPayload, numberOfNodes, numberOfIds) => defaultClient.searchContents(queryPayload, numberOfNodes, numberOfIds),
     getMetricsReports: () => defaultClient.getMetricsReports(),
-    getMetricsData: (reportId, queryParams) => defaultClient.getMetricsData(reportId, queryParams)
+    getMetricsData: (reportId, queryParams) => defaultClient.getMetricsData(reportId, queryParams),
+    getWorkfolders: (types) => defaultClient.getWorkfolders(types),
+    duplicateNode: (familyRef, payload) => defaultClient.duplicateNode(familyRef, payload)
 };

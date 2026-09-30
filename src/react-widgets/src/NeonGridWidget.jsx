@@ -1,8 +1,13 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import { buildColumnDefs, defaultColDef } from './columns.jsx';
+import { evaluateRowRules } from './row-rules.js';
 import { fetchArticles, updateMetadata } from './api.js';
 import { buildMetadataChangeFromXpath } from './metadata.js';
+import { usePollingSearchDelta } from './usePollingSearchDelta.js';
+import { useNeonNotifier } from './useNeonNotifier.js';
+import { FilterBar } from './FilterBar.jsx';
+import { normalizeFiltersConfig, buildInitialFilterState, mergeFilterVariables } from './filter-utils.js';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import './neon-grid.css';
@@ -13,32 +18,169 @@ const RefreshIcon = () => (
   </svg>
 );
 
+function Toast({ toast }) {
+  if (!toast) return null;
+  return (
+    <div style={{
+      position: 'fixed', bottom: '22px', left: '50%', transform: 'translateX(-50%)', zIndex: 600,
+      background: '#3f3c4e', color: '#fff', borderRadius: '10px', padding: '10px 16px',
+      fontSize: '12.5px', fontWeight: 600, boxShadow: '0 10px 30px rgba(0,0,0,.28)',
+    }}>
+      {toast.text}
+    </div>
+  );
+}
+
+const ACTION_LABELS = { copy: 'Copy', move: 'Move', send: 'Send' };
+
+const NOTIFIER_EVENTS = [
+  'lock', 'unlock', 'changeStatus', 'majorVersion', 'minorVersion',
+  'noLockUpdate', 'changeAssignment', 'publishLiveUpdateState'
+];
+
 export default function NeonGridWidget() {
   const gridConfig = window.CONFIG?.gridConfig ?? { columns: [] };
-  const columnDefs = useMemo(() => buildColumnDefs(gridConfig.columns), [gridConfig]);
+  const isIframe = window !== window.parent;
+
+  const filters = useMemo(() => normalizeFiltersConfig(gridConfig), [gridConfig]);
+  const [filterState, setFilterState] = useState(() => buildInitialFilterState(filters));
+  const filterStateRef = useRef(filterState);
+  filterStateRef.current = filterState;
+
+  const [toast, setToast] = useState(null);
+  const toastTimerRef = useRef(null);
+
+  const showToast = useCallback((text) => {
+    setToast({ text, t: Date.now() });
+    clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = setTimeout(() => setToast(null), 2400);
+  }, []);
+
+  const handleAction = useCallback((actionId, row, extra) => {
+    if (actionId === 'moveToWorkspace' && extra?.workFolder) {
+      showToast(`Moved "${row?.headline ?? row?.id}" → ${extra.workFolder}`);
+      return;
+    }
+    if (actionId === 'pinboard') {
+      showToast(`Aggiunto a Pinboard: "${row?.headline ?? row?.id ?? 'row'}"`);
+      return;
+    }
+    const label = ACTION_LABELS[actionId] || actionId;
+    showToast(`${label} triggered for "${row?.headline ?? row?.id ?? 'row'}"`);
+  }, [showToast]);
 
   const [rowData, setRowData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const loadArticles = useCallback(() => {
-    setLoading(true);
-    setError(null);
-    fetchArticles()
-      .then(data => {
-        setRowData(data.articles ?? data);
-        setLoading(false);
-      })
+  const userCache = useMemo(() => {
+    const map = {};
+    rowData.forEach(row => {
+      const addUser = (userId, alias) => { if (userId) map[userId] = alias || userId; };
+      addUser(row.versionInfo?.createFamilyUserRef?.userId, row.versionInfo?.createFamilyUserRef?.alias);
+      addUser(row.lockInfos?.USER?.userUpdateRef?.userId, row.lockInfos?.USER?.userUpdateRef?.userName);
+      addUser(row.versionInfo?.updateVersionUserRef?.userId, row.versionInfo?.updateVersionUserRef?.alias);
+    });
+    return map;
+  }, [rowData]);
+
+  const columnDefs = useMemo(
+    () => buildColumnDefs(gridConfig.columns, { onAction: handleAction }),
+    [gridConfig, handleAction]
+  );
+
+  const fetchFn = useCallback(() => {
+    const vars = mergeFilterVariables(filters, filterStateRef.current);
+    return fetchArticles(Object.keys(vars).length > 0 ? vars : null)
+      .then(d => d.articles ?? d)
       .catch(err => {
         setError(err.message);
         setLoading(false);
+        return [];
       });
+  }, [filters]);
+
+  const pollFetchFn = useCallback(() => {
+    const vars = mergeFilterVariables(filters, filterStateRef.current);
+    return fetchArticles(Object.keys(vars).length > 0 ? vars : null, { maxResults: 25 })
+      .then(d => d.articles ?? d)
+      .catch(err => { console.warn('[Neon Grid] Poll error:', err.message); return []; });
+  }, [filters]);
+
+  const handleDelta = useCallback((delta) => {
+    if (delta.type === 'init') {
+      setRowData(delta.items);
+      setLoading(false);
+      return;
+    }
+    if (delta.type === 'poll') {
+      if (!delta.added.length && !delta.updated.length) return;
+      setRowData(prev => {
+        const updMap = new Map(delta.updated.map(u => [u.id, u]));
+        const merged = prev.map(r => updMap.has(r.id) ? { ...updMap.get(r.id), isNew: false } : r);
+        const newItems = delta.added.map(a => ({ ...a, isNew: true }));
+        return [...newItems, ...merged];
+      });
+      return;
+    }
+    // type === 'delta': full-fetch diff (no pollFetchFn)
+    const removed = new Set(delta.removedIds);
+    setRowData(prev => {
+      const kept = prev.filter(r => !removed.has(r.id));
+      return [...delta.added.map(a => ({ ...a, isNew: true })), ...kept];
+    });
   }, []);
 
-  useEffect(() => { loadArticles(); }, [loadArticles]);
+  const { reload } = usePollingSearchDelta({
+    fetchFn,
+    pollFetchFn,
+    idKey: 'id',
+    intervalMs: gridConfig.pollIntervalMs ?? 20000,
+    onDelta: handleDelta,
+    enabled: true
+  });
+
+  const familyRefs = useMemo(() => rowData.map(r => r.id), [rowData]);
+
+  useNeonNotifier({
+    familyRefs,
+    events: NOTIFIER_EVENTS,
+    onEvent: useCallback(() => { reload(); }, [reload]),
+    enabled: false // temporarily disabled
+  });
+
+  useEffect(() => {
+    const handleUnlockSuccess = () => { reload(); };
+    document.addEventListener('neon-unlock-success', handleUnlockSuccess);
+    return () => document.removeEventListener('neon-unlock-success', handleUnlockSuccess);
+  }, [reload]);
+
+  const handleRefresh = useCallback(() => {
+    setLoading(true);
+    setError(null);
+    reload();
+  }, [reload]);
+
+  const handleSingleChange = useCallback((id, idx) => {
+    filterStateRef.current = { ...filterStateRef.current, [id]: idx };
+    setFilterState(s => ({ ...s, [id]: idx }));
+    setLoading(true);
+    setError(null);
+    reload();
+  }, [reload]);
+
+  const handleMultiChange = useCallback((id, newSet) => {
+    filterStateRef.current = { ...filterStateRef.current, [id]: newSet };
+    setFilterState(s => ({ ...s, [id]: newSet }));
+    setLoading(true);
+    setError(null);
+    reload();
+  }, [reload]);
 
   const handleCellValueChanged = useCallback((params) => {
     const familyRef = params.data?.id;
+    setRowData(prev => prev.map(r => r.id === familyRef ? { ...r, isNew: false } : r));
+
     const colCfg = gridConfig.columns.find(c => c.field === params.colDef.field);
     const change = buildMetadataChangeFromXpath(colCfg?.metadataXpath, params.newValue, { isDate: !!colCfg?.isDate });
     if (!familyRef || !change) return;
@@ -52,6 +194,20 @@ export default function NeonGridWidget() {
       console.error(`[Neon Grid] Metadata update failed for ${familyRef}:`, err.message);
     });
   }, [gridConfig]);
+
+  const getRowStyle = useCallback((params) => {
+    return evaluateRowRules(gridConfig.rowColorRules, params.data);
+  }, [gridConfig.rowColorRules]);
+
+  const handleRowClicked = useCallback((params) => {
+    // AG-Grid fires row click via a native listener on the row, so a cell
+    // renderer's React stopPropagation can't suppress it. Bail when the click
+    // originated inside the actions cell — otherwise mutating the row here
+    // refreshes the cell and destroys the open dropdown.
+    if (params.event?.target?.closest?.('.neon-actions-cell')) return;
+    const familyRef = params.data?.id;
+    setRowData(prev => prev.map(r => r.id === familyRef ? { ...r, isNew: false } : r));
+  }, []);
 
   return (
     <div style={{
@@ -72,7 +228,7 @@ export default function NeonGridWidget() {
         borderBottom: '1px solid #dddce5',
         flexShrink: 0
       }}>
-        <span style={{ fontSize: '14px', fontWeight: 600, color: '#3f3c4e' }}>Articles</span>
+        <span style={{ fontSize: '14px', fontWeight: 600, color: '#3f3c4e' }}>{gridConfig.title || 'Articles'}</span>
         {!loading && !error && (
           <span style={{
             fontSize: '11px',
@@ -84,9 +240,15 @@ export default function NeonGridWidget() {
             {rowData.length}
           </span>
         )}
+        <FilterBar
+          filters={filters}
+          filterState={filterState}
+          onSingleChange={handleSingleChange}
+          onMultiChange={handleMultiChange}
+        />
         <div style={{ flex: 1 }} />
         <button
-          onClick={loadArticles}
+          onClick={handleRefresh}
           disabled={loading}
           style={{
             display: 'inline-flex',
@@ -106,11 +268,11 @@ export default function NeonGridWidget() {
           onMouseLeave={e => { e.currentTarget.style.background = 'none'; }}
         >
           <RefreshIcon />
-          Refresh
+          {gridConfig.locales?.refresh || 'Refresh'}
         </button>
       </div>
 
-      <div style={{ flex: 1, padding: '16px', overflow: 'hidden', minHeight: 0 }}>
+      <div style={{ flex: 1, padding: isIframe ? '0' : '16px', overflow: 'hidden', minHeight: 0 }}>
         {loading && (
           <div style={{
             display: 'flex',
@@ -120,7 +282,7 @@ export default function NeonGridWidget() {
             color: '#9d9aac',
             fontSize: '14px'
           }}>
-            Loading articles…
+            {gridConfig.locales?.loading || 'Loading articles…'}
           </div>
         )}
         {error && !loading && (
@@ -137,12 +299,12 @@ export default function NeonGridWidget() {
         )}
         {!loading && !error && (
           <div
-            className="ag-theme-alpine"
+            className={isIframe ? 'ag-theme-alpine neon-grid-iframe' : 'ag-theme-alpine'}
             style={{
               height: '100%',
               width: '100%',
-              border: '1px solid #dddce5',
-              borderRadius: '10px',
+              border: isIframe ? 'none' : '1px solid #dddce5',
+              borderRadius: isIframe ? '0' : '10px',
               overflow: 'hidden',
               boxShadow: 'none'
             }}
@@ -151,13 +313,22 @@ export default function NeonGridWidget() {
               rowData={rowData}
               columnDefs={columnDefs}
               defaultColDef={defaultColDef}
+              getRowId={params => params.data.id}
+              context={{ userCache, icons: gridConfig.icons || {}, typeIcons: gridConfig.typeIcons || {}, workspaceIcons: gridConfig.workspaceIcons || {}, typeLabels: gridConfig.typeLabels || {}, gridActions: gridConfig.actions || [], locales: gridConfig.locales || {} }}
+              localeText={gridConfig.locales?.agGrid ?? undefined}
+              enableBrowserTooltips={true}
               pagination={true}
               paginationPageSize={25}
+              paginationPageSizeSelector={[25, 100, 200]}
+              getRowStyle={getRowStyle}
               onCellValueChanged={handleCellValueChanged}
+              onRowClicked={handleRowClicked}
+              rowClassRules={{ 'ag-row-new': params => !!params.data?.isNew }}
             />
           </div>
         )}
       </div>
+      <Toast toast={toast} />
     </div>
   );
 }

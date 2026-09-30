@@ -21,20 +21,54 @@ async function apiFetch(path) {
   return response.json();
 }
 
-export function fetchArticles() {
+export function fetchArticles(queryVars = null, { maxResults } = {}) {
   const demo = window.CONFIG?.demo;
   const config = window.CONFIG?.gridConfigName;
+  const query = window.CONFIG?.queryConfigName;
   const params = new URLSearchParams();
   if (demo) params.set('demo', 'true');
   if (config) params.set('config', config);
+  if (query) params.set('query', query);
+  if (queryVars && Object.keys(queryVars).length > 0) params.set('qv', JSON.stringify(queryVars));
+  if (maxResults) params.set('maxResults', String(maxResults));
   const qs = params.toString();
   return apiFetch(`/api/neon/grid/articles${qs ? `?${qs}` : ''}`);
 }
 
 export function fetchStories() {
   const demo = window.CONFIG?.demo;
-  const url = demo ? '/api/print-query-board/stories?demo=true' : '/api/print-query-board/stories';
-  return apiFetch(url);
+  const query = window.CONFIG?.queryConfigName;
+  const params = new URLSearchParams();
+  if (demo) params.set('demo', 'true');
+  if (query) params.set('query', query);
+  const qs = params.toString();
+  return apiFetch(`/api/print-query-board/stories${qs ? `?${qs}` : ''}`);
+}
+
+export async function duplicateArticle(familyRef, { workFolder, name, type }) {
+  const apiKey = window.CONFIG?.apiKey ?? '';
+  const response = await fetch(`${BASE_URL}/api/neon/grid/duplicate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', apikey: apiKey },
+    body: JSON.stringify({ familyRef, workFolder, name, type })
+  });
+  if (!response.ok) {
+    throw new Error(`API error ${response.status}: /api/neon/grid/duplicate`);
+  }
+  return response.json();
+}
+
+export async function unlockNode(familyRef, updateContextId = null) {
+  const apiKey = window.CONFIG?.apiKey ?? '';
+  const response = await fetch(`${BASE_URL}/api/neon/nodes/unlock`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', apikey: apiKey },
+    body: JSON.stringify({ familyRef, ...(updateContextId && { updateContextId }) })
+  });
+  if (!response.ok) {
+    throw new Error(`API error ${response.status}: /api/neon/nodes/unlock`);
+  }
+  return response.json();
 }
 
 export async function updateMetadata(familyRef, changes) {

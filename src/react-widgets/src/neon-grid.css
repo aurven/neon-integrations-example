@@ -1,3 +1,8 @@
+/* iframe embed: strip all outer borders */
+.neon-grid-iframe .ag-root-wrapper {
+  border: none !important;
+}
+
 /* AG-Grid Neon theme override */
 .ag-theme-alpine {
   --ag-font-family: "Source Sans 3", "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -19,12 +24,12 @@
   --ag-checkbox-checked-color: #0a2ee6;
   --ag-disabled-foreground-color: #bfbfca;
   --ag-header-height: 36px;
-  --ag-row-height: 58px;
+  --ag-row-height: 48px;
   --ag-cell-horizontal-padding: 12px;
 }
 
 .ag-theme-alpine .ag-cell {
-  padding-top: 6px;
+  padding-top: 4px;
   box-sizing: border-box;
 }
 
@@ -59,4 +64,17 @@
 
 .ag-theme-alpine .ag-paging-button button:not(:disabled):hover {
   background: #f6f3f6;
+}
+
+.ag-theme-alpine .ag-row.ag-row-new {
+  animation: ag-row-new-settle 1.6s ease-out forwards;
+}
+
+@keyframes ag-row-new-settle {
+  from {
+    background-color: rgba(37, 99, 235, 0.22);
+  }
+  to {
+    background-color: rgba(37, 99, 235, 0.06);
+  }
 }

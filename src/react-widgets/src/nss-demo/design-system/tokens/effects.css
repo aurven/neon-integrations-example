@@ -1,0 +1,33 @@
+/* Neon Design System — effects: elevation, radii, focus, motion
+   Shadow values transcribed exactly from the Figma source. */
+:root {
+  /* Elevation — Neon uses two soft, warm-grey shadows */
+  --shadow-1: 0 4px 8px 0 rgba(63, 60, 78, 0.1);        /* cards, popovers, menus */
+  --shadow-inline-button: 0 1px 4px 0 rgba(63, 60, 78, 0.1); /* inline / floating buttons */
+  --shadow-overlay: 0 8px 24px 0 rgba(29, 25, 48, 0.16);     /* modals, large surfaces */
+
+  /* Border radii (px) */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;   /* small controls */
+  --radius-lg: 8px;   /* medium controls, cards */
+  --radius-xl: 10px;  /* large controls */
+  --radius-full: 999px;
+
+  /* Control heights (px) */
+  --control-sm: 24px;
+  --control-md: 32px;
+  --control-lg: 40px;
+
+  /* Focus ring — light blue, drawn as an outer ring */
+  --focus-ring: 0 0 0 2px var(--color-blue-500);
+  --focus-ring-tight: 0 0 0 1px var(--color-blue-500);
+
+  /* Hairline stroke used across inputs, cards, tables */
+  --hairline: rgb(221, 220, 229);
+
+  /* Motion — Neon transitions are quick, ease-out, no bounce */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1); /* @kind other */
+  --dur-fast: 120ms; /* @kind other */
+  --dur-base: 180ms; /* @kind other */
+}

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import { useState, useMemo, useRef, useCallback } from 'react';
 import './print-query-board.css';
 import {
   PRI, buildFacets, applyPatch, covStatus, sectionsTotal, dayLabel, fmtDate, dayDiffFromToday,
@@ -8,6 +8,7 @@ import { C, CoverageBar, StatusBadge, NeonPanel, NeonInput, IconSearch, IconFilt
 import { BoardColumn, SegmentPicker, Distribution, Toast } from './board.jsx';
 import { fetchStories, updateMetadata } from '../api.js';
 import { buildMetadataChange } from '../metadata.js';
+import { usePollingSearchDelta } from '../usePollingSearchDelta.js';
 
 const esc = (s) => (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const trunc = (s, n = 46) => s.length > n ? s.slice(0, n - 1) + '…' : s;
@@ -181,18 +182,36 @@ export default function PrintQueryBoard() {
   const [issueDate, setIssueDate] = useState(printConfig.issueDate ? new Date(printConfig.issueDate) : TOMORROW);
   const toastTimer = useRef(null);
 
-  useEffect(() => {
-    fetchStories()
-      .then(data => {
-        const fallback = printConfig.issueDate ? new Date(printConfig.issueDate) : TOMORROW;
-        setStories((data.stories || []).map(s => ({
-          ...s,
-          offset: dayDiffFromToday(s.issueDate ? new Date(s.issueDate) : fallback),
-        })));
+  const fetchFn = useCallback(() => {
+    const fallback = printConfig.issueDate ? new Date(printConfig.issueDate) : TOMORROW;
+    return fetchStories()
+      .then(data => (data.stories || []).map(s => ({
+        ...s,
+        offset: dayDiffFromToday(s.issueDate ? new Date(s.issueDate) : fallback),
+      })))
+      .catch(err => {
+        setError(err.message);
         setLoading(false);
-      })
-      .catch(err => { setError(err.message); setLoading(false); });
+        return [];
+      });
+  }, [printConfig]);
+
+  const handleDelta = useCallback((delta) => {
+    if (delta.type === 'init') {
+      setStories(delta.items);
+      setLoading(false);
+      return;
+    }
+    const removed = new Set(delta.removedIds);
+    setStories(prev => [...prev.filter(s => !removed.has(s.id)), ...delta.added.map(a => ({ ...a, isNew: true }))]);
   }, []);
+
+  const { reload } = usePollingSearchDelta({
+    fetchFn,
+    idKey: 'id',
+    intervalMs: printConfig.pollIntervalMs ?? 20000,
+    onDelta: handleDelta,
+  });
 
   const showToast = useCallback((html) => {
     setToast({ html, t: Date.now() });
@@ -239,7 +258,7 @@ export default function PrintQueryBoard() {
     setDragOverCol(null); setDragId(null);
     const s = storyById[storyId];
     if (!s || facet.value(s) === colKey) return;
-    setStories(prev => prev.map(x => x.id === storyId ? applyPatch(x, facet.patch(colKey)) : x));
+    setStories(prev => prev.map(x => x.id === storyId ? { ...applyPatch(x, facet.patch(colKey)), isNew: false } : x));
     if (facet.key === 'section') {
       const col = facet.columns.find(c => c.key === colKey);
       pushMetadataUpdate(s, 'printSection', col?.printSection ?? null);
@@ -252,7 +271,7 @@ export default function PrintQueryBoard() {
   const handlePriority = useCallback((storyId, k) => {
     const s = storyById[storyId];
     if (!s || s.printPriority === k) return;
-    setStories(prev => prev.map(x => x.id === storyId ? { ...x, printPriority: k } : x));
+    setStories(prev => prev.map(x => x.id === storyId ? { ...x, printPriority: k, isNew: false } : x));
     pushMetadataUpdate(s, 'printPriority', k);
     const moved = facetKey === 'priority';
     const priLabel = k != null ? `${PRI[k].label} · ${PRI[k].name}` : 'No priority';
@@ -262,7 +281,7 @@ export default function PrintQueryBoard() {
   const handleDate = useCallback((storyId, off) => {
     const s = storyById[storyId];
     if (!s || s.offset === off) return;
-    setStories(prev => prev.map(x => x.id === storyId ? { ...x, offset: off } : x));
+    setStories(prev => prev.map(x => x.id === storyId ? { ...x, offset: off, isNew: false } : x));
     const d = new Date(TODAY); d.setDate(d.getDate() + off);
     const iso = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
     pushMetadataUpdate(s, 'issueDate', iso);
@@ -271,7 +290,11 @@ export default function PrintQueryBoard() {
     else showToast(`Moved <b>"${esc(trunc(s.title, 34))}"</b> to the <b>${lbl}</b> issue`);
   }, [storyById, issueOffset, showToast]);
 
-  const cardProps = { dragId, onDragStart: setDragId, onDragEnd: () => setDragId(null), onPriority: handlePriority, onDate: handleDate };
+  const handleDismissNew = useCallback((storyId) => {
+    setStories(prev => prev.map(x => x.id === storyId ? { ...x, isNew: false } : x));
+  }, []);
+
+  const cardProps = { dragId, onDragStart: setDragId, onDragEnd: () => setDragId(null), onPriority: handlePriority, onDate: handleDate, onDismissNew: handleDismissNew };
 
   return (
     <div style={{

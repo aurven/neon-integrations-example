@@ -164,6 +164,10 @@ function metadataGenerator(meta) {
     const seoTitle = meta?.seoTitle || '';
     const seoMeta = meta?.seoMeta || '';
     const keywords = meta?.keywords || '';
+    const printSection = meta?.printSection || '';
+    const printPriority = meta?.printPriority || '';
+    const printIssueDate = meta?.printIssueDate || '';
+    const printDiffusion = meta?.printDiffusion || '';
     const body = `
         <?xml version="1.0" encoding="UTF-8"?>
         <!DOCTYPE ObjectMetadata SYSTEM "/common/rules/classify.dtd">
@@ -240,6 +244,11 @@ function metadataGenerator(meta) {
                     <BlogSection/>
                     <BlogDate/>
                 </Blog>
+                <Print>
+                    <PrintSection>${printSection}</PrintSection>
+                    <PrintPriority>${printPriority}</PrintPriority>
+                    <PrintIssueDate>${printIssueDate}</PrintIssueDate>
+                </Print>
                 <Output>
                     <Queue/>
                     <PriorityQueue/>
@@ -247,7 +256,7 @@ function metadataGenerator(meta) {
                 </Output>
             </DistributionChannels>
             <Diffusion>
-                <Diff_Print/>
+                <Diff_Print>${printDiffusion}</Diff_Print>
                 <Diff_Web/>
                 <Diff_Syndication/>
             </Diffusion>

@@ -1,0 +1,14 @@
+{
+  "issueDate": "2026-06-18",
+  "printProduct": "Tabloid",
+  "editions": ["EUROPE", "USA", "ASIA"],
+  "sectionsAndBooks": [
+    { "key": "Business", "label": "Business", "color": "#724659", "wordTarget": 1500, "printSection": "/Product/Business" },
+    { "key": "National", "label": "National", "color": "#FF3845", "wordTarget": 1500, "printSection": "/Product/National" },
+    { "key": "World",    "label": "World",    "color": "#0B60D8", "wordTarget": 2000, "printSection": "/Product/World" },
+    { "key": "Sport",    "label": "Sport",    "color": "#39CA40", "wordTarget": 1500, "printSection": "/Product/Sport" },
+    { "key": "Art",      "label": "Art",      "color": "#F6A745", "wordTarget": 1200, "printSection": "/Product/Art" },
+    { "key": "Politics", "label": "Politics", "color": "#235764", "wordTarget": 2300, "printSection": "/Product/Politics" },
+    { "key": "Specials", "label": "Specials", "color": "#A12EE6", "wordTarget": 1000, "printSection": "/Product/Specials" }
+  ]
+}

@@ -40,101 +40,124 @@ body {
 .es-header {
     display: flex;
     flex-direction: column;
-    padding: 0.625rem 0.875rem 0;
+    padding: 0.5rem 0.875rem;
     background: var(--es-surface);
     border-bottom: 1px solid var(--es-border);
     flex-shrink: 0;
-    gap: 0.5rem;
 }
 
-/* ── Provider row ────────────────────────────────────── */
-.es-providers {
-    display: flex;
-    align-items: center;
-    gap: 0.375rem;
-}
-
-.es-provider-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 2rem;
-    padding: 0 0.625rem;
-    border-radius: var(--es-card-radius);
-    border: 1px solid var(--es-border);
-    background: var(--es-surface);
-    cursor: pointer;
-    transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
-    flex-shrink: 0;
-}
-
-.es-provider-btn:hover {
-    border-color: var(--es-accent);
-    box-shadow: 0 0 0 2px var(--es-accent-light);
-}
-
-.es-provider-btn.active {
-    border-color: var(--es-accent);
-    background: var(--es-accent-light);
-}
-
-.es-provider-logo {
-    height: 18px;
-    width: auto;
-    max-width: 72px;
-    object-fit: contain;
-    display: block;
-}
-
-.es-provider-btn.active .es-provider-logo {
-    /* keep logo visible on light bg */
-}
-
-/* ── Type + search row ───────────────────────────────── */
+/* ── Toolbar (single row: provider select + search) ──── */
 .es-toolbar {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding-bottom: 0.625rem;
 }
 
-/* Type pill */
-.es-type-pill {
-    display: flex;
-    background: var(--es-bg);
-    border: 1px solid var(--es-border);
-    border-radius: 4px;
-    padding: 2px;
-    gap: 2px;
+/* ── Provider custom select ──────────────────────────── */
+.es-provider-select {
+    position: relative;
     flex-shrink: 0;
+    outline: none;
 }
 
-.es-type-btn {
+.es-provider-current {
     display: flex;
     align-items: center;
-    gap: 0.3rem;
-    padding: 0.2rem 0.6rem;
-    border-radius: 3px;
-    font-size: 0.75rem;
-    font-weight: 500;
-    letter-spacing: 0.03em;
-    border: none;
-    background: transparent;
-    color: var(--es-text-secondary);
+    gap: 0.375rem;
+    height: 2rem;
+    padding: 0 0.5rem 0 0.625rem;
+    border: 1px solid var(--es-border);
+    border-radius: var(--es-card-radius);
+    background: var(--es-surface);
     cursor: pointer;
-    transition: background 0.15s, color 0.15s;
+    user-select: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
     white-space: nowrap;
 }
 
-.es-type-btn svg {
-    width: 12px;
-    height: 12px;
+.es-provider-select:focus .es-provider-current,
+.es-provider-select.open .es-provider-current {
+    border-color: var(--es-accent);
+    box-shadow: 0 0 0 2px var(--es-accent-light);
+}
+
+.es-provider-logo {
+    height: 16px;
+    width: auto;
+    max-width: 56px;
+    object-fit: contain;
+    display: block;
     flex-shrink: 0;
 }
 
-.es-type-btn.active {
-    background: var(--es-accent);
-    color: #fff;
+.es-provider-name {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--es-text);
+}
+
+.es-provider-chevron {
+    width: 12px;
+    height: 12px;
+    color: var(--es-text-secondary);
+    flex-shrink: 0;
+    transition: transform 0.15s;
+}
+
+.es-provider-select.open .es-provider-chevron {
+    transform: rotate(180deg);
+}
+
+/* Dropdown */
+.es-provider-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    min-width: 100%;
+    background: var(--es-surface);
+    border: 1px solid var(--es-border);
+    border-radius: var(--es-card-radius);
+    box-shadow: var(--es-elevation-2);
+    z-index: 100;
+    overflow: hidden;
+}
+
+.es-provider-select.open .es-provider-dropdown {
+    display: block;
+}
+
+.es-provider-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.45rem 0.75rem;
+    cursor: pointer;
+    transition: background 0.1s;
+    white-space: nowrap;
+}
+
+.es-provider-option:hover {
+    background: var(--es-bg);
+}
+
+.es-provider-option.active {
+    background: var(--es-accent-light);
+}
+
+.es-provider-option-logo {
+    height: 14px;
+    width: auto;
+    max-width: 50px;
+    object-fit: contain;
+    display: block;
+    flex-shrink: 0;
+}
+
+.es-provider-option-name {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--es-text);
 }
 
 /* Search input */
@@ -252,6 +275,14 @@ body {
 
 .es-card:active {
     cursor: grabbing;
+}
+
+.es-card.es-no-drag {
+    cursor: default;
+}
+
+.es-card.es-no-drag:active {
+    cursor: default;
 }
 
 .es-card.es-dragging {

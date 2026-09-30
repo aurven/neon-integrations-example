@@ -1,0 +1,22 @@
+{
+  "buttons": [
+    {
+      "label": "Nuovo articolo",
+      "icon": "article",
+      "createOptions": {
+        "type": "article",
+        "workFolder": "/Wire/Cronaca",
+        "template": "article.xml"
+      }
+    },
+    {
+      "label": "Nuovo flash",
+      "icon": "flash",
+      "createOptions": {
+        "type": "article/flash",
+        "workFolder": "/Wire/Cronaca",
+        "template": "flash.xml"
+      }
+    }
+  ]
+}

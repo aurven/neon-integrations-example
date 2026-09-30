@@ -15,7 +15,8 @@ function getCreationOptions(itemData) {
     const translation = itemData.translation;
 
     const cleanedUpTitle = utils.removeNonAlphanumeric(itemData.id || itemData.title);
-    const fileName = cleanedUpTitle + '_' + (translation || language) + '.xml';
+    const generatedFileName = cleanedUpTitle + ((translation && '_' + translation) || (language && '_' + language) || '') + '.xml';
+    const fileName = itemData.name || generatedFileName;
 
     const type = itemData.type || 'article';
 
@@ -78,17 +79,25 @@ async function newNodeFromStory(story, publishStory = true) {
 
             if (updateStatus) {
                 await neon.unlockNode(familyRef);
-                await neonUtils.workflowTransitionTo({ familyRef, targetWorkflowName: 'Story', targetStateName: 'Edit', principals });
+
+                if (await neonUtils.hasWorkflow(familyRef)) {
+                    await neonUtils.workflowTransitionTo({ familyRef, targetWorkflowName: 'Story', targetStateName: 'Edit', principals });
+
+                    if (publishStory) {
+                      await neonUtils.workflowTransitionTo({ familyRef, targetWorkflowName: 'Story', targetStateName: 'Ready', principals });
+                    } else {
+                      await neonUtils.workflowTransitionTo({ familyRef, targetWorkflowName: 'Story', targetStateName: 'Revision', principals });
+                    }
+                } else {
+                    console.log(`Node ${familyRef} has no associated workflow, skipping workflow transitions`);
+                }
 
                 if (publishStory) {
-                  await neonUtils.workflowTransitionTo({ familyRef, targetWorkflowName: 'Story', targetStateName: 'Ready', principals });
                   console.log(`${familyRef} updated successfully!`);
                   const promotionResponse = await neon.promoteNode(familyRef, { targetSite: story.tgtSite, targetSection: story.tgtSection, mode: 'LIVE' });
                   await neon.promoteNodeEverywhere(familyRef, { mode: 'LIVE' });
-                } else {
-                  await neonUtils.workflowTransitionTo({ familyRef, targetWorkflowName: 'Story', targetStateName: 'Revision', principals });
                 }
-              
+
                 resolve(familyRef);
             } else {
                 console.warn(`Error during content Update, deletion of ${familyRef} in progress...`);
@@ -136,12 +145,12 @@ async function populateNeonInstance(data, options = {site: null, workspace: null
         console.log(story.id || story.title);
 
         story.tgtSite = options.site;
-        story.tgtWorkspace = options.workspace;
+        story.tgtWorkspace = story.workfolder || options.workspace;
         story.tgtSection = options.section;
         story.language = options.language;
         story.translate = options.translate;
         story.siteAsChannel = options.siteAsChannel;
-        story.type = options.type || 'article';
+        story.type = story.type || options.type || 'article';
         const directPublish = options.directPublish;
 
         return await promiseAcc.then(async () => {

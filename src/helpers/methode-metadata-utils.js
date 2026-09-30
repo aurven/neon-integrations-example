@@ -108,7 +108,7 @@ function mapBoostPriority(printPriority) {
     if (p === 1) return '2';
     if (p === 2) return '1';
     if (p === 3) return '0';
-    return null;
+    return '0';
 }
 
 /**

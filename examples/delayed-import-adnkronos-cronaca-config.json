@@ -1,0 +1,16 @@
+{
+  "rssUrl": "https://www.adnkronos.com/RSS_Cronaca.xml",
+  "site": "Wire",
+  "workspace": "wire/cronaca",
+  "duration": 1,
+  "type": "wirestory",
+  "publish": false,
+  "fieldMap": {
+    "title":   "title",
+    "byline":  "dc:creator",
+    "summary": "description",
+    "content": "description"
+  },
+  "contentSuffix": "<p>Questo articolo è apparso su Adnkronos.com <a href=\"${link}\">a questo indirizzo</a> il ${pubDate}</p>",
+  "dateLocale": "it-IT"
+}

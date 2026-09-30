@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{seo.title}}</title>
+    <link rel="icon" href="/assets/favicon.ico">
+    <link rel="stylesheet" href="/css/tailwind-panels.css">
+    <link rel="stylesheet" href="/neon/api/demo-integration/css/tailwind-panels.css">
+    <script src="/js/panel-api-helper.js"></script>
+    <script src="/neon/api/demo-integration/js/panel-api-helper.js"></script>
+    <style>
+        * { box-sizing: border-box; }
+        html, body { height: 100%; margin: 0; }
+        body {
+            font-family: "Source Sans 3", "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            font-size: 13px;
+            background: #f9f9fb;
+            color: #3f3c4e;
+        }
+        body.is-embedded {
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            max-height: 85px;
+        }
+        .fr-container {
+            padding: 10px;
+        }
+        .fr-label-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 6px;
+            color: #69667f;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .fr-label-row svg { flex-shrink: 0; }
+        .fr-bar {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #fff;
+            border: 1px solid #dddce5;
+            border-radius: 10px;
+            padding: 6px 8px;
+        }
+        .fr-confirm {
+            display: none;
+            position: absolute;
+            inset: 0;
+            background: rgba(255,255,255,0.97);
+            border-radius: 10px;
+            align-items: center;
+            gap: 8px;
+            padding: 0 8px;
+            z-index: 10;
+        }
+        .fr-confirm.fr-visible { display: flex; }
+        .fr-confirm-text {
+            flex: 1;
+            min-width: 0;
+            font-size: 12px;
+            font-weight: 600;
+            color: #3f3c4e;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .fr-bar-form {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            min-width: 0;
+        }
+        .fr-input {
+            flex: 1;
+            min-width: 0;
+            border: none;
+            outline: none;
+            font-size: 13px;
+            font-family: inherit;
+            color: #3f3c4e;
+            background: transparent;
+        }
+        .fr-input::placeholder { color: #b0aec0; }
+        .fr-divider {
+            width: 1px;
+            height: 18px;
+            background: #dddce5;
+            flex-shrink: 0;
+        }
+        .fr-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 7px;
+            font-size: 12px;
+            font-family: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            white-space: nowrap;
+            flex-shrink: 0;
+            transition: background 120ms;
+        }
+        .fr-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+        .fr-btn-primary { background: #0a2ee6; color: #fff; }
+        .fr-btn-primary:not(:disabled):hover { background: #0925c4; }
+        .fr-btn-success { background: #16a34a; color: #fff; }
+        .fr-btn-success:hover { background: #15803d; }
+        .fr-btn-secondary { background: #f1f0f4; color: #3f3c4e; }
+        .fr-btn-secondary:hover { background: #e4e3ec; }
+        .fr-btn-danger { background: #dc2626; color: #fff; }
+        .fr-btn-danger:hover { background: #b91c1c; }
+        .fr-status {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .fr-status.fr-success { color: #16a34a; }
+        .fr-status.fr-error   { color: #dc2626; }
+        .fr-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+        .fr-spinner { animation: fr-spin 0.8s linear infinite; }
+        @keyframes fr-spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+
+<body>
+    <div id="fr-container" class="fr-container">
+
+        <div id="fr-label-row" class="fr-label-row">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="13" height="13">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            Flash Rapido
+        </div>
+
+        <div class="fr-bar">
+            <!-- Confirmation overlay -->
+            <div id="fr-confirm" class="fr-confirm">
+                <span class="fr-confirm-text">Pubblicare il flash?</span>
+                <button id="fr-confirm-ok" type="button" class="fr-btn fr-btn-primary">Conferma</button>
+                <button id="fr-confirm-cancel" type="button" class="fr-btn fr-btn-secondary">Annulla</button>
+            </div>
+
+            <!-- Form state -->
+            <form id="fr-form" class="fr-bar-form">
+                <input
+                    class="fr-input"
+                    type="text"
+                    id="fr-headline"
+                    name="headline"
+                    required
+                    maxlength="255"
+                    placeholder="Titolo del flash…"
+                    autocomplete="off"
+                >
+                <div class="fr-divider"></div>
+                <button type="submit" id="fr-publish-btn" class="fr-btn fr-btn-primary">
+                    Pubblica
+                </button>
+            </form>
+
+            <!-- Result state (hidden initially) -->
+            <div id="fr-result" style="display:none;flex:1;min-width:0;align-items:center;gap:8px;">
+                <div id="fr-result-msg" class="fr-status"></div>
+                <div id="fr-result-actions" class="fr-actions"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const frEmbedded = (typeof PanelAPI !== 'undefined') ? PanelAPI.isEmbedded() : (window.self !== window.top);
+        if (frEmbedded) {
+            document.body.classList.add('is-embedded');
+        }
+
+        const neonAppUrl = '{{neonAppUrl}}';
+
+        function frSpinner() {
+            return `<svg class="fr-spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" width="14" height="14">
+                <circle style="opacity:.25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>`;
+        }
+        function frCheck() {
+            return `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>`;
+        }
+        function frCross() {
+            return `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>`;
+        }
+
+        const frForm    = document.getElementById('fr-form');
+        const frResult  = document.getElementById('fr-result');
+        const frMsg     = document.getElementById('fr-result-msg');
+        const frActions = document.getElementById('fr-result-actions');
+        const frBtn     = document.getElementById('fr-publish-btn');
+        const frConfirm = document.getElementById('fr-confirm');
+
+        function frShowResult(state, html, buttons = []) {
+            frForm.style.display = 'none';
+            frResult.style.display = 'flex';
+            frMsg.className = 'fr-status' + (state ? ' fr-' + state : '');
+            frMsg.innerHTML = html;
+            frActions.innerHTML = '';
+            buttons.forEach(({ label, style, onClick }) => {
+                const btn = document.createElement('button');
+                btn.className = 'fr-btn fr-btn-' + (style || 'secondary');
+                btn.innerHTML = label;
+                btn.onclick = onClick;
+                frActions.appendChild(btn);
+            });
+        }
+
+        function frShowForm() {
+            frResult.style.display = 'none';
+            frForm.style.display = '';
+            frBtn.disabled = false;
+            frBtn.innerHTML = 'Pubblica';
+            document.getElementById('fr-headline').focus();
+        }
+
+        function frShowConfirm() { frConfirm.classList.add('fr-visible'); }
+        function frHideConfirm() { frConfirm.classList.remove('fr-visible'); }
+
+        document.getElementById('fr-confirm-cancel').addEventListener('click', frHideConfirm);
+
+        document.getElementById('fr-confirm-ok').addEventListener('click', async function () {
+            frHideConfirm();
+            const headline = document.getElementById('fr-headline').value.trim();
+
+            frBtn.disabled = true;
+            frBtn.innerHTML = frSpinner();
+            frShowResult('', frSpinner() + '&nbsp;Pubblicazione in corso…');
+
+            try {
+                const formData = new URLSearchParams();
+                formData.append('headline', headline);
+
+                const endpoint = '/widgets/flash-rapido/publish';
+                let response;
+                if (typeof PanelAPI !== 'undefined') {
+                    response = await PanelAPI.apiCall(endpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: formData,
+                    });
+                } else {
+                    response = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: formData,
+                    });
+                }
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    const { familyRef } = result;
+                    frShowResult('success', frCheck() + '&nbsp;Flash pubblicato!', [
+                        familyRef && neonAppUrl ? {
+                            label: 'Apri',
+                            style: 'success',
+                            onClick: () => window.open(neonAppUrl + '/neon/app/neon.html#open/' + familyRef),
+                        } : null,
+                        {
+                            label: 'Nuovo',
+                            style: 'secondary',
+                            onClick: () => {
+                                document.getElementById('fr-form').reset();
+                                frShowForm();
+                            },
+                        },
+                    ].filter(Boolean));
+                } else {
+                    frShowResult('error', frCross() + '&nbsp;' + (result.message || 'Errore'), [
+                        { label: 'Riprova', style: 'danger', onClick: frShowForm },
+                    ]);
+                }
+            } catch (err) {
+                frShowResult('error', frCross() + '&nbsp;Errore di rete', [
+                    { label: 'Riprova', style: 'danger', onClick: frShowForm },
+                ]);
+            }
+        });
+
+        frForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            if (!document.getElementById('fr-headline').value.trim()) return;
+            frShowConfirm();
+        });
+    </script>
+</body>
+
+</html>

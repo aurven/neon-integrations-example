@@ -132,7 +132,9 @@ fastify.get("/services", function (request, reply) {
       { name: "Neon Grid", endpoint: "GET /widgets/neon-grid", demoUrl: "/widgets/neon-grid?demo=true", description: "AG-Grid article list from Neon CMS — headline, summary, date, status columns (supports demo mode with ?demo=true)" },
       { name: "Tag Manager", endpoint: "GET /tags/widget", demoUrl: "/tags/widget", description: "Manage distribution tags, packages, and customer subscriptions" },
       { name: "Tags Input Mockup", endpoint: "GET /tags/input-mockup", demoUrl: "/tags/input-mockup", description: "NeonTagsInput component mockup — copy-paste ready for Neon Object Panel" },
-      { name: "Print Query Board", endpoint: "GET /widgets/print-query-board", demoUrl: "/widgets/print-query-board", description: "Kanban board for planning print edition stories — segment by section (with char budget), priority, desk, or access. Drag cards to reclassify." }
+      { name: "Print Query Board", endpoint: "GET /widgets/print-query-board", demoUrl: "/widgets/print-query-board", description: "Kanban board for planning print edition stories — segment by section (with char budget), priority, desk, or access. Drag cards to reclassify." },
+      { name: "Create Content", endpoint: "GET /widgets/neon-create", demoUrl: "/widgets/neon-create", description: "Config-driven grid of buttons to create new Neon content objects. Each button defines a label, icon, and createOptions (type, workFolder, etc.). On click: creates the object via Neon API, then opens it. Use ?config=name to load a named button set from conf/widgets/neon-create/." },
+      { name: "NSS Demo", endpoint: "GET /widgets/nss-demo", demoUrl: "/widgets/nss-demo", description: "Walkable demo of the Neon Syndication Service (Adnkronos) — Prodotti, Pacchetti, Clienti with fake data, Italian UI" }
     ],
     panels: [
       { name: "Trello Panel", endpoint: "GET /panels/trello", demoUrl: "/panels/trello", description: "Trello card management panel for Neon CMS iframe embedding with PostMessage API" },
@@ -238,6 +240,7 @@ fastify.get("/neon/api/core/metrics/*", neonMetricsHandlers.getMetricsDataHandle
  *
  */
 const widgetHandlers = require("./src/requestHandlers/widgets.js");
+const neonEventsHandlers = require("./src/requestHandlers/neon-events.js");
 fastify.get("/widgets/test", widgetHandlers.testWidgetHandler);
 fastify.get("/widgets/drop", widgetHandlers.dropWidgetHandler);
 fastify.post("/widgets/drop/upload", widgetHandlers.asyncDropUploadWidgetHandler);
@@ -250,8 +253,18 @@ fastify.get("/widgets/welcome", widgetHandlers.welcomeWidgetHandler);
 fastify.get("/widgets/planning-board", widgetHandlers.planningBoardWidgetHandler);
 fastify.get("/widgets/neon-grid", widgetHandlers.neonGridWidgetHandler);
 fastify.get("/api/neon/grid/articles", widgetHandlers.neonGridDataHandler);
+fastify.post("/api/neon/grid/duplicate", widgetHandlers.neonGridDuplicateHandler);
+fastify.post("/api/neon/nodes/unlock", widgetHandlers.neonNodeUnlockHandler);
 fastify.get("/widgets/print-query-board", widgetHandlers.printQueryBoardHandler);
 fastify.get("/api/print-query-board/stories", widgetHandlers.printQueryBoardDataHandler);
+fastify.get("/widgets/nss-demo", widgetHandlers.nssDemoWidgetHandler);
+fastify.get("/widgets/neon-create", widgetHandlers.neonCreateWidgetHandler);
+fastify.post("/api/neon/create", widgetHandlers.neonCreateHandler);
+fastify.get("/widgets/flash-rapido", widgetHandlers.flashRapidoWidgetHandler);
+fastify.post("/widgets/flash-rapido/publish", widgetHandlers.flashRapidoPublishHandler);
+
+// Neon live events proxy (client-notifier SSE)
+fastify.post("/api/neon/events/subscribe", neonEventsHandlers.neonEventsSubscribeHandler);
 
 /**
  *
@@ -340,7 +353,6 @@ fastify.register(async function (fastify) {
 const methodeHandlers = require("./src/requestHandlers/methode.js");
 fastify.get("/out/methode", methodeHandlers.getMethodeHandler);
 fastify.post("/out/methode", methodeHandlers.postMethodeHandler);
-fastify.post("/out/imagesToMethode", methodeHandlers.postMethodeImageHandler);
 fastify.post("/out/methode/test", methodeHandlers.postMethodeTest);
 
 // Sendgrid
@@ -381,6 +393,9 @@ fastify.post("/in/delayed-import", delayedImportHandlers.submitJobHandler);
 fastify.get("/in/delayed-import", delayedImportHandlers.listJobsHandler);
 fastify.get("/in/delayed-import/:jobId", delayedImportHandlers.getJobHandler);
 fastify.delete("/in/delayed-import/:jobId", delayedImportHandlers.cancelJobHandler);
+
+const rssDelayedImportHandlers = require("./src/requestHandlers/neon-rss-delayed-import.js");
+fastify.post("/in/delayed-import/from/rss", rssDelayedImportHandlers.submitRssDelayedImportHandler);
 
 /**
  *
@@ -531,6 +546,7 @@ fastify.listen(
     }
     
     console.log(`🚀 Server is running on ${address}`);
+    console.log(`🔗 Neon BO URL: ${process.env.NEON_BO_URL || '(not set)'}`);
 
     // Show additional access information
     const protocol = httpsOptions.https ? 'https' : 'http';

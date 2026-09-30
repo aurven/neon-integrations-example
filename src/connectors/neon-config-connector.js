@@ -20,6 +20,10 @@ const CONFIGS = {
     contentTypes: {
         label:     'Content Types',
         cacheFile: 'content-types.json'
+    },
+    workfolders: {
+        label:     'Workfolders',
+        cacheFile: 'workfolders.json'
     }
 };
 
@@ -40,12 +44,26 @@ async function saveToCache(type, data) {
     console.log(`[Neon Config] Saved ${type} to cache`);
 }
 
+function isCacheUsable(type, data) {
+    if (!data) return false;
+    if (type === 'workflows')   return data.workflows  && Object.keys(data.workflows).length > 0;
+    if (type === 'workfolders') return data.workfolders && data.workfolders.length > 0;
+    if (type === 'usersGroups') return (data.users && data.users.length > 0) || (data.groups && data.groups.length > 0);
+    if (type === 'contentTypes') return data.types && data.types.length > 0;
+    return true;
+}
+
 async function loadFromCache(type) {
     try {
         const cacheFile = path.join(CACHE_DIR, CONFIGS[type].cacheFile);
         const content = await fs.readFile(cacheFile, 'utf8');
+        const data = JSON.parse(content);
+        if (!isCacheUsable(type, data)) {
+            console.log(`[Neon Config] Cache for ${type} is empty — treating as miss`);
+            return null;
+        }
         console.log(`[Neon Config] Loaded ${type} from cache`);
-        return JSON.parse(content);
+        return data;
     } catch (error) {
         if (error.code === 'ENOENT') return null;
         throw new Error(`Failed to load cache for ${type}: ${error.message}`);
@@ -105,26 +123,71 @@ async function fetchFromNeon(type) {
     const client = new NeonClient();
 
     if (type === 'usersGroups') {
-        const [usersResult, groupsResult] = await Promise.all([
+        const [usersSettled, groupsSettled] = await Promise.allSettled([
             client.getUsers(),
             client.getGroups()
         ]);
 
+        if (usersSettled.status === 'rejected') {
+            console.warn(`[Neon Config] getUsers() failed: ${usersSettled.reason?.message}`);
+        }
+        if (groupsSettled.status === 'rejected') {
+            console.warn(`[Neon Config] getGroups() failed: ${groupsSettled.reason?.message}`);
+        }
+
+        const usersResult  = usersSettled.status  === 'fulfilled' ? usersSettled.value  : null;
+        const groupsResult = groupsSettled.status === 'fulfilled' ? groupsSettled.value : null;
+
         return {
             lastUpdated: new Date().toISOString(),
             source: 'neon-bo',
-            users:  usersResult?.users  || (Array.isArray(usersResult)  ? usersResult  : []),
-            groups: groupsResult?.groups || (Array.isArray(groupsResult) ? groupsResult : [])
+            users:  usersResult?.result  || usersResult?.users  || [],
+            groups: groupsResult?.result || groupsResult?.groups || []
         };
     }
 
     if (type === 'workflows') {
-        const workflowsResult = await client.getWorkflowDefinitions();
+        const fs = require('fs');
+        const cfgPath = path.join(process.cwd(), 'conf', 'neon-config', 'workflows.json');
+        let workflowNames = [];
+        try {
+            workflowNames = JSON.parse(fs.readFileSync(cfgPath, 'utf8')).workflows || [];
+        } catch (e) {
+            console.warn(`[Neon Config] Could not read workflows config: ${e.message}`);
+        }
+
+        // Fetch each configured workflow graph and build a step lookup map.
+        // Shape: { "Story": { version, steps: { "Edit": { id, color, description, initialState, endState, transitions[] } } } }
+        const byName = {};
+        for (const entry of workflowNames) {
+            const wfName = typeof entry === 'string' ? entry : entry.name;
+            const version = entry.version ?? undefined;
+            try {
+                const graph = await client.getWorkflowGraph(wfName, version);
+                const steps = {};
+                for (const step of (graph.steps || [])) {
+                    steps[step.name] = {
+                        id:           step.id,
+                        color:        step.color || null,
+                        description:  step.description || null,
+                        initialState: !!step.initialState,
+                        endState:     !!step.endState,
+                        transitions:  (step.transitions || []).map(t => t.name)
+                    };
+                }
+                byName[wfName] = {
+                    version: graph.process?.version ?? null,
+                    steps
+                };
+            } catch (e) {
+                console.error(`[Neon Config] Failed to fetch workflow graph "${wfName}": ${e.message}`);
+            }
+        }
 
         return {
             lastUpdated: new Date().toISOString(),
             source: 'neon-bo',
-            workflows: workflowsResult?.workflows || (Array.isArray(workflowsResult) ? workflowsResult : [])
+            workflows: byName
         };
     }
 
@@ -136,6 +199,20 @@ async function fetchFromNeon(type) {
             source: 'neon-bo',
             types: flattenContentTypes(typesResult)
         };
+    }
+
+    if (type === 'workfolders') {
+        // Workfolders are statically configured — the Neon BO endpoint for this
+        // does not exist on all versions. Edit conf/neon-config/workfolders.json to update.
+        const fsSync = require('fs');
+        const cfgPath = path.join(process.cwd(), 'conf', 'neon-config', 'workfolders.json');
+        let workfolders = [];
+        try {
+            workfolders = JSON.parse(fsSync.readFileSync(cfgPath, 'utf8')).workfolders || [];
+        } catch (e) {
+            console.warn(`[Neon Config] Could not read workfolders config: ${e.message}`);
+        }
+        return { lastUpdated: new Date().toISOString(), source: 'conf', workfolders };
     }
 }
 
@@ -244,6 +321,33 @@ function getTypeLabel(composedTypeName) {
     return labels[composedTypeName] || composedTypeName;
 }
 
+/**
+ * Load (cache or fetch) the workflows config.
+ * Returns { "Story": { version, steps: { stepName: { color, description, transitions[] } } } }
+ */
+async function loadWorkflowsConfig(forceRefresh = false) {
+    try {
+        const config = await getConfig('workflows', forceRefresh);
+        return config?.workflows || {};
+    } catch (error) {
+        console.warn(`⚠️ loadWorkflowsConfig(): failed to load (${error.message})`);
+        return {};
+    }
+}
+
+/**
+ * Load (cache or fetch) the workfolders config and return the flat list.
+ */
+async function loadWorkfoldersConfig(forceRefresh = false) {
+    try {
+        const config = await getConfig('workfolders', forceRefresh);
+        return config?.workfolders || [];
+    } catch (error) {
+        console.warn(`⚠️ loadWorkfoldersConfig(): failed to load (${error.message})`);
+        return [];
+    }
+}
+
 function getAvailableConfigs() {
     return Object.entries(CONFIGS).reduce((acc, [type, config]) => {
         acc[type] = { label: config.label, cacheFile: config.cacheFile };
@@ -262,6 +366,8 @@ module.exports = {
     refreshConfig,
     getAvailableConfigs,
     loadContentTypesConfig,
+    loadWorkflowsConfig,
+    loadWorkfoldersConfig,
     getTypeLabel,
     CONFIGS
 };

@@ -1,0 +1,7 @@
+/* Neon Design System — webfonts
+   Source Sans 3 is the current name for "Source Sans Pro", the primary UI
+   typeface in the Figma source. Inter is the secondary UI/label face.
+   Quicksand is used only for the Neon wordmark/logo.
+   NOTE: served from Google Fonts CDN. If you need offline binaries, drop
+   .woff2 files in tokens/fonts/ and replace this import with @font-face rules. */
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Inter:wght@400;500;600&family=Quicksand:wght@500;700&display=swap');
