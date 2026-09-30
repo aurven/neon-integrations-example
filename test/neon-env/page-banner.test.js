@@ -13,12 +13,32 @@ function runScript(html, responseEnv) {
     console: { log: (...a) => logs.push(a.join(' ')), error: (...a) => errors.push(a.join(' ')) },
     location: { href: 'https://app.example.com/neon/api/demo-integration/widgets/x', origin: 'https://app.example.com' },
     URL,
+    Headers,
   };
   sandbox.window = sandbox;
   sandbox.fetch = async () => ({ headers: { get: (h) => (h === 'X-Neon-Env' ? responseEnv : null) } });
   const code = html.match(/<script>([\s\S]*?)<\/script>/)[1];
   vm.runInNewContext(code, sandbox);
   return { sandbox, logs, errors };
+}
+
+// Records the init actually handed to the underlying fetch, to assert on header pinning.
+function runScriptRecording(html) {
+  const calls = [];
+  const sandbox = {
+    console: { log: () => {}, error: () => {} },
+    location: { href: 'https://app.example.com/neon/api/demo-integration/widgets/x', origin: 'https://app.example.com' },
+    URL,
+    Headers,
+  };
+  sandbox.window = sandbox;
+  sandbox.fetch = async (input, init) => {
+    calls.push({ input, init });
+    return { headers: { get: () => null } };
+  };
+  const code = html.match(/<script>([\s\S]*?)<\/script>/)[1];
+  vm.runInNewContext(code, sandbox);
+  return { sandbox, calls };
 }
 
 test('banner escapes </script> in labels and injects after <head>', () => {
@@ -49,6 +69,58 @@ test('missing header is reported, cross-origin calls are silent', async () => {
 test('null env prints a neutral banner', () => {
   const { logs } = runScript(bannerScript(null), null);
   assert.ok(logs[0].includes('no Neon environment'));
+});
+
+test('same-origin fetches are pinned to the page env via x-neon-env header', async () => {
+  const { sandbox, calls } = runScriptRecording(bannerScript(env));
+  await sandbox.window.fetch('/api/x');
+  assert.equal(calls[0].init.headers.get('x-neon-env'), 'demorc');
+});
+
+test('an explicit caller-supplied x-neon-env header (plain object) is not overwritten', async () => {
+  const { sandbox, calls } = runScriptRecording(bannerScript(env));
+  await sandbox.window.fetch('/api/x', { headers: { 'x-neon-env': 'other' } });
+  // Untouched (transparent): the wrapper leaves a header source it did not need to modify as-is.
+  assert.equal(new Headers(calls[0].init.headers).get('x-neon-env'), 'other');
+});
+
+test('an explicit caller-supplied x-neon-env header (array of pairs) is not overwritten', async () => {
+  const { sandbox, calls } = runScriptRecording(bannerScript(env));
+  await sandbox.window.fetch('/api/x', { headers: [['x-neon-env', 'other']] });
+  assert.equal(new Headers(calls[0].init.headers).get('x-neon-env'), 'other');
+});
+
+test('an explicit caller-supplied x-neon-env header (Headers instance) is not overwritten', async () => {
+  const { sandbox, calls } = runScriptRecording(bannerScript(env));
+  await sandbox.window.fetch('/api/x', { headers: new Headers({ 'x-neon-env': 'other' }) });
+  assert.equal(calls[0].init.headers.get('x-neon-env'), 'other');
+});
+
+test('a Request input already carrying x-neon-env is left untouched (init.headers absent)', async () => {
+  const { sandbox, calls } = runScriptRecording(bannerScript(env));
+  const req = new Request('https://app.example.com/api/x', { headers: { 'x-neon-env': 'other' } });
+  await sandbox.window.fetch(req);
+  assert.equal(calls[0].input, req);
+  assert.equal(calls[0].init, undefined);
+});
+
+test('a Request input without a header gets pinned via a copied Headers set', async () => {
+  const { sandbox, calls } = runScriptRecording(bannerScript(env));
+  const req = new Request('https://app.example.com/api/x');
+  await sandbox.window.fetch(req);
+  assert.equal(calls[0].init.headers.get('x-neon-env'), 'demorc');
+});
+
+test('cross-origin calls get no x-neon-env header', async () => {
+  const { sandbox, calls } = runScriptRecording(bannerScript(env));
+  await sandbox.window.fetch('https://api.pexels.com/v1/search');
+  assert.equal(calls[0].init, undefined);
+});
+
+test('null page env adds no header', async () => {
+  const { sandbox, calls } = runScriptRecording(bannerScript(null));
+  await sandbox.window.fetch('/api/x');
+  assert.equal(calls[0].init, undefined);
 });
 
 test('HTML without <head> is returned untouched', () => {

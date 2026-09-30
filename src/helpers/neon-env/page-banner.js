@@ -16,7 +16,23 @@ var wrapped = function (input, init) {
   var url = typeof input === 'string' ? input : (input && input.url) || String(input);
   var sameOrigin = false;
   try { sameOrigin = new URL(url, location.href).origin === location.origin; } catch (err) {}
-  return orig.apply(this, arguments).then(function (res) {
+
+  // Pin same-origin calls to this page's environment, so a stale admin cookie from
+  // another tab/env cannot hijack this page's calls. An explicit x-neon-env is kept.
+  var finalInit = init;
+  if (sameOrigin && e) {
+    var source = (init && init.headers !== undefined)
+      ? init.headers
+      : (input && typeof input === 'object' && input.headers !== undefined ? input.headers : undefined);
+    var h;
+    try { h = new Headers(source); } catch (err) { h = new Headers(); }
+    if (!h.has('x-neon-env')) {
+      h.set('x-neon-env', e.id);
+      finalInit = init ? Object.assign({}, init, { headers: h }) : { headers: h };
+    }
+  }
+
+  return orig.call(this, input, finalInit).then(function (res) {
     if (!sameOrigin) return res;
     var got = res && res.headers && res.headers.get('X-Neon-Env');
     if (!got) console.log(tag + ' (no env header) → ' + method + ' ' + url);
