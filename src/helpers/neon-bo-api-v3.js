@@ -1,6 +1,8 @@
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
+const https = require('https');
+const context = require('./neon-env/context.js');
 
 const NEON_CALLS_LOG_DIR = path.join(process.cwd(), 'logs', 'neon-calls');
 
@@ -12,16 +14,17 @@ function getCallerName() {
     return match ? match[1] : 'unknown';
 }
 
-function logNeonCall({ callerName, requestConfig, response, error }) {
+function logNeonCall({ callerName, requestConfig, response, error, envId }) {
     if (process.env.NEON_EXT_LOCATION !== 'Local') return;
 
     try {
         fs.mkdirSync(NEON_CALLS_LOG_DIR, { recursive: true });
 
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-        const filename = `${timestamp}_${callerName}.json`;
+        const filename = `${envId}_${timestamp}_${callerName}.json`;
 
         const entry = {
+            env: envId,
             caller: callerName,
             timestamp: new Date().toISOString(),
             request: {
@@ -51,16 +54,16 @@ function logNeonCall({ callerName, requestConfig, response, error }) {
 
 class NeonClient {
     constructor(options = {}) {
-        this.baseUrl = options.baseUrl || process.env.NEON_BO_URL;
-        this.apiKey = options.apiKey || process.env.NEON_BO_APIKEY;
-        this.userApiKey = options.userApiKey || process.env.NEON_USER_API_KEY;
+        // Explicit baseUrl = caller-managed client (tests/tools); otherwise bind to the request's env
+        const env = options.env || (options.baseUrl ? null : context.requireEnv());
+        this.envId = env?.id || 'custom';
+        this.baseUrl = options.baseUrl || env.neon.bo.url;
+        this.apiKey = options.apiKey || env.neon.bo.apiKey;
+        this.userApiKey = options.userApiKey || env.neon.bo.userApiKey;
         this.updateContextId = `neon-integration-${Date.now()}`;
 
-        if (process.env.NEON_EXT_LOCATION === 'Local') {
-            process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-        }
-
-        this.client = axios.create();
+        const insecure = options.insecureTls ?? env?.neon.insecureTls ?? false;
+        this.client = axios.create(insecure ? { httpsAgent: new https.Agent({ rejectUnauthorized: false }) } : {});
     }
 
     async makeRequest(config, successMessage = null, returnData = false) {
@@ -79,14 +82,14 @@ class NeonClient {
 
         const callerName = getCallerName();
 
-        console.log(`➡️  ${config.method?.toUpperCase() || 'REQUEST'} ${config.url} called by ${callerName} with config:`, '\n', JSON.stringify({ baseURL: this.baseUrl, ...restConfig }, null, 2));
+        console.log(`➡️  [env=${this.envId}] ${config.method?.toUpperCase() || 'REQUEST'} ${config.url} called by ${callerName} with config:`, '\n', JSON.stringify({ baseURL: this.baseUrl, ...restConfig }, null, 2));
 
         try {
             const response = await this.client.request(requestConfig);
             if (successMessage) {
                 console.log(`✅ ${successMessage}`);
             }
-            logNeonCall({ callerName, requestConfig, response });
+            logNeonCall({ callerName, requestConfig, response, envId: this.envId });
             return returnData ? response.data : response;
         } catch (error) {
             const errorMsg = `❌ ${config.method?.toUpperCase() || 'REQUEST'} ${config.url} failed: ${error.response?.status || error.code}`;
@@ -94,7 +97,7 @@ class NeonClient {
             if (error.response?.data) {
                 console.error('Error details:', JSON.stringify(error.response.data, null, 2));
             }
-            logNeonCall({ callerName, requestConfig, error });
+            logNeonCall({ callerName, requestConfig, error, envId: this.envId });
             throw error;
         }
     }
@@ -427,43 +430,58 @@ class NeonClient {
     }
 }
 
-const defaultClient = new NeonClient();
+const clientCache = new Map();
+
+function clientFor(env) {
+    const cached = clientCache.get(env.id);
+    if (cached && cached.envRef === env) return cached;
+    const client = new NeonClient({ env });
+    client.envRef = env;
+    clientCache.set(env.id, client);
+    return client;
+}
+
+function currentClient() {
+    return clientFor(context.requireEnv());
+}
 
 module.exports = {
     NeonClient,
+    clientFor,
+    currentClient,
 
-    // Flat API delegating to default client
-    getNode: (familyRef) => defaultClient.getNode(familyRef),
-    getNodeMetadata: (familyRef) => defaultClient.getNodeMetadata(familyRef),
-    deleteNode: (familyRef, force) => defaultClient.deleteNode(familyRef, force),
-    lockNode: (familyRef) => defaultClient.lockNode(familyRef),
-    unlockNode: (familyRef, unlockMode, force, updateContextId) => defaultClient.unlockNode(familyRef, unlockMode, force, updateContextId),
-    updateNodeContent: (familyRef, xmlBodyString) => defaultClient.updateNodeContent(familyRef, xmlBodyString),
-    updateNodeMetadata: (familyRef, xmlBodyString) => defaultClient.updateNodeMetadata(familyRef, xmlBodyString),
-    createNewStory: (options) => defaultClient.createNewStory(options),
-    putNode: (params) => defaultClient.putNode(params),
-    getSites: () => defaultClient.getSites(),
-    createNewSiteNode: (options, realm) => defaultClient.createNewSiteNode(options, realm),
-    publishSiteNode: (options, realm, viewStatus) => defaultClient.publishSiteNode(options, realm, viewStatus),
-    createUser: (options) => defaultClient.createUser(options),
-    getUsers: () => defaultClient.getUsers(),
-    getGroups: () => defaultClient.getGroups(),
-    addUserToGroup: (userId, groupName) => defaultClient.addUserToGroup(userId, groupName),
-    createGroup: (options) => defaultClient.createGroup(options),
-    updateGroup: (options) => defaultClient.updateGroup(options),
-    updateWorkspace: (params) => defaultClient.updateWorkspace(params),
-    updateWorkspaceTemplates: (params) => defaultClient.updateWorkspaceTemplates(params),
-    createBasefolder: (options) => defaultClient.createBasefolder(options),
-    getNextSteps: (familyRef) => defaultClient.getNextSteps(familyRef),
-    nextStepAssignment: (familyRef, options) => defaultClient.nextStepAssignment(familyRef, options),
-    getWorkflowGraph: (name, version) => defaultClient.getWorkflowGraph(name, version),
-    getContentTypesConfig: () => defaultClient.getContentTypesConfig(),
-    promoteNode: (familyRef, params) => defaultClient.promoteNode(familyRef, params),
-    promoteNodeEverywhere: (familyRef, params) => defaultClient.promoteNodeEverywhere(familyRef, params),
-    discoveryServices: () => defaultClient.discoveryServices(),
-    searchContents: (queryPayload, numberOfNodes, numberOfIds) => defaultClient.searchContents(queryPayload, numberOfNodes, numberOfIds),
-    getMetricsReports: () => defaultClient.getMetricsReports(),
-    getMetricsData: (reportId, queryParams) => defaultClient.getMetricsData(reportId, queryParams),
-    getWorkfolders: (types) => defaultClient.getWorkfolders(types),
-    duplicateNode: (familyRef, payload) => defaultClient.duplicateNode(familyRef, payload)
+    // Flat API delegating to current client
+    getNode: (familyRef) => currentClient().getNode(familyRef),
+    getNodeMetadata: (familyRef) => currentClient().getNodeMetadata(familyRef),
+    deleteNode: (familyRef, force) => currentClient().deleteNode(familyRef, force),
+    lockNode: (familyRef) => currentClient().lockNode(familyRef),
+    unlockNode: (familyRef, unlockMode, force, updateContextId) => currentClient().unlockNode(familyRef, unlockMode, force, updateContextId),
+    updateNodeContent: (familyRef, xmlBodyString) => currentClient().updateNodeContent(familyRef, xmlBodyString),
+    updateNodeMetadata: (familyRef, xmlBodyString) => currentClient().updateNodeMetadata(familyRef, xmlBodyString),
+    createNewStory: (options) => currentClient().createNewStory(options),
+    putNode: (params) => currentClient().putNode(params),
+    getSites: () => currentClient().getSites(),
+    createNewSiteNode: (options, realm) => currentClient().createNewSiteNode(options, realm),
+    publishSiteNode: (options, realm, viewStatus) => currentClient().publishSiteNode(options, realm, viewStatus),
+    createUser: (options) => currentClient().createUser(options),
+    getUsers: () => currentClient().getUsers(),
+    getGroups: () => currentClient().getGroups(),
+    addUserToGroup: (userId, groupName) => currentClient().addUserToGroup(userId, groupName),
+    createGroup: (options) => currentClient().createGroup(options),
+    updateGroup: (options) => currentClient().updateGroup(options),
+    updateWorkspace: (params) => currentClient().updateWorkspace(params),
+    updateWorkspaceTemplates: (params) => currentClient().updateWorkspaceTemplates(params),
+    createBasefolder: (options) => currentClient().createBasefolder(options),
+    getNextSteps: (familyRef) => currentClient().getNextSteps(familyRef),
+    nextStepAssignment: (familyRef, options) => currentClient().nextStepAssignment(familyRef, options),
+    getWorkflowGraph: (name, version) => currentClient().getWorkflowGraph(name, version),
+    getContentTypesConfig: () => currentClient().getContentTypesConfig(),
+    promoteNode: (familyRef, params) => currentClient().promoteNode(familyRef, params),
+    promoteNodeEverywhere: (familyRef, params) => currentClient().promoteNodeEverywhere(familyRef, params),
+    discoveryServices: () => currentClient().discoveryServices(),
+    searchContents: (queryPayload, numberOfNodes, numberOfIds) => currentClient().searchContents(queryPayload, numberOfNodes, numberOfIds),
+    getMetricsReports: () => currentClient().getMetricsReports(),
+    getMetricsData: (reportId, queryParams) => currentClient().getMetricsData(reportId, queryParams),
+    getWorkfolders: (types) => currentClient().getWorkfolders(types),
+    duplicateNode: (familyRef, payload) => currentClient().duplicateNode(familyRef, payload)
 };
