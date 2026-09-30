@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "adminApiKey": "env:NEON_EXT_APIKEY",
+  "environments": [
+    {
+      "id": "demorc",
+      "label": "Demo RC",
+      "default": false,
+      "hosts": ["neon-app-demorc.example.com"],
+      "extApiKey": "env:DEMORC_EXT_APIKEY",
+      "extApiKeyLimited": "env:DEMORC_EXT_APIKEY_LIMITED",
+      "warmup": true,
+      "neon": {
+        "insecureTls": false,
+        "app": {
+          "url": "https://neon-app-demorc.example.com"
+        },
+        "bo": {
+          "url": "https://neon-bo-demorc.example.com/api",
+          "apiKey": "env:DEMORC_BO_APIKEY",
+          "userApiKey": "env:DEMORC_USER_APIKEY"
+        },
+        "fo": {
+          "apiKey": "env:DEMORC_FO_APIKEY",
+          "sites": {
+            "theglobe": {
+              "live": "https://theglobe-demorc.example.com",
+              "preview": "https://preview-theglobe-demorc.example.com"
+            }
+          }
+        }
+      },
+      "services": {
+        "telegram": {
+          "botToken": "env:DEMORC_TELEGRAM_BOT_TOKEN",
+          "chatIds": {
+            "default": "env:DEMORC_TELEGRAM_CHAT_ID"
+          }
+        }
+      }
+    }
+  ]
+}
