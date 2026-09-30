@@ -48,3 +48,11 @@ test('insecureTls env does not touch process-wide TLS flag', () => {
   context.run(envB, () => new neonApi.NeonClient());
   assert.equal(process.env.NODE_TLS_REJECT_UNAUTHORIZED, before);
 });
+
+test('NeonClient with only baseUrl outside context does not throw and has undefined apiKey', () => {
+  const c = new neonApi.NeonClient({ baseUrl: 'https://x' });
+  assert.equal(c.envId, 'custom');
+  assert.equal(c.apiKey, undefined);
+  assert.equal(c.userApiKey, undefined);
+  assert.equal(c.baseUrl, 'https://x');
+});

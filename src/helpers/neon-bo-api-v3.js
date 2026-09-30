@@ -57,9 +57,9 @@ class NeonClient {
         // Explicit baseUrl = caller-managed client (tests/tools); otherwise bind to the request's env
         const env = options.env || (options.baseUrl ? null : context.requireEnv());
         this.envId = env?.id || 'custom';
-        this.baseUrl = options.baseUrl || env.neon.bo.url;
-        this.apiKey = options.apiKey || env.neon.bo.apiKey;
-        this.userApiKey = options.userApiKey || env.neon.bo.userApiKey;
+        this.baseUrl = options.baseUrl || env?.neon.bo.url;
+        this.apiKey = options.apiKey || env?.neon.bo.apiKey;
+        this.userApiKey = options.userApiKey || env?.neon.bo.userApiKey;
         this.updateContextId = `neon-integration-${Date.now()}`;
 
         const insecure = options.insecureTls ?? env?.neon.insecureTls ?? false;
