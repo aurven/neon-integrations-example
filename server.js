@@ -487,26 +487,17 @@ fastify.register(async function (fastify) {
 });
 
 // Initialize Neon config cache on startup (non-blocking)
-const { initializeAll: initializeNeonConfig } = require("./src/connectors/neon-config-connector");
+const { initializeAllEnvs: initializeNeonConfigAllEnvs } = require("./src/connectors/neon-config-connector");
 setImmediate(async () => {
-  try {
-    console.log('[Neon Config] Initializing cache...');
-    const results = await initializeNeonConfig();
-
-    if (results.initialized.length > 0) {
-      console.log(`[Neon Config] ✓ Fetched and cached: ${results.initialized.join(', ')}`);
+  console.log('[Neon Config] Initializing cache for all environments...');
+  const byEnv = await initializeNeonConfigAllEnvs(neonEnv.getRegistry());
+  for (const [envId, results] of Object.entries(byEnv)) {
+    if (results.error) {
+      console.error(`[Neon Config] [env=${envId}] ✗ ${results.error}`);
+      continue;
     }
-    if (results.cached.length > 0) {
-      console.log(`[Neon Config] ✓ Already cached: ${results.cached.join(', ')}`);
-    }
-    if (results.errors.length > 0) {
-      console.error(`[Neon Config] ✗ Errors: ${results.errors.length}`);
-      results.errors.forEach(err => {
-        console.error(`  - ${err.type}: ${err.error}`);
-      });
-    }
-  } catch (error) {
-    console.error('[Neon Config] Failed to initialize:', error.message);
+    console.log(`[Neon Config] [env=${envId}] ✓ fetched: ${results.initialized.join(', ') || '-'} | cached: ${results.cached.join(', ') || '-'}`);
+    results.errors.forEach(err => console.error(`[Neon Config] [env=${envId}]   - ${err.type}: ${err.error}`));
   }
 });
 
