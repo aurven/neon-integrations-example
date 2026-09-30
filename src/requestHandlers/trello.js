@@ -2,6 +2,7 @@ const seo = require("../seo.json");
 const trelloToNeon = require("../trello/import-card-to-neon.js");
 const { safeLogRequest } = require("../helpers/utils.js");
 const { authenticate } = require("../helpers/auth.js");
+const neonEnv = require("../helpers/neon-env");
 
 function mainPageHandler(request, reply) {
   let params = { seo: seo, iconHost: process.env.PROJECT_DOMAIN };
@@ -10,7 +11,7 @@ function mainPageHandler(request, reply) {
 };
 
 function sendToNeonPageHandler(request, reply) {
-  let params = { seo: seo, neonAppUrl: process.env.NEON_APP_URL };
+  let params = { seo: seo, neonAppUrl: neonEnv.appUrl() };
 
   return reply.view("/src/trello/send-to-neon.hbs", params);
 };

@@ -8,6 +8,7 @@ const { MethodeClient } = require("../helpers/methode-bo-api.js");
 const { createStoryPreviewWithSetup } = require("../helpers/methode-bo-api.js");
 const { authenticate, shouldShowMaintenance } = require("../helpers/auth.js");
 const { parseNeonArticleContent } = require("../helpers/neon-content-parser.js");
+const neonEnv = require("../helpers/neon-env");
 const { generateArticlePDF } = require("../helpers/pdf-generator.js");
 const { applyMetadataChanges } = require("../helpers/metadata-xpath-utils.js");
 
@@ -41,7 +42,7 @@ function trelloPanelHandler(request, reply) {
   let params = {
     seo: seo,
     apiKey: auth.apikey,
-    neonAppUrl: process.env.NEON_APP_URL,
+    neonAppUrl: neonEnv.appUrl(),
     trelloApiKey: process.env.TRELLO_APIKEY,
     trelloToken: process.env.TRELLO_TOKEN,
     trelloOrganizationId: process.env.TRELLO_ORGANIZATION_ID,
@@ -398,7 +399,7 @@ function methodePanelHandler(request, reply) {
   let params = {
     seo: seo,
     apiKey: auth.apikey,
-    neonAppUrl: process.env.NEON_APP_URL,
+    neonAppUrl: neonEnv.appUrl(),
     swingAppUrl: process.env.SWING_APP_URL,
     swingHost: process.env.SWING_HOST,
     methodeId: methodeId || null,
@@ -418,7 +419,7 @@ function quickchartPanelHandler(request, reply) {
   let params = {
     seo: seo,
     apiKey: auth.apikey,
-    neonAppUrl: process.env.NEON_APP_URL
+    neonAppUrl: neonEnv.appUrl()
   };
 
   // The Handlebars code will be able to access the parameter values and build them into the page
@@ -576,7 +577,7 @@ function articlePdfPanelHandler(request, reply) {
   let params = {
     seo: seo,
     apiKey: auth.apikey,
-    neonAppUrl: process.env.NEON_APP_URL,
+    neonAppUrl: neonEnv.appUrl(),
     objectId: objectId || null
   };
 
@@ -737,7 +738,7 @@ function socialMediaPanelHandler(request, reply) {
   let params = {
     seo: seo,
     apiKey: auth.apikey,
-    neonAppUrl: process.env.NEON_APP_URL || 'http://localhost:3000'
+    neonAppUrl: neonEnv.appUrl() || 'http://localhost:3000'
   };
 
   return reply.view("/src/panels/social-media-panel.hbs", params);
@@ -801,7 +802,7 @@ function externalSourcesPanelV2Handler(request, reply) {
   return reply.view('/src/panels/external-sources-panel-v2.hbs', {
     seo: seo,
     apiKey: auth.apikey,
-    neonAppUrl: process.env.NEON_APP_URL,
+    neonAppUrl: neonEnv.appUrl(),
     pexelsApiKey: process.env.PEXELS_APIKEY,
     youtubeApiKey: process.env.YOUTUBE_APIKEY,
     dailymotionApiKey: process.env.DAILYMOTION_APIKEY,
@@ -817,7 +818,7 @@ function familyAuditPanelV2Handler(request, reply) {
   return reply.view('/src/panels/family-audit-panel-v2.hbs', {
     seo: seo,
     apiKey: auth.apikey,
-    neonAppUrl: process.env.NEON_APP_URL
+    neonAppUrl: neonEnv.appUrl()
   });
 }
 
@@ -852,7 +853,7 @@ function socialPublisherPanelHandler(request, reply) {
   return reply.view('/src/panels/social-publisher-panel.hbs', {
     seo: seo,
     apiKey: auth.apikey,
-    neonAppUrl: process.env.NEON_APP_URL || 'http://localhost:3000'
+    neonAppUrl: neonEnv.appUrl() || 'http://localhost:3000'
   });
 }
 

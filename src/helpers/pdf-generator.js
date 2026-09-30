@@ -5,6 +5,7 @@
 
 const PDFDocument = require('pdfkit');
 const axios = require('axios');
+const neonEnv = require('./neon-env');
 
 /**
  * Download image from URL
@@ -17,7 +18,7 @@ async function downloadImage(url) {
       responseType: 'arraybuffer',
       timeout: 10000,
       // Bypass SSL verification for local development if needed
-      httpsAgent: process.env.NEON_EXT_LOCATION === 'Local'
+      httpsAgent: neonEnv.insecureTls()
         ? new (require('https').Agent)({ rejectUnauthorized: false })
         : undefined
     });

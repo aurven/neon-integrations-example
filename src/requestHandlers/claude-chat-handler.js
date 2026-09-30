@@ -4,6 +4,7 @@ const seo = require('../seo.json');
 const crypto = require('crypto');
 const { authenticate, shouldShowMaintenance } = require('../helpers/auth.js');
 const { handleChatTurn } = require('../helpers/claude-chat-helper.js');
+const neonEnv = require('../helpers/neon-env');
 
 /**
  * GET /panels/claude-chat
@@ -26,7 +27,7 @@ async function claudeChatPanelHandler(request, reply) {
   const params = {
     seo,
     apiKey: auth.apikey,
-    neonAppUrl: process.env.NEON_APP_URL || '',
+    neonAppUrl: neonEnv.appUrl() || '',
     sessionId: crypto.randomUUID(),
     isDemoMode: request.query.demo === 'true',
     role: auth.role

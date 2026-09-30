@@ -7,6 +7,7 @@ const { authenticate } = require("../helpers/auth.js");
 const neonBoApi = require("../helpers/neon-bo-api-v3.js");
 const neonUtils = require("../helpers/neon-utils.js");
 const neonConfigConnector = require("../connectors/neon-config-connector.js");
+const neonEnv = require("../helpers/neon-env");
 
 // Normalize "yyyymmdd" or "yyyy-mm-dd" into "yyyy-mm-dd" (used by issueDate field).
 function normalizeDateToIso(value) {
@@ -123,7 +124,7 @@ function dropWidgetHandler(request, reply) {
   }
 
   // params is an object we'll pass to our handlebars template
-  let params = { seo: seo, neonAppUrl: process.env.NEON_APP_URL };
+  let params = { seo: seo, neonAppUrl: neonEnv.appUrl() };
 
   // Check for theme query parameter
   const theme = request.query.theme;
@@ -270,7 +271,7 @@ function wiresWidgetHandler(request, reply) {
   }
 
   // params is an object we'll pass to our handlebars template
-  let params = { seo: seo, apiKey: auth.apikey, neonAppUrl: process.env.NEON_APP_URL };
+  let params = { seo: seo, apiKey: auth.apikey, neonAppUrl: neonEnv.appUrl() };
 
   // The Handlebars code will be able to access the parameter values and build them into the page
   return reply.view("/src/widgets/wires-list.hbs", params);
@@ -283,7 +284,7 @@ function breakingNewsWidgetHandler(request, reply) {
   }
 
   // params is an object we'll pass to our handlebars template
-  let params = { seo: seo, neonAppUrl: process.env.NEON_APP_URL };
+  let params = { seo: seo, neonAppUrl: neonEnv.appUrl() };
 
   return reply.view("/src/widgets/breakingnews-light.hbs", params);
 }
@@ -412,9 +413,10 @@ function nssDemoWidgetHandler(request, reply) {
       title: "NSS Demo — Neon Syndication Service",
       description: "Walkable demo of the Neon Syndication Service (Adnkronos) — Prodotti, Pacchetti, Clienti with fake data"
     },
-    neonAppUrl: process.env.NEON_APP_URL,
+    neonAppUrl: neonEnv.appUrl(),
     apiKey: auth.apikey,
-    demo: true
+    demo: true,
+    neonEnv: request.neonEnv ? { id: request.neonEnv.id, label: request.neonEnv.label, boHost: request.neonEnv.neon.bo.host } : null
   };
   return reply.view("/src/widgets/nss-demo.hbs", params);
 }
@@ -430,7 +432,7 @@ function planningBoardWidgetHandler(request, reply) {
       title: "Planning Board",
       description: "Editorial task planning board for newsroom workflow management"
     },
-    neonAppUrl: process.env.NEON_APP_URL
+    neonAppUrl: neonEnv.appUrl()
   };
   return reply.view("/src/widgets/planning-board.hbs", params);
 }
@@ -461,12 +463,13 @@ async function neonGridWidgetHandler(request, reply) {
       title: "Neon Articles Grid",
       description: "AG-Grid list of articles from Neon CMS"
     },
-    neonAppUrl: process.env.NEON_APP_URL,
+    neonAppUrl: neonEnv.appUrl(),
     apiKey: auth.apikey,
     demo: request.query.demo === 'true',
     gridConfig: JSON.stringify(gridConfig),
     gridConfigName: configName,
-    queryConfigName: queryName
+    queryConfigName: queryName,
+    neonEnv: request.neonEnv ? { id: request.neonEnv.id, label: request.neonEnv.label, boHost: request.neonEnv.neon.bo.host } : null
   };
   return reply.view("/src/widgets/neon-grid.hbs", params);
 }
@@ -599,11 +602,12 @@ function printQueryBoardHandler(request, reply) {
 
   return reply.view('/src/widgets/print-query-board.hbs', {
     seo: { title: 'Print Query Board', description: 'Kanban board for planning print edition stories by section, priority, desk, or access' },
-    neonAppUrl: process.env.NEON_APP_URL,
+    neonAppUrl: neonEnv.appUrl(),
     apiKey: auth.apikey,
     demo: request.query.demo === 'true',
     printConfig: JSON.stringify(printConfig),
-    queryConfigName: queryName
+    queryConfigName: queryName,
+    neonEnv: request.neonEnv ? { id: request.neonEnv.id, label: request.neonEnv.label, boHost: request.neonEnv.neon.bo.host } : null
   });
 }
 
@@ -688,7 +692,7 @@ async function neonCreateWidgetHandler(request, reply) {
 
   return reply.view('/src/widgets/neon-create.hbs', {
     seo: { title: 'Create Content', description: 'Quick content creation widget' },
-    neonAppUrl: process.env.NEON_APP_URL,
+    neonAppUrl: neonEnv.appUrl(),
     apiKey: auth.apikey,
     createConfig: JSON.stringify(createConfig),
   });
@@ -744,7 +748,7 @@ async function flashRapidoWidgetHandler(request, reply) {
   if (!auth.authenticated) return reply.status(401).send({ error: 'Unauthorized' });
   return reply.view('/src/widgets/flash-rapido.hbs', {
     seo: { title: 'Flash Rapido', description: 'Crea e pubblica flash ADNKronos' },
-    neonAppUrl: process.env.NEON_APP_URL,
+    neonAppUrl: neonEnv.appUrl(),
   });
 }
 

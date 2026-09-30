@@ -177,7 +177,7 @@ function extractBodyParagraphs(elements) {
  * @returns {Object} - Parsed article data
  */
 function parseNeonArticleContent(neonObject) {
-  const neonBaseUrl = process.env.NEON_BO_URL || '';
+  const neonBaseUrl = require('./neon-env').currentEnv()?.neon.bo.url || '';
 
   // Extract root-level metadata
   const rootData = neonObject.rootData || neonObject;

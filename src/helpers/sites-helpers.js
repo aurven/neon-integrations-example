@@ -1,7 +1,13 @@
 const https = require('https');
 const axios = require('axios');
+const { requireEnv } = require('./neon-env/context.js');
+const { NeonEnvConfigError } = require('./neon-env/errors.js');
 
-const NEON_FO_APIKEY = process.env.NEON_FO_APIKEY;
+function foConfig() {
+  const env = requireEnv();
+  if (!env.neon.fo) throw new NeonEnvConfigError(`FO not configured for env ${env.id}`, 501);
+  return env.neon.fo;
+}
 
 /**
  * Get the live public hostname for a site by fetching the siteNode info from the Front Office API
@@ -24,7 +30,7 @@ async function getSiteHostname(siteName, environment = 'live') {
     url: `${frontOfficeUrl}/api/sites/current`,
     headers: {
       'Content-Type': 'application/json',
-      'neon-fo-access-key': NEON_FO_APIKEY,
+      'neon-fo-access-key': foConfig().apiKey,
     },
   };
 
@@ -49,16 +55,13 @@ async function getSiteHostname(siteName, environment = 'live') {
 }
 
 function getFrontOfficeUrl(siteName, environment = 'live') {
-  console.log(`[getFrontOfficeUrl] siteName: ${siteName}, environment: ${environment}`);
-  // Build env var name: NEON_FO_THEGLOBE_LIVE_URL, NEON_FO_THEGLOBE_PREVIEW_URL, etc.
-  const envVarName = `NEON_FO_${siteName.toUpperCase()}_${environment.toUpperCase()}_URL`;
-  const url = process.env[envVarName];
-  console.log(`[getFrontOfficeUrl] returning: ${url}`);
+  const url = foConfig().sites?.[String(siteName).toLowerCase()]?.[String(environment).toLowerCase()];
+  console.log(`[getFrontOfficeUrl] env=${requireEnv().id} siteName: ${siteName}, environment: ${environment}, returning: ${url}`);
   return url;
 }
 
 async function getNodeById({ siteName, targetId, environment }) {
-  console.log(`[getNodeById] siteName: ${siteName}, targetId: ${targetId}, environment: ${environment}, NEON_FO_APIKEY: ${NEON_FO_APIKEY}`);
+  console.log(`[getNodeById] siteName: ${siteName}, targetId: ${targetId}, environment: ${environment}`);
   const frontOfficeUrl = getFrontOfficeUrl(siteName, environment);
 
   const config = {
@@ -67,7 +70,7 @@ async function getNodeById({ siteName, targetId, environment }) {
     url: `${frontOfficeUrl}/api/nodes/${targetId}`,
     headers: {
       "Content-Type": 'application/json',
-      "neon-fo-access-key": NEON_FO_APIKEY,
+      "neon-fo-access-key": foConfig().apiKey,
     },
   };
   
@@ -90,7 +93,7 @@ async function getNodeById({ siteName, targetId, environment }) {
 }
 
 async function getResource({ siteName, url, environment }) {
-  console.log(`[getResource] siteName: ${siteName}, url: ${url}, environment: ${environment}, NEON_FO_APIKEY: ${NEON_FO_APIKEY}`);
+  console.log(`[getResource] siteName: ${siteName}, url: ${url}, environment: ${environment}`);
   const frontOfficeUrl = getFrontOfficeUrl(siteName, environment);
 
   const config = {
@@ -99,7 +102,7 @@ async function getResource({ siteName, url, environment }) {
     url: `${frontOfficeUrl}${url}`,
     responseType: 'stream',
     headers: {
-      "neon-fo-access-key": NEON_FO_APIKEY,
+      "neon-fo-access-key": foConfig().apiKey,
       Accept: 'image/*'
     },
   };
@@ -134,5 +137,6 @@ module.exports = {
   getSiteHostname,
   getNodeById,
   getResource,
-  getResourceById
+  getResourceById,
+  getFrontOfficeUrl
 };
