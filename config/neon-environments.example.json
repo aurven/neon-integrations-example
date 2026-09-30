@@ -1,5 +1,6 @@
 {
   "version": 1,
+  "_note": "Any 'env:VAR_NAME' reference anywhere in an environment entry whose variable is unset (or empty) invalidates that WHOLE entry, not just the field that used it — even an optional field like extApiKeyLimited below. The entry is skipped entirely (see the startup log) rather than partially loaded.",
   "adminApiKey": "env:NEON_EXT_APIKEY",
   "environments": [
     {

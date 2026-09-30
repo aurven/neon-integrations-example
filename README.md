@@ -284,6 +284,10 @@ For each request, the environment is determined by:
 3. **Admin key + caller host**: If no explicit env, use the environment whose `hosts` contain the request's caller host.
 4. **Admin key + default**: Fall back to the default environment.
 
+Once an environment is selected (by key or by explicit `?env=`), its `hosts` list is checked against the request's `Origin`/`Referer`/`X-Forwarded-Host`. The request is rejected with 403 **only when a caller host belongs to a different registered environment** — e.g. an `env-a` apikey used from a page whose `Referer` is one of `env-b`'s hosts. A caller host that isn't registered to any environment (a standalone link opened from Notion, Slack, an email client, etc.) is ignored, not rejected.
+
+In **legacy mode** (no registry file), keyless requests still run in the single legacy environment's context, so keyless routes such as `/in/neon/webhook` keep working as before. In **file mode** (a registry file is present), a keyless request resolves to no environment at all — env-scoped routes (webhooks, delayed-import jobs, etc.) then require either an env-bound `?apikey=` or the known-insecure `/legacy?env=<id>` fallback below.
+
 ### Integration Configuration
 
 For each Neon environment in your registry:
@@ -298,7 +302,11 @@ For each Neon environment in your registry:
 
 ### Known-Insecure Webhook Fallback
 
-The endpoint `POST /in/neon/webhook/legacy?env=<id>` accepts requests **without an apikey**, but only for environments with `"insecureWebhook": true` in the registry. Unknown environments or those without the flag return 403. This fallback is for legacy Neon iframes that cannot send custom headers; prefer `?apikey=` URLs whenever possible. Each insecure call is logged as a warning.
+The endpoint `POST /in/neon/webhook/legacy?env=<id>` accepts requests **without an apikey**, but only for environments with `"insecureWebhook": true` in the registry. Unknown environments or those without the flag return 403. This fallback is for **Neon webhooks**, which cannot send custom headers or an apikey; prefer `?apikey=` URLs whenever possible. Each insecure call is logged as a warning. A wrong apikey on this endpoint is always rejected with 401, never silently treated as a keyless call.
+
+### After Fixing a Misconfigured Environment
+
+If an environment's registry entry was missing/wrong (bad `extApiKey`, unreachable `neon.bo.url`, etc.) and its first Neon config warm-up failed at startup, that environment's cached config (users/groups, workflows, content types, workfolders) can be left empty. Fixing the registry entry alone does not retry that warm-up. After correcting it, refresh the cache explicitly: `POST /neon/config/refresh` using that environment's own apikey.
 
 ### Rollout
 
