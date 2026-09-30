@@ -1,6 +1,8 @@
 const delayedImporter = require("../delayed-importer.js");
 const { safeLogRequest } = require("../helpers/utils.js");
 const { authenticate } = require("../helpers/auth.js");
+const { NoNeonEnvError } = require("../helpers/neon-env/errors.js");
+const { getRegistry } = require("../helpers/neon-env/registry.js");
 
 // Delayed simulated feed into Neon
 async function submitJobHandler(request, reply) {
@@ -8,6 +10,10 @@ async function submitJobHandler(request, reply) {
   if (!auth.authenticated) {
     console.log("submitJobHandler << ERROR: Unauthorized");
     return reply.status(401).send({ error: "Unauthorized" });
+  }
+  if (!request.neonEnv) {
+    console.log("submitJobHandler << ERROR: No Neon environment");
+    return reply.status(400).send({ error: new NoNeonEnvError(getRegistry().ids()).message });
   }
 
   console.log("submitJobHandler << IN:");
