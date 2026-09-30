@@ -1,4 +1,5 @@
 const store = require('../helpers/tag-manager-store');
+const { isAdminRequest } = require('../helpers/auth.js');
 
 /**
  * Tag Manager Request Handlers
@@ -816,15 +817,12 @@ async function deleteStream(request, reply) {
 // --- Route Registration ---
 
 async function registerRoutes(fastify, options) {
-  const { apikey } = options;
-
   const authenticate = async (request, reply) => {
-    const requestApiKey = request.headers['apikey'] || request.query.apikey || request.cookies?.apikey;
-    if (!requestApiKey || requestApiKey !== apikey) {
+    if (!isAdminRequest(request)) {
       return reply.status(401).send({ success: false, error: 'Unauthorized' });
     }
     // Set cookie so subsequent browser fetch calls authenticate automatically
-    reply.setCookie('apikey', requestApiKey, {
+    reply.setCookie('apikey', request.neonAuth.apikey, {
       path: '/',
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',

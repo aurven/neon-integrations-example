@@ -5,6 +5,7 @@ const {
     refreshAll,
     refreshConfig
 } = require('../connectors/neon-config-connector');
+const { isAdminRequest } = require('../helpers/auth.js');
 
 const VALID_TYPES = ['usersGroups', 'workflows', 'contentTypes', 'workfolders'];
 
@@ -132,12 +133,9 @@ async function refreshSingleConfig(request, reply) {
 // ── Route registration ────────────────────────────────────────────────────────
 
 async function registerRoutes(fastify, options) {
-    const { apikey } = options;
-
     // Auth preHandler — scoped to this plugin instance only
     fastify.addHook('preHandler', async (request, reply) => {
-        const requestApiKey = request.headers['apikey'];
-        if (!requestApiKey || requestApiKey !== apikey) {
+        if (!isAdminRequest(request)) {
             return reply.status(401).send({
                 success: false,
                 error:   'Unauthorized: Invalid or missing API key'

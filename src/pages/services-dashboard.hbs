@@ -249,6 +249,14 @@
     </style>
   </head>
   <body>
+    {{#if registryWarning}}
+    <div style="background:#b00020;color:#fff;padding:8px 16px;font-weight:600">⚠️ Neon environment registry unusable, running in legacy mode: {{registryWarning}}</div>
+    {{/if}}
+    {{#if neonEnvs.length}}
+    <div style="padding:6px 16px;font-size:13px;background:#f2f4f7">Neon environments:
+      {{#each neonEnvs}}<span style="margin-right:12px">{{#if current}}<b>● {{label}}</b>{{else}}{{label}}{{/if}} <code>{{id}}</code> ({{boHost}})</span>{{/each}}
+    </div>
+    {{/if}}
     <div class="dashboard-container">
       <div class="header">
         <h1>Neon Integrations Dashboard</h1>

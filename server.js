@@ -44,6 +44,14 @@ fastify.register(require("@fastify/cookie"), {
   parseOptions: {}
 });
 
+// Neon environment resolution (per-request env context, X-Neon-Env headers, console banner)
+const neonEnv = require("./src/helpers/neon-env");
+const { printRegistrySummary } = require("./src/helpers/neon-env/registry.js");
+fastify.register(require("./src/helpers/neon-env/fastify-plugin.js"));
+printRegistrySummary(neonEnv.getRegistry());
+
+const { authenticate, isAdminRequest } = require("./src/helpers/auth.js");
+
 // View is a templating manager for fastify
 const handlebars = require("handlebars");
 
@@ -92,7 +100,7 @@ fastify.get("/", function (request, reply) {
 });
 
 // Services dashboard
-fastify.get("/services", function (request, reply) {
+fastify.get("/services", async function handler(request, reply) {
   const integrations = {
     inbound: [
       { name: "Generic Import", endpoint: "POST /in/neon", description: "Import items from external sources to Neon CMS" },
@@ -191,10 +199,12 @@ fastify.get("/services", function (request, reply) {
     ]
   };
 
-  let params = { 
-    seo: seo, 
+  let params = {
+    seo: seo,
     integrations: integrations,
-    location: process.env.NEON_EXT_LOCATION || "Unknown",
+    location: request.neonEnv?.label || "No environment",
+    neonEnvs: neonEnv.getRegistry().list().map(e => ({ id: e.id, label: e.label, boHost: e.neon.bo.host, current: e.id === request.neonEnv?.id })),
+    registryWarning: neonEnv.getRegistry().loadError || null,
     version: appVersion
   };
 
@@ -203,19 +213,25 @@ fastify.get("/services", function (request, reply) {
 
 // Example
 fastify.get("/test", async function handler(request, reply) {
-  const { apikey } = request.headers?.apikey
-    ? request.headers
-    : { apikey: null };
-
-  if (!apikey || apikey != process.env.NEON_EXT_APIKEY) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) {
     return reply.status(401).send({ error: "Unauthorized" });
   }
 
   return reply.status(200).send({
     message: "Neon Integrations Up and Running",
     version: appVersion,
-    location: process.env.NEON_EXT_LOCATION || "Unknown",
+    location: request.neonEnv?.label || "No environment",
+    neonEnv: request.neonEnv?.id || null,
   });
+});
+
+// TEMPORARY probe (spec §10 step 2): which headers does the Neon proxy forward? Remove after rollout step 2.
+fastify.get("/debug/headers", async function handler(request, reply) {
+  if (!isAdminRequest(request)) return reply.status(401).send({ error: "Unauthorized" });
+  const redacted = { ...request.headers };
+  for (const k of ["apikey", "cookie", "authorization"]) if (redacted[k]) redacted[k] = "[redacted]";
+  return { headers: redacted, resolvedEnv: request.neonEnv?.id || null, role: request.neonAuth.role, global: request.neonAuth.global };
 });
 
 // Utilities
@@ -546,7 +562,7 @@ fastify.listen(
     }
     
     console.log(`🚀 Server is running on ${address}`);
-    console.log(`🔗 Neon BO URL: ${process.env.NEON_BO_URL || '(not set)'}`);
+    console.log(`🔗 Neon environments: ${neonEnv.getRegistry().ids().join(', ') || '(none)'}`);
 
     // Show additional access information
     const protocol = httpsOptions.https ? 'https' : 'http';
