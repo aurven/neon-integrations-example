@@ -244,3 +244,22 @@ Manual checks:
 ## Open questions
 
 - Which headers the `/neon/api/demo-integration` proxy forwards (resolved in rollout step 2). The key-based resolution does not depend on this; only the secondary host check does.
+
+## Amendments (planning phase, 2026-09-30)
+
+These refinements came up while writing the implementation plan (`docs/superpowers/plans/2026-09-30-multi-neon-env.md`):
+
+1. **Admin key with no explicit env: infer from the caller host.** Resolution order for the global admin key is:
+   1. explicit env (`x-neon-env` header → `?env` → `neonEnv` cookie)
+   2. registry env whose `hosts` contain the caller host
+   3. the default env
+
+   This keeps Neon iframes that still send the shared admin key pointed at the right env during rollout.
+2. **Admin key, no env resolvable.** The request proceeds with no env (instead of a 400 at resolution time), and the first Neon call throws `NoNeonEnvError` (statusCode 400, listing valid ids). This way static assets and non-Neon routes are not blocked.
+3. **Explicit env persistence.** An admin `?env=` or `x-neon-env` choice is stored in an httpOnly `neonEnv` cookie, so follow-up calls from a standalone page stay on that env. A cookie naming an env that is no longer registered is cleared and ignored.
+4. **Self-host exclusion.** The host check ignores `Origin`/`Referer`/`X-Forwarded-Host` values equal to the request `Host` or `PROJECT_DOMAIN`, and ignores `Origin: null`.
+5. **Keyless requests in legacy mode.** With no registry file, unauthenticated requests still run in the legacy env context, so keyless routes such as `/in/neon/webhook` (whose auth is currently commented out) keep working. In file mode, keyless requests get no env, so webhooks must carry `?apikey=<extApiKey>`.
+6. **Console logging uses a global `fetch` wrapper.** The wrapper is injected inline into every HTML response (right after `<head>`). This replaces patching the individual helpers, so raw `fetch` calls in templates and React bundles are covered too. Only same-origin calls are logged. A missing `X-Neon-Env` header (e.g. stripped by the Neon proxy) is logged as such.
+7. **Méthode TLS.** `methode-bo-api.js` keeps its Local-only process-wide TLS flag, because `axios-cookiejar-support` rejects custom `httpsAgent`s. Neon, PDF and Mailjet use per-request agents driven by `neon.insecureTls`.
+8. **Claude chat sessions** are keyed by `<envId>:<sessionId>`.
+9. **SDK client caches** (Anthropic, Sendgrid) are keyed by API key rather than env id, which gives equivalent isolation and simpler invalidation.
