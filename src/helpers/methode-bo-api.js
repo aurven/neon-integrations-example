@@ -1,6 +1,7 @@
 const axios = require('axios');
 const { wrapper } = require('axios-cookiejar-support');
 const { CookieJar } = require('tough-cookie');
+const { serviceConfig } = require('./neon-env');
 
 /**
  * Méthode BO API Client - Refactored for better session management and less repetition
@@ -14,11 +15,12 @@ const { CookieJar } = require('tough-cookie');
 
 class MethodeClient {
     constructor(options = {}) {
-        this.server = options.server || process.env.EDAPI_SERVER;
-        this.restEndpoint = options.restEndpoint || process.env.EDAPI_REST_ENDPOINT;
+        const cfg = serviceConfig('methode');
+        this.server = options.server || cfg.server;
+        this.restEndpoint = options.restEndpoint || cfg.restEndpoint;
         this.baseUrl = this.server + this.restEndpoint;
-        this.connectionId = options.connectionId || process.env.EDAPI_CONNECTIONID;
-        this.databaseId = options.databaseId || process.env.EDAPI_DATABASEID;
+        this.connectionId = options.connectionId || cfg.connectionId;
+        this.databaseId = options.databaseId || cfg.databaseId;
         this.sessionId = options.sessionId || `methode-session-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
         
         // Create individual cookie jar for this session
@@ -597,8 +599,8 @@ async function getStoryShapeWithContent(loid) {
         const methodeClient = new MethodeClient();
 
         await methodeClient.login({
-            username: process.env.EDAPI_USERNAME,
-            password: process.env.EDAPI_PASSWORD
+            username: serviceConfig('methode').username,
+            password: serviceConfig('methode').password
         });
 
         const storyObject = await methodeClient.getObject(loid);
@@ -669,8 +671,8 @@ async function createStoryPreviewWithSetup(loid, previewOptions = {}) {
 
         const methodeClient = new MethodeClient();
         await methodeClient.login({
-            username: process.env.EDAPI_USERNAME,
-            password: process.env.EDAPI_PASSWORD
+            username: serviceConfig('methode').username,
+            password: serviceConfig('methode').password
         });
 
         const { shape, storyObject, xmlContent, printPageId, targetBundleChannel, linkId, linkedPagePath } = await getStoryShapeWithContent(loid);

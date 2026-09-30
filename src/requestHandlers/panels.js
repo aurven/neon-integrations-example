@@ -43,11 +43,11 @@ function trelloPanelHandler(request, reply) {
     seo: seo,
     apiKey: auth.apikey,
     neonAppUrl: neonEnv.appUrl(),
-    trelloApiKey: process.env.TRELLO_APIKEY,
-    trelloToken: process.env.TRELLO_TOKEN,
-    trelloOrganizationId: process.env.TRELLO_ORGANIZATION_ID,
+    trelloApiKey: neonEnv.serviceConfig('trello').apiKey,
+    trelloToken: neonEnv.serviceConfig('trello').token,
+    trelloOrganizationId: neonEnv.serviceConfig('trello').organizationId,
     externalRef: externalRef || null,
-    isDraggable: !!process.env.TRELLO_PANEL_DRAGGABLE
+    isDraggable: !!neonEnv.serviceConfig('trello').panelDraggable
   };
 
   // The Handlebars code will be able to access the parameter values and build them into the page
@@ -64,10 +64,10 @@ function externalSourcesPanelHandler(request, reply) {
   let params = {
     seo: seo,
     apiKey: auth.apikey,
-    pexelsApiKey: process.env.PEXELS_APIKEY,
-    youtubeApiKey: process.env.YOUTUBE_APIKEY,
-    dailymotionApiKey: process.env.DAILYMOTION_APIKEY,
-    dailymotionApiSecret: process.env.DAILYMOTION_APISECRET,
+    pexelsApiKey: neonEnv.serviceConfig('pexels').apiKey,
+    youtubeApiKey: neonEnv.serviceConfig('youtube').apiKey,
+    dailymotionApiKey: neonEnv.serviceConfig('dailymotion').apiKey,
+    dailymotionApiSecret: neonEnv.serviceConfig('dailymotion').apiSecret,
     integrationsApiKey: auth.apikey
   };
 
@@ -91,7 +91,7 @@ async function trelloApiProxyHandler(request, reply) {
     const url = `${baseUrl}/${endpoint}`;
     
     // Set up OAuth Authorization header
-    const authHeader = `OAuth oauth_consumer_key="${process.env.TRELLO_APIKEY}", oauth_token="${process.env.TRELLO_TOKEN}"`;
+    const authHeader = `OAuth oauth_consumer_key="${neonEnv.serviceConfig('trello').apiKey}", oauth_token="${neonEnv.serviceConfig('trello').token}"`;
     
     const config = {
       headers: {
@@ -146,7 +146,7 @@ async function pexelsApiProxyHandler(request, reply) {
 
     const config = {
       headers: {
-        'Authorization': process.env.PEXELS_APIKEY,
+        'Authorization': neonEnv.serviceConfig('pexels').apiKey,
         'Content-Type': 'application/json'
       },
       params: request.query // Pass through query parameters
@@ -204,7 +204,7 @@ async function youtubeApiProxyHandler(request, reply) {
       },
       params: {
         ...request.query,
-        key: process.env.YOUTUBE_APIKEY
+        key: neonEnv.serviceConfig('youtube').apiKey
       }
     };
 
@@ -243,8 +243,10 @@ let dailymotionTokenCache = {
  * Get OAuth 2.0 access token for DailyMotion API
  */
 async function getDailymotionAccessToken() {
+  const { apiKey, apiSecret } = neonEnv.serviceConfig('dailymotion');
+
   // If no credentials, return null
-  if (!process.env.DAILYMOTION_APIKEY || !process.env.DAILYMOTION_APISECRET) {
+  if (!apiKey || !apiSecret) {
     return null;
   }
 
@@ -258,8 +260,8 @@ async function getDailymotionAccessToken() {
     const response = await axios.post('https://api.dailymotion.com/oauth/token', null, {
       params: {
         grant_type: 'client_credentials',
-        client_id: process.env.DAILYMOTION_APIKEY,
-        client_secret: process.env.DAILYMOTION_APISECRET
+        client_id: apiKey,
+        client_secret: apiSecret
       }
     });
 
@@ -400,8 +402,8 @@ function methodePanelHandler(request, reply) {
     seo: seo,
     apiKey: auth.apikey,
     neonAppUrl: neonEnv.appUrl(),
-    swingAppUrl: process.env.SWING_APP_URL,
-    swingHost: process.env.SWING_HOST,
+    swingAppUrl: neonEnv.serviceConfig('methode').swingAppUrl,
+    swingHost: neonEnv.serviceConfig('methode').swingHost,
     methodeId: methodeId || null,
     printConfig: JSON.stringify(loadPrintConfig()),
   };
@@ -443,8 +445,8 @@ async function methodeApiProxyHandler(request, reply) {
     
     // Login with credentials from environment
     await methodeClient.login({
-      username: process.env.EDAPI_USERNAME,
-      password: process.env.EDAPI_PASSWORD
+      username: neonEnv.serviceConfig('methode').username,
+      password: neonEnv.serviceConfig('methode').password
     });
 
     let result;
@@ -803,10 +805,10 @@ function externalSourcesPanelV2Handler(request, reply) {
     seo: seo,
     apiKey: auth.apikey,
     neonAppUrl: neonEnv.appUrl(),
-    pexelsApiKey: process.env.PEXELS_APIKEY,
-    youtubeApiKey: process.env.YOUTUBE_APIKEY,
-    dailymotionApiKey: process.env.DAILYMOTION_APIKEY,
-    dailymotionApiSecret: process.env.DAILYMOTION_APISECRET,
+    pexelsApiKey: neonEnv.serviceConfig('pexels').apiKey,
+    youtubeApiKey: neonEnv.serviceConfig('youtube').apiKey,
+    dailymotionApiKey: neonEnv.serviceConfig('dailymotion').apiKey,
+    dailymotionApiSecret: neonEnv.serviceConfig('dailymotion').apiSecret,
     integrationsApiKey: auth.apikey
   });
 }

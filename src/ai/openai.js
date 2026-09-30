@@ -2,27 +2,32 @@ const { OpenAI } = require('openai');
 const fs = require('fs');
 const path = require('path');
 const { Readable } = require('stream');
+const { serviceConfig } = require('../helpers/neon-env');
 
-const OPENAI_APIKEY = process.env.OPENAI_APIKEY;
+const openaiClients = new Map();
 
-// Initialize OpenAI client with proper error handling
-const openai = OPENAI_APIKEY ? new OpenAI({
-  apiKey: OPENAI_APIKEY,
-}) : null;
+// Get (or lazily create) the OpenAI client for the current environment's API key
+function getOpenAI() {
+  const { apiKey } = serviceConfig('openai');
+  if (!apiKey) return null;
+  if (!openaiClients.has(apiKey)) openaiClients.set(apiKey, new OpenAI({ apiKey }));
+  return openaiClients.get(apiKey);
+}
 
 async function completions({
   model = "gpt-4o-mini",
   messages,
   temperature = 0.7
 }) {
+    const openai = getOpenAI();
     if (!openai) {
         throw new Error('OpenAI client not initialized. Please set OPENAI_APIKEY environment variable.');
     }
-    
+
     console.log(model);
     console.log(temperature);
     console.log(messages);
-    
+
     try {
         const completion = await openai.chat.completions.create({
             model,
@@ -46,11 +51,12 @@ async function completions({
  * @param {string} apiKey - Your OpenAI API key (optional, uses environment variable by default).
  * @returns {Promise<Object>} - Object containing QNA array, raw text, and OpenAI response data.
  */
-async function transcribeAudio(audio, filename, apiKey = OPENAI_APIKEY) {
+async function transcribeAudio(audio, filename, apiKey = serviceConfig('openai').apiKey) {
+  const openai = getOpenAI();
   if (!openai) {
     throw new Error('OpenAI client not initialized. Please set OPENAI_APIKEY environment variable.');
   }
-  
+
   try {
     // Convert buffer to readable stream for OpenAI SDK
     const audioStream = Readable.from(audio);
@@ -114,11 +120,12 @@ function getAudioMimeType(filename) {
  * @param {string} apiKey - OpenAI API key (optional, uses environment variable by default).
  * @returns {Promise<Object>} - Object containing structured article data.
  */
-async function generateInterviewStructure(transcription, apiKey = OPENAI_APIKEY) {
+async function generateInterviewStructure(transcription, apiKey = serviceConfig('openai').apiKey) {
+  const openai = getOpenAI();
   if (!openai) {
     throw new Error('OpenAI client not initialized. Please set OPENAI_APIKEY environment variable.');
   }
-  
+
   const systemPrompt = `
 You are a journalist formatting an interview for publication. Use always the whole text as reference.
 You are given a transcription of an interview in raw text. 

@@ -2,9 +2,8 @@ const fs = require('fs');
 const axios = require('axios');
 const { parse } = require('node-html-parser');
 const dayjs = require('dayjs');
+const { serviceConfig } = require('../helpers/neon-env');
 
-// Replace with your own API key obtained from The Guardian https://open-platform.theguardian.com/documentation/
-const apiKey = process.env.GUARDIAN_APIKEY;
 const baseUrl = 'https://content.guardianapis.com/search';
 
 async function downloadImage(url, image_path) {
@@ -54,7 +53,7 @@ async function getItemsFromSite(options, saveLocally = false) {
     }
 
     // Build the API request URL
-    const url = `${baseUrl}?api-key=${apiKey}&page-size=${pageSize}&section=${section}&from-date=${fromDate}&to-date=${toDate}&show-fields=${showFields}`;
+    const url = `${baseUrl}?api-key=${serviceConfig('guardian').apiKey}&page-size=${pageSize}&section=${section}&from-date=${fromDate}&to-date=${toDate}&show-fields=${showFields}`;
 
     const items = [];
 

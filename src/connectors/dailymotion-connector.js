@@ -1,7 +1,6 @@
 const axios = require("axios");
+const { serviceConfig } = require('../helpers/neon-env');
 
-const DAILYMOTION_APIKEY = process.env.DAILYMOTION_APIKEY;
-const DAILYMOTION_APISECRET = process.env.DAILYMOTION_APISECRET;
 const DAILYMOTION_URL = 'https://api.dailymotion.com';
 
 // Cache for access token
@@ -15,8 +14,10 @@ let accessTokenCache = {
  * @returns {Promise<string|null>} Access token or null if credentials not configured
  */
 async function getAccessToken() {
+  const { apiKey, apiSecret } = serviceConfig('dailymotion');
+
   // If no credentials, return null (API will work with limited access)
-  if (!DAILYMOTION_APIKEY || !DAILYMOTION_APISECRET) {
+  if (!apiKey || !apiSecret) {
     console.log('DailyMotion credentials not configured, using public access');
     return null;
   }
@@ -31,8 +32,8 @@ async function getAccessToken() {
     const response = await axios.post('https://api.dailymotion.com/oauth/token', null, {
       params: {
         grant_type: 'client_credentials',
-        client_id: DAILYMOTION_APIKEY,
-        client_secret: DAILYMOTION_APISECRET
+        client_id: apiKey,
+        client_secret: apiSecret
       }
     });
 

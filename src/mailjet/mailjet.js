@@ -5,7 +5,8 @@ const { getSiteHostname } = require('../helpers/sites-helpers');
 const neonEnv = require('../helpers/neon-env');
 
 async function sendSingleEmail(emailData) {
-  const auth = Buffer.from(`${process.env.MAILJET_APIKEY}:${process.env.MAILJET_APISECRET}`).toString('base64');
+  const mj = neonEnv.serviceConfig('mailjet');
+  const auth = Buffer.from(`${mj.apiKey}:${mj.apiSecret}`).toString('base64');
   
   const config = {
     method: 'post',

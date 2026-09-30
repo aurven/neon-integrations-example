@@ -1,6 +1,7 @@
 const OpenAI = require('openai');
 const Anthropic = require('@anthropic-ai/sdk');
 const { parseRichText } = require('../connectors/bluesky-connector');
+const { serviceConfig } = require('./neon-env');
 
 /**
  * Social Media Helper
@@ -53,7 +54,7 @@ const PLATFORM_CONFIGS = {
  * @returns {Anthropic|null} Anthropic client instance or null if not configured
  */
 function getAnthropicClient() {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = serviceConfig('anthropic').apiKey;
 
   if (!apiKey) {
     console.log('[Social Media Helper] Anthropic API key not configured. Will use OpenAI fallback.');
@@ -68,7 +69,7 @@ function getAnthropicClient() {
  * @returns {OpenAI|null} OpenAI client instance or null if not configured
  */
 function getOpenAIClient() {
-  const apiKey = process.env.OPENAI_APIKEY;
+  const apiKey = serviceConfig('openai').apiKey;
 
   if (!apiKey) {
     console.log('[Social Media Helper] OpenAI API key not configured.');

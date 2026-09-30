@@ -1,6 +1,15 @@
-const sgMail = require("@sendgrid/mail");
-
-sgMail.setApiKey(process.env.SENDGRID_APIKEY);
+const { MailService } = require('@sendgrid/mail');
+const { serviceConfig } = require('../helpers/neon-env');
+const mailServices = new Map();
+function mailer() {
+  const { apiKey } = serviceConfig('sendgrid');
+  if (!mailServices.has(apiKey)) {
+    const svc = new MailService();
+    svc.setApiKey(apiKey);
+    mailServices.set(apiKey, svc);
+  }
+  return mailServices.get(apiKey);
+}
 
 async function sendTest() {
   const msg = {
@@ -10,7 +19,7 @@ async function sendTest() {
     text: 'and easy to do anywhere, even with Node.js',
     html: '<strong>and easy to do anywhere, even with Node.js</strong>',
   };
-  return sgMail
+  return mailer()
     .send(msg)
     .then(() => {
       const msg = "Email sent";
@@ -57,7 +66,7 @@ async function sendWeeklyGlobe() {
       Sender_Zip: "20010",
     },
   };
-  return sgMail
+  return mailer()
     .send(msg)
     .then(() => {
       const msg = "Email sent";

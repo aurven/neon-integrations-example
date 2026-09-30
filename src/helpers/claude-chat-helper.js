@@ -2,17 +2,18 @@
 
 const Anthropic = require('@anthropic-ai/sdk');
 const { NeonClient } = require('./neon-bo-api-v3.js');
+const { serviceConfig } = require('./neon-env');
 const crypto = require('crypto');
 
 // ---------------------------------------------------------------------------
-// Anthropic client (singleton, lazy-initialised)
+// Anthropic client (per-key cache)
 // ---------------------------------------------------------------------------
-let _anthropic = null;
+const anthropicClients = new Map();
 function getAnthropicClient() {
-  if (!_anthropic && process.env.ANTHROPIC_API_KEY) {
-    _anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-  }
-  return _anthropic;
+  const { apiKey } = serviceConfig('anthropic');
+  if (!apiKey) return null;
+  if (!anthropicClients.has(apiKey)) anthropicClients.set(apiKey, new Anthropic({ apiKey }));
+  return anthropicClients.get(apiKey);
 }
 
 // ---------------------------------------------------------------------------
@@ -323,7 +324,7 @@ async function handleChatTurn({ sessionId, userMessage, neonContext, role, rawRe
     }));
 
     const requestParams = {
-      model: process.env.CLAUDE_CHAT_MODEL || 'claude-sonnet-4-6',
+      model: serviceConfig('anthropic').chatModel || 'claude-sonnet-4-6',
       max_tokens: 4096,
       system: session.systemPrompt || 'You are a helpful CMS assistant integrated into Neon CMS.',
       messages: session.messages,
