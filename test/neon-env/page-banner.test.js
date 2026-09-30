@@ -127,6 +127,20 @@ test('HTML without <head> is returned untouched', () => {
   assert.equal(injectBanner('<div>x</div>', env), '<div>x</div>');
 });
 
+test('a <header> tag before <head> is not mistaken for it', () => {
+  const html = '<html><body><header>site header</header></body><head><title>t</title></head></html>';
+  const out = injectBanner(html, env);
+  assert.ok(out.includes('<header>site header</header>'), 'header element left untouched');
+  assert.ok(!out.slice(0, out.indexOf('<head>')).includes('<script>'), 'banner not injected before <head>');
+  assert.ok(out.startsWith('<html><body><header>site header</header></body><head><script>'));
+});
+
+test('<head lang="x"> (attributes on head) still gets the banner', () => {
+  const html = '<html><head lang="x"><title>t</title></head></html>';
+  const out = injectBanner(html, env);
+  assert.ok(out.startsWith('<html><head lang="x"><script>'));
+});
+
 test('escapes U+2028 and U+2029 in labels, and runScript parses correctly', () => {
   const envWithLineBreaks = { id: 'test', label: 'Demo  RC', neon: { bo: { host: 'bo.example.com' } } };
   const script = bannerScript(envWithLineBreaks);

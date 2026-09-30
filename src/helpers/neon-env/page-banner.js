@@ -54,7 +54,7 @@ function bannerScript(env) {
 }
 
 function injectBanner(html, env) {
-  const m = html.match(/<head[^>]*>/i);
+  const m = html.match(/<head(\s[^>]*)?>/i);
   if (!m) return html;
   const at = m.index + m[0].length;
   return html.slice(0, at) + bannerScript(env) + html.slice(at);
