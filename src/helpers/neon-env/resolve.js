@@ -83,7 +83,14 @@ function resolveRequest(req, registry, { selfHosts } = {}) {
   }
 
   if (env && env.hosts.length) {
-    const foreign = hosts.filter((h) => !env.hosts.includes(h));
+    // Only reject a caller host that belongs to a *different* registered environment.
+    // An unrecognized host (e.g. a Referer from Notion/Slack/Google on a standalone link)
+    // is ignored rather than rejected.
+    const foreign = hosts.filter((h) => {
+      if (env.hosts.includes(h)) return false;
+      const other = registry.byHost(h);
+      return other && other.id !== env.id;
+    });
     if (foreign.length) {
       return result(auth, null, {
         error: {

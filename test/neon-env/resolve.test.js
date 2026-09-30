@@ -83,6 +83,12 @@ test('self host referer (standalone on Render) is not a mismatch', () => {
   assert.equal(r.env.id, 'a');
 });
 
+test('unregistered external referer (https://www.notion.so/x) with key-a -> env a, no error', () => {
+  const r = resolveRequest(req({ headers: { apikey: 'key-a', referer: 'https://www.notion.so/x' } }), reg, SELF);
+  assert.equal(r.error, null);
+  assert.equal(r.env.id, 'a');
+});
+
 test('Origin: null is ignored by host check', () => {
   const r = resolveRequest(req({ headers: { apikey: 'key-a', origin: 'null' } }), reg, SELF);
   assert.equal(r.error, null);
