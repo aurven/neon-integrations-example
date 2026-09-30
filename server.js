@@ -51,6 +51,7 @@ fastify.register(require("./src/helpers/neon-env/fastify-plugin.js"));
 printRegistrySummary(neonEnv.getRegistry());
 
 const { authenticate, isAdminRequest } = require("./src/helpers/auth.js");
+const { servicesRegistryView } = require("./src/helpers/neon-env/services-view.js");
 
 // View is a templating manager for fastify
 const handlebars = require("handlebars");
@@ -200,12 +201,18 @@ fastify.get("/services", async function handler(request, reply) {
     ]
   };
 
+  const { neonEnvs, registryWarning } = servicesRegistryView(
+    neonEnv.getRegistry(),
+    isAdminRequest(request),
+    request.neonEnv?.id || null
+  );
+
   let params = {
     seo: seo,
     integrations: integrations,
     location: request.neonEnv?.label || "No environment",
-    neonEnvs: neonEnv.getRegistry().list().map(e => ({ id: e.id, label: e.label, boHost: e.neon.bo.host, current: e.id === request.neonEnv?.id })),
-    registryWarning: neonEnv.getRegistry().loadError || null,
+    neonEnvs,
+    registryWarning,
     version: appVersion
   };
 
