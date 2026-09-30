@@ -54,3 +54,12 @@ test('null env prints a neutral banner', () => {
 test('HTML without <head> is returned untouched', () => {
   assert.equal(injectBanner('<div>x</div>', env), '<div>x</div>');
 });
+
+test('escapes U+2028 and U+2029 in labels, and runScript parses correctly', () => {
+  const envWithLineBreaks = { id: 'test', label: 'Demo  RC', neon: { bo: { host: 'bo.example.com' } } };
+  const script = bannerScript(envWithLineBreaks);
+  assert.ok(!script.includes(' '), 'raw U+2028 should be escaped');
+  assert.ok(!script.includes(' '), 'raw U+2029 should be escaped');
+  const { logs } = runScript(script, 'test');
+  assert.ok(logs[0].includes('test'), 'banner should still log correctly after escaping');
+});

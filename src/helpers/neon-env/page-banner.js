@@ -14,7 +14,7 @@ var orig = window.fetch;
 var wrapped = function (input, init) {
   var method = String((init && init.method) || (input && input.method) || 'GET').toUpperCase();
   var url = typeof input === 'string' ? input : (input && input.url) || String(input);
-  var sameOrigin = true;
+  var sameOrigin = false;
   try { sameOrigin = new URL(url, location.href).origin === location.origin; } catch (err) {}
   return orig.apply(this, arguments).then(function (res) {
     if (!sameOrigin) return res;
@@ -31,7 +31,9 @@ window.fetch = wrapped;
 
 function bannerScript(env) {
   const info = env ? { id: env.id, label: env.label, boHost: env.neon.bo.host } : null;
-  const json = JSON.stringify(info).replace(/</g, '\\u003c');
+  let json = JSON.stringify(info).replace(/</g, '\\u003c');
+  json = json.replace(new RegExp(String.fromCharCode(0x2028), 'g'), '\\u2028');
+  json = json.replace(new RegExp(String.fromCharCode(0x2029), 'g'), '\\u2029');
   return `<script>(function(){var e=${json};window.__NEON_ENV__=e;${CLIENT_JS}})();</script>`;
 }
 
