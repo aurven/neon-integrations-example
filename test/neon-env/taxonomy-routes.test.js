@@ -107,3 +107,29 @@ test('demo mode never touches Neon', async () => {
   assert.equal(create.json().counts.created, 4);
   assert.equal(neon.calls.length, 0);
 });
+
+test('create: category family read failure -> 400 and no writes', async () => {
+  neon = { ...fakeNeon(), async getCategoryFamilies() { neon.calls.push('getCategoryFamilies'); throw new Error('ECONNREFUSED'); } };
+  const app = await buildApp();
+  const res = await post(app, '/api/neon/taxonomy-builder/create');
+  assert.equal(res.statusCode, 400);
+  assert.ok(res.json().errors[0].startsWith('could not read existing category families in env a'), res.body);
+  assert.ok(!neon.calls.some((c) => c.startsWith('create')));
+});
+
+test('create: subtree read failure for one family -> 400 and no writes', async () => {
+  const base = fakeNeon();
+  neon = {
+    ...base,
+    async getCategoryFamilies() { return [{ categoryRef: 'r1', name: 'Uno' }, { categoryRef: 'r2', name: 'Due' }]; },
+    async getCategory({ categoryRef }) {
+      if (categoryRef === 'r2') throw new Error('boom');
+      return { categoryRef, children: [] };
+    },
+  };
+  const app = await buildApp();
+  const res = await post(app, '/api/neon/taxonomy-builder/create', { payload: { categories: 'Uno\n  A\nDue\n  B', tags: '' } });
+  assert.equal(res.statusCode, 400);
+  assert.ok(res.json().errors.some((e) => e.startsWith('could not read existing categories of "Due"')), res.body);
+  assert.ok(!base.calls.some((c) => c.startsWith('create')));
+});
