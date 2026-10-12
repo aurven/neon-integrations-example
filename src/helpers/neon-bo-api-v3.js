@@ -63,6 +63,8 @@ function requireArg(value, name) {
 
 const segment = (value) => encodeURIComponent(value);
 
+const VIEW_STATUSES = ['PREVIEW', 'STAGE', 'LIVE'];
+
 class NeonClient {
     constructor(options = {}) {
         // Explicit baseUrl = caller-managed client (tests/tools); otherwise bind to the request's env
@@ -212,12 +214,56 @@ class NeonClient {
         }, 'Asset uploaded', true);
     }
 
-    async getSites() {
+    async getSites({ limit, offset } = {}) {
         const response = await this.makeRequest({
             method: 'get',
-            url: '/core/sites'
+            url: '/core/sites',
+            params: compactParams({ limit, offset })
         }, 'Sites retrieved', true);
         return response.result;
+    }
+
+    // ── Core service: sites (neon-core-openapi /sites, /v2/sites) ──
+
+    async createSite(siteForCreate) {
+        requireArg(siteForCreate, 'siteForCreate');
+        requireArg(siteForCreate.name, 'siteForCreate.name');
+        requireArg(siteForCreate.title, 'siteForCreate.title');
+        return await this.makeRequest({
+            method: 'post',
+            url: '/core/sites/create',
+            data: siteForCreate
+        }, `Site ${siteForCreate.name} created`, true);
+    }
+
+    async cloneSite({ sourceSiteName, targetSiteName, viewStatus, targetHost } = {}) {
+        requireArg(sourceSiteName, 'sourceSiteName');
+        requireArg(targetSiteName, 'targetSiteName');
+        return await this.makeRequest({
+            method: 'post',
+            url: '/core/sites/clone',
+            data: compactParams({ sourceSiteName, targetSiteName, viewStatus, targetHost })
+        }, `Site ${sourceSiteName} cloned to ${targetSiteName}`, true);
+    }
+
+    async getSitemap(siteName, viewStatus = 'LIVE') {
+        requireArg(siteName, 'siteName');
+        const status = String(viewStatus).toUpperCase();
+        if (!VIEW_STATUSES.includes(status)) throw new Error(`viewStatus must be one of ${VIEW_STATUSES.join(', ')}`);
+        return await this.makeRequest({
+            method: 'get',
+            url: `/core/v2/sites/${segment(siteName)}/${status}/sitemap`
+        }, `Sitemap for ${siteName} (${status}) retrieved`, true);
+    }
+
+    async createSiteNode(nodeForCreate) {
+        requireArg(nodeForCreate, 'nodeForCreate');
+        for (const field of ['name', 'path', 'title']) requireArg(nodeForCreate[field], `nodeForCreate.${field}`);
+        return await this.makeRequest({
+            method: 'post',
+            url: '/core/sites/nodes/create',
+            data: nodeForCreate
+        }, `Site node ${nodeForCreate.name} created`, true);
     }
 
     async createNewSiteNode(options, realm = 'default') {
@@ -647,7 +693,11 @@ module.exports = {
     updateNodeMetadata: (familyRef, xmlBodyString) => currentClient().updateNodeMetadata(familyRef, xmlBodyString),
     createNewStory: (options) => currentClient().createNewStory(options),
     putNode: (params) => currentClient().putNode(params),
-    getSites: () => currentClient().getSites(),
+    getSites: (options) => currentClient().getSites(options),
+    createSite: (siteForCreate) => currentClient().createSite(siteForCreate),
+    cloneSite: (request) => currentClient().cloneSite(request),
+    getSitemap: (siteName, viewStatus) => currentClient().getSitemap(siteName, viewStatus),
+    createSiteNode: (nodeForCreate) => currentClient().createSiteNode(nodeForCreate),
     createNewSiteNode: (options, realm) => currentClient().createNewSiteNode(options, realm),
     publishSiteNode: (options, realm, viewStatus) => currentClient().publishSiteNode(options, realm, viewStatus),
     createUser: (options) => currentClient().createUser(options),
