@@ -19,6 +19,37 @@ const DEFAULT_CHANNEL_RULES = {
   table: '!Tabloid'
 };
 
+// Neon attributes dropped when serialising the story to Méthode XML.
+// Element ids are kept so Méthode stores the Neon ids instead of generating new ones.
+const NEON_EXCLUDED_ATTRIBUTES = [
+  "enabledcropslist",
+  "emxed-trx-anchor",
+  "emxed-trx-captiongroup",
+  "emxed-trx-captionsequence",
+  "emxed-trx-captiontitle",
+  "emxed-trx-captiontype",
+  "emxed-trx-component",
+  "emxed-trx-iscaption",
+  "emxed-trx-anchor-element",
+];
+
+// Méthode web-image-group: fixed group attributes and the three Méthode web crops.
+// Neon crops (Wide/Square/Portrait/Ultrawide) carry no usable crop data for Méthode,
+// so each Méthode crop only borrows the id of a Neon crop and Méthode applies its default framing.
+const WEB_IMAGE_GROUP_ATTRIBUTES = {
+  class: 'default',
+  group: 'media',
+  picturedesklite: 'true',
+  enabledcropslist: 'Landscape,Square,Rectangle',
+};
+const METHODE_WEB_CROPS = [
+  { softCrop: 'Landscape', className: 'landscape', idFrom: 'wide' },
+  { softCrop: 'Square', className: 'square', idFrom: 'square' },
+  { softCrop: 'Rectangle', className: 'rect', idFrom: 'portrait' },
+];
+// Neon image attributes that describe the Neon crop/resource and must not reach Méthode
+const NEON_CROP_ATTRIBUTES = ['src', 'id', 'class', 'softCrop', 'softcropenabled', 'tmx', 'xtransform', 'targetid'];
+
 const getChannelRules = (customRules = {}) => {
   return { ...DEFAULT_CHANNEL_RULES, ...customRules };
 };
@@ -48,18 +79,7 @@ const processWebhookData = async (model) => {
   const generateContentFromModel = async (model) => {
     const neonXmlContent = await jsonToXml({
       json: model.files,
-      excludeAttributes: [
-        "id",
-        "enabledcropslist",
-        "emxed-trx-anchor",
-        "emxed-trx-captiongroup",
-        "emxed-trx-captionsequence",
-        "emxed-trx-captiontitle",
-        "emxed-trx-captiontype",
-        "emxed-trx-component",
-        "emxed-trx-iscaption",
-        "emxed-trx-anchor-element",
-      ],
+      excludeAttributes: NEON_EXCLUDED_ATTRIBUTES,
       excludeTags: [
         "style",
         "teaser",
@@ -111,16 +131,6 @@ function resolveMethodeFileref(neonSrc, imageReferences) {
   return matched ? matched[1].fileref : null;
 }
 
-function replaceImageWithWebImage($doc, img, imageReferences) {
-  const $img = $doc(img);
-  const attribs = { ...(img.attribs || {}) };
-  const fileref = resolveMethodeFileref(attribs.src, imageReferences);
-  if (fileref) attribs.fileref = fileref;
-  delete attribs.src;
-  const attribStr = Object.entries(attribs).map(([k, v]) => ` ${k}="${v}"`).join('');
-  $img.replaceWith(`<web-image${attribStr}/>`);
-}
-
 function injectFilerefIntoImage($doc, img, imageReferences) {
   const $img = $doc(img);
   const fileref = resolveMethodeFileref($img.attr('src'), imageReferences);
@@ -132,16 +142,45 @@ function restructureCaptionGroup($doc, captionEl, captionTag) {
   const $captionGroup = $doc(captionEl);
   const captionText = $captionGroup.find('caption').text() || '<?EM-dummyText Caption ?>';
   const creditText  = $captionGroup.find('credit').text()  || '<?EM-dummyText Credit ?>';
+  const id = $captionGroup.attr('id');
+  const idAttr = id ? ` id="${id}"` : '';
   $captionGroup.replaceWith(
-    `<${captionTag}><p><caption>${captionText}</caption><credit>${creditText}</credit></p></${captionTag}>`
+    `<${captionTag}${idAttr}><p><caption>${captionText}</caption><credit>${creditText}</credit></p></${captionTag}>`
   );
 }
 
+// Replace the Neon crop <image>s of a web-image-group with the three Méthode web-image crops.
+function replaceNeonCropsWithMethodeCrops($doc, $group, imageReferences) {
+  const sources = $group.find('image').toArray();
+  if (sources.length === 0) return;
+
+  const byNeonCrop = new Map(sources.map((img) => [String(img.attribs.softCrop || '').toLowerCase(), img]));
+  const fileref = sources.map((img) => resolveMethodeFileref(img.attribs.src, imageReferences)).find(Boolean);
+  const usedIds = new Set();
+
+  for (const crop of METHODE_WEB_CROPS) {
+    const source = byNeonCrop.get(crop.idFrom) || sources[0];
+    const kept = Object.fromEntries(
+      Object.entries(source.attribs).filter(([name]) => !NEON_CROP_ATTRIBUTES.includes(name))
+    );
+    let id = byNeonCrop.get(crop.idFrom)?.attribs.id;
+    if (!id || usedIds.has(id)) id = utils.generateAutoId();
+    usedIds.add(id);
+
+    const attrs = { ...kept, id, class: crop.className, softCrop: crop.softCrop };
+    if (fileref) attrs.fileref = fileref;
+    $doc(sources[0]).before($doc('<web-image/>').attr(attrs));
+  }
+
+  sources.forEach((img) => $doc(img).remove());
+}
+
 function transformWebImageGroups($doc, imageReferences) {
-  // web-image-group: <image> → <web-image> with fileref; <web-image-caption> restructured
+  // web-image-group: Méthode group attributes; Neon crops → Landscape/Square/Rectangle web-images; caption restructured
   $doc('web-image-group').each((_, group) => {
     const $group = $doc(group);
-    $group.find('image').each((_, img) => replaceImageWithWebImage($doc, img, imageReferences));
+    $group.attr(WEB_IMAGE_GROUP_ATTRIBUTES);
+    replaceNeonCropsWithMethodeCrops($doc, $group, imageReferences);
     $group.find('web-image-caption').each((_, cap) => restructureCaptionGroup($doc, cap, 'web-image-caption'));
   });
 
@@ -360,4 +399,6 @@ function simplifyImageReferences(imageReferences) {
 
 module.exports = {
   processNeonStoryV2,
+  transformWebImageGroups,
+  NEON_EXCLUDED_ATTRIBUTES,
 };
