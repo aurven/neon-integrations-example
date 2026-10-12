@@ -180,3 +180,12 @@ test('F1: backstop - no parent/root ref or family id means failed with no write'
   assert.equal(report.tags[1].error, 'missing family id');
   assert.equal(writes(neon).length, 0);
 });
+
+test('F2: malformed children is a read error; null children means none', async () => {
+  const catFamilies = [{ categoryRef: 'r', name: 'Fam' }];
+  const bad = await readExisting(plan('Fam\n  Child'), fakeNeon({ catFamilies, trees: { r: { categoryRef: 'r', children: { not: 'a list' } } } }), 'env1');
+  assert.deepEqual(bad.errors, ['could not read existing categories of "Fam" in env env1: unexpected children shape']);
+  const nul = await readExisting(plan('Fam\n  Child'), fakeNeon({ catFamilies, trees: { r: { categoryRef: 'r', children: null } } }), 'env1');
+  assert.deepEqual(nul.errors, []);
+  assert.equal(nul.existing.categories[1].status, 'new');
+});

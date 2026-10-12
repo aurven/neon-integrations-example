@@ -21,7 +21,13 @@ function nameOf(node) {
   return typeof names === 'string' ? names.split('/').pop().trim() : '';
 }
 
-function childrenOf(node) { return asList(node && node.children) || asList(node && node.items) || []; }
+function childrenOf(node) {
+  const raw = node && (node.children != null ? node.children : node.items);
+  if (raw === undefined || raw === null) return [];
+  const list = asList(raw);
+  if (!list) throw new Error('unexpected children shape');
+  return list;
+}
 
 function findLive(list, name) {
   const wanted = name.trim().toLowerCase();
@@ -77,10 +83,16 @@ async function readExisting(plan, neon, envId) {
         if (item.depth === 1) continue;
         const parent = categories[item.parentIndex];
         if (parent.status !== 'exists' || !parent.node) continue;
-        const match = findLive(childrenOf(parent.node), item.name);
+        const family = plan.categories[familyIndexOf(plan.categories, i)].name;
+        let match;
+        try { match = findLive(childrenOf(parent.node), item.name); }
+        catch (error) {
+          const message = `could not read existing categories of "${family}" in env ${envId}: ${error.message}`;
+          if (!errors.includes(message)) errors.push(message);
+          continue;
+        }
         if (!match) continue;
         if (!refOf(match)) {
-          const family = plan.categories[familyIndexOf(plan.categories, i)].name;
           errors.push(`could not read existing categories of "${family}" in env ${envId}: matched "${item.name}" has no ref`);
           continue;
         }
