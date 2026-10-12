@@ -153,3 +153,30 @@ test('flat exports exist for every taxonomy method and resolve the env client', 
   assert.equal(seen[0].baseURL, 'https://neon-bo-tax.example.com/api');
   assert.equal(seen[0].url, '/core/tags/families');
 });
+
+test('createCategoryRaw posts the body unchanged', async () => {
+  const body = { categoryName: 'Livello 1', categoryMeta: { description: '', type: 'item' }, parentRef: '21cfe1a0a85a-8b6a226ac675', rootRef: '21cfe1a0a85a-8b6a226ac675' };
+  assert.deepEqual(await callOf((n) => n.createCategoryRaw(body)), { method: 'post', url: '/core/categories/create', params: undefined, data: body });
+});
+
+test('createTagFamilyRaw encodes the name in the path and sends familyName', async () => {
+  const c = await callOf((n) => n.createTagFamilyRaw('Nuova Famiglia'));
+  assert.deepEqual(c, { method: 'post', url: '/core/tags/families/Nuova%20Famiglia', params: undefined, data: { familyName: 'Nuova Famiglia' } });
+});
+
+test('createTagRaw encodes the tag, sends tagName and familyName = family id', async () => {
+  const c = await callOf((n) => n.createTagRaw('21cfe337d5c5-f642bdca2d4e', 'Nuovo Tag/A&B'));
+  assert.deepEqual(c, {
+    method: 'post', url: '/core/tags/21cfe337d5c5-f642bdca2d4e/Nuovo%20Tag%2FA%26B', params: undefined,
+    data: { tagName: 'Nuovo Tag/A&B', familyName: '21cfe337d5c5-f642bdca2d4e' },
+  });
+});
+
+test('raw taxonomy methods validate arguments and are flat-exported', async () => {
+  const { client, calls } = stubbedClient();
+  await assert.rejects(() => client.createCategoryRaw(), /body is required/);
+  await assert.rejects(() => client.createTagFamilyRaw(''), /name is required/);
+  await assert.rejects(() => client.createTagRaw('fam'), /tagName is required/);
+  assert.equal(calls.length, 0);
+  for (const name of ['createCategoryRaw', 'createTagFamilyRaw', 'createTagRaw']) assert.equal(typeof neonApi[name], 'function');
+});

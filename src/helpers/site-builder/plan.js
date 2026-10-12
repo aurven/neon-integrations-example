@@ -4,8 +4,9 @@
  * Pure, no network. Spec: docs/superpowers/specs/2026-10-12-site-builder-design.md §2
  */
 
+const { parseIndented } = require('../outline/parse-indented.js');
+
 const MAX_SECTIONS = 200;
-const TAB_WIDTH = 2;
 
 function slugify(text) {
   return String(text ?? '')
@@ -16,58 +17,18 @@ function slugify(text) {
     .replace(/^-+|-+$/g, '');
 }
 
-function indentWidth(line) {
-  let width = 0;
-  for (const ch of line) {
-    if (ch === ' ') width += 1;
-    else if (ch === '\t') width += TAB_WIDTH;
-    else break;
-  }
-  return width;
-}
-
 function parseOutline(outline) {
-  const sections = [];
-  const errors = [];
-  let stack = []; // open levels: { width, depth, index }
-
-  String(outline ?? '').replace(/\r/g, '').split('\n').forEach((raw, i) => {
-    const line = i + 1;
-    if (!raw.trim()) return;
-    const width = indentWidth(raw);
-    const title = raw.trim();
-
-    let parent = null;
-    let depth;
-    let nextStack;
-    if (stack.length === 0) {
-      if (width !== 0) { errors.push(`line ${line}: first section cannot be indented`); return; }
-      depth = 1;
-      nextStack = [];
-    } else if (width > stack[stack.length - 1].width) {
-      parent = stack[stack.length - 1];
-      depth = parent.depth + 1;
-      nextStack = [...stack];
-    } else {
-      const s = [...stack];
-      while (s.length && s[s.length - 1].width > width) s.pop();
-      const level = s[s.length - 1];
-      if (!level || level.width !== width) { errors.push(`line ${line}: indentation does not match any parent level`); return; }
-      s.pop();
-      parent = s[s.length - 1] || null;
-      depth = level.depth;
-      nextStack = s;
-    }
-
-    const name = slugify(title);
-    if (!name) { errors.push(`line ${line}: "${title}" has no usable characters for a name`); return; }
-
-    const parentPath = parent ? sections[parent.index].path : '/';
-    const index = sections.length;
-    sections.push({ line, title, name, depth, parentIndex: parent ? parent.index : null, path: `${parentPath}${name}/` });
-    nextStack.push({ width, depth, index });
-    stack = nextStack;
+  const parsed = parseIndented(outline, {
+    firstLineNoun: 'section',
+    accept: (title) => (slugify(title) ? null : `"${title}" has no usable characters for a name`),
   });
+  const errors = [...parsed.errors];
+  const sections = [];
+  for (const entry of parsed.entries) {
+    const name = slugify(entry.text);
+    const parentPath = entry.parentIndex === null ? '/' : sections[entry.parentIndex].path;
+    sections.push({ line: entry.line, title: entry.text, name, depth: entry.depth, parentIndex: entry.parentIndex, path: `${parentPath}${name}/` });
+  }
 
   const seen = new Map();
   for (const section of sections) {
