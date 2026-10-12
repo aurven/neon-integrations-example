@@ -4,9 +4,10 @@ const assert = require('node:assert/strict');
 const Fastify = require('fastify');
 const { buildRegistry } = require('../../src/helpers/neon-env/registry.js');
 const handlers = require('../../src/requestHandlers/taxonomy-builder.js');
+const jobs = require('../../src/helpers/taxonomy-builder/jobs.js');
 const { envJson, registryJson } = require('./fixtures.js');
 
-const reg = buildRegistry({ json: registryJson([envJson('a', { extApiKeyLimited: 'lim-a' })]), envVars: {} });
+const reg = buildRegistry({ json: registryJson([envJson('a', { extApiKeyLimited: 'lim-a' }), envJson('b')]), envVars: {} });
 
 let neon;
 function fakeNeon({ catFamilies = [] } = {}) {
@@ -28,8 +29,14 @@ async function buildApp() {
   const app = Fastify();
   await app.register(require('@fastify/cookie'));
   await app.register(require('../../src/helpers/neon-env/fastify-plugin.js'), { getRegistry: () => reg });
-  app.post('/api/neon/taxonomy-builder/preview', handlers.previewTaxonomyHandler);
-  app.post('/api/neon/taxonomy-builder/create', handlers.createTaxonomyHandler);
+  const opts = { bodyLimit: handlers.BODY_LIMIT };
+  app.post('/api/neon/taxonomy-builder/preview', opts, handlers.previewTaxonomyHandler);
+  app.post('/api/neon/taxonomy-builder/create', opts, handlers.createTaxonomyHandler);
+  app.post('/api/neon/taxonomy-builder/jobs', opts, handlers.startTaxonomyJobHandler);
+  app.get('/api/neon/taxonomy-builder/jobs', handlers.listTaxonomyJobsHandler);
+  app.get('/api/neon/taxonomy-builder/jobs/:id', handlers.getTaxonomyJobHandler);
+  app.get('/api/neon/taxonomy-builder/jobs/:id/report', handlers.taxonomyJobReportHandler);
+  app.post('/api/neon/taxonomy-builder/jobs/:id/cancel', opts, handlers.cancelTaxonomyJobHandler);
   return app;
 }
 
@@ -37,6 +44,7 @@ const BODY = { categories: 'GruppoBello\n  Livello 1', tags: 'Nuova Famiglia\n  
 const post = (app, url, opts = {}) => app.inject({ method: 'POST', url, headers: { apikey: 'key-a', ...(opts.headers || {}) }, payload: opts.payload ?? BODY });
 
 beforeEach(() => {
+  jobs.__resetForTest();
   neon = fakeNeon();
   handlers.__setClientProviderForTest(() => neon);
 });
@@ -132,4 +140,111 @@ test('create: subtree read failure for one family -> 400 and no writes', async (
   assert.equal(res.statusCode, 400);
   assert.ok(res.json().errors.some((e) => e.startsWith('could not read existing categories of "Due"')), res.body);
   assert.ok(!base.calls.some((c) => c.startsWith('create')));
+});
+
+const get = (app, url, apikey = 'key-a') => app.inject({ method: 'GET', url, headers: { apikey } });
+
+test('POST /jobs → 202 with jobId/total/toCreate; status, list, report work', async () => {
+  neon = fakeNeon({ catFamilies: [{ categoryRef: 'r', name: 'GruppoBello' }] });
+  const app = await buildApp();
+  const res = await post(app, '/api/neon/taxonomy-builder/jobs');
+  assert.equal(res.statusCode, 202);
+  const { jobId, total, toCreate } = res.json();
+  assert.match(jobId, /^txj-/);
+  assert.equal(total, 4);
+  assert.equal(toCreate, 3);
+  await jobs.waitForJob(jobId);
+  const status = await get(app, `/api/neon/taxonomy-builder/jobs/${jobId}`);
+  assert.equal(status.statusCode, 200);
+  assert.equal(status.json().state, 'completed');
+  assert.deepEqual(status.json().counts, { created: 3, exists: 1, failed: 0, skipped: 0 });
+  const list = await get(app, '/api/neon/taxonomy-builder/jobs');
+  assert.deepEqual(list.json().jobs.map((j) => j.jobId), [jobId]);
+  const report = await get(app, `/api/neon/taxonomy-builder/jobs/${jobId}/report`);
+  assert.equal(report.statusCode, 200);
+  assert.equal(report.headers['content-disposition'], `attachment; filename="${jobId}-report.json"`);
+  assert.equal(report.json().categories.length, 2);
+});
+
+test('POST /jobs with plan errors → 400 {errors (max 200), errorCount}, no job, no Neon calls', async () => {
+  const app = await buildApp();
+  const bad = ['A', ...Array.from({ length: 301 }, () => '  dup')].join('\n'); // 300 duplicate-sibling errors
+  const res = await post(app, '/api/neon/taxonomy-builder/jobs', { payload: { categories: bad, tags: '' } });
+  assert.equal(res.statusCode, 400);
+  assert.equal(res.json().errors.length, 200);
+  assert.equal(res.json().errorCount, 300);
+  assert.deepEqual(jobs.listJobs({ envId: null }), []);
+  assert.equal(neon.calls.length, 0);
+});
+
+test('POST /jobs while one is running in the env → 409 with the running jobId, before any read', async () => {
+  const app = await buildApp();
+  const first = (await post(app, '/api/neon/taxonomy-builder/jobs?demo=true')).json();
+  neon.calls.length = 0;
+  const res = await post(app, '/api/neon/taxonomy-builder/jobs');
+  assert.equal(res.statusCode, 409);
+  assert.deepEqual(res.json(), { error: 'a taxonomy job is already running in env a', jobId: first.jobId });
+  assert.equal(neon.calls.length, 0);
+  const cancelled = await post(app, `/api/neon/taxonomy-builder/jobs/${first.jobId}/cancel`, { payload: {} });
+  assert.equal(cancelled.statusCode, 200);
+  assert.equal(cancelled.json().jobId, first.jobId);
+  await jobs.waitForJob(first.jobId);
+  const again = await post(app, `/api/neon/taxonomy-builder/jobs/${first.jobId}/cancel`, { payload: {} });
+  assert.equal(again.statusCode, 409);
+  assert.deepEqual(again.json(), { error: 'job is not running' });
+});
+
+test('demo job: no Neon calls, completes with demo ids', async () => {
+  const app = await buildApp();
+  const res = await post(app, '/api/neon/taxonomy-builder/jobs?demo=true');
+  assert.equal(res.statusCode, 202);
+  await jobs.waitForJob(res.json().jobId);
+  const report = (await get(app, `/api/neon/taxonomy-builder/jobs/${res.json().jobId}/report`)).json();
+  assert.equal(report.state, 'completed');
+  assert.equal(report.categories[0].ref, 'demo-1');
+  assert.equal(neon.calls.length, 0);
+});
+
+test('job endpoints: 401 without key, 403 for limited key, 404 unknown or other env; global admin sees all', async () => {
+  const app = await buildApp();
+  const { jobId } = (await post(app, '/api/neon/taxonomy-builder/jobs?demo=true')).json();
+  assert.equal((await app.inject({ method: 'GET', url: '/api/neon/taxonomy-builder/jobs' })).statusCode, 401);
+  const limited = await get(app, '/api/neon/taxonomy-builder/jobs', 'lim-a');
+  assert.equal(limited.statusCode, 403);
+  assert.deepEqual(limited.json(), { error: 'taxonomy creation requires an admin key' });
+  assert.equal((await get(app, '/api/neon/taxonomy-builder/jobs/txj-00000000-000000')).statusCode, 404);
+  assert.deepEqual((await get(app, '/api/neon/taxonomy-builder/jobs/txj-00000000-000000')).json(), { error: 'job not found' });
+  assert.equal((await get(app, `/api/neon/taxonomy-builder/jobs/${jobId}`, 'key-b')).statusCode, 404);
+  assert.equal((await get(app, `/api/neon/taxonomy-builder/jobs/${jobId}/report`, 'key-b')).statusCode, 404);
+  assert.equal((await post(app, `/api/neon/taxonomy-builder/jobs/${jobId}/cancel`, { headers: { apikey: 'key-b' }, payload: {} })).statusCode, 404);
+  assert.deepEqual((await get(app, '/api/neon/taxonomy-builder/jobs', 'key-b')).json(), { jobs: [] });
+  assert.deepEqual((await get(app, '/api/neon/taxonomy-builder/jobs', 'admin-key')).json().jobs.map((j) => j.jobId), [jobId]);
+  assert.equal((await get(app, `/api/neon/taxonomy-builder/jobs/${jobId}`, 'admin-key')).statusCode, 200);
+  await jobs.waitForJob(jobId);
+});
+
+test('body limit: 1.2 MB accepted, 6 MB rejected with 413', async () => {
+  const app = await buildApp();
+  const line = '  Commune with a fairly long name number ';
+  const big = ['France', ...Array.from({ length: 30000 }, (_, i) => `${line}${i}`)].join('\n');
+  assert.ok(Buffer.byteLength(big) > 1.2 * 1024 * 1024);
+  const ok = await post(app, '/api/neon/taxonomy-builder/preview', { payload: { categories: big, tags: '' } });
+  assert.equal(ok.statusCode, 200);
+  assert.equal(ok.json().mode, 'summary');
+  assert.equal(ok.json().total, 30001);
+  const huge = 'x'.repeat(6 * 1024 * 1024);
+  const tooBig = await post(app, '/api/neon/taxonomy-builder/jobs', { payload: { categories: huge, tags: '' } });
+  assert.equal(tooBig.statusCode, 413);
+});
+
+test('sync create still enforces 500 items; preview allows up to 50000', async () => {
+  const app = await buildApp();
+  const many = ['F', ...Array.from({ length: 600 }, (_, i) => `  C ${i}`)].join('\n');
+  const created = await post(app, '/api/neon/taxonomy-builder/create', { payload: { categories: many, tags: '' } });
+  assert.equal(created.statusCode, 400);
+  assert.deepEqual(created.json().errors, ['outline has 601 items; the limit is 500']);
+  const preview = await post(app, '/api/neon/taxonomy-builder/preview', { payload: { categories: many, tags: '' } });
+  assert.equal(preview.statusCode, 200);
+  assert.deepEqual(preview.json().errors, []);
+  assert.equal(preview.json().mode, 'summary');
 });
