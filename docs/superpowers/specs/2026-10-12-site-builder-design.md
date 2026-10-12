@@ -52,8 +52,9 @@ Examples:
 - **Indentation width:** a tab counts as 2 spaces. The width is the count of leading spaces after tab expansion.
 - **Depth uses a stack of open ancestors' widths:**
   - The first non-blank line must have width 0; otherwise it's an error (`line N: first section cannot be indented`).
-  - A line wider than the current top of the stack is a child of the previous line. Only one level can be opened per line: a line whose width exceeds the previous line's width while the previous line itself was opened at a deeper depth is still exactly one level deeper.
-  - A line not wider than the top pops ancestors until a match. The line's width must equal the width of an existing ancestor level, or 0; otherwise it's an error (`line N: indentation does not match any parent level`).
+  - A line wider than the previous line is a child of the previous line. Its depth is always the previous line's depth + 1, however much wider it is, so one line opens exactly one level.
+  - A line as wide as the previous line is the previous line's sibling.
+  - A line narrower than the previous line closes levels until it reaches an open level of exactly the same width, and becomes a sibling at that level. If no open level has that width, it's an error (`line N: indentation does not match any parent level`).
 - **Section shape:** `{ line, title, name: slugify(title), depth (1-based), parentIndex (index into sections, or null for top level), path }`.
   - `path` is `"/" + ancestor names and own name joined by "/" + "/"`. Example: `/prima-sezione/prima-sottosezione/`.
 - **Errors:**
