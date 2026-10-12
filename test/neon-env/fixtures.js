@@ -8,7 +8,7 @@ function envJson(id, overrides = {}) {
     neon: {
       app: { url: `https://neon-app-${id}.example.com` },
       bo: { url: `https://neon-bo-${id}.example.com/api`, apiKey: `bo-${id}`, userApiKey: `user-${id}` },
-      fo: { apiKey: `fo-${id}`, sites: { theglobe: { live: `https://fo-${id}.example.com` } } },
+      fo: { url: `https://neon-fo-${id}.example.com`, apiKey: `fo-${id}` },
     },
     ...overrides,
   };

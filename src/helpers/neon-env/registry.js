@@ -13,8 +13,7 @@ const DEFAULT_PATHS = [
   path.join(process.cwd(), 'config', 'neon-environments.json'),
 ];
 const ID_RE = /^[a-z0-9-]+$/;
-const LEGACY_VARS = ['NEON_BO_URL', 'NEON_BO_APIKEY', 'NEON_USER_API_KEY', 'NEON_APP_URL', 'NEON_FO_APIKEY'];
-const LEGACY_FO_RE = /^NEON_FO_(.+)_(LIVE|PREVIEW|STAGE)_URL$/;
+const LEGACY_VARS = ['NEON_BO_URL', 'NEON_BO_APIKEY', 'NEON_USER_API_KEY', 'NEON_APP_URL', 'NEON_FO_APIKEY', 'NEON_FO_URL'];
 
 function safeEqual(a, b) {
   if (typeof a !== 'string' || typeof b !== 'string' || !a || !b) return false;
@@ -25,6 +24,15 @@ function safeEqual(a, b) {
 
 function hostOf(url) {
   try { return new URL(url).host.toLowerCase(); } catch { return null; }
+}
+
+function isHttpUrl(url) {
+  try {
+    const u = new URL(url);
+    return u.protocol === 'http:' || u.protocol === 'https:';
+  } catch {
+    return false;
+  }
 }
 
 function resolveRefs(value, envVars, missing) {
@@ -69,22 +77,13 @@ function validateEntry(raw) {
   if (!neon.bo || !isNonEmptyString(neon.bo.userApiKey)) errors.push('neon.bo.userApiKey is required');
   if (neon.fo !== undefined) {
     if (!isNonEmptyString(neon.fo?.apiKey)) errors.push('neon.fo.apiKey is required when neon.fo is set');
-    if (!neon.fo?.sites || typeof neon.fo.sites !== 'object') errors.push('neon.fo.sites must be an object when neon.fo is set');
+    if (!isNonEmptyString(neon.fo?.url) || !isHttpUrl(neon.fo.url)) errors.push('neon.fo.url must be an http(s) URL when neon.fo is set');
   }
   if (raw.services !== undefined && (typeof raw.services !== 'object' || Array.isArray(raw.services) || raw.services === null)) {
     errors.push('services must be an object');
   }
   if (raw.insecureWebhook !== undefined && typeof raw.insecureWebhook !== 'boolean') errors.push('insecureWebhook must be a boolean');
   return errors;
-}
-
-function lowerKeys(sites) {
-  const out = {};
-  for (const [site, envs] of Object.entries(sites || {})) {
-    out[site.toLowerCase()] = {};
-    for (const [stage, url] of Object.entries(envs || {})) out[site.toLowerCase()][stage.toLowerCase()] = url;
-  }
-  return out;
 }
 
 function normalize(raw, keySource) {
@@ -102,7 +101,9 @@ function normalize(raw, keySource) {
       insecureTls: raw.neon.insecureTls === true,
       app: { url: raw.neon.app.url },
       bo: { url: raw.neon.bo.url, apiKey: raw.neon.bo.apiKey, userApiKey: raw.neon.bo.userApiKey, host: hostOf(raw.neon.bo.url) },
-      fo: raw.neon.fo ? { apiKey: raw.neon.fo.apiKey, sites: lowerKeys(raw.neon.fo.sites) } : null,
+      fo: raw.neon.fo
+        ? { url: raw.neon.fo.url.replace(/\/+$/, ''), apiKey: raw.neon.fo.apiKey, host: hostOf(raw.neon.fo.url) }
+        : null,
     },
     services: raw.services || {},
   };
@@ -122,17 +123,13 @@ function rejectCollisions(envs, keysOf, reason, skipped) {
   });
 }
 
-function buildLegacyEnv(envVars) {
-  const sites = {};
-  for (const [name, value] of Object.entries(envVars)) {
-    const m = name.match(LEGACY_FO_RE);
-    if (m && value) {
-      const site = m[1].toLowerCase();
-      sites[site] = sites[site] || {};
-      sites[site][m[2].toLowerCase()] = value;
-    }
+function buildLegacyEnv(envVars, warnings) {
+  let fo = null;
+  if (envVars.NEON_FO_URL && envVars.NEON_FO_APIKEY) {
+    fo = { url: envVars.NEON_FO_URL.replace(/\/+$/, ''), apiKey: envVars.NEON_FO_APIKEY, host: hostOf(envVars.NEON_FO_URL) };
+  } else if (envVars.NEON_FO_URL || envVars.NEON_FO_APIKEY) {
+    warnings.push(`legacy FO not configured: ${envVars.NEON_FO_URL ? 'NEON_FO_APIKEY' : 'NEON_FO_URL'} is missing`);
   }
-  const hasFo = !!envVars.NEON_FO_APIKEY || Object.keys(sites).length > 0;
   return {
     id: 'legacy',
     label: envVars.NEON_EXT_LOCATION || 'Legacy',
@@ -152,7 +149,7 @@ function buildLegacyEnv(envVars) {
         userApiKey: envVars.NEON_USER_API_KEY || '',
         host: hostOf(envVars.NEON_BO_URL),
       },
-      fo: hasFo ? { apiKey: envVars.NEON_FO_APIKEY || '', sites } : null,
+      fo,
     },
     services: {},
   };
@@ -187,10 +184,12 @@ class Registry {
 
 function buildRegistry({ json, envVars = process.env }) {
   if (json === null || json === undefined) {
+    const warnings = [];
     return new Registry({
-      environments: [buildLegacyEnv(envVars)],
+      environments: [buildLegacyEnv(envVars, warnings)],
       adminApiKey: envVars.NEON_EXT_APIKEY || null,
       source: 'legacy',
+      warnings,
     });
   }
   if (typeof json !== 'object' || !Array.isArray(json.environments)) {
@@ -220,6 +219,9 @@ function buildRegistry({ json, envVars = process.env }) {
     if (errors.length) {
       skipped.push({ id: name, reason: errors.join('; ') });
       return;
+    }
+    if (resolved.neon.fo && resolved.neon.fo.sites !== undefined) {
+      warnings.push(`env ${resolved.id}: neon.fo.sites ignored; sites come from ${resolved.neon.fo.url.replace(/\/+$/, '')}/api/sites/live`);
     }
     envs.push(normalize(resolved, keySource));
   });
