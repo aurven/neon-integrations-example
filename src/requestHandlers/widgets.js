@@ -435,6 +435,20 @@ function siteBuilderWidgetHandler(request, reply) {
   });
 }
 
+function taxonomyBuilderWidgetHandler(request, reply) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) {
+    return reply.status(401).send({ error: "Unauthorized" });
+  }
+  const neonEnvInfo = request.neonEnv ? { id: request.neonEnv.id, label: request.neonEnv.label, boHost: request.neonEnv.neon.bo.host } : null;
+  return reply.view("/src/widgets/taxonomy-builder.hbs", {
+    seo: { title: "Taxonomy Builder — create Neon category and tag families", description: "Create Neon category and tag families from outlines" },
+    apiKey: auth.apikey,
+    demo: request.query.demo === 'true',
+    neonEnvJson: JSON.stringify(neonEnvInfo).replace(/</g, '\\u003c'),
+  });
+}
+
 function planningBoardWidgetHandler(request, reply) {
   const auth = authenticate(request, reply);
   if (!auth.authenticated) {
@@ -835,6 +849,7 @@ module.exports = {
   welcomeWidgetHandler,
   nssDemoWidgetHandler,
   siteBuilderWidgetHandler,
+  taxonomyBuilderWidgetHandler,
   planningBoardWidgetHandler,
   neonGridWidgetHandler,
   neonGridDataHandler,

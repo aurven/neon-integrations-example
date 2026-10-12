@@ -330,6 +330,17 @@ Create a headless Neon site and its section hierarchy from an indented outline.
 - Nothing is published: the site and sections are only created.
 - Partial failure: If the site is created but some sections fail, the response is still 200 with a per-section report (created / failed / skipped): nothing is rolled back and the children of a failed section are skipped. 502 is returned only when the site itself could not be created; validation errors return 400.
 
+## Taxonomy Builder
+
+Bulk-create category families/categories and tag families/tags from indented outlines.
+
+- Widget: `GET /widgets/taxonomy-builder` (add `?demo=true` to simulate creation without touching Neon).
+- Endpoints: `POST /api/neon/taxonomy-builder/preview` (plans only, writes nothing) and `POST /api/neon/taxonomy-builder/create`, both with body `{ "categories": "...", "tags": "...", "defaultLanguage": "en-uk" }`.
+- Outline rules: top level is a family. Categories nest freely under a family; tags are one level only (a tag directly under a family).
+- Merging: items are matched to existing ones by case-insensitive name, so re-running the same outline is safe: existing items are reported as `exists` and only missing ones are created.
+- Admin only: requires the admin API key.
+- Status codes: 200 with a per-item report (created / exists / failed / skipped); 400 for outline parse errors or when existing taxonomy cannot be read (nothing is written); 502 when every attempted create failed.
+
 ## Troubleshooting
 
 ### HTTPS Issues

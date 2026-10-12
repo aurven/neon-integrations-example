@@ -620,6 +620,36 @@ class NeonClient {
         }, `Tags in family ${tagFamilyId} retrieved`, true);
     }
 
+    // ── Raw-body taxonomy creation, as sent by the Neon UI (Taxonomy Builder) ──
+
+    async createCategoryRaw(body) {
+        requireArg(body, 'body');
+        return await this.makeRequest({
+            method: 'post',
+            url: '/core/categories/create',
+            data: body
+        }, `Category ${body.categoryName} created`, true);
+    }
+
+    async createTagFamilyRaw(name) {
+        requireArg(name, 'name');
+        return await this.makeRequest({
+            method: 'post',
+            url: `/core/tags/families/${segment(name)}`,
+            data: { familyName: name }
+        }, `Tag family ${name} created`, true);
+    }
+
+    async createTagRaw(familyId, tagName) {
+        requireArg(familyId, 'familyId');
+        requireArg(tagName, 'tagName');
+        return await this.makeRequest({
+            method: 'post',
+            url: `/core/tags/${segment(familyId)}/${segment(tagName)}`,
+            data: { tagName, familyName: familyId }
+        }, `Tag ${tagName} created in family ${familyId}`, true);
+    }
+
     async suggestTags({ tagName, tagFamilyName, limit, locale } = {}) {
         return await this.makeRequest({
             method: 'get',
@@ -759,6 +789,9 @@ module.exports = {
     // Core service: tags
     getTagFamilies: (options) => currentClient().getTagFamilies(options),
     getTagsInFamily: (tagFamilyId) => currentClient().getTagsInFamily(tagFamilyId),
+    createCategoryRaw: (body) => currentClient().createCategoryRaw(body),
+    createTagFamilyRaw: (name) => currentClient().createTagFamilyRaw(name),
+    createTagRaw: (familyId, tagName) => currentClient().createTagRaw(familyId, tagName),
     suggestTags: (options) => currentClient().suggestTags(options),
     getTagByName: (tagFamilyName, tagName) => currentClient().getTagByName(tagFamilyName, tagName),
     createTagFamily: (tagFamilyName) => currentClient().createTagFamily(tagFamilyName),
