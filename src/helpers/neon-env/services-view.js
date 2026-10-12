@@ -21,4 +21,12 @@ function servicesRegistryView(registry, isAdmin, currentEnvId) {
   return { neonEnvs, registryWarning };
 }
 
-module.exports = { servicesRegistryView, ANONYMOUS_REGISTRY_WARNING };
+function servicesSitesView(isAdmin, sites, errorMessage) {
+  if (!isAdmin) return { sites: [], sitesError: null };
+  return {
+    sites: (sites || []).map((s) => ({ label: s.label, publicUrl: s.publicUrl })),
+    sitesError: errorMessage ? `sites unavailable: ${errorMessage}` : null,
+  };
+}
+
+module.exports = { servicesRegistryView, servicesSitesView, ANONYMOUS_REGISTRY_WARNING };
