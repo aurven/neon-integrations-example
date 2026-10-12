@@ -52,6 +52,17 @@ function logNeonCall({ callerName, requestConfig, response, error, envId }) {
     }
 }
 
+// Query params without the keys left undefined/null by the caller
+function compactParams(params) {
+    return Object.fromEntries(Object.entries(params).filter(([, v]) => v !== undefined && v !== null));
+}
+
+function requireArg(value, name) {
+    if (value === undefined || value === null || value === '') throw new Error(`${name} is required`);
+}
+
+const segment = (value) => encodeURIComponent(value);
+
 class NeonClient {
     constructor(options = {}) {
         // Explicit baseUrl = caller-managed client (tests/tools); otherwise bind to the request's env
@@ -428,6 +439,182 @@ class NeonClient {
             data: { name, workFolder, type, issueDate, retrieveOptions: {} }
         }, `Node ${familyRef} duplicated to ${workFolder}`, true);
     }
+
+    // ── Core service: categories (neon-core-openapi /categories; admin/replication endpoints not exposed) ──
+
+    async getCategory({ categoryRef, includeDeleted, depth, limit, localeForOrdering } = {}) {
+        return await this.makeRequest({
+            method: 'get',
+            url: '/core/categories',
+            params: compactParams({ categoryRef, includeDeleted, depth, limit, localeForOrdering })
+        }, `Category ${categoryRef || '(root)'} retrieved`, true);
+    }
+
+    async getCategoryFamilies({ includeDeleted } = {}) {
+        return await this.makeRequest({
+            method: 'get',
+            url: '/core/categories/families',
+            params: compactParams({ includeDeleted })
+        }, 'Category families retrieved', true);
+    }
+
+    async suggestCategories({ rootCategoryName, namePattern, limit, locale } = {}) {
+        return await this.makeRequest({
+            method: 'get',
+            url: '/core/categories/suggest',
+            params: compactParams({ rootCategoryName, namePattern, limit, locale })
+        }, 'Category suggestions retrieved', true);
+    }
+
+    async createCategory(categoryCreator) {
+        requireArg(categoryCreator, 'categoryCreator');
+        return await this.makeRequest({
+            method: 'post',
+            url: '/core/categories/create',
+            data: categoryCreator
+        }, 'Category created', true);
+    }
+
+    async updateCategory(categoryUpdater) {
+        requireArg(categoryUpdater, 'categoryUpdater');
+        return await this.makeRequest({
+            method: 'post',
+            url: '/core/categories/update',
+            data: categoryUpdater
+        }, 'Category updated', true);
+    }
+
+    async deleteCategory(categoryRef, secureCode) {
+        requireArg(categoryRef, 'categoryRef');
+        requireArg(secureCode, 'secureCode');
+        return await this.makeRequest({
+            method: 'delete',
+            url: '/core/categories/delete',
+            params: { categoryRef, secureCode }
+        }, `Category ${categoryRef} deleted`, true);
+    }
+
+    async destroyCategory(categoryRef, secureCode) {
+        requireArg(categoryRef, 'categoryRef');
+        requireArg(secureCode, 'secureCode');
+        return await this.makeRequest({
+            method: 'delete',
+            url: '/core/categories/destroy',
+            params: { categoryRef, secureCode }
+        }, `Category ${categoryRef} destroyed`, true);
+    }
+
+    async bulkDeleteCategories(categoryRefs, secureCode) {
+        if (!Array.isArray(categoryRefs) || categoryRefs.length === 0) throw new Error('categoryRefs must be a non-empty array');
+        requireArg(secureCode, 'secureCode');
+        return await this.makeRequest({
+            method: 'post',
+            url: '/core/categories/bulk/delete',
+            params: { secureCode },
+            data: categoryRefs
+        }, `${categoryRefs.length} categories deleted`, true);
+    }
+
+    async bulkDestroyCategories(categoryRefs, secureCode) {
+        if (!Array.isArray(categoryRefs) || categoryRefs.length === 0) throw new Error('categoryRefs must be a non-empty array');
+        requireArg(secureCode, 'secureCode');
+        return await this.makeRequest({
+            method: 'post',
+            url: '/core/categories/bulk/destroy',
+            params: { secureCode },
+            data: categoryRefs
+        }, `${categoryRefs.length} categories destroyed`, true);
+    }
+
+    async restoreCategory(categoryRef, { locale } = {}) {
+        requireArg(categoryRef, 'categoryRef');
+        return await this.makeRequest({
+            method: 'post',
+            url: '/core/categories/restore',
+            params: compactParams({ categoryRef, locale })
+        }, `Category ${categoryRef} restored`, true);
+    }
+
+    // ── Core service: tags (neon-core-openapi /tags) ──
+
+    async getTagFamilies({ includeDeleted } = {}) {
+        return await this.makeRequest({
+            method: 'get',
+            url: '/core/tags/families',
+            params: compactParams({ includeDeleted })
+        }, 'Tag families retrieved', true);
+    }
+
+    async getTagsInFamily(tagFamilyId) {
+        requireArg(tagFamilyId, 'tagFamilyId');
+        return await this.makeRequest({
+            method: 'get',
+            url: '/core/tags',
+            params: { tagFamilyId }
+        }, `Tags in family ${tagFamilyId} retrieved`, true);
+    }
+
+    async suggestTags({ tagName, tagFamilyName, limit, locale } = {}) {
+        return await this.makeRequest({
+            method: 'get',
+            url: '/core/tags/suggest',
+            params: compactParams({ tagName, tagFamilyName, limit, locale })
+        }, 'Tag suggestions retrieved', true);
+    }
+
+    async getTagByName(tagFamilyName, tagName) {
+        requireArg(tagFamilyName, 'tagFamilyName');
+        requireArg(tagName, 'tagName');
+        return await this.makeRequest({
+            method: 'get',
+            url: `/core/tags/families/${segment(tagFamilyName)}/${segment(tagName)}`
+        }, `Tag ${tagFamilyName}/${tagName} retrieved`, true);
+    }
+
+    async createTagFamily(tagFamilyName) {
+        requireArg(tagFamilyName, 'tagFamilyName');
+        return await this.makeRequest({
+            method: 'post',
+            url: `/core/tags/families/${segment(tagFamilyName)}`
+        }, `Tag family ${tagFamilyName} created`, true);
+    }
+
+    async deleteTagFamily(tagFamilyName, { destroy } = {}) {
+        requireArg(tagFamilyName, 'tagFamilyName');
+        return await this.makeRequest({
+            method: 'delete',
+            url: `/core/tags/families/${segment(tagFamilyName)}`,
+            params: compactParams({ destroy })
+        }, `Tag family ${tagFamilyName} deleted`, true);
+    }
+
+    async createTag(tagFamilyName, tagName) {
+        requireArg(tagFamilyName, 'tagFamilyName');
+        requireArg(tagName, 'tagName');
+        return await this.makeRequest({
+            method: 'post',
+            url: `/core/tags/families/${segment(tagFamilyName)}/${segment(tagName)}`
+        }, `Tag ${tagFamilyName}/${tagName} created`, true);
+    }
+
+    async createTagByFamilyId(tagFamilyId, tagName) {
+        requireArg(tagFamilyId, 'tagFamilyId');
+        requireArg(tagName, 'tagName');
+        return await this.makeRequest({
+            method: 'post',
+            url: `/core/tags/${segment(tagFamilyId)}/${segment(tagName)}`
+        }, `Tag ${tagName} created in family ${tagFamilyId}`, true);
+    }
+
+    async deleteTag(tagFamilyName, tag, { destroy } = {}) {
+        requireArg(tagFamilyName, 'tagFamilyName');
+        requireArg(tag, 'tag');
+        return await this.makeRequest({
+            method: 'delete',
+            url: `/core/tags/families/${segment(tagFamilyName)}/${segment(tag)}`,
+            params: compactParams({ destroy })
+        }, `Tag ${tagFamilyName}/${tag} deleted`, true);
+    }
 }
 
 const clientCache = new Map();
@@ -483,5 +670,28 @@ module.exports = {
     getMetricsReports: () => currentClient().getMetricsReports(),
     getMetricsData: (reportId, queryParams) => currentClient().getMetricsData(reportId, queryParams),
     getWorkfolders: (types) => currentClient().getWorkfolders(types),
-    duplicateNode: (familyRef, payload) => currentClient().duplicateNode(familyRef, payload)
+    duplicateNode: (familyRef, payload) => currentClient().duplicateNode(familyRef, payload),
+
+    // Core service: categories
+    getCategory: (options) => currentClient().getCategory(options),
+    getCategoryFamilies: (options) => currentClient().getCategoryFamilies(options),
+    suggestCategories: (options) => currentClient().suggestCategories(options),
+    createCategory: (categoryCreator) => currentClient().createCategory(categoryCreator),
+    updateCategory: (categoryUpdater) => currentClient().updateCategory(categoryUpdater),
+    deleteCategory: (categoryRef, secureCode) => currentClient().deleteCategory(categoryRef, secureCode),
+    destroyCategory: (categoryRef, secureCode) => currentClient().destroyCategory(categoryRef, secureCode),
+    bulkDeleteCategories: (categoryRefs, secureCode) => currentClient().bulkDeleteCategories(categoryRefs, secureCode),
+    bulkDestroyCategories: (categoryRefs, secureCode) => currentClient().bulkDestroyCategories(categoryRefs, secureCode),
+    restoreCategory: (categoryRef, options) => currentClient().restoreCategory(categoryRef, options),
+
+    // Core service: tags
+    getTagFamilies: (options) => currentClient().getTagFamilies(options),
+    getTagsInFamily: (tagFamilyId) => currentClient().getTagsInFamily(tagFamilyId),
+    suggestTags: (options) => currentClient().suggestTags(options),
+    getTagByName: (tagFamilyName, tagName) => currentClient().getTagByName(tagFamilyName, tagName),
+    createTagFamily: (tagFamilyName) => currentClient().createTagFamily(tagFamilyName),
+    deleteTagFamily: (tagFamilyName, options) => currentClient().deleteTagFamily(tagFamilyName, options),
+    createTag: (tagFamilyName, tagName) => currentClient().createTag(tagFamilyName, tagName),
+    createTagByFamilyId: (tagFamilyId, tagName) => currentClient().createTagByFamilyId(tagFamilyId, tagName),
+    deleteTag: (tagFamilyName, tag, options) => currentClient().deleteTag(tagFamilyName, tag, options)
 };
