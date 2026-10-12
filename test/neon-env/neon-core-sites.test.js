@@ -92,3 +92,25 @@ test('flat exports exist for the new site methods', () => {
     assert.equal(typeof neonApi[name], 'function', `missing flat export ${name}`);
   }
 });
+
+test('createHeadlessSite posts the raw payload unchanged', async () => {
+  const payload = { type: 'site/headless', name: 'il-mio-nuovo-sito', description: '', parentRef: '', familyRef: '', title: 'Il Mio Nuovo Sito', liveHostname: 'https://ilmionuovosito-canary.neon.test:3000', group: '' };
+  const c = await callOf((n) => n.createHeadlessSite(payload), { id: 'root-1' });
+  assert.deepEqual({ method: c.method, url: c.url, data: c.data }, { method: 'post', url: '/core/sites/create', data: payload });
+  assert.deepEqual(c.result, { id: 'root-1' });
+});
+
+test('createSiteNodeRaw posts the raw payload unchanged', async () => {
+  const payload = { siteName: 'il-mio-nuovo-sito', parentId: 'p', name: 'prima-sezione', type: 'section', title: 'Prima Sezione', description: null, path: '/prima-sezione/', style: { theme: null, variant: null, type: null, template: null }, status: null };
+  const c = await callOf((n) => n.createSiteNodeRaw(payload), { id: 'n-1' });
+  assert.deepEqual({ method: c.method, url: c.url, data: c.data }, { method: 'post', url: '/core/sites/nodes/create', data: payload });
+});
+
+test('raw create methods require a payload and are flat-exported', async () => {
+  const { client, calls } = stubbedClient();
+  await assert.rejects(() => client.createHeadlessSite(), /payload is required/);
+  await assert.rejects(() => client.createSiteNodeRaw(), /payload is required/);
+  assert.equal(calls.length, 0);
+  assert.equal(typeof neonApi.createHeadlessSite, 'function');
+  assert.equal(typeof neonApi.createSiteNodeRaw, 'function');
+});

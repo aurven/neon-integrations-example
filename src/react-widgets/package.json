@@ -6,6 +6,7 @@
     "build": "vite build",
     "build:print-query-board": "vite build --config vite.print-query-board.config.js",
     "build:nss-demo": "vite build --config vite.nss-demo.config.js",
+    "build:site-builder": "vite build --config vite.site-builder.config.js",
     "dev": "vite"
   },
   "dependencies": {

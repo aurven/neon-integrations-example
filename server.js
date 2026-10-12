@@ -141,7 +141,9 @@ fastify.get("/services", async function handler(request, reply) {
       { name: "Pexels Photos", endpoint: "GET /sources/pexels", description: "Source photos from Pexels API" },
       { name: "Neon Discovery", endpoint: "GET /utilities/services", description: "Discover Neon services" },
       { name: "Metrics Reports", endpoint: "GET /neon/api/core/metrics", description: "List available Neon BO analytics reports" },
-      { name: "Metrics Data", endpoint: "GET /neon/api/core/metrics/*", description: "Get specific metrics data from Neon BO (supports path-style reportId)" }
+      { name: "Metrics Data", endpoint: "GET /neon/api/core/metrics/*", description: "Get specific metrics data from Neon BO (supports path-style reportId)" },
+      { name: "Site Builder Preview", endpoint: "POST /api/neon/site-builder/preview", description: "Plan a headless Neon site from { title, outline } without creating anything (admin key; ?demo=true supported)" },
+      { name: "Site Builder Create", endpoint: "POST /api/neon/site-builder/create", description: "Create a headless Neon site and its section hierarchy from { title, outline } (admin key; ?demo=true supported)" }
     ],
     widgets: [
       { name: "Test Widget", endpoint: "GET /widgets/test", demoUrl: "/widgets/test", description: "Test widget interface" },
@@ -159,7 +161,8 @@ fastify.get("/services", async function handler(request, reply) {
       { name: "Tags Input Mockup", endpoint: "GET /tags/input-mockup", demoUrl: "/tags/input-mockup", description: "NeonTagsInput component mockup — copy-paste ready for Neon Object Panel" },
       { name: "Print Query Board", endpoint: "GET /widgets/print-query-board", demoUrl: "/widgets/print-query-board", description: "Kanban board for planning print edition stories — segment by section (with char budget), priority, desk, or access. Drag cards to reclassify." },
       { name: "Create Content", endpoint: "GET /widgets/neon-create", demoUrl: "/widgets/neon-create", description: "Config-driven grid of buttons to create new Neon content objects. Each button defines a label, icon, and createOptions (type, workFolder, etc.). On click: creates the object via Neon API, then opens it. Use ?config=name to load a named button set from conf/widgets/neon-create/." },
-      { name: "NSS Demo", endpoint: "GET /widgets/nss-demo", demoUrl: "/widgets/nss-demo", description: "Walkable demo of the Neon Syndication Service (Adnkronos) — Prodotti, Pacchetti, Clienti with fake data, Italian UI" }
+      { name: "NSS Demo", endpoint: "GET /widgets/nss-demo", demoUrl: "/widgets/nss-demo", description: "Walkable demo of the Neon Syndication Service (Adnkronos) — Prodotti, Pacchetti, Clienti with fake data, Italian UI" },
+      { name: "Site Builder", endpoint: "GET /widgets/site-builder", demoUrl: "/widgets/site-builder?demo=true", description: "Create a headless Neon site and its section hierarchy from an indented outline (admin key; demo mode simulates creation)" }
     ],
     panels: [
       { name: "Trello Panel", endpoint: "GET /panels/trello", demoUrl: "/panels/trello", description: "Trello card management panel for Neon CMS iframe embedding with PostMessage API" },
@@ -313,6 +316,12 @@ fastify.post("/api/neon/nodes/unlock", widgetHandlers.neonNodeUnlockHandler);
 fastify.get("/widgets/print-query-board", widgetHandlers.printQueryBoardHandler);
 fastify.get("/api/print-query-board/stories", widgetHandlers.printQueryBoardDataHandler);
 fastify.get("/widgets/nss-demo", widgetHandlers.nssDemoWidgetHandler);
+fastify.get("/widgets/site-builder", widgetHandlers.siteBuilderWidgetHandler);
+
+// Site Builder (create a Neon site from a section outline)
+const siteBuilderHandlers = require("./src/requestHandlers/site-builder.js");
+fastify.post("/api/neon/site-builder/preview", siteBuilderHandlers.previewSiteHandler);
+fastify.post("/api/neon/site-builder/create", siteBuilderHandlers.createSiteHandler);
 fastify.get("/widgets/neon-create", widgetHandlers.neonCreateWidgetHandler);
 fastify.post("/api/neon/create", widgetHandlers.neonCreateHandler);
 fastify.get("/widgets/flash-rapido", widgetHandlers.flashRapidoWidgetHandler);

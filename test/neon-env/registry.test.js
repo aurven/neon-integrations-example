@@ -90,7 +90,7 @@ test('legacy fallback builds one default env from env vars', () => {
   assert.equal(env.label, 'Local');
   assert.equal(env.neon.insecureTls, true);
   assert.deepEqual(env.hosts, []);
-  assert.deepEqual(env.neon.fo, { url: 'https://fo.local', apiKey: 'fo', host: 'fo.local' });
+  assert.deepEqual(env.neon.fo, { url: 'https://fo.local', apiKey: 'fo', host: 'fo.local', siteHostSuffix: null });
   assert.equal(reg.byKey('legacy-key').env.id, 'legacy');
 });
 
@@ -132,7 +132,7 @@ test('insecureWebhook must be boolean', () => {
 
 test('neon.fo is normalized to { url, apiKey, host } with trailing slash trimmed', () => {
   const reg = buildRegistry({ json: registryJson([envJson('a', { neon: { ...envJson('a').neon, fo: { url: 'https://neon-fo-a.example.com/', apiKey: 'k' } } })]), envVars: {} });
-  assert.deepEqual(reg.get('a').neon.fo, { url: 'https://neon-fo-a.example.com', apiKey: 'k', host: 'neon-fo-a.example.com' });
+  assert.deepEqual(reg.get('a').neon.fo, { url: 'https://neon-fo-a.example.com', apiKey: 'k', host: 'neon-fo-a.example.com', siteHostSuffix: null });
 });
 
 test('neon.fo without a valid http(s) url -> entry skipped', () => {
@@ -163,4 +163,23 @@ test('legacy with only one of NEON_FO_URL / NEON_FO_APIKEY -> fo null + warning'
 test('legacy per-site NEON_FO_*_URL vars are no longer read', () => {
   const reg = buildRegistry({ json: null, envVars: { NEON_FO_THEGLOBE_LIVE_URL: 'https://x' } });
   assert.equal(reg.get('legacy').neon.fo, null);
+});
+
+test('neon.fo.siteHostSuffix is normalized (default null)', () => {
+  const withSuffix = envJson('a', { neon: { ...envJson('a').neon, fo: { url: 'https://neon-fo-a.example.com', apiKey: 'k', siteHostSuffix: '-canary.neon.test:3000' } } });
+  const reg = buildRegistry({ json: registryJson([withSuffix, envJson('b')]), envVars: {} });
+  assert.equal(reg.get('a').neon.fo.siteHostSuffix, '-canary.neon.test:3000');
+  assert.equal(reg.get('b').neon.fo.siteHostSuffix, null);
+});
+
+test('neon.fo.siteHostSuffix must be a non-empty string when present', () => {
+  const bad = envJson('bad', { neon: { ...envJson('bad').neon, fo: { url: 'https://neon-fo-bad.example.com', apiKey: 'k', siteHostSuffix: '' } } });
+  const reg = buildRegistry({ json: registryJson([bad, envJson('ok')]), envVars: {} });
+  assert.deepEqual(reg.ids(), ['ok']);
+  assert.match(reg.skipped[0].reason, /neon\.fo\.siteHostSuffix must be a non-empty string/);
+});
+
+test('legacy NEON_FO_SITE_HOST_SUFFIX is read with legacy fo', () => {
+  const reg = buildRegistry({ json: null, envVars: { NEON_FO_URL: 'https://fo.local', NEON_FO_APIKEY: 'fo', NEON_FO_SITE_HOST_SUFFIX: '-x.local' } });
+  assert.equal(reg.get('legacy').neon.fo.siteHostSuffix, '-x.local');
 });

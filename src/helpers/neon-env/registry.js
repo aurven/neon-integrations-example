@@ -78,6 +78,7 @@ function validateEntry(raw) {
   if (neon.fo !== undefined) {
     if (!isNonEmptyString(neon.fo?.apiKey)) errors.push('neon.fo.apiKey is required when neon.fo is set');
     if (!isNonEmptyString(neon.fo?.url) || !isHttpUrl(neon.fo.url)) errors.push('neon.fo.url must be an http(s) URL when neon.fo is set');
+    if (neon.fo?.siteHostSuffix !== undefined && !isNonEmptyString(neon.fo.siteHostSuffix)) errors.push('neon.fo.siteHostSuffix must be a non-empty string');
   }
   if (raw.services !== undefined && (typeof raw.services !== 'object' || Array.isArray(raw.services) || raw.services === null)) {
     errors.push('services must be an object');
@@ -102,7 +103,7 @@ function normalize(raw, keySource) {
       app: { url: raw.neon.app.url },
       bo: { url: raw.neon.bo.url, apiKey: raw.neon.bo.apiKey, userApiKey: raw.neon.bo.userApiKey, host: hostOf(raw.neon.bo.url) },
       fo: raw.neon.fo
-        ? { url: raw.neon.fo.url.replace(/\/+$/, ''), apiKey: raw.neon.fo.apiKey, host: hostOf(raw.neon.fo.url) }
+        ? { url: raw.neon.fo.url.replace(/\/+$/, ''), apiKey: raw.neon.fo.apiKey, host: hostOf(raw.neon.fo.url), siteHostSuffix: raw.neon.fo.siteHostSuffix || null }
         : null,
     },
     services: raw.services || {},
@@ -126,7 +127,7 @@ function rejectCollisions(envs, keysOf, reason, skipped) {
 function buildLegacyEnv(envVars, warnings) {
   let fo = null;
   if (envVars.NEON_FO_URL && envVars.NEON_FO_APIKEY) {
-    fo = { url: envVars.NEON_FO_URL.replace(/\/+$/, ''), apiKey: envVars.NEON_FO_APIKEY, host: hostOf(envVars.NEON_FO_URL) };
+    fo = { url: envVars.NEON_FO_URL.replace(/\/+$/, ''), apiKey: envVars.NEON_FO_APIKEY, host: hostOf(envVars.NEON_FO_URL), siteHostSuffix: envVars.NEON_FO_SITE_HOST_SUFFIX || null };
   } else if (envVars.NEON_FO_URL || envVars.NEON_FO_APIKEY) {
     warnings.push(`legacy FO not configured: ${envVars.NEON_FO_URL ? 'NEON_FO_APIKEY' : 'NEON_FO_URL'} is missing`);
   }
