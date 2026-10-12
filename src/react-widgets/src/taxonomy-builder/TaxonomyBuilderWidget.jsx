@@ -100,13 +100,13 @@ export default function TaxonomyBuilderWidget() {
       <div className="tbw-body">
         <section className="tbw-form">
           <label className="tbw-label" htmlFor="tbw-categories">Categories (top level = family, indent to nest)</label>
-          <textarea id="tbw-categories" className="tbw-outline" value={categories} placeholder={CATEGORY_PLACEHOLDER} spellCheck={false}
+          <textarea id="tbw-categories" className="tbw-outline" value={categories} placeholder={CATEGORY_PLACEHOLDER} spellCheck={false} disabled={creating}
             onChange={clearReport(setCategories)} onKeyDown={(e) => insertTab(e, categories, setCategories)} />
           <label className="tbw-label" htmlFor="tbw-tags">Tags (top level = family, indented once = tag)</label>
-          <textarea id="tbw-tags" className="tbw-outline" value={tags} placeholder={TAG_PLACEHOLDER} spellCheck={false}
+          <textarea id="tbw-tags" className="tbw-outline" value={tags} placeholder={TAG_PLACEHOLDER} spellCheck={false} disabled={creating}
             onChange={clearReport(setTags)} onKeyDown={(e) => insertTab(e, tags, setTags)} />
           <label className="tbw-label" htmlFor="tbw-lang">Default language (new category families)</label>
-          <input id="tbw-lang" className="tbw-input" value={defaultLanguage} onChange={clearReport(setDefaultLanguage)} />
+          <input id="tbw-lang" className="tbw-input" disabled={creating} value={defaultLanguage} onChange={clearReport(setDefaultLanguage)} />
           <button type="button" className="tbw-button" disabled={!canCreate} onClick={onCreate}>
             {creating ? 'Creating…' : `Create ${toCreate} item${toCreate === 1 ? '' : 's'}`}
           </button>
