@@ -257,6 +257,19 @@
       {{#each neonEnvs}}<span style="margin-right:12px">{{#if current}}<b>● {{label}}</b>{{else}}{{label}}{{/if}} <code>{{id}}</code> ({{boHost}})</span>{{/each}}
     </div>
     {{/if}}
+    {{#if sites.length}}
+    <div style="padding:6px 16px;font-size:13px;background:#f2f4f7">Sites:
+      {{#each sites}}<span style="margin-right:12px">{{label}} → <a href="{{publicUrl}}" target="_blank" rel="noopener">{{publicUrl}}</a></span>{{/each}}
+    </div>
+    {{/if}}
+    {{#if sitesError}}
+    <div style="padding:6px 16px;font-size:13px;background:#fff4e5">{{sitesError}}</div>
+    {{/if}}
+    {{#if skippedEnvs.length}}
+    <div style="padding:6px 16px;font-size:13px;background:#fde8e8">Skipped environments (fix the registry):
+      {{#each skippedEnvs}}<div><code>{{id}}</code>: {{reason}}</div>{{/each}}
+    </div>
+    {{/if}}
     <div class="dashboard-container">
       <div class="header">
         <h1>Neon Integrations Dashboard</h1>

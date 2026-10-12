@@ -176,6 +176,7 @@ PROJECT_DOMAIN=https://integrations.neon-examples.test:54861
 ```bash
 NEON_BO_URL=https://your-neon-bo.domain.com
 NEON_BO_APIKEY=your_neon_bo_api_key
+NEON_FO_URL=https://your-neon-fo.example.io
 NEON_FO_APIKEY=your_neon_fo_api_key
 NEON_APP_URL=https://your-neon-app.domain.com
 NEON_USERNAME=your.username
@@ -275,6 +276,9 @@ The registry is a JSON file loaded from:
 3. Legacy fallback: synthesized from `NEON_*` env vars (no registry file)
 
 See `config/neon-environments.example.json` for the schema.
+
+- **Front Office sites** are discovered, not configured: each environment sets `neon.fo.url` (FO API base, e.g. `https://neon-fo-<env>…`) and `neon.fo.apiKey`; sites, their public hostnames and live/stage/preview API hosts come from `<fo.url>/api/sites/live?siteMap=false` (cached 10 min). The old `neon.fo.sites` block is ignored with a warning.
+- **Upgrading from `neon.fo.sites`:** an entry that has `neon.fo` but no `neon.fo.url` is **skipped entirely** (BO included). Add `fo.url` (e.g. `https://neon-fo-<env>…`) to every env in the registry / Render Secret File **before** deploying, then check the startup log and the admin `/services` page for skipped environments.
 
 ### Environment Resolution
 

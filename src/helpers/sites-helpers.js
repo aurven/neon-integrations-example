@@ -1,135 +1,69 @@
-const https = require('https');
-const axios = require('axios');
+'use strict';
+/**
+ * Front Office helpers. Sites, public hostnames and per-stage API hosts come from the
+ * env's FO site catalog (src/helpers/neon-env/fo-sites.js), never from hard-coded URLs.
+ * Spec: docs/superpowers/specs/2026-10-12-fo-site-catalog-design.md §3
+ */
 const { requireEnv } = require('./neon-env/context.js');
-const { NeonEnvConfigError } = require('./neon-env/errors.js');
+const { getSite, apiUrl, foRequest } = require('./neon-env/fo-sites.js');
 
-function foConfig() {
-  const env = requireEnv();
-  if (!env.neon.fo) throw new NeonEnvConfigError(`FO not configured for env ${env.id}`, 501);
-  return env.neon.fo;
+function logFoError(where, error) {
+  console.error(`[${where}] ❌ ERROR: ${(error.response && error.response.status) || error.code || error.message}`);
+  if (error.response && error.response.data) console.error(JSON.stringify(error.response.data));
 }
 
 /**
- * Get the live public hostname for a site by fetching the siteNode info from the Front Office API
- * @param {string} siteName - The site name (e.g., 'theglobe')
- * @param {string} environment - The environment ('live' or 'preview')
- * @returns {Promise<string|null>} - The public hostname URL or null if not found
+ * Public hostname (with scheme) of a site, e.g. https://theglobe-demorc.sites.neap.eidosmedia.io.
+ * Only live public hostnames are exposed by the FO; other stages return the live one.
  */
 async function getSiteHostname(siteName, environment = 'live') {
-  console.log(`[getSiteHostname] siteName: ${siteName}, environment: ${environment}`);
-  const frontOfficeUrl = getFrontOfficeUrl(siteName, environment);
-
-  if (!frontOfficeUrl) {
-    console.error(`[getSiteHostname] No Front Office URL found for site: ${siteName}, environment: ${environment}`);
-    return null;
+  if (String(environment).toLowerCase() !== 'live') {
+    console.warn(`[getSiteHostname] only live public hostnames are exposed; returning live hostname for ${siteName} (${environment} requested)`);
   }
+  const site = await getSite(siteName);
+  console.log(`[getSiteHostname] env=${requireEnv().id} site=${site.name} -> ${site.publicUrl}`);
+  return site.publicUrl;
+}
 
-  const config = {
-    method: 'get',
-    maxBodyLength: Infinity,
-    url: `${frontOfficeUrl}/api/sites/current`,
-    headers: {
-      'Content-Type': 'application/json',
-      'neon-fo-access-key': foConfig().apiKey,
-    },
-  };
-
-  const insecureInstance = axios.create({
-    httpsAgent: new https.Agent({
-      rejectUnauthorized: false
-    })
-  });
-
+async function getNodeById({ siteName, targetId, environment = 'live' }) {
+  const base = await apiUrl(siteName, environment);
+  console.log(`[getNodeById] env=${requireEnv().id} site=${siteName} stage=${environment} id=${targetId}`);
   try {
-    const response = await insecureInstance.request(config);
-    const hostname = response.data?.siteNode?.hostname;
-    console.log(`[getSiteHostname] Retrieved hostname: ${hostname}`);
-    return hostname || null;
+    const response = await foRequest({
+      method: 'get',
+      url: `${base}/api/nodes/${targetId}`,
+      headers: { 'Content-Type': 'application/json' },
+    });
+    return response.data;
   } catch (error) {
-    console.error(`[getSiteHostname] ❌ ERROR: ${error.code || error.message}`);
-    if (error.response?.data) {
-      console.error(JSON.stringify(error.response.data));
-    }
-    return null;
+    logFoError('getNodeById', error);
+    return undefined;
   }
 }
 
-function getFrontOfficeUrl(siteName, environment = 'live') {
-  const url = foConfig().sites?.[String(siteName).toLowerCase()]?.[String(environment).toLowerCase()];
-  console.log(`[getFrontOfficeUrl] env=${requireEnv().id} siteName: ${siteName}, environment: ${environment}, returning: ${url}`);
-  return url;
-}
-
-async function getNodeById({ siteName, targetId, environment }) {
-  console.log(`[getNodeById] siteName: ${siteName}, targetId: ${targetId}, environment: ${environment}`);
-  const frontOfficeUrl = getFrontOfficeUrl(siteName, environment);
-
-  const config = {
-    method: 'get',
-    maxBodyLength: Infinity,
-    url: `${frontOfficeUrl}/api/nodes/${targetId}`,
-    headers: {
-      "Content-Type": 'application/json',
-      "neon-fo-access-key": foConfig().apiKey,
-    },
-  };
-  
-  const insecureInstance = axios.create({
-    httpsAgent: new https.Agent({  
-      rejectUnauthorized: false
-    })
-  });
-
-  return await insecureInstance
-    .request(config)
-    .then((response) => {
-      console.log(JSON.stringify(response.data));
-      return response.data;
-    })
-    .catch((error) => {
-      console.error(`❌ ERROR: ${error.code}`);
-      console.error(JSON.stringify(error.response.data));
+async function getResource({ siteName, url, environment = 'live' }) {
+  const base = await apiUrl(siteName, environment);
+  console.log(`[getResource] env=${requireEnv().id} site=${siteName} stage=${environment} url=${url}`);
+  try {
+    const response = await foRequest({
+      method: 'get',
+      url: `${base}${url}`,
+      responseType: 'stream',
+      headers: { Accept: 'image/*' },
     });
-}
-
-async function getResource({ siteName, url, environment }) {
-  console.log(`[getResource] siteName: ${siteName}, url: ${url}, environment: ${environment}`);
-  const frontOfficeUrl = getFrontOfficeUrl(siteName, environment);
-
-  const config = {
-    method: 'get',
-    maxBodyLength: Infinity,
-    url: `${frontOfficeUrl}${url}`,
-    responseType: 'stream',
-    headers: {
-      "neon-fo-access-key": foConfig().apiKey,
-      Accept: 'image/*'
-    },
-  };
-  
-  const insecureInstance = axios.create({
-    httpsAgent: new https.Agent({  
-      rejectUnauthorized: false
-    })
-  });
-
-  return await insecureInstance
-    .request(config)
-    .then((response) => {
-      return response.data;
-    })
-    .catch((error) => {
-      console.error(`❌ ERROR: ${error.code}`);
-      console.error(JSON.stringify(error.response.data));
-    });
+    return response.data;
+  } catch (error) {
+    logFoError('getResource', error);
+    return undefined;
+  }
 }
 
 async function getResourceById({ siteName, targetId, environment = 'live' }) {
   const node = await getNodeById({ siteName, targetId, environment });
-  const { resourceUrl } = node;
+  if (!node) throw new Error(`node ${targetId} not found on site ${siteName} (${environment})`);
   return {
     node,
-    data: await getResource({ siteName, url: resourceUrl, environment })
+    data: await getResource({ siteName, url: node.resourceUrl, environment }),
   };
 }
 
@@ -138,5 +72,4 @@ module.exports = {
   getNodeById,
   getResource,
   getResourceById,
-  getFrontOfficeUrl
 };

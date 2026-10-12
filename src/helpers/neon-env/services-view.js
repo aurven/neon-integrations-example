@@ -18,7 +18,17 @@ function servicesRegistryView(registry, isAdmin, currentEnvId) {
       : ANONYMOUS_REGISTRY_WARNING;
   }
 
-  return { neonEnvs, registryWarning };
+  const skippedEnvs = isAdmin ? (registry.skipped || []).map((s) => ({ id: s.id, reason: s.reason })) : [];
+
+  return { neonEnvs, registryWarning, skippedEnvs };
 }
 
-module.exports = { servicesRegistryView, ANONYMOUS_REGISTRY_WARNING };
+function servicesSitesView(isAdmin, sites, errorMessage) {
+  if (!isAdmin) return { sites: [], sitesError: null };
+  return {
+    sites: (sites || []).map((s) => ({ label: s.label, publicUrl: s.publicUrl })),
+    sitesError: errorMessage ? `sites unavailable: ${errorMessage}` : null,
+  };
+}
+
+module.exports = { servicesRegistryView, servicesSitesView, ANONYMOUS_REGISTRY_WARNING };

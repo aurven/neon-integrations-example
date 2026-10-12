@@ -81,7 +81,7 @@ test('legacy fallback builds one default env from env vars', () => {
     envVars: {
       NEON_EXT_APIKEY: 'legacy-key', NEON_EXT_LOCATION: 'Local',
       NEON_BO_URL: 'https://bo.local/api', NEON_BO_APIKEY: 'bo', NEON_USER_API_KEY: 'u', NEON_APP_URL: 'https://app.local',
-      NEON_FO_APIKEY: 'fo', NEON_FO_THEGLOBE_LIVE_URL: 'https://fo.local', NEON_FO_THEGLOBE_PREVIEW_URL: 'https://fo-prev.local',
+      NEON_FO_APIKEY: 'fo', NEON_FO_URL: 'https://fo.local/',
     },
   });
   assert.equal(reg.source, 'legacy');
@@ -90,7 +90,7 @@ test('legacy fallback builds one default env from env vars', () => {
   assert.equal(env.label, 'Local');
   assert.equal(env.neon.insecureTls, true);
   assert.deepEqual(env.hosts, []);
-  assert.equal(env.neon.fo.sites.theglobe.preview, 'https://fo-prev.local');
+  assert.deepEqual(env.neon.fo, { url: 'https://fo.local', apiKey: 'fo', host: 'fo.local' });
   assert.equal(reg.byKey('legacy-key').env.id, 'legacy');
 });
 
@@ -128,4 +128,39 @@ test('insecureWebhook defaults false for file envs, true for legacy', () => {
 test('insecureWebhook must be boolean', () => {
   const reg = buildRegistry({ json: registryJson([envJson('a', { insecureWebhook: 'yes' })]), envVars: {} });
   assert.deepEqual(reg.ids(), []);
+});
+
+test('neon.fo is normalized to { url, apiKey, host } with trailing slash trimmed', () => {
+  const reg = buildRegistry({ json: registryJson([envJson('a', { neon: { ...envJson('a').neon, fo: { url: 'https://neon-fo-a.example.com/', apiKey: 'k' } } })]), envVars: {} });
+  assert.deepEqual(reg.get('a').neon.fo, { url: 'https://neon-fo-a.example.com', apiKey: 'k', host: 'neon-fo-a.example.com' });
+});
+
+test('neon.fo without a valid http(s) url -> entry skipped', () => {
+  const noUrl = envJson('nourl', { neon: { ...envJson('nourl').neon, fo: { apiKey: 'k' } } });
+  const badUrl = envJson('badurl', { neon: { ...envJson('badurl').neon, fo: { url: 'ftp://x', apiKey: 'k' } } });
+  const reg = buildRegistry({ json: registryJson([noUrl, badUrl, envJson('ok')]), envVars: {} });
+  assert.deepEqual(reg.ids(), ['ok']);
+  assert.ok(reg.skipped.every((s) => /neon\.fo\.url/.test(s.reason)));
+});
+
+test('neon.fo.sites is ignored with a warning; entry kept', () => {
+  const withSites = envJson('a', { neon: { ...envJson('a').neon, fo: { url: 'https://neon-fo-a.example.com', apiKey: 'k', sites: { theglobe: { live: 'https://x' } } } } });
+  const reg = buildRegistry({ json: registryJson([withSites]), envVars: {} });
+  assert.deepEqual(reg.ids(), ['a']);
+  assert.equal(reg.get('a').neon.fo.sites, undefined);
+  assert.ok(reg.warnings.some((w) => w === 'env a: neon.fo.sites ignored; sites come from https://neon-fo-a.example.com/api/sites/live'));
+});
+
+test('legacy with only one of NEON_FO_URL / NEON_FO_APIKEY -> fo null + warning', () => {
+  const onlyKey = buildRegistry({ json: null, envVars: { NEON_FO_APIKEY: 'fo' } });
+  assert.equal(onlyKey.get('legacy').neon.fo, null);
+  assert.ok(onlyKey.warnings.some((w) => /NEON_FO_URL is missing/.test(w)));
+  const onlyUrl = buildRegistry({ json: null, envVars: { NEON_FO_URL: 'https://fo.local' } });
+  assert.equal(onlyUrl.get('legacy').neon.fo, null);
+  assert.ok(onlyUrl.warnings.some((w) => /NEON_FO_APIKEY is missing/.test(w)));
+});
+
+test('legacy per-site NEON_FO_*_URL vars are no longer read', () => {
+  const reg = buildRegistry({ json: null, envVars: { NEON_FO_THEGLOBE_LIVE_URL: 'https://x' } });
+  assert.equal(reg.get('legacy').neon.fo, null);
 });

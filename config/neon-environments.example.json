@@ -24,13 +24,8 @@
           "userApiKey": "env:DEMORC_USER_APIKEY"
         },
         "fo": {
-          "apiKey": "env:DEMORC_FO_APIKEY",
-          "sites": {
-            "theglobe": {
-              "live": "https://theglobe-demorc.example.com",
-              "preview": "https://preview-theglobe-demorc.example.com"
-            }
-          }
+          "url": "https://neon-fo-demorc.example.com",
+          "apiKey": "env:DEMORC_FO_APIKEY"
         }
       },
       "services": {

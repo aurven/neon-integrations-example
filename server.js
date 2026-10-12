@@ -66,7 +66,8 @@ fastify.register(require("./src/helpers/neon-env/fastify-plugin.js"));
 printRegistrySummary(neonEnv.getRegistry());
 
 const { authenticate, isAdminRequest } = require("./src/helpers/auth.js");
-const { servicesRegistryView } = require("./src/helpers/neon-env/services-view.js");
+const { servicesRegistryView, servicesSitesView } = require("./src/helpers/neon-env/services-view.js");
+const { listSites } = require("./src/helpers/neon-env/fo-sites.js");
 
 // View is a templating manager for fastify
 const handlebars = require("handlebars");
@@ -216,11 +217,23 @@ fastify.get("/services", async function handler(request, reply) {
     ]
   };
 
-  const { neonEnvs, registryWarning } = servicesRegistryView(
+  const isAdmin = isAdminRequest(request);
+  const { neonEnvs, registryWarning, skippedEnvs } = servicesRegistryView(
     neonEnv.getRegistry(),
-    isAdminRequest(request),
+    isAdmin,
     request.neonEnv?.id || null
   );
+
+  let siteList = null;
+  let sitesErrorMessage = null;
+  if (isAdmin) {
+    try {
+      siteList = await listSites();
+    } catch (error) {
+      sitesErrorMessage = error.message;
+    }
+  }
+  const { sites, sitesError } = servicesSitesView(isAdmin, siteList, sitesErrorMessage);
 
   let params = {
     seo: seo,
@@ -228,6 +241,9 @@ fastify.get("/services", async function handler(request, reply) {
     location: request.neonEnv?.label || "No environment",
     neonEnvs,
     registryWarning,
+    skippedEnvs,
+    sites,
+    sitesError,
     version: appVersion
   };
 

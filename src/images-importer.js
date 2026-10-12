@@ -6,6 +6,7 @@ const utils = require('./helpers/utils.js');
 const siteshelpers = require('./helpers/sites-helpers.js');
 const { findAllElementsByNodeType, findElementByNodeType, extractTextFromElements } = require('./helpers/neon-content-parser.js');
 const { serviceConfig } = require('./helpers/neon-env');
+const { apiUrl } = require('./helpers/neon-env/fo-sites.js');
 
 function isTrelloUrl(url) {
     return /^https?:\/\/(www\.)?trello\.com\//.test(url);
@@ -204,7 +205,17 @@ async function modelImagesToMethode(methodeClient,model, {workFolder, channel, i
 
   const images = model.links?.hyperlink?.image?.map?.(image => image.targetId) || [];
   const methodeImages = {};
-  
+
+  // One catalog check up front: if the FO is down or the site is unknown, every image would fail the same way.
+  if (images.length > 0) {
+    try {
+      await apiUrl(siteName, 'live');
+    } catch (error) {
+      console.warn(`⚠️ WARNING: Neon FO unavailable for site ${siteName} (${error.message}). Skipping ${images.length} image(s).`);
+      return methodeImages;
+    }
+  }
+
   for (let i = 0; i < images.length; i++) {
     const targetId = images[i];
     const neonImage = await prepareNeonImage({ siteName, targetId, environment: 'live' })

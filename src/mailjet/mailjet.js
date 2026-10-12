@@ -1,7 +1,9 @@
 const axios = require('axios');
 const https = require('https');
 const cheerio = require('cheerio');
-const { getSiteHostname } = require('../helpers/sites-helpers');
+const { getSite, siteFromModel } = require('../helpers/neon-env/fo-sites');
+const { requireEnv } = require('../helpers/neon-env/context.js');
+const { NeonEnvConfigError } = require('../helpers/neon-env/errors.js');
 const neonEnv = require('../helpers/neon-env');
 
 async function sendSingleEmail(emailData) {
@@ -98,21 +100,34 @@ async function fetchNewsletterHtmlFromPage(pageUrl, baseUrl) {
   }
 }
 
+/**
+ * Base URL (public site) and sender display name for a newsletter payload.
+ * Base: payload siteNode.hostname, else the site's publicUrl from the FO catalog.
+ * Spec: docs/superpowers/specs/2026-10-12-fo-site-catalog-design.md §3
+ */
+async function resolveNewsletterSite(neonModel) {
+  const payloadHost = neonModel && neonModel.siteNode && neonModel.siteNode.hostname;
+  let site = null;
+  try {
+    site = await getSite(await siteFromModel(neonModel));
+  } catch (error) {
+    if (!payloadHost) throw error;
+    console.warn(`[mailjet] site lookup failed (${error.message}); using payload siteNode.hostname`);
+  }
+  const baseUrl = payloadHost || site.publicUrl;
+  if (!baseUrl) throw new NeonEnvConfigError(`site '${site.name}' in env ${requireEnv().id} has no public hostname`, 404);
+  return {
+    baseUrl: String(baseUrl).replace(/\/+$/, ''),
+    senderName: site ? `${site.label} Newsletter` : 'Newsletter',
+  };
+}
+
 async function sendNewsletter(neonModel, options = {}) {
   const contentData = neonModel.contentData || {};
   const model = neonModel.model || neonModel;
   const newsletterTitle = contentData.data.title || model.data?.title || "Latest News Updates";
 
-  // Get the public hostname for the site (not the Front Office API URL)
-  let baseUrl = neonModel.siteNode?.hostname;
-  if (!baseUrl) {
-    // Fetch the live hostname from the Front Office API
-    baseUrl = await getSiteHostname('theglobe', 'live');
-  }
-  if (!baseUrl) {
-    // Final fallback to a default public URL
-    baseUrl = 'https://theglobe-demo.neon.eks-dev.dev.eidosmedia.io';
-  }
+  const { baseUrl, senderName } = await resolveNewsletterSite(neonModel);
 
   const mode = options.mode === 'webpage' ? 'webpage' : 'generated';
 
@@ -130,7 +145,7 @@ async function sendNewsletter(neonModel, options = {}) {
             {
               "From": {
                 "Email": "aureliano.ventrella@eidosmedia.com",
-                "Name": "TheGlobe Newsletter"
+                "Name": senderName
               },
               "To": [
                 {
@@ -195,7 +210,7 @@ async function sendNewsletter(neonModel, options = {}) {
       {
         "From": {
           "Email": "aureliano.ventrella@eidosmedia.com",
-          "Name": "TheGlobe Newsletter"
+          "Name": senderName
         },
         "To": [
           {
@@ -305,5 +320,6 @@ To unsubscribe or update preferences, please contact us.
 module.exports = {
   sendSingleEmail,
   sendTest,
-  sendNewsletter
+  sendNewsletter,
+  resolveNewsletterSite
 };
