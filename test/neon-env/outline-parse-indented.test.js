@@ -32,3 +32,26 @@ test('accept() rejects a line without changing the stack', () => {
   assert.deepEqual(r.errors, ['line 2: bad name']);
   assert.deepEqual(shape(r), [[1, 'A', null], [2, 'B', 0]]);
 });
+
+test('comments option skips # lines, indented or not, without touching indentation', () => {
+  const text = '# header\nA\n  # note under A\n  B\n    # deep note\n    C\n# trailing\nD';
+  const { entries, errors } = parseIndented(text, { comments: true });
+  assert.deepEqual(errors, []);
+  assert.deepEqual(entries.map((e) => [e.line, e.text, e.depth, e.parentIndex]), [
+    [2, 'A', 1, null],
+    [4, 'B', 2, 0],
+    [6, 'C', 3, 1],
+    [8, 'D', 1, null],
+  ]);
+});
+
+test('an indented comment as the first non-blank line is not an indentation error', () => {
+  const { entries, errors } = parseIndented('   # banner\nA', { comments: true });
+  assert.deepEqual(errors, []);
+  assert.deepEqual(entries.map((e) => e.text), ['A']);
+});
+
+test('comments are off by default (Site Builder unchanged)', () => {
+  const { entries } = parseIndented('# not a comment\nA');
+  assert.deepEqual(entries.map((e) => e.text), ['# not a comment', 'A']);
+});
