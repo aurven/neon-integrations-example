@@ -266,6 +266,26 @@ class NeonClient {
         }, `Site node ${nodeForCreate.name} created`, true);
     }
 
+    // Raw payload as sent by the Neon UI (Site Builder); not the OpenAPI SiteForCreate shape
+    async createHeadlessSite(payload) {
+        requireArg(payload, 'payload');
+        return await this.makeRequest({
+            method: 'post',
+            url: '/core/sites/create',
+            data: payload
+        }, `Site ${payload.name} created`, true);
+    }
+
+    // Raw payload as sent by the Neon UI (Site Builder); not the OpenAPI NodeForCreate shape
+    async createSiteNodeRaw(payload) {
+        requireArg(payload, 'payload');
+        return await this.makeRequest({
+            method: 'post',
+            url: '/core/sites/nodes/create',
+            data: payload
+        }, `Site node ${payload.path} created`, true);
+    }
+
     async createNewSiteNode(options, realm = 'default') {
         const response = await this.makeRequest({
             method: 'post',
@@ -698,6 +718,8 @@ module.exports = {
     cloneSite: (request) => currentClient().cloneSite(request),
     getSitemap: (siteName, viewStatus) => currentClient().getSitemap(siteName, viewStatus),
     createSiteNode: (nodeForCreate) => currentClient().createSiteNode(nodeForCreate),
+    createHeadlessSite: (payload) => currentClient().createHeadlessSite(payload),
+    createSiteNodeRaw: (payload) => currentClient().createSiteNodeRaw(payload),
     createNewSiteNode: (options, realm) => currentClient().createNewSiteNode(options, realm),
     publishSiteNode: (options, realm, viewStatus) => currentClient().publishSiteNode(options, realm, viewStatus),
     createUser: (options) => currentClient().createUser(options),
