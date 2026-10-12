@@ -16,7 +16,7 @@ function asList(value) {
 function refOf(node) { return (node && (node.categoryRef || node.id)) || null; }
 
 function nameOf(node) {
-  if (node && typeof node.name === 'string') return node.name;
+  if (node && typeof node.name === 'string' && node.name.trim()) return node.name;
   const names = node && node.categoryInfo && node.categoryInfo.names;
   return typeof names === 'string' ? names.split('/').pop().trim() : '';
 }
@@ -57,6 +57,10 @@ async function readExisting(plan, neon, envId) {
         if (item.depth !== 1) continue;
         const match = findLive(families, item.name);
         if (!match) continue;
+        if (!refOf(match)) {
+          errors.push(`could not read existing categories of "${item.name}" in env ${envId}: matched "${item.name}" has no ref`);
+          continue;
+        }
         categories[i] = { status: 'exists', ref: refOf(match), node: match };
         const depth = maxDepthUnder(plan.categories, i) - 1;
         if (depth < 1) continue;
@@ -74,7 +78,13 @@ async function readExisting(plan, neon, envId) {
         const parent = categories[item.parentIndex];
         if (parent.status !== 'exists' || !parent.node) continue;
         const match = findLive(childrenOf(parent.node), item.name);
-        if (match) categories[i] = { status: 'exists', ref: refOf(match), node: match };
+        if (!match) continue;
+        if (!refOf(match)) {
+          const family = plan.categories[familyIndexOf(plan.categories, i)].name;
+          errors.push(`could not read existing categories of "${family}" in env ${envId}: matched "${item.name}" has no ref`);
+          continue;
+        }
+        categories[i] = { status: 'exists', ref: refOf(match), node: match };
       }
     }
   }
@@ -89,6 +99,10 @@ async function readExisting(plan, neon, envId) {
         if (item.depth !== 1) continue;
         const match = findLive(families, item.name);
         if (!match) continue;
+        if (!match.id) {
+          errors.push(`could not read existing tags of "${item.name}" in env ${envId}: matched "${item.name}" has no id`);
+          continue;
+        }
         tags[i] = { status: 'exists', ref: match.id };
         if (!plan.tags.some((t) => t.parentIndex === i)) continue;
         let existingTags;
@@ -97,7 +111,12 @@ async function readExisting(plan, neon, envId) {
         plan.tags.forEach((t, j) => {
           if (t.parentIndex !== i) return;
           const found = findLive(existingTags, t.name);
-          if (found) tags[j] = { status: 'exists', ref: found.id };
+          if (!found) return;
+          if (!found.id) {
+            errors.push(`could not read existing tags of "${item.name}" in env ${envId}: matched "${t.name}" has no id`);
+            return;
+          }
+          tags[j] = { status: 'exists', ref: found.id };
         });
       }
     }
@@ -162,11 +181,13 @@ async function createTaxonomy(plan, existing, neon, envId) {
     }
     const parentRef = results[item.parentIndex].ref;
     const rootRef = results[familyIndexOf(plan.categories, i)].ref;
+    if (!parentRef || !rootRef) throw new Error('missing parent or root ref');
     const res = await neon.createCategoryRaw(categoryPayload(item.name, parentRef, rootRef));
     return (res && (res.categoryRef || res.id)) || null;
   });
 
   report.tags = await runItems(plan.tags, existing.tags, 'id', async (item, i, results) => {
+    if (item.depth !== 1 && !results[item.parentIndex].id) throw new Error('missing family id');
     const res = item.depth === 1
       ? await neon.createTagFamilyRaw(item.name)
       : await neon.createTagRaw(results[item.parentIndex].id, item.name);

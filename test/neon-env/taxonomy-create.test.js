@@ -147,3 +147,36 @@ test('demoReport simulates success', () => {
   assert.deepEqual(report.categories.map((i) => i.ref), ['demo-1', 'demo-2']);
   assert.deepEqual(report.tags.map((i) => i.id), ['demo-3', 'demo-4']);
 });
+
+test('F1: matched items without ref/id are read errors, not "exists"', async () => {
+  const neon1 = fakeNeon({ catFamilies: [{ name: 'Fam' }] });
+  const r1 = await readExisting(plan('Fam\n  Child'), neon1, 'env1');
+  assert.deepEqual(r1.errors, ['could not read existing categories of "Fam" in env env1: matched "Fam" has no ref']);
+  assert.ok(!neon1.calls.some((c) => c[0] === 'getCategory'));
+
+  const r2 = await readExisting(plan('Fam\n  Child'), fakeNeon({
+    catFamilies: [{ categoryRef: 'r', name: 'Fam' }],
+    trees: { r: { categoryRef: 'r', children: [{ name: 'Child' }] } },
+  }), 'env1');
+  assert.deepEqual(r2.errors, ['could not read existing categories of "Fam" in env env1: matched "Child" has no ref']);
+
+  const neon3 = fakeNeon({ tagFamilies: [{ name: 'TF' }] });
+  const r3 = await readExisting(plan('', 'TF\n  T'), neon3, 'env1');
+  assert.deepEqual(r3.errors, ['could not read existing tags of "TF" in env env1: matched "TF" has no id']);
+  assert.ok(!neon3.calls.some((c) => c[0] === 'getTagsInFamily'));
+
+  const r4 = await readExisting(plan('', 'TF\n  T'), fakeNeon({ tagFamilies: [{ id: 'tf', name: 'TF' }], tagsByFamily: { tf: [{ name: 'T' }] } }), 'env1');
+  assert.deepEqual(r4.errors, ['could not read existing tags of "TF" in env env1: matched "T" has no id']);
+});
+
+test('F1: backstop - no parent/root ref or family id means failed with no write', async () => {
+  const p = plan('Fam\n  Child', 'TF\n  T');
+  const neon = fakeNeon();
+  const existing = { categories: [{ status: 'exists', ref: null }, { status: 'new' }], tags: [{ status: 'exists', ref: null }, { status: 'new' }] };
+  const report = await createTaxonomy(p, existing, neon, 'env1');
+  assert.deepEqual(report.categories[1].status, 'failed');
+  assert.equal(report.categories[1].error, 'missing parent or root ref');
+  assert.equal(report.tags[1].status, 'failed');
+  assert.equal(report.tags[1].error, 'missing family id');
+  assert.equal(writes(neon).length, 0);
+});
