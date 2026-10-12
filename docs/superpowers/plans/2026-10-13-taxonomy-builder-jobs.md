@@ -219,7 +219,7 @@ test('small previews are full mode with errorCount', async () => {
 test('previews above 500 items are summaries with per-level rows and capped sample/errors', () => {
   const p = buildTaxonomyPlan({ categories: franceOutline({ regions: 2, departments: 4, communes: 600 }), tags: 'TF\n  T1\n  T2', maxItems: JOB_MAX_ITEMS });
   assert.deepEqual(p.errors, []);
-  const existing = { categories: p.categories.map((_, i) => ({ status: i < 3 ? 'exists' : 'new' })), tags: p.tags.map(() => ({ status: 'new' })) };
+  const existing = { categories: p.categories.map((_, i) => ({ status: p.categories[i].depth <= 2 ? 'exists' : 'new' })), tags: p.tags.map(() => ({ status: 'new' })) };
   const errors = Array.from({ length: 250 }, (_, i) => `err ${i}`);
   const view = previewView(p, existing, 'env1', errors);
   assert.equal(view.mode, 'summary');
@@ -1181,12 +1181,12 @@ test('job endpoints: 401 without key, 403 for limited key, 404 unknown or other 
 test('body limit: 1.2 MB accepted, 6 MB rejected with 413', async () => {
   const app = await buildApp();
   const line = '  Commune with a fairly long name number ';
-  const big = ['France', ...Array.from({ length: 25000 }, (_, i) => `${line}${i}`)].join('\n');
+  const big = ['France', ...Array.from({ length: 30000 }, (_, i) => `${line}${i}`)].join('\n');
   assert.ok(Buffer.byteLength(big) > 1.2 * 1024 * 1024);
   const ok = await post(app, '/api/neon/taxonomy-builder/preview', { payload: { categories: big, tags: '' } });
   assert.equal(ok.statusCode, 200);
   assert.equal(ok.json().mode, 'summary');
-  assert.equal(ok.json().total, 25001);
+  assert.equal(ok.json().total, 30001);
   const huge = 'x'.repeat(6 * 1024 * 1024);
   const tooBig = await post(app, '/api/neon/taxonomy-builder/jobs', { payload: { categories: huge, tags: '' } });
   assert.equal(tooBig.statusCode, 413);
