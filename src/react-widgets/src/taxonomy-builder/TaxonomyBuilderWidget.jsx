@@ -149,7 +149,7 @@ function JobPanel({ job, cancelling, onCancel, onClose }) {
               <ul className="tbw-failures">
                 {(job.failures || []).map((f, i) => <li key={i}><code>{f.outline}</code> {f.path}: <span className="tbw-error">{f.error}</span></li>)}
               </ul>
-              {job.failureCount > (job.failures || []).length && <p className="tbw-muted">…and {fmt(job.failureCount - job.failures.length)} more in the full report</p>}
+              {job.failureCount > (job.failures || []).length && <p className="tbw-muted">…and {fmt(job.failureCount - (job.failures || []).length)} more in the full report</p>}
             </>
           )}
           <div className="tbw-actions">
@@ -253,9 +253,16 @@ export default function TaxonomyBuilderWidget() {
     wasRunning.current = jobRunning;
   }, [jobRunning, refreshJobs]);
 
+  useEffect(() => {
+    if (!otherRunning) return undefined;
+    const timer = setInterval(refreshJobs, 5000);
+    return () => clearInterval(timer);
+  }, [otherRunning, refreshJobs]);
+
   const errors = preview?.errors || [];
   const toCreate = preview?.toCreate || 0;
-  const busy = starting || jobRunning;
+  const otherRunning = jobs.some((j) => j.state === 'running' && j.jobId !== jobId);
+  const busy = starting || jobRunning || otherRunning;
   const canCreate = !!preview && errors.length === 0 && toCreate > 0 && !loading && !busy;
 
   async function openJob(id) {
@@ -281,6 +288,7 @@ export default function TaxonomyBuilderWidget() {
         setStartError({ errors: [data.error], conflictJobId: data.jobId });
       } else {
         setStartError({ errors: data?.errors || [data?.error || `Start failed (HTTP ${status})`], errorCount: data?.errorCount });
+        refreshJobs();
       }
     } catch (e) {
       setStartError({ errors: [e.message] });
@@ -307,10 +315,10 @@ export default function TaxonomyBuilderWidget() {
       </header>
       <div className="tbw-body">
         <section className="tbw-form">
-          <OutlineField id="tbw-categories" label="Categories (top level = family, indent to nest)" value={categories} onChange={setCategories} placeholder={CATEGORY_PLACEHOLDER} disabled={busy} />
-          <OutlineField id="tbw-tags" label="Tags (top level = family, indented once = tag)" value={tags} onChange={setTags} placeholder={TAG_PLACEHOLDER} disabled={busy} />
+          <OutlineField id="tbw-categories" label="Categories (top level = family, indent to nest)" value={categories} onChange={(v) => { setCategories(v); setStartError(null); }} placeholder={CATEGORY_PLACEHOLDER} disabled={busy} />
+          <OutlineField id="tbw-tags" label="Tags (top level = family, indented once = tag)" value={tags} onChange={(v) => { setTags(v); setStartError(null); }} placeholder={TAG_PLACEHOLDER} disabled={busy} />
           <label className="tbw-label" htmlFor="tbw-lang">Default language (new category families)</label>
-          <input id="tbw-lang" className="tbw-input" disabled={busy} value={defaultLanguage} onChange={(e) => setDefaultLanguage(e.target.value)} />
+          <input id="tbw-lang" className="tbw-input" disabled={busy} value={defaultLanguage} onChange={(e) => { setDefaultLanguage(e.target.value); setStartError(null); }} />
           <button type="button" className="tbw-button" disabled={!canCreate} onClick={onCreate}>
             {starting ? 'Starting…' : `Create ${fmt(toCreate)} item${toCreate === 1 ? '' : 's'}`}
           </button>
@@ -322,8 +330,13 @@ export default function TaxonomyBuilderWidget() {
           )}
           <JobsList jobs={jobs} currentId={jobId} onOpen={openJob} />
         </section>
+        <div className="tbw-right">
+        {job && (
+          <section className="tbw-preview">
+            <JobPanel key={job.jobId} job={job} cancelling={cancelling} onCancel={onCancel} onClose={() => setJob(null)} />
+          </section>
+        )}
         <section className="tbw-preview" aria-live="polite">
-          {job && <JobPanel job={job} cancelling={cancelling} onCancel={onCancel} onClose={() => setJob(null)} />}
           <h2>Preview {loading && <span className="tbw-muted">updating…</span>}</h2>
           {previewError && <p className="tbw-error">{previewError}</p>}
           {!preview && !previewError && <p className="tbw-muted">Type or load categories or tags to see the preview.</p>}
@@ -340,6 +353,7 @@ export default function TaxonomyBuilderWidget() {
             </>
           )}
         </section>
+        </div>
       </div>
     </div>
   );
