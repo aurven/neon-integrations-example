@@ -18,7 +18,9 @@ function servicesRegistryView(registry, isAdmin, currentEnvId) {
       : ANONYMOUS_REGISTRY_WARNING;
   }
 
-  return { neonEnvs, registryWarning };
+  const skippedEnvs = isAdmin ? (registry.skipped || []).map((s) => ({ id: s.id, reason: s.reason })) : [];
+
+  return { neonEnvs, registryWarning, skippedEnvs };
 }
 
 function servicesSitesView(isAdmin, sites, errorMessage) {

@@ -217,22 +217,23 @@ fastify.get("/services", async function handler(request, reply) {
     ]
   };
 
-  const { neonEnvs, registryWarning } = servicesRegistryView(
+  const isAdmin = isAdminRequest(request);
+  const { neonEnvs, registryWarning, skippedEnvs } = servicesRegistryView(
     neonEnv.getRegistry(),
-    isAdminRequest(request),
+    isAdmin,
     request.neonEnv?.id || null
   );
 
   let siteList = null;
   let sitesErrorMessage = null;
-  if (isAdminRequest(request)) {
+  if (isAdmin) {
     try {
       siteList = await listSites();
     } catch (error) {
       sitesErrorMessage = error.message;
     }
   }
-  const { sites, sitesError } = servicesSitesView(isAdminRequest(request), siteList, sitesErrorMessage);
+  const { sites, sitesError } = servicesSitesView(isAdmin, siteList, sitesErrorMessage);
 
   let params = {
     seo: seo,
@@ -240,6 +241,7 @@ fastify.get("/services", async function handler(request, reply) {
     location: request.neonEnv?.label || "No environment",
     neonEnvs,
     registryWarning,
+    skippedEnvs,
     sites,
     sitesError,
     version: appVersion

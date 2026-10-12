@@ -54,3 +54,15 @@ test('servicesSitesView: admin sees the error message', () => {
 test('servicesSitesView: anonymous sees nothing', () => {
   assert.deepEqual(servicesSitesView(false, [{ label: 'A', publicUrl: 'https://a' }], 'boom'), { sites: [], sitesError: null });
 });
+
+test('servicesRegistryView: admin sees skipped envs with id and reason', () => {
+  const r = reg();
+  r.skipped = [{ id: 'old', reason: 'neon.fo.url missing' }];
+  assert.deepEqual(servicesRegistryView(r, true, null).skippedEnvs, [{ id: 'old', reason: 'neon.fo.url missing' }]);
+});
+
+test('servicesRegistryView: anonymous gets no skipped envs', () => {
+  const r = reg();
+  r.skipped = [{ id: 'old', reason: 'neon.fo.url missing' }];
+  assert.deepEqual(servicesRegistryView(r, false, null).skippedEnvs, []);
+});
