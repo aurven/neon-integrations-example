@@ -4,6 +4,8 @@ const assert = require('node:assert/strict');
 const { buildTaxonomyPlan } = require('../../src/helpers/taxonomy-builder/plan.js');
 const { errorMessage } = require('../../src/helpers/site-builder/create-site.js');
 const { readExisting, previewView, createTaxonomy, demoReport, httpStatusFor } = require('../../src/helpers/taxonomy-builder/create-taxonomy.js');
+const { JOB_MAX_ITEMS } = require('../../src/helpers/taxonomy-builder/plan.js');
+const { attemptItem, categoryCreator, tagCreator, emptyResult } = require('../../src/helpers/taxonomy-builder/create-taxonomy.js');
 
 const plan = (categories, tags = '') => buildTaxonomyPlan({ categories, tags });
 
@@ -140,6 +142,7 @@ test('previewView marks new/exists and counts toCreate', async () => {
   assert.deepEqual(view.tags.map((i) => [i.path, i.status]), [['TF', 'new']]);
   assert.equal(view.toCreate, 2);
   assert.equal(view.env, 'env1');
+  assert.equal(view.mode, 'full');
 });
 
 test('demoReport simulates success', () => {
@@ -210,4 +213,106 @@ test('F3: read errors surface the Neon HTTP status/message', async () => {
 test('F3: plan flags duplicates that differ only by whitespace/case', () => {
   const p = plan('Root\n  A  B\n  a b');
   assert.ok(p.errors.some((m) => /duplicate/.test(m)), JSON.stringify(p.errors));
+});
+
+function franceOutline({ regions = 19, departments = 106, communes = 34960 } = {}) {
+  const lines = ['# generated', 'France'];
+  let d = 0;
+  let c = 0;
+  for (let r = 0; r < regions; r += 1) {
+    lines.push(`  Region ${r}`);
+    const dEnd = Math.round(((r + 1) * departments) / regions);
+    for (; d < dEnd; d += 1) {
+      lines.push(`    Dept ${d}`);
+      const cEnd = Math.round(((d + 1) * communes) / departments);
+      for (; c < cEnd; c += 1) lines.push(`      Commune ${c}`);
+    }
+  }
+  return lines.join('\n');
+}
+
+test('small previews are full mode with errorCount', async () => {
+  const p = plan('Fam\n  New', 'TF');
+  const view = previewView(p, { categories: [{ status: 'exists' }, { status: 'new' }], tags: [{ status: 'new' }] }, 'env1', ['e1']);
+  assert.equal(view.mode, 'full');
+  assert.equal(view.errorCount, 1);
+  assert.deepEqual(view.errors, ['e1']);
+  assert.equal(view.toCreate, 2);
+});
+
+test('previews above 500 items are summaries with per-level rows and capped sample/errors', () => {
+  const p = buildTaxonomyPlan({ categories: franceOutline({ regions: 2, departments: 4, communes: 600 }), tags: 'TF\n  T1\n  T2', maxItems: JOB_MAX_ITEMS });
+  assert.deepEqual(p.errors, []);
+  const existing = { categories: p.categories.map((_, i) => ({ status: p.categories[i].depth <= 2 ? 'exists' : 'new' })), tags: p.tags.map(() => ({ status: 'new' })) };
+  const errors = Array.from({ length: 250 }, (_, i) => `err ${i}`);
+  const view = previewView(p, existing, 'env1', errors);
+  assert.equal(view.mode, 'summary');
+  assert.equal(view.env, 'env1');
+  assert.equal(view.total, 1 + 2 + 4 + 600 + 3);
+  assert.equal(view.toCreate, view.total - 3);
+  assert.deepEqual(view.levels, [
+    { outline: 'categories', depth: 1, kind: 'family', total: 1, new: 0, exists: 1 },
+    { outline: 'categories', depth: 2, kind: 'category', total: 2, new: 0, exists: 2 },
+    { outline: 'categories', depth: 3, kind: 'category', total: 4, new: 4, exists: 0 },
+    { outline: 'categories', depth: 4, kind: 'category', total: 600, new: 600, exists: 0 },
+    { outline: 'tags', depth: 1, kind: 'family', total: 1, new: 1, exists: 0 },
+    { outline: 'tags', depth: 2, kind: 'tag', total: 2, new: 2, exists: 0 },
+  ]);
+  assert.equal(view.sample.categories.length, 200);
+  assert.deepEqual(view.sample.categories[0], { path: 'France', name: 'France', depth: 1, kind: 'family', status: 'exists' });
+  assert.equal(view.sample.tags.length, 3);
+  assert.equal(view.errors.length, 200);
+  assert.equal(view.errorCount, 250);
+  assert.equal(view.categories, undefined);
+});
+
+test('attemptItem applies the per-item rules shared by sync create and jobs', async () => {
+  const p = plan('F\n  C\nG\n  D', '');
+  const results = p.categories.map(emptyResult);
+  const matches = [{ status: 'exists', ref: 'f-ref' }, { status: 'new' }, { status: 'new' }, { status: 'new' }];
+  const created = [];
+  const create = async (item) => { created.push(item.name); if (item.name === 'G') throw new Error('boom'); return `id-${item.name}`; };
+  assert.equal((await attemptItem(p.categories, matches, results, 0, 'ref', create)).status, 'exists');
+  assert.deepEqual(await attemptItem(p.categories, matches, results, 1, 'ref', create), { path: 'F / C', name: 'C', depth: 2, kind: 'category', status: 'created', ref: 'id-C' });
+  assert.deepEqual(await attemptItem(p.categories, matches, results, 2, 'ref', create), { path: 'G', name: 'G', depth: 1, kind: 'family', status: 'failed', error: 'boom' });
+  assert.deepEqual(await attemptItem(p.categories, matches, results, 3, 'ref', create), { path: 'G / D', name: 'D', depth: 2, kind: 'category', status: 'skipped', error: 'parent "G" was not created' });
+  assert.deepEqual(created, ['C', 'G']);
+  const noId = await attemptItem(p.categories, [{ status: 'new' }], [emptyResult(p.categories[0])], 0, 'ref', async () => null);
+  assert.equal(noId.error, 'created but no id returned');
+});
+
+test('categoryCreator and tagCreator build the reference payloads', async () => {
+  const neon = fakeNeon();
+  const p = plan('F\n  C', 'TF\n  T');
+  const cats = p.categories.map(emptyResult);
+  const createCat = categoryCreator(p, neon);
+  cats[0].status = 'created'; cats[0].ref = await createCat(p.categories[0], 0, cats);
+  cats[1].ref = await createCat(p.categories[1], 1, cats);
+  const tags = p.tags.map(emptyResult);
+  const createTag = tagCreator(neon);
+  tags[0].status = 'created'; tags[0].id = await createTag(p.tags[0], 0, tags);
+  tags[1].id = await createTag(p.tags[1], 1, tags);
+  assert.deepEqual(neon.calls, [
+    ['createCategoryRaw', { categoryName: 'F', categoryMeta: { description: '', type: 'root', defaultLanguage: 'en-uk' } }],
+    ['createCategoryRaw', { categoryName: 'C', categoryMeta: { description: '', type: 'item' }, parentRef: 'new-1', rootRef: 'new-1' }],
+    ['createTagFamilyRaw', 'TF'],
+    ['createTagRaw', 'new-3', 'T'],
+  ]);
+});
+
+test('readExisting matches a 35k all-existing tree quickly (indexed lookups)', async () => {
+  const p = buildTaxonomyPlan({ categories: franceOutline(), tags: '', maxItems: JOB_MAX_ITEMS });
+  assert.deepEqual(p.errors, []);
+  assert.equal(p.categories.length, 35086);
+  // Build the Neon tree mirroring the outline.
+  const nodes = p.categories.map((item, i) => ({ categoryRef: `ref-${i}`, name: item.name, children: [] }));
+  p.categories.forEach((item, i) => { if (item.parentIndex !== null) nodes[item.parentIndex].children.push(nodes[i]); });
+  const neon = fakeNeon({ catFamilies: [{ categoryRef: 'ref-0', name: 'France' }], trees: { 'ref-0': nodes[0] } });
+  const started = Date.now();
+  const { existing, errors } = await readExisting(p, neon, 'env1');
+  const elapsed = Date.now() - started;
+  assert.deepEqual(errors, []);
+  assert.ok(existing.categories.every((m) => m.status === 'exists'));
+  assert.equal(existing.categories[35085].ref, 'ref-35085');
+  assert.ok(elapsed < 3000, `readExisting took ${elapsed} ms`);
 });
