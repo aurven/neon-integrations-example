@@ -319,6 +319,17 @@ If an environment's registry entry was missing/wrong (bad `extApiKey`, unreachab
 3. Add the Secret File with environments and update each environment's panel/widget/webhook config.
 4. Remove legacy Neon env vars from Render.
 
+## Site Builder
+
+Create a headless Neon site and its section hierarchy from an indented outline.
+
+- Widget: `GET /widgets/site-builder` (add `?demo=true` to simulate creation without touching Neon).
+- Endpoints: `POST /api/neon/site-builder/preview` (plans only, creates nothing) and `POST /api/neon/site-builder/create`, both with body `{ "title": "...", "outline": "..." }`.
+- Each environment must set `neon.fo.siteHostSuffix` in the registry (also `NEON_FO_SITE_HOST_SUFFIX` in legacy mode). The site's `liveHostname` is `https://<name without hyphens><siteHostSuffix>`, e.g. `-canary.neon.test:3000` gives `https://ilmionuovosito-canary.neon.test:3000`. Demo mode uses a placeholder suffix.
+- Admin only: requires the admin API key.
+- Nothing is published: the site and sections are only created.
+- Partial failure: if the site is created but some sections fail, the response is 502 with a per-node report (`created` / `failed` / `skipped`) and nothing is rolled back; children of a failed section are skipped.
+
 ## Troubleshooting
 
 ### HTTPS Issues
