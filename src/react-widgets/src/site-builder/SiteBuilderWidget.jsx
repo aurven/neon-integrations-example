@@ -16,7 +16,7 @@ export default function SiteBuilderWidget() {
   const requestSeq = useRef(0);
 
   useEffect(() => {
-    if (!title.trim()) { setPreview(null); setPreviewError(null); return undefined; }
+    if (!title.trim()) { requestSeq.current += 1; setLoading(false); setPreview(null); setPreviewError(null); return undefined; }
     const seq = ++requestSeq.current;
     setLoading(true);
     const timer = setTimeout(async () => {

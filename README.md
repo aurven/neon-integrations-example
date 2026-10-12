@@ -328,7 +328,7 @@ Create a headless Neon site and its section hierarchy from an indented outline.
 - Each environment must set `neon.fo.siteHostSuffix` in the registry (also `NEON_FO_SITE_HOST_SUFFIX` in legacy mode). The site's `liveHostname` is `https://<name without hyphens><siteHostSuffix>`, e.g. `-canary.neon.test:3000` gives `https://ilmionuovosito-canary.neon.test:3000`. Demo mode uses a placeholder suffix.
 - Admin only: requires the admin API key.
 - Nothing is published: the site and sections are only created.
-- Partial failure: if the site is created but some sections fail, the response is 502 with a per-node report (`created` / `failed` / `skipped`) and nothing is rolled back; children of a failed section are skipped.
+- Partial failure: If the site is created but some sections fail, the response is still 200 with a per-section report (created / failed / skipped): nothing is rolled back and the children of a failed section are skipped. 502 is returned only when the site itself could not be created; validation errors return 400.
 
 ## Troubleshooting
 
