@@ -76,7 +76,10 @@ class NeonClient {
         this.updateContextId = `neon-integration-${Date.now()}`;
 
         const insecure = options.insecureTls ?? env?.neon.insecureTls ?? false;
-        this.client = axios.create(insecure ? { httpsAgent: new https.Agent({ rejectUnauthorized: false }) } : {});
+        this.quiet = options.quiet === true;
+        const axiosOptions = insecure ? { httpsAgent: new https.Agent({ rejectUnauthorized: false }) } : {};
+        if (options.timeoutMs) axiosOptions.timeout = options.timeoutMs;
+        this.client = axios.create(axiosOptions);
     }
 
     async makeRequest(config, successMessage = null, returnData = false) {
@@ -95,16 +98,25 @@ class NeonClient {
 
         const callerName = getCallerName();
 
-        console.log(`➡️  [env=${this.envId}] ${config.method?.toUpperCase() || 'REQUEST'} ${config.url} called by ${callerName} with config:`, '\n', JSON.stringify({ baseURL: this.baseUrl, ...restConfig }, null, 2));
+        if (!this.quiet) {
+            console.log(`➡️  [env=${this.envId}] ${config.method?.toUpperCase() || 'REQUEST'} ${config.url} called by ${callerName} with config:`, '\n', JSON.stringify({ baseURL: this.baseUrl, ...restConfig }, null, 2));
+        }
 
         try {
             const response = await this.client.request(requestConfig);
-            if (successMessage) {
-                console.log(`✅ ${successMessage}`);
+            if (!this.quiet) {
+                if (successMessage) {
+                    console.log(`✅ ${successMessage}`);
+                }
+                logNeonCall({ callerName, requestConfig, response, envId: this.envId });
             }
-            logNeonCall({ callerName, requestConfig, response, envId: this.envId });
             return returnData ? response.data : response;
         } catch (error) {
+            if (this.quiet) {
+                console.error(`❌ [env=${this.envId}] ${config.method?.toUpperCase() || 'REQUEST'} ${config.url} failed: ${error.response?.status || error.code}`);
+                logNeonCall({ callerName, requestConfig, error, envId: this.envId });
+                throw error;
+            }
             const errorMsg = `❌ ${config.method?.toUpperCase() || 'REQUEST'} ${config.url} failed: ${error.response?.status || error.code}`;
             console.error(errorMsg);
             if (error.response?.data) {

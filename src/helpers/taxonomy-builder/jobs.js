@@ -11,6 +11,7 @@ const { emptyResult, attemptItem, categoryCreator, tagCreator } = require('./cre
 const CONCURRENCY = 4;
 const RETENTION_MS = 24 * 60 * 60 * 1000;
 const MAX_FINISHED_PER_ENV = 20;
+const MAX_REPORTS_PER_ENV = 3;
 const FAILURE_CAP = 5000;
 const LOG_EVERY = 1000;
 const DEMO_DURATION_MS = 3000;
@@ -20,6 +21,7 @@ const ID_KEY = { categories: 'ref', tags: 'id' };
 
 const jobs = new Map();
 let retentionMs = RETENTION_MS;
+let finishSeq = 0;
 
 class JobConflictError extends Error {
   constructor(envId, jobId) {
@@ -84,11 +86,11 @@ function createRecord(plan, envId) {
   return job;
 }
 
-function record(job, outline, result) {
+function record(job, outline, result, { silent = false } = {}) {
   job.counts[result.status] += 1;
   job.done += 1;
   if (result.status === 'failed') job.failures.push({ outline, path: result.path, error: result.error });
-  if (job.done % LOG_EVERY === 0) log(job, `progress ${job.done}/${job.total} counts=${JSON.stringify(job.counts)}`);
+  if (!silent && job.done % LOG_EVERY === 0) log(job, `progress ${job.done}/${job.total} counts=${JSON.stringify(job.counts)}`);
 }
 
 function markExisting(job, existing) {
@@ -98,7 +100,7 @@ function markExisting(job, existing) {
       const result = job.report[outline][i];
       result.status = 'exists';
       result[ID_KEY[outline]] = match.ref;
-      record(job, outline, result);
+      record(job, outline, result, { silent: true });
     });
   }
 }
@@ -144,6 +146,10 @@ function scheduleEviction(job) {
     clearTimeout(oldest.timer);
     jobs.delete(oldest.jobId);
   }
+  finished
+    .sort((a, b) => b.finishSeq - a.finishSeq)
+    .slice(MAX_REPORTS_PER_ENV)
+    .forEach((old) => { old.report = null; });
 }
 
 function finish(job, state, reason) {
@@ -158,6 +164,8 @@ function finish(job, state, reason) {
   job.state = state;
   job.phase = null;
   job.finishedAt = new Date().toISOString();
+  finishSeq += 1;
+  job.finishSeq = finishSeq;
   log(job, `${state} counts=${JSON.stringify(job.counts)}${job.error ? ` error=${job.error}` : ''}`);
   scheduleEviction(job);
 }
@@ -170,8 +178,9 @@ function logFinishError(job, error) {
 function startJob({ plan, existing, env, client }) {
   const job = createRecord(plan, env.id);
   try {
+    const existingCount = OUTLINES.reduce((n, o) => n + existing[o].filter((m) => m && m.status === 'exists').length, 0);
+    log(job, `started total=${job.total} toCreate=${job.total - existingCount}`);
     markExisting(job, existing);
-    log(job, `started total=${job.total} toCreate=${job.total - job.counts.exists}`);
     job.promise = context.run(env, () => runLevels(job, plan, existing, client)).then(
       () => finish(job, job.cancelRequested ? 'cancelled' : 'completed', 'cancelled'),
       (error) => {
@@ -267,6 +276,7 @@ function listJobs({ envId } = {}) {
 function getReport(jobId, { envId } = {}) {
   const job = visibleJob(jobId, envId);
   if (!job) return null;
+  if (!job.report) return { error: 'report no longer available' };
   return { jobId: job.jobId, envId: job.envId, state: job.state, counts: { ...job.counts }, categories: job.report.categories, tags: job.report.tags };
 }
 
@@ -294,6 +304,6 @@ function __setRetentionMsForTest(ms) { retentionMs = ms; }
 
 module.exports = {
   startJob, startDemoJob, runningJobId, getJob, listJobs, getReport, cancelJob, waitForJob,
-  JobConflictError, CONCURRENCY, RETENTION_MS, MAX_FINISHED_PER_ENV, FAILURE_CAP,
+  JobConflictError, CONCURRENCY, RETENTION_MS, MAX_FINISHED_PER_ENV, MAX_REPORTS_PER_ENV, FAILURE_CAP,
   __resetForTest, __setRetentionMsForTest,
 };

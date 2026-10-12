@@ -13,7 +13,12 @@ const neonApi = require('../helpers/neon-bo-api-v3.js');
 const BAD_BODY = 'body must be { categories: string, tags: string, defaultLanguage?: string }';
 const BODY_LIMIT = 5 * 1024 * 1024;
 
-let clientProvider = () => neonApi.currentClient();
+const JOB_CALL_TIMEOUT_MS = 60 * 1000;
+
+const defaultClientProvider = () => neonApi.currentClient();
+const defaultJobClientProvider = (env) => new neonApi.NeonClient({ env, quiet: true, timeoutMs: JOB_CALL_TIMEOUT_MS });
+let clientProvider = defaultClientProvider;
+let jobClientProvider = defaultJobClientProvider;
 
 function requireAdmin(request, reply) {
   const auth = authenticate(request, reply);
@@ -85,7 +90,7 @@ async function startTaxonomyJobHandler(request, reply) {
   try {
     const job = req.demo
       ? jobs.startDemoJob({ plan, envId: req.env.id })
-      : jobs.startJob({ plan, existing, env: req.env, client: clientProvider() });
+      : jobs.startJob({ plan, existing, env: req.env, client: jobClientProvider(req.env) });
     const toCreate = [...existing.categories, ...existing.tags].filter((m) => m.status !== 'exists').length;
     return reply.status(202).send({ jobId: job.jobId, total: job.total, toCreate });
   } catch (error) {
@@ -113,6 +118,7 @@ async function taxonomyJobReportHandler(request, reply) {
   if (!requireAdmin(request, reply)) return reply;
   const report = jobs.getReport(request.params.id, scopeOf(request));
   if (!report) return notFound(reply);
+  if (report.error) return reply.status(410).send(report);
   return reply
     .status(200)
     .header('Content-Disposition', `attachment; filename="${report.jobId}-report.json"`)
@@ -128,7 +134,8 @@ async function cancelTaxonomyJobHandler(request, reply) {
 }
 
 function __setClientProviderForTest(fn) {
-  clientProvider = fn || (() => neonApi.currentClient());
+  clientProvider = fn || defaultClientProvider;
+  jobClientProvider = fn ? () => fn() : defaultJobClientProvider;
 }
 
 module.exports = {

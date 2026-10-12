@@ -267,3 +267,40 @@ test('scale: 1 / 19 / 106 / 34,960 outline → exactly 35,086 creates in valid o
   assert.equal(new Set(refByIndex).size, 35086);
   assert.ok(elapsed < 10000, `job took ${elapsed} ms`);
 });
+
+test('reports are kept only for the 3 most recent finished jobs per env', async () => {
+  const ids = [];
+  for (let i = 0; i < 5; i += 1) {
+    const plan = planOf('A');
+    const { jobId } = jobs.startJob({ plan, existing: allNew(plan), env: ENV, client: fakeNeon() });
+    await jobs.waitForJob(jobId);
+    ids.push(jobId);
+  }
+  assert.equal(jobs.MAX_REPORTS_PER_ENV, 3);
+  for (const id of ids.slice(0, 2)) {
+    assert.deepEqual(jobs.getReport(id, { envId: null }), { error: 'report no longer available' });
+    assert.equal(jobs.getJob(id, { envId: null }).state, 'completed');
+    assert.equal(jobs.getJob(id, { envId: null }).counts.created, 1);
+  }
+  for (const id of ids.slice(2)) {
+    assert.equal(jobs.getReport(id, { envId: null }).categories.length, 1);
+  }
+});
+
+test('startJob logs started first; resuming existing items prints no progress lines', async () => {
+  const names = Array.from({ length: 2500 }, (_, i) => `C${i}`).join('\n');
+  const plan = planOf(names);
+  const existing = { categories: plan.categories.map((_, i) => ({ status: 'exists', ref: `r${i}` })), tags: [] };
+  const lines = [];
+  const orig = console.log;
+  console.log = (...args) => lines.push(args.join(' '));
+  let started;
+  try {
+    started = jobs.startJob({ plan, existing, env: ENV, client: fakeNeon() });
+    await jobs.waitForJob(started.jobId);
+  } finally { console.log = orig; }
+  const own = lines.filter((l) => l.includes('[taxonomy-job]'));
+  assert.ok(own[0].includes('started'));
+  assert.equal(own.filter((l) => l.includes('progress')).length, 0);
+  assert.equal(jobs.getJob(started.jobId, { envId: null }).counts.exists, 2500);
+});

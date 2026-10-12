@@ -248,3 +248,21 @@ test('sync create still enforces 500 items; preview allows up to 50000', async (
   assert.deepEqual(preview.json().errors, []);
   assert.equal(preview.json().mode, 'summary');
 });
+
+test('report of a job beyond the 3 most recent finished per env -> 410', async () => {
+  const app = await buildApp();
+  const { buildTaxonomyPlan, JOB_MAX_ITEMS } = require('../../src/helpers/taxonomy-builder/plan.js');
+  const ids = [];
+  for (let i = 0; i < 4; i += 1) {
+    const plan = buildTaxonomyPlan({ categories: 'A', tags: '', maxItems: JOB_MAX_ITEMS });
+    const existing = { categories: [{ status: 'new' }], tags: [] };
+    const { jobId } = jobs.startJob({ plan, existing, env: { id: 'a' }, client: neon });
+    await jobs.waitForJob(jobId);
+    ids.push(jobId);
+  }
+  const old = await get(app, `/api/neon/taxonomy-builder/jobs/${ids[0]}/report`);
+  assert.equal(old.statusCode, 410);
+  assert.deepEqual(old.json(), { error: 'report no longer available' });
+  assert.equal((await get(app, `/api/neon/taxonomy-builder/jobs/${ids[0]}`)).statusCode, 200);
+  assert.equal((await get(app, `/api/neon/taxonomy-builder/jobs/${ids[3]}/report`)).statusCode, 200);
+});
