@@ -1,0 +1,50 @@
+[
+  {
+    "root": {
+      "nodeType": "siteRootNode",
+      "id": "4081-5a4c9e3d0b22-9288ec8303bc-2000",
+      "name": "NextFrontier",
+      "title": "NextFrontier",
+      "hostname": "https://nextfrontier-demorc.sites.neap.eidosmedia.io",
+      "staticAttributes": { "sitelabel": "Next Frontier" }
+    },
+    "nodes": {},
+    "apiHostnames": {
+      "liveHostname": "nextfrontier-demorc-site.sites.neap.eidosmedia.io",
+      "stageHostname": "nextfrontier-stage-demorc-site.sites.neap.eidosmedia.io",
+      "previewHostname": "nextfrontier-preview-demorc-site.sites.neap.eidosmedia.io"
+    }
+  },
+  {
+    "root": {
+      "nodeType": "siteRootNode",
+      "id": "401c-ff374c9adf0f-95777f25901b-2000",
+      "name": "SportsArena",
+      "title": "SportsArena",
+      "hostname": "https://sportsarena-demorc.sites.neap.eidosmedia.io",
+      "staticAttributes": { "sitelabel": "Sports Arena" }
+    },
+    "nodes": {},
+    "apiHostnames": {
+      "liveHostname": "sportsarena-demorc-site.sites.neap.eidosmedia.io",
+      "stageHostname": "sportsarena-stage-demorc-site.sites.neap.eidosmedia.io",
+      "previewHostname": "sportsarena-preview-demorc-site.sites.neap.eidosmedia.io"
+    }
+  },
+  {
+    "root": {
+      "nodeType": "siteRootNode",
+      "id": "4081-6ae2db5a299f-683d6269f078-2000",
+      "name": "TheGlobe",
+      "title": "TheGlobe",
+      "hostname": "https://theglobe-demorc.sites.neap.eidosmedia.io/",
+      "staticAttributes": { "sitelabel": "The Globe" }
+    },
+    "nodes": {},
+    "apiHostnames": {
+      "liveHostname": "theglobe-demorc-site.sites.neap.eidosmedia.io",
+      "stageHostname": "theglobe-stage-demorc-site.sites.neap.eidosmedia.io",
+      "previewHostname": "theglobe-preview-demorc-site.sites.neap.eidosmedia.io"
+    }
+  }
+]
