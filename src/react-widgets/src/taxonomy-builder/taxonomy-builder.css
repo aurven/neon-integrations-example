@@ -92,3 +92,44 @@
 .tbw-exists { background: var(--fg-tertiary, #9d9aac); }
 .tbw-family { font-weight: 600; }
 .tbw h3 { font-size: var(--fs-sm, 12px); font-weight: 600; color: var(--fg-secondary, #69667f); margin: 12px 0 4px; text-transform: uppercase; letter-spacing: 0.04em; }
+
+.tbw-field { display: flex; flex-direction: column; gap: 4px; }
+.tbw-field-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-top: 8px; }
+.tbw-field:first-child .tbw-field-head { margin-top: 0; }
+.tbw-field-head .tbw-label { margin-top: 0; }
+
+.tbw-link {
+  background: none; border: 0; padding: 0; cursor: pointer;
+  color: var(--fg-link, #4f46e5); font: inherit; font-size: var(--fs-sm, 12px);
+}
+.tbw-link:disabled { color: var(--fg-disabled, #a9a7b8); cursor: default; }
+
+.tbw-chip {
+  padding: 10px 12px;
+  border: 1px dashed var(--border-default, #dddce5);
+  border-radius: var(--radius-md, 8px);
+  background: var(--bg-subtle, #f4f4f7);
+  font-size: var(--fs-sm, 12px);
+}
+
+.tbw-levels { width: 100%; border-collapse: collapse; margin-bottom: 8px; font-size: var(--fs-sm, 12px); }
+.tbw-levels th, .tbw-levels td { text-align: left; padding: 4px 8px; border-bottom: 1px solid var(--border-default, #dddce5); }
+.tbw-levels td:nth-child(n+4), .tbw-levels th:nth-child(n+4) { text-align: right; font-variant-numeric: tabular-nums; }
+
+.tbw-job {
+  margin-bottom: 16px; padding: 12px;
+  border: 1px solid var(--border-default, #dddce5);
+  border-radius: var(--radius-md, 8px);
+}
+.tbw-progress { height: 8px; border-radius: 4px; background: var(--bg-subtle, #f4f4f7); overflow: hidden; margin: 8px 0; }
+.tbw-progress > div { height: 100%; background: var(--accent, #4f46e5); transition: width 0.3s ease; }
+.tbw-failures { max-height: 240px; overflow: auto; margin: 4px 0 8px; padding-left: 16px; font-size: var(--fs-sm, 12px); }
+.tbw-actions { display: flex; gap: 8px; margin-top: 8px; }
+.tbw-secondary { background: var(--bg-surface, #fff); color: var(--fg-primary, #3f3c4e); border: 1px solid var(--border-default, #dddce5); }
+
+.tbw-jobs { margin-top: 16px; }
+.tbw-jobs ul { list-style: none; padding: 0; margin: 4px 0 0; display: flex; flex-direction: column; gap: 4px; font-size: var(--fs-sm, 12px); }
+
+.tbw-running, .tbw-pending { background: var(--brand, #0a2ee6); }
+.tbw-completed { background: var(--green-500, #367d38); }
+.tbw-cancelled, .tbw-lost { background: var(--fg-tertiary, #9d9aac); }
