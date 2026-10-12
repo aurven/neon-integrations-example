@@ -141,7 +141,9 @@ fastify.get("/services", async function handler(request, reply) {
       { name: "Pexels Photos", endpoint: "GET /sources/pexels", description: "Source photos from Pexels API" },
       { name: "Neon Discovery", endpoint: "GET /utilities/services", description: "Discover Neon services" },
       { name: "Metrics Reports", endpoint: "GET /neon/api/core/metrics", description: "List available Neon BO analytics reports" },
-      { name: "Metrics Data", endpoint: "GET /neon/api/core/metrics/*", description: "Get specific metrics data from Neon BO (supports path-style reportId)" }
+      { name: "Metrics Data", endpoint: "GET /neon/api/core/metrics/*", description: "Get specific metrics data from Neon BO (supports path-style reportId)" },
+      { name: "Site Builder Preview", endpoint: "POST /api/neon/site-builder/preview", description: "Plan a headless Neon site from { title, outline } without creating anything (admin key; ?demo=true supported)" },
+      { name: "Site Builder Create", endpoint: "POST /api/neon/site-builder/create", description: "Create a headless Neon site and its section hierarchy from { title, outline } (admin key; ?demo=true supported)" }
     ],
     widgets: [
       { name: "Test Widget", endpoint: "GET /widgets/test", demoUrl: "/widgets/test", description: "Test widget interface" },
@@ -313,6 +315,11 @@ fastify.post("/api/neon/nodes/unlock", widgetHandlers.neonNodeUnlockHandler);
 fastify.get("/widgets/print-query-board", widgetHandlers.printQueryBoardHandler);
 fastify.get("/api/print-query-board/stories", widgetHandlers.printQueryBoardDataHandler);
 fastify.get("/widgets/nss-demo", widgetHandlers.nssDemoWidgetHandler);
+
+// Site Builder (create a Neon site from a section outline)
+const siteBuilderHandlers = require("./src/requestHandlers/site-builder.js");
+fastify.post("/api/neon/site-builder/preview", siteBuilderHandlers.previewSiteHandler);
+fastify.post("/api/neon/site-builder/create", siteBuilderHandlers.createSiteHandler);
 fastify.get("/widgets/neon-create", widgetHandlers.neonCreateWidgetHandler);
 fastify.post("/api/neon/create", widgetHandlers.neonCreateHandler);
 fastify.get("/widgets/flash-rapido", widgetHandlers.flashRapidoWidgetHandler);
