@@ -341,6 +341,23 @@ Bulk-create category families/categories and tag families/tags from indented out
 - Admin only: requires the admin API key.
 - Status codes: 200 with a per-item report (created / exists / failed / skipped); 400 for outline parse errors or when existing taxonomy cannot be read (nothing is written); 502 when every attempted create failed.
 
+### Large taxonomies (background jobs)
+
+- Outline lines starting with `#` are comments and are ignored.
+- Limits: the synchronous `create` accepts up to 500 items; `preview` and jobs accept up to 50,000. Request bodies are capped at 5 MB (413 above).
+- Endpoints (admin key; `?demo=true` simulates a job without touching Neon):
+  - `POST /api/neon/taxonomy-builder/jobs` with the same body as `create`: 202 `{ jobId, total, toCreate }`; 400 `{ errors, errorCount }` (errors capped at 200); 409 `{ error, jobId }` when a job is already running in the env.
+  - `GET /api/neon/taxonomy-builder/jobs`: 200 `{ jobs }`.
+  - `GET /api/neon/taxonomy-builder/jobs/:id`: 200 status (state, counts, first 5000 failures) or 404.
+  - `GET /api/neon/taxonomy-builder/jobs/:id/report`: 200 full report with a `Content-Disposition` attachment header, or 404; 410 `report no longer available` once the job is no longer among the 3 most recent finished jobs of its env.
+  - `POST /api/neon/taxonomy-builder/jobs/:id/cancel`: 200 status; 409 `job is not running`; 404 if unknown.
+- One running job per env. Items are created with `CONCURRENCY = 4`.
+- Full reports are kept only for the 3 most recent finished jobs per environment (older jobs keep their counts and failures; their report answers 410).
+- Each Neon create call of a job has a 60 s timeout. A job that ends with failed or skipped items (e.g. a transient Neon 429/502 skips that item's whole subtree) should simply be re-run with the same outline: existing items are merged and only the missing ones are created.
+- Jobs live in memory: a server restart loses them. Re-run the same outline afterwards, existing items are merged and only missing ones are created.
+- Visibility: the global admin key sees jobs of all envs; an env-bound key sees only its own env's jobs.
+- Logs: `[taxonomy-job] <jobId> env=<id> ...` on start, every 1000 items, and at the end.
+
 ## Troubleshooting
 
 ### HTTPS Issues

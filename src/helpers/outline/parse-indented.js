@@ -1,6 +1,7 @@
 'use strict';
 /**
  * Shared indented-outline parser (Site Builder, Taxonomy Builder).
+ * Optional comments: lines whose first non-blank character is # are skipped.
  * Tab = 2 spaces; wider than the previous line = child (depth + 1); equal = sibling;
  * narrower must match an open level exactly. Pure, no network.
  */
@@ -16,7 +17,7 @@ function indentWidth(line) {
   return width;
 }
 
-function parseIndented(text, { firstLineNoun = 'line', accept } = {}) {
+function parseIndented(text, { firstLineNoun = 'line', accept, comments = false } = {}) {
   const entries = [];
   const errors = [];
   let stack = []; // open levels: { width, depth, index }
@@ -24,6 +25,7 @@ function parseIndented(text, { firstLineNoun = 'line', accept } = {}) {
   String(text ?? '').replace(/\r/g, '').split('\n').forEach((raw, i) => {
     const line = i + 1;
     if (!raw.trim()) return;
+    if (comments && raw.trim().startsWith('#')) return;
     const width = indentWidth(raw);
     const value = raw.trim();
 

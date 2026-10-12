@@ -1,7 +1,7 @@
 'use strict';
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
-const { buildTaxonomyPlan, categoryFamilyPayload, categoryPayload, familyIndexOf, MAX_ITEMS } = require('../../src/helpers/taxonomy-builder/plan.js');
+const { buildTaxonomyPlan, categoryFamilyPayload, categoryPayload, familyIndexOf, MAX_ITEMS, JOB_MAX_ITEMS } = require('../../src/helpers/taxonomy-builder/plan.js');
 
 test('categories outline: families and nested categories with paths', () => {
   const plan = buildTaxonomyPlan({ categories: 'GruppoBello\n  Livello 1\n    Livello 2\nAltro', tags: '' });
@@ -49,4 +49,21 @@ test('payload builders match the reference payloads', () => {
   assert.deepEqual(categoryPayload('Livello 1', '21cfe1a0a85a-8b6a226ac675', '21cfe1a0a85a-8b6a226ac675'), {
     categoryName: 'Livello 1', categoryMeta: { description: '', type: 'item' }, parentRef: '21cfe1a0a85a-8b6a226ac675', rootRef: '21cfe1a0a85a-8b6a226ac675',
   });
+});
+
+test('taxonomy outlines ignore # comment lines', () => {
+  const plan = buildTaxonomyPlan({ categories: '# France\nFrance\n  # regions\n  Bretagne', tags: '# none\nF\n  T' });
+  assert.deepEqual(plan.errors, []);
+  assert.deepEqual(plan.categories.map((i) => [i.line, i.path]), [[2, 'France'], [4, 'France / Bretagne']]);
+  assert.deepEqual(plan.tags.map((i) => i.path), ['F', 'F / T']);
+});
+
+test('item limit is a parameter: 500 by default, 50000 for jobs', () => {
+  assert.equal(MAX_ITEMS, 500);
+  assert.equal(JOB_MAX_ITEMS, 50000);
+  const many = ['F', ...Array.from({ length: 600 }, (_, i) => `  C ${i}`)].join('\n');
+  assert.deepEqual(buildTaxonomyPlan({ categories: many, tags: '' }).errors, ['outline has 601 items; the limit is 500']);
+  assert.deepEqual(buildTaxonomyPlan({ categories: many, tags: '', maxItems: JOB_MAX_ITEMS }).errors, []);
+  const huge = ['F', ...Array.from({ length: 50000 }, (_, i) => `  C ${i}`)].join('\n');
+  assert.deepEqual(buildTaxonomyPlan({ categories: huge, tags: '', maxItems: JOB_MAX_ITEMS }).errors, ['outline has 50001 items; the limit is 50000']);
 });

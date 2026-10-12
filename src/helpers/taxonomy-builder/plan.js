@@ -1,15 +1,17 @@
 'use strict';
 /**
  * Taxonomy Builder plan: categories + tags outlines → items + validation errors. Pure, no network.
- * Spec: docs/superpowers/specs/2026-10-12-taxonomy-builder-design.md §1
+ * Spec: docs/superpowers/specs/2026-10-12-taxonomy-builder-design.md §1;
+ * docs/superpowers/specs/2026-10-13-taxonomy-builder-jobs-design.md §1 (item limits)
  */
 const { parseIndented } = require('../outline/parse-indented.js');
 
 const MAX_ITEMS = 500;
+const JOB_MAX_ITEMS = 50000;
 const DEFAULT_LANGUAGE = 'en-uk';
 
 function parseKind(text, label, childKind) {
-  const parsed = parseIndented(text);
+  const parsed = parseIndented(text, { comments: true });
   const errors = parsed.errors.map((e) => `${label} ${e}`);
   const items = [];
   for (const entry of parsed.entries) {
@@ -42,7 +44,7 @@ function familyIndexOf(items, index) {
   return i;
 }
 
-function buildTaxonomyPlan({ categories, tags, defaultLanguage } = {}) {
+function buildTaxonomyPlan({ categories, tags, defaultLanguage, maxItems = MAX_ITEMS } = {}) {
   const cat = parseKind(categories, 'categories', 'category');
   const tag = parseKind(tags, 'tags', 'tag');
   const errors = [...cat.errors, ...tag.errors];
@@ -50,7 +52,7 @@ function buildTaxonomyPlan({ categories, tags, defaultLanguage } = {}) {
     if (item.depth > 2) errors.push(`tags line ${item.line}: tags cannot be nested under a tag`);
   }
   const total = cat.items.length + tag.items.length;
-  if (total > MAX_ITEMS) errors.push(`outline has ${total} items; the limit is ${MAX_ITEMS}`);
+  if (total > maxItems) errors.push(`outline has ${total} items; the limit is ${maxItems}`);
   return {
     defaultLanguage: (typeof defaultLanguage === 'string' && defaultLanguage.trim()) || DEFAULT_LANGUAGE,
     categories: cat.items,
@@ -67,4 +69,4 @@ function categoryPayload(name, parentRef, rootRef) {
   return { categoryName: name, categoryMeta: { description: '', type: 'item' }, parentRef, rootRef };
 }
 
-module.exports = { MAX_ITEMS, DEFAULT_LANGUAGE, buildTaxonomyPlan, categoryFamilyPayload, categoryPayload, familyIndexOf };
+module.exports = { MAX_ITEMS, JOB_MAX_ITEMS, DEFAULT_LANGUAGE, buildTaxonomyPlan, categoryFamilyPayload, categoryPayload, familyIndexOf };
