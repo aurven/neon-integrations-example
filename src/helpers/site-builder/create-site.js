@@ -22,7 +22,8 @@ function siteMatches(site, name) {
 
 async function listSites(neon) {
   const sites = await neon.getSites({ limit: SITES_LOOKUP_LIMIT });
-  return Array.isArray(sites) ? sites : [];
+  if (!Array.isArray(sites)) throw new Error('unexpected sites list from Neon');
+  return sites;
 }
 
 async function checkPlan(plan, neon, envId) {

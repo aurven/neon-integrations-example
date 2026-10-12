@@ -48,6 +48,11 @@ test('checkPlan: getSites failure blocks with a clear error', async () => {
   assert.deepEqual(errors, ['could not check existing sites in env sandbox: ECONNREFUSED']);
 });
 
+test('checkPlan: non-array getSites result blocks instead of passing', async () => {
+  const errors = await checkPlan(plan(''), fakeNeon({ sites: { result: [] } }), 'sandbox');
+  assert.deepEqual(errors, ['could not check existing sites in env sandbox: unexpected sites list from Neon']);
+});
+
 test('creates site then sections parent-first with correct parentIds', async () => {
   const neon = fakeNeon();
   const report = await createSiteFromPlan(plan('Prima Sezione\n  Prima Sottosezione\nSeconda'), neon, 'sandbox');
