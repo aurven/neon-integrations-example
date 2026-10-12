@@ -143,7 +143,9 @@ fastify.get("/services", async function handler(request, reply) {
       { name: "Metrics Reports", endpoint: "GET /neon/api/core/metrics", description: "List available Neon BO analytics reports" },
       { name: "Metrics Data", endpoint: "GET /neon/api/core/metrics/*", description: "Get specific metrics data from Neon BO (supports path-style reportId)" },
       { name: "Site Builder Preview", endpoint: "POST /api/neon/site-builder/preview", description: "Plan a headless Neon site from { title, outline } without creating anything (admin key; ?demo=true supported)" },
-      { name: "Site Builder Create", endpoint: "POST /api/neon/site-builder/create", description: "Create a headless Neon site and its section hierarchy from { title, outline } (admin key; ?demo=true supported)" }
+      { name: "Site Builder Create", endpoint: "POST /api/neon/site-builder/create", description: "Create a headless Neon site and its section hierarchy from { title, outline } (admin key; ?demo=true supported)" },
+      { name: "Taxonomy Builder Preview", endpoint: "POST /api/neon/taxonomy-builder/preview", description: "Plan category/tag families from { categories, tags } outlines, merged with what exists, without writing (admin key; ?demo=true supported)" },
+      { name: "Taxonomy Builder Create", endpoint: "POST /api/neon/taxonomy-builder/create", description: "Create missing category families/categories and tag families/tags from outlines, reusing existing ones (admin key; ?demo=true supported)" }
     ],
     widgets: [
       { name: "Test Widget", endpoint: "GET /widgets/test", demoUrl: "/widgets/test", description: "Test widget interface" },
@@ -322,6 +324,11 @@ fastify.get("/widgets/site-builder", widgetHandlers.siteBuilderWidgetHandler);
 const siteBuilderHandlers = require("./src/requestHandlers/site-builder.js");
 fastify.post("/api/neon/site-builder/preview", siteBuilderHandlers.previewSiteHandler);
 fastify.post("/api/neon/site-builder/create", siteBuilderHandlers.createSiteHandler);
+
+// Taxonomy Builder (bulk category and tag families)
+const taxonomyBuilderHandlers = require("./src/requestHandlers/taxonomy-builder.js");
+fastify.post("/api/neon/taxonomy-builder/preview", taxonomyBuilderHandlers.previewTaxonomyHandler);
+fastify.post("/api/neon/taxonomy-builder/create", taxonomyBuilderHandlers.createTaxonomyHandler);
 fastify.get("/widgets/neon-create", widgetHandlers.neonCreateWidgetHandler);
 fastify.post("/api/neon/create", widgetHandlers.neonCreateHandler);
 fastify.get("/widgets/flash-rapido", widgetHandlers.flashRapidoWidgetHandler);
