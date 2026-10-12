@@ -13,6 +13,7 @@ export default function SiteBuilderWidget() {
   const [loading, setLoading] = useState(false);
   const [creating, setCreating] = useState(false);
   const [report, setReport] = useState(null);
+  const [refreshKey, setRefreshKey] = useState(0);
   const requestSeq = useRef(0);
 
   useEffect(() => {
@@ -32,7 +33,7 @@ export default function SiteBuilderWidget() {
       }
     }, 400);
     return () => clearTimeout(timer);
-  }, [title, outline]);
+  }, [title, outline, refreshKey]);
 
   function onOutlineKeyDown(e) {
     if (e.key !== 'Tab') return;
@@ -54,8 +55,10 @@ export default function SiteBuilderWidget() {
     setReport(null);
     try {
       const { status, data } = await createSite(title, outline);
-      if (status === 400) setReport({ errors: data.errors || [data.error] });
-      else setReport(data);
+      if (data && data.site && data.counts) {
+        setReport(data);
+        if (data.site.status === 'created') setRefreshKey((k) => k + 1);
+      } else setReport({ errors: data?.errors || [data?.error || data?.message || `Create failed (HTTP ${status}). Check Neon before retrying: the site may be partially created.`] });
     } catch (e) {
       setReport({ errors: [e.message] });
     } finally {
@@ -124,7 +127,7 @@ export default function SiteBuilderWidget() {
                   <ul className="sbw-tree">
                     {report.sections.map((s) => (
                       <li key={s.path} style={{ paddingLeft: `${(s.depth - 1) * 20}px` }}>
-                        <span className={`sbw-badge sbw-${s.status}`}>{STATUS_LABEL[s.status]}</span> {s.title} <code className="sbw-muted">{s.path}</code>
+                        <span className={`sbw-badge sbw-${s.status}`}>{STATUS_LABEL[s.status] || s.status}</span> {s.title} <code className="sbw-muted">{s.path}</code>
                         {s.error && <span className="sbw-error"> {s.error}</span>}
                       </li>
                     ))}
