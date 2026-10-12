@@ -164,7 +164,8 @@ fastify.get("/services", async function handler(request, reply) {
       { name: "Print Query Board", endpoint: "GET /widgets/print-query-board", demoUrl: "/widgets/print-query-board", description: "Kanban board for planning print edition stories — segment by section (with char budget), priority, desk, or access. Drag cards to reclassify." },
       { name: "Create Content", endpoint: "GET /widgets/neon-create", demoUrl: "/widgets/neon-create", description: "Config-driven grid of buttons to create new Neon content objects. Each button defines a label, icon, and createOptions (type, workFolder, etc.). On click: creates the object via Neon API, then opens it. Use ?config=name to load a named button set from conf/widgets/neon-create/." },
       { name: "NSS Demo", endpoint: "GET /widgets/nss-demo", demoUrl: "/widgets/nss-demo", description: "Walkable demo of the Neon Syndication Service (Adnkronos) — Prodotti, Pacchetti, Clienti with fake data, Italian UI" },
-      { name: "Site Builder", endpoint: "GET /widgets/site-builder", demoUrl: "/widgets/site-builder?demo=true", description: "Create a headless Neon site and its section hierarchy from an indented outline (admin key; demo mode simulates creation)" }
+      { name: "Site Builder", endpoint: "GET /widgets/site-builder", demoUrl: "/widgets/site-builder?demo=true", description: "Create a headless Neon site and its section hierarchy from an indented outline (admin key; demo mode simulates creation)" },
+      { name: "Taxonomy Builder", endpoint: "GET /widgets/taxonomy-builder", demoUrl: "/widgets/taxonomy-builder?demo=true", description: "Bulk-create category families/categories and tag families/tags from outlines, merging with what exists (admin key; demo mode simulates creation)" }
     ],
     panels: [
       { name: "Trello Panel", endpoint: "GET /panels/trello", demoUrl: "/panels/trello", description: "Trello card management panel for Neon CMS iframe embedding with PostMessage API" },
@@ -319,6 +320,7 @@ fastify.get("/widgets/print-query-board", widgetHandlers.printQueryBoardHandler)
 fastify.get("/api/print-query-board/stories", widgetHandlers.printQueryBoardDataHandler);
 fastify.get("/widgets/nss-demo", widgetHandlers.nssDemoWidgetHandler);
 fastify.get("/widgets/site-builder", widgetHandlers.siteBuilderWidgetHandler);
+fastify.get("/widgets/taxonomy-builder", widgetHandlers.taxonomyBuilderWidgetHandler);
 
 // Site Builder (create a Neon site from a section outline)
 const siteBuilderHandlers = require("./src/requestHandlers/site-builder.js");
