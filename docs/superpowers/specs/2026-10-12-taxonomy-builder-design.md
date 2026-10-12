@@ -68,7 +68,7 @@ Before any write, existing items are read for every family named in the outlines
 
 - **Category families:** `getCategoryFamilies()` → `GET /core/categories/families` → `Category[]`.
   - An outline family matches an existing one whose `name` matches ignoring case and whose `deleted` is not `true`.
-- **Category subtree** (only for existing families with children in the outline): `getCategory({ categoryRef: <family ref>, depth: <outline depth of that family> })` → `GET /core/categories` → `Category` with `children: Category[]`.
+- **Category subtree** (only for existing families with children in the outline): `getCategory({ categoryRef: <family ref>, depth: <number of outline levels below that family> })` (Neon counts child levels; no `limit`) → `GET /core/categories` → `Category` with `children: Category[]`.
   - Each outline child is matched by name, ignoring case, among the non-deleted `children` of its matched parent.
   - A child under an unmatched parent is new.
 - **Tag families:** `getTagFamilies()` → `GET /core/tags/families` → `TagTerm[]` (`id`, `name`, `deleted`). Matched like category families.

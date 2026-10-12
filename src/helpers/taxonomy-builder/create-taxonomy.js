@@ -73,6 +73,9 @@ async function readExisting(plan, neon, envId) {
         const depth = maxDepthUnder(plan.categories, i) - 1;
         if (depth < 1) continue;
         try {
+          // Neon CategoriesResource documents depth as "the number of children levels (0 = no children, null = all)",
+          // so the levels below the family = outline max depth - 1. NEVER pass `limit`: the Neon UI uses limit 100,
+          // which would truncate the read and cause duplicate creates.
           const tree = await neon.getCategory({ categoryRef: refOf(match), depth });
           if (!tree || typeof tree !== 'object') throw unexpected();
           categories[i].node = tree;
