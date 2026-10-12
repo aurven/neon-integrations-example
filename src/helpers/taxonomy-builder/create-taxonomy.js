@@ -29,9 +29,11 @@ function childrenOf(node) {
   return list;
 }
 
+function normaliseName(s) { return String(s).normalize('NFC').replace(/\s+/g, ' ').trim().toLowerCase(); }
+
 function findLive(list, name) {
-  const wanted = name.trim().toLowerCase();
-  return list.find((n) => n && n.deleted !== true && nameOf(n).trim().toLowerCase() === wanted) || null;
+  const wanted = normaliseName(name);
+  return list.find((n) => n && n.deleted !== true && normaliseName(nameOf(n)) === wanted) || null;
 }
 
 function unexpected() { return new Error('unexpected response'); }
@@ -56,7 +58,7 @@ async function readExisting(plan, neon, envId) {
   if (plan.categories.length) {
     let families = null;
     try { families = await readList(() => neon.getCategoryFamilies()); }
-    catch (error) { errors.push(`could not read existing category families in env ${envId}: ${error.message}`); }
+    catch (error) { errors.push(`could not read existing category families in env ${envId}: ${errorMessage(error)}`); }
     if (families) {
       for (let i = 0; i < plan.categories.length; i += 1) {
         const item = plan.categories[i];
@@ -75,7 +77,7 @@ async function readExisting(plan, neon, envId) {
           if (!tree || typeof tree !== 'object') throw unexpected();
           categories[i].node = tree;
         } catch (error) {
-          errors.push(`could not read existing categories of "${item.name}" in env ${envId}: ${error.message}`);
+          errors.push(`could not read existing categories of "${item.name}" in env ${envId}: ${errorMessage(error)}`);
         }
       }
       for (let i = 0; i < plan.categories.length; i += 1) {
@@ -87,7 +89,7 @@ async function readExisting(plan, neon, envId) {
         let match;
         try { match = findLive(childrenOf(parent.node), item.name); }
         catch (error) {
-          const message = `could not read existing categories of "${family}" in env ${envId}: ${error.message}`;
+          const message = `could not read existing categories of "${family}" in env ${envId}: ${errorMessage(error)}`;
           if (!errors.includes(message)) errors.push(message);
           continue;
         }
@@ -104,7 +106,7 @@ async function readExisting(plan, neon, envId) {
   if (plan.tags.length) {
     let families = null;
     try { families = await readList(() => neon.getTagFamilies()); }
-    catch (error) { errors.push(`could not read existing tag families in env ${envId}: ${error.message}`); }
+    catch (error) { errors.push(`could not read existing tag families in env ${envId}: ${errorMessage(error)}`); }
     if (families) {
       for (let i = 0; i < plan.tags.length; i += 1) {
         const item = plan.tags[i];
@@ -119,7 +121,7 @@ async function readExisting(plan, neon, envId) {
         if (!plan.tags.some((t) => t.parentIndex === i)) continue;
         let existingTags;
         try { existingTags = await readList(() => neon.getTagsInFamily(match.id)); }
-        catch (error) { errors.push(`could not read existing tags of "${item.name}" in env ${envId}: ${error.message}`); continue; }
+        catch (error) { errors.push(`could not read existing tags of "${item.name}" in env ${envId}: ${errorMessage(error)}`); continue; }
         plan.tags.forEach((t, j) => {
           if (t.parentIndex !== i) return;
           const found = findLive(existingTags, t.name);

@@ -25,7 +25,7 @@ function parseKind(text, label, childKind) {
   }
   const seen = new Set();
   for (const item of items) {
-    const key = `${item.parentIndex}|${item.name.toLowerCase()}`;
+    const key = `${item.parentIndex}|${item.name.normalize('NFC').replace(/\s+/g, ' ').trim().toLowerCase()}`;
     if (seen.has(key)) {
       const parentName = item.parentIndex === null ? 'top level' : items[item.parentIndex].name;
       errors.push(`${label} line ${item.line}: duplicate "${item.name}" under ${parentName}`);

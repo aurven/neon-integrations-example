@@ -2,6 +2,7 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const { buildTaxonomyPlan } = require('../../src/helpers/taxonomy-builder/plan.js');
+const { errorMessage } = require('../../src/helpers/site-builder/create-site.js');
 const { readExisting, previewView, createTaxonomy, demoReport, httpStatusFor } = require('../../src/helpers/taxonomy-builder/create-taxonomy.js');
 
 const plan = (categories, tags = '') => buildTaxonomyPlan({ categories, tags });
@@ -188,4 +189,25 @@ test('F2: malformed children is a read error; null children means none', async (
   const nul = await readExisting(plan('Fam\n  Child'), fakeNeon({ catFamilies, trees: { r: { categoryRef: 'r', children: null } } }), 'env1');
   assert.deepEqual(nul.errors, []);
   assert.equal(nul.existing.categories[1].status, 'new');
+});
+
+test('F3: matching ignores case, repeated/NBSP whitespace and Unicode normalisation', async () => {
+  const r1 = await readExisting(plan('Gruppo  Bello'), fakeNeon({ catFamilies: [{ categoryRef: 'r', name: 'gruppo bello' }] }), 'env1');
+  assert.equal(r1.existing.categories[0].status, 'exists');
+  const r2 = await readExisting(plan('Gruppo Bello'), fakeNeon({ catFamilies: [{ categoryRef: 'r', name: 'Gruppo Bello' }] }), 'env1');
+  assert.equal(r2.existing.categories[0].status, 'exists');
+  const r3 = await readExisting(plan('Café'), fakeNeon({ catFamilies: [{ categoryRef: 'r', name: 'Café' }] }), 'env1');
+  assert.equal(r3.existing.categories[0].status, 'exists');
+});
+
+test('F3: read errors surface the Neon HTTP status/message', async () => {
+  const e = new Error('Request failed'); e.response = { status: 503, data: { message: 'unavailable' } };
+  const r = await readExisting(plan('Fam'), fakeNeon({ fail: { getCategoryFamilies: e } }), 'env1');
+  assert.equal(r.errors[0], `could not read existing category families in env env1: ${errorMessage(e)}`);
+  assert.notEqual(errorMessage(e), 'Request failed');
+});
+
+test('F3: plan flags duplicates that differ only by whitespace/case', () => {
+  const p = plan('Root\n  A  B\n  a b');
+  assert.ok(p.errors.some((m) => /duplicate/.test(m)), JSON.stringify(p.errors));
 });
