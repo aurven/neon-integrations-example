@@ -184,21 +184,41 @@ test('status view caps failures at 5000 but counts them all', async () => {
 
 test('an unexpected crash marks the job failed and skips untouched items', async () => {
   const plan = planOf('F\n  C1\n  C2');
-  const client = fakeNeon();
-  // A creator that throws synchronously-before-try is impossible to reach through the client, so break the record step:
   const existing = allNew(plan);
   existing.categories[1] = null; // attemptItem reads matches[i].status → TypeError outside the per-item try
-  const { jobId } = jobs.startJob({ plan, existing: { categories: [existing.categories[0], { status: 'new' }, { status: 'new' }], tags: [] }, env: ENV, client });
-  await jobs.waitForJob(jobId);
-  assert.equal(jobs.getJob(jobId, { envId: null }).state, 'completed'); // sanity: normal run completes
   const crash = jobs.startJob({ plan, existing, env: ENV, client: fakeNeon() });
   await jobs.waitForJob(crash.jobId);
   const job = jobs.getJob(crash.jobId, { envId: null });
   assert.equal(job.state, 'failed');
-  assert.match(job.error, /status/);
+  assert.match(job.error, /Cannot read properties of null|status/);
   assert.equal(job.done, job.total);
   const report = jobs.getReport(crash.jobId, { envId: null });
   assert.ok(report.categories.filter((i) => i.status === 'skipped').every((i) => i.error.startsWith('job failed: ')));
+});
+
+test('a synchronous start error leaves no job behind and does not block the env', async () => {
+  const plan = planOf('F', 'TF\n  T');
+  assert.throws(() => jobs.startJob({ plan, existing: { categories: [{ status: 'new' }], tags: undefined }, env: ENV, client: fakeNeon() }));
+  assert.equal(jobs.runningJobId('env1'), null);
+  assert.deepEqual(jobs.listJobs({ envId: null }), []);
+  const ok = jobs.startJob({ plan, existing: allNew(plan), env: ENV, client: fakeNeon() });
+  await jobs.waitForJob(ok.jobId);
+  assert.equal(jobs.getJob(ok.jobId, { envId: null }).state, 'completed');
+});
+
+test('a demo job cancelled right after start ends cancelled with untouched items skipped', async () => {
+  const plan = planOf('F\n  C', 'TF\n  T');
+  const { jobId } = jobs.startDemoJob({ plan, envId: 'env1', durationMs: 200 });
+  assert.equal(jobs.cancelJob(jobId, { envId: 'env1' }).jobId, jobId);
+  await jobs.waitForJob(jobId);
+  const job = jobs.getJob(jobId, { envId: null });
+  assert.equal(job.state, 'cancelled');
+  assert.equal(job.done, job.total);
+  const report = jobs.getReport(jobId, { envId: null });
+  for (const item of [...report.categories, ...report.tags]) {
+    assert.equal(item.status, 'skipped');
+    assert.equal(item.error, 'cancelled');
+  }
 });
 
 test('demo job marks everything created with demo ids and completes', async () => {

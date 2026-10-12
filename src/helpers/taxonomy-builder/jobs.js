@@ -162,44 +162,69 @@ function finish(job, state, reason) {
   scheduleEviction(job);
 }
 
+function logFinishError(job, error) {
+  console.error(`[taxonomy-job] ${job.jobId} env=${job.envId} finish error: ${error && error.message}`);
+}
+
+// Synchronous setup failures must not leave a registered job stuck in 'running'.
 function startJob({ plan, existing, env, client }) {
   const job = createRecord(plan, env.id);
-  markExisting(job, existing);
-  log(job, `started total=${job.total} toCreate=${job.total - job.counts.exists}`);
-  job.promise = context.run(env, () => runLevels(job, plan, existing, client)).then(
-    () => finish(job, job.cancelRequested ? 'cancelled' : 'completed', 'cancelled'),
-    (error) => {
-      job.error = (error && error.message) || String(error);
-      finish(job, 'failed', `job failed: ${job.error}`);
-    },
-  );
-  return statusView(job);
+  try {
+    markExisting(job, existing);
+    log(job, `started total=${job.total} toCreate=${job.total - job.counts.exists}`);
+    job.promise = context.run(env, () => runLevels(job, plan, existing, client)).then(
+      () => finish(job, job.cancelRequested ? 'cancelled' : 'completed', 'cancelled'),
+      (error) => {
+        job.error = (error && error.message) || String(error);
+        finish(job, 'failed', `job failed: ${job.error}`);
+      },
+    ).catch((error) => logFinishError(job, error));
+    return statusView(job);
+  } catch (error) {
+    jobs.delete(job.jobId);
+    throw error;
+  }
+}
+
+function demoTick(job, state) {
+  if (job.cancelRequested) { finish(job, 'cancelled', 'cancelled'); return true; }
+  for (const { outline, i, phase } of state.order.slice(state.next, state.next + state.perTick)) {
+    job.phase = phase;
+    const result = job.report[outline][i];
+    result.status = 'created';
+    result[ID_KEY[outline]] = `demo-${(state.n += 1)}`;
+    record(job, outline, result);
+  }
+  state.next += state.perTick;
+  if (state.next >= state.order.length) { finish(job, 'completed', 'cancelled'); return true; }
+  return false;
 }
 
 function startDemoJob({ plan, envId, durationMs = DEMO_DURATION_MS }) {
   const job = createRecord(plan, envId);
-  log(job, `started (demo) total=${job.total}`);
-  const order = levelsOf(plan).flatMap((level) => level.indexes.map((i) => ({ outline: level.outline, i, phase: level.phase })));
-  const perTick = Math.max(1, Math.ceil(order.length / DEMO_TICKS));
-  let next = 0;
-  let n = 0;
-  job.promise = new Promise((resolve) => {
-    const tick = () => {
-      if (job.cancelRequested) { finish(job, 'cancelled', 'cancelled'); resolve(); return; }
-      for (const { outline, i, phase } of order.slice(next, next + perTick)) {
-        job.phase = phase;
-        const result = job.report[outline][i];
-        result.status = 'created';
-        result[ID_KEY[outline]] = `demo-${(n += 1)}`;
-        record(job, outline, result);
-      }
-      next += perTick;
-      if (next >= order.length) { finish(job, 'completed', 'cancelled'); resolve(); return; }
+  try {
+    log(job, `started (demo) total=${job.total}`);
+    const order = levelsOf(plan).flatMap((level) => level.indexes.map((i) => ({ outline: level.outline, i, phase: level.phase })));
+    const state = { order, perTick: Math.max(1, Math.ceil(order.length / DEMO_TICKS)), next: 0, n: 0 };
+    job.promise = new Promise((resolve) => {
+      const tick = () => {
+        let done;
+        try {
+          done = demoTick(job, state);
+        } catch (error) {
+          job.error = (error && error.message) || String(error);
+          try { finish(job, 'failed', `job failed: ${job.error}`); } catch (e) { logFinishError(job, e); }
+          done = true;
+        }
+        if (done) resolve(); else setTimeout(tick, durationMs / DEMO_TICKS);
+      };
       setTimeout(tick, durationMs / DEMO_TICKS);
-    };
-    setTimeout(tick, durationMs / DEMO_TICKS);
-  });
-  return statusView(job);
+    });
+    return statusView(job);
+  } catch (error) {
+    jobs.delete(job.jobId);
+    throw error;
+  }
 }
 
 function statusView(job) {
