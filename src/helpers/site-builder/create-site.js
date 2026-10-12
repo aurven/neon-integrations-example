@@ -127,4 +127,4 @@ function demoReport(plan, envId) {
   return finalize(report);
 }
 
-module.exports = { checkPlan, createSiteFromPlan, demoReport };
+module.exports = { checkPlan, createSiteFromPlan, demoReport, errorMessage };
