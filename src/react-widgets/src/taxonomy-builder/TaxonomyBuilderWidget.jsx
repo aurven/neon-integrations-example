@@ -261,7 +261,8 @@ export default function TaxonomyBuilderWidget() {
 
   const errors = preview?.errors || [];
   const toCreate = preview?.toCreate || 0;
-  const otherRunning = jobs.some((j) => j.state === 'running' && j.jobId !== jobId);
+  const envId = window.CONFIG?.neonEnv?.id;
+  const otherRunning = jobs.some((j) => j.state === 'running' && j.jobId !== jobId && (!envId || j.envId === envId));
   const busy = starting || jobRunning || otherRunning;
   const canCreate = !!preview && errors.length === 0 && toCreate > 0 && !loading && !busy;
 
