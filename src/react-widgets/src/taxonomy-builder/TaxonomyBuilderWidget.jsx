@@ -253,6 +253,9 @@ export default function TaxonomyBuilderWidget() {
     wasRunning.current = jobRunning;
   }, [jobRunning, refreshJobs]);
 
+  const envId = window.CONFIG?.neonEnv?.id;
+  const otherRunning = jobs.some((j) => j.state === 'running' && j.jobId !== jobId && (!envId || j.envId === envId));
+
   useEffect(() => {
     if (!otherRunning) return undefined;
     const timer = setInterval(refreshJobs, 5000);
@@ -261,8 +264,6 @@ export default function TaxonomyBuilderWidget() {
 
   const errors = preview?.errors || [];
   const toCreate = preview?.toCreate || 0;
-  const envId = window.CONFIG?.neonEnv?.id;
-  const otherRunning = jobs.some((j) => j.state === 'running' && j.jobId !== jobId && (!envId || j.envId === envId));
   const busy = starting || jobRunning || otherRunning;
   const canCreate = !!preview && errors.length === 0 && toCreate > 0 && !loading && !busy;
 
