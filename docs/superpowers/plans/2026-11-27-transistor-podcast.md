@@ -19,7 +19,7 @@
 - Metadata node: `/ObjectMetadata/DistributionChannels/Podcast/{Enabled,ShareUrl,MediaUrl,EpisodeId,TextHash,Provider,Status,UpdatedAt}`. The service never writes `Enabled`. `TextHash` format `sha256:<hex>`. `Status` ∈ `ready` | `failed`. `UpdatedAt` ISO 8601 UTC (spec §6).
 - Opt-in: only `Enabled` = `true` (case-insensitive, trimmed) generates. `false`, empty, or no `<Podcast>` node → skip, even when forced. Template default is `false` (demorc conf, set 2026-11-27).
 - Job concurrency: one per familyRef, global cap 2 (FIFO wait), retention 24 h. Concurrent publish while running → `rerunRequested`, re-run once.
-- Third-party config goes through `serviceConfig()` in `src/helpers/neon-env/services.js` (per-env block, else global env vars). Global env var names follow that file's `*_APIKEY` convention: `ELEVENLABS_API_KEY`, `ELEVENLABS_VOICE_ID`, `ELEVENLABS_MODEL`, `OPENAI_APIKEY` (existing), `OPENAI_TTS_MODEL`, `OPENAI_TTS_VOICE`, `TRANSISTOR_APIKEY`, `TRANSISTOR_SHOW_ID`, plus plain `TTS_PROVIDER` (default `elevenlabs`). *`ELEVENLABS_API_KEY` keeps the name already in the user's `.env`; the others follow the repo's `*_APIKEY` convention.*
+- Third-party config goes through `serviceConfig()` in `src/helpers/neon-env/services.js` (per-env block, else global env vars). Global env var names use the `*_API_KEY` format: `ELEVENLABS_API_KEY`, `ELEVENLABS_VOICE_ID`, `ELEVENLABS_MODEL`, `OPENAI_API_KEY` (legacy `OPENAI_APIKEY` still accepted as fallback), `OPENAI_TTS_MODEL`, `OPENAI_TTS_VOICE`, `TRANSISTOR_API_KEY`, `TRANSISTOR_SHOW_ID`, plus plain `TTS_PROVIDER` (default `elevenlabs`). *Renamed from `*_APIKEY` on 2026-11-27 at the user's request; other integrations keep their existing names.*
 - Metadata write follows the proven flow in `src/requestHandlers/metadata.js`: `getNodeMetadata` → modify XML → `updateNodeMetadata`, no lock. *Deviation from spec §3 step 4 (lock/unlock):* add `lockNode`/`unlockNode` (unlock in `finally`) only if Neon rejects the unlocked write during manual verification.
 - New test files must be added to the `test` script in `package.json` (it lists files explicitly).
 - Never log API keys; use `src/helpers/redact-url.js` for URLs.
@@ -126,7 +126,7 @@
 
 **Files:**
 - Create: `src/helpers/transistor/client.js`
-- Modify: `src/helpers/neon-env/services.js` (`transistor: { apiKey: 'TRANSISTOR_APIKEY', showId: 'TRANSISTOR_SHOW_ID' }`)
+- Modify: `src/helpers/neon-env/services.js` (`transistor: { apiKey: 'TRANSISTOR_API_KEY', showId: 'TRANSISTOR_SHOW_ID' }`)
 - Test: `test/transistor/client.test.js`; add `test/transistor/*.test.js` to `package.json`
 
 **Interfaces:**
@@ -248,5 +248,5 @@
 - Modify: `.env.example` (new vars from Global Constraints, empty values), `CLAUDE.md` (Outbound Integrations: add Transistor.fm line)
 
 - [ ] **Step 1:** Add the env vars and the one-line doc entries.
-- [ ] **Step 2: End-to-end (needs real keys; skip and report if absent):** with `OPENAI_APIKEY`, `TRANSISTOR_APIKEY`, `TRANSISTOR_SHOW_ID` set and `TTS_PROVIDER` unset (no ElevenLabs key → fallback path): POST the example payload with `?env=<test env>` against a test Neon env whose article type has the `<Podcast>` node, on an article with `Enabled=true`. Expect: episode visible in Transistor, `<Podcast>` node populated, `Provider=openai`. Re-POST same payload → `unchanged`, no new episode. Change body text, re-POST → same `EpisodeId`, new audio.
+- [ ] **Step 2: End-to-end (needs real keys; skip and report if absent):** with `OPENAI_API_KEY`, `TRANSISTOR_API_KEY`, `TRANSISTOR_SHOW_ID` set and `TTS_PROVIDER` unset (no ElevenLabs key → fallback path): POST the example payload with `?env=<test env>` against a test Neon env whose article type has the `<Podcast>` node, on an article with `Enabled=true`. Expect: episode visible in Transistor, `<Podcast>` node populated, `Provider=openai`. Re-POST same payload → `unchanged`, no new episode. Change body text, re-POST → same `EpisodeId`, new audio.
 - [ ] **Step 3: Commit** `docs(transistor): env vars and integration entry`
