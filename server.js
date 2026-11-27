@@ -130,6 +130,7 @@ fastify.get("/services", async function handler(request, reply) {
     ],
     outbound: [
       { name: "Méthode CMS", endpoint: "POST /out/methode", description: "Export Neon content to Méthode CMS" },
+      { name: "Transistor Podcast", endpoint: "POST /out/transistor", description: "Neon article to TTS audio to Transistor.fm episode (async job; webhook answers immediately with a writeback payload). Keyless fallback: POST /out/transistor/legacy?env=<id> (insecureWebhook envs only)" },
       { name: "Méthode Images", endpoint: "POST /out/imagesToMethode", description: "Export images to Méthode CMS" },
       { name: "Sendgrid", endpoint: "POST /out/sendgrid", description: "Export content to Sendgrid email marketing" },
       { name: "Mailjet", endpoint: "POST /out/mailjet", description: "Export content to Mailjet email service" }
@@ -185,6 +186,7 @@ fastify.get("/services", async function handler(request, reply) {
       { name: "Social Publisher Panel", endpoint: "GET /panels/social-publisher", demoUrl: "/panels/social-publisher", description: "Unified social publishing panel for Twitter/X, Facebook, Instagram, Threads, Bluesky — with AI content generation, publication, and live metrics." },
       { name: "Social Publisher API", endpoint: "ALL /panels/social-publisher/api/*", description: "Connector registry API: /{platform}/status, /{platform}/publish, /{platform}/metrics/{id}, /generate-post" },
       { name: "Family Audit Panel", endpoint: "GET /panels/family-audit", demoUrl: "/panels/family-audit?demo=true", description: "Vertical audit timeline for any Neon object — standard and advanced verbosity levels" },
+      { name: "Podcast Panel API", endpoint: "GET /panels/podcast/api/status, POST /panels/podcast/api/regenerate", description: "Podcast job status and forced regeneration for the Transistor episode of an article (?demo=true for a simulated job)" },
       { name: "Family Audit API Proxy", endpoint: "GET /panels/family-audit/api/events", description: "Proxy for Neon metrics family_audit API with familyRef authentication" }
     ],
     webhooks: [
@@ -439,6 +441,14 @@ fastify.get("/out/methode", methodeHandlers.getMethodeHandler);
 fastify.post("/out/methode", methodeHandlers.postMethodeHandler);
 fastify.post("/out/methode/test", methodeHandlers.postMethodeTest);
 
+const { withInsecureEnvParam } = require("./src/helpers/neon-env/insecure-webhook.js");
+// Transistor podcast
+const transistorHandlers = require("./src/requestHandlers/transistor.js");
+fastify.post("/out/transistor", transistorHandlers.postTransistorWebhook);
+fastify.post("/out/transistor/legacy", withInsecureEnvParam(transistorHandlers.postTransistorWebhook));
+fastify.get("/panels/podcast/api/status", transistorHandlers.getPodcastStatus);
+fastify.post("/panels/podcast/api/regenerate", transistorHandlers.postPodcastRegenerate);
+
 // Sendgrid
 const neonExportHandlers = require("./src/requestHandlers/neon-export.js");
 fastify.get("/out/sendgrid", neonExportHandlers.getSendgridHandler);
@@ -454,7 +464,6 @@ fastify.get("/in/neon/webhook", neonWebhookHandlers.getNeonWebhookHandler);
 fastify.post("/in/neon/webhook", neonWebhookHandlers.postNeonWebhookHandler);
 fastify.post("/in/neon/webhook/test", neonWebhookHandlers.postNeonWebhookTest);
 // Known-insecure fallback (opt-in per env via "insecureWebhook": true): env from ?env=, no apikey
-const { withInsecureEnvParam } = require("./src/helpers/neon-env/insecure-webhook.js");
 fastify.post("/in/neon/webhook/legacy", withInsecureEnvParam(neonWebhookHandlers.postNeonWebhookHandler));
 
 /**
