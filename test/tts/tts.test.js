@@ -117,3 +117,18 @@ test('openai provider: request shape', async () => {
   assert.equal(seen.url, 'https://api.openai.com/v1/audio/speech');
   assert.deepEqual(JSON.parse(seen.opts.body), { model: 'gpt-4o-mini-tts', voice: 'alloy', input: 'hello', response_format: 'mp3' });
 });
+
+test('elevenlabs provider: 429 quota_exceeded -> QuotaExceededError, no retries', async () => {
+  let n = 0;
+  const p = createElevenLabsProvider({ apiKey: 'k', voiceId: 'v', fetchImpl: async () => { n++; return resp(429, { detail: { status: 'quota_exceeded' } }); }, sleep: async () => {} });
+  await assert.rejects(p.synthesizeChunk('hi'), QuotaExceededError);
+  assert.equal(n, 1);
+});
+
+test('synthesize: elevenlabs 429 quota falls back to openai', async () => {
+  const el = createElevenLabsProvider({ apiKey: 'k', voiceId: 'v', fetchImpl: async () => resp(429, { detail: { status: 'quota_exceeded' } }), sleep: async () => {} });
+  const oa = fake('openai');
+  const r = await synthesize(TEXT, { providers: { elevenlabs: el, openai: oa } });
+  assert.equal(r.provider, 'openai');
+  assert.equal(r.fellBack, true);
+});

@@ -16,7 +16,7 @@ function createElevenLabsProvider({ apiKey, voiceId, model, fetchImpl = fetch, s
       });
       if (res.ok) return Buffer.from(await res.arrayBuffer());
       const body = await res.text().catch(() => '');
-      if (res.status === 402 || (res.status === 401 && body.includes('quota_exceeded'))) {
+      if (res.status === 402 || ((res.status === 401 || res.status === 429) && body.includes('quota_exceeded'))) {
         throw new QuotaExceededError(`ElevenLabs quota exceeded (HTTP ${res.status})`);
       }
       if (res.status === 429 && attempt < MAX_TRIES) {
