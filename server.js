@@ -445,7 +445,7 @@ const { withInsecureEnvParam } = require("./src/helpers/neon-env/insecure-webhoo
 // Transistor podcast
 const transistorHandlers = require("./src/requestHandlers/transistor.js");
 fastify.post("/out/transistor", transistorHandlers.postTransistorWebhook);
-fastify.post("/out/transistor/legacy", withInsecureEnvParam(transistorHandlers.postTransistorWebhook));
+fastify.post("/out/transistor/legacy", withInsecureEnvParam(transistorHandlers.postTransistorWebhookLegacy));
 fastify.get("/panels/podcast/api/status", transistorHandlers.getPodcastStatus);
 fastify.post("/panels/podcast/api/regenerate", transistorHandlers.postPodcastRegenerate);
 

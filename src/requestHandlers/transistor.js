@@ -6,13 +6,22 @@ const { readPodcastMetadata } = require('../helpers/podcast/metadata.js');
 
 const DEMO_MP3 = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
 const DEMO_DURATION_MS = 8000;
-const demoJobs = new Map(); // familyRef -> startedAt (ms)
+const DEMO_MAX_ENTRIES = 100;
+const demoJobs = new Map(); // familyRef -> startedAt (ms), insertion-ordered
+
+function pruneDemo() {
+  const cutoff = Date.now() - DEMO_DURATION_MS - 60000;
+  for (const [k, t] of demoJobs) if (t < cutoff) demoJobs.delete(k);
+  while (demoJobs.size > DEMO_MAX_ENTRIES) demoJobs.delete(demoJobs.keys().next().value);
+}
+const demoKey = (ref) => String(ref).slice(0, 200);
 
 function isDemo(request) {
   return String(request.query && request.query.demo) === 'true';
 }
 
 function demoJob(familyRef) {
+  pruneDemo();
   const startedAt = demoJobs.get(familyRef);
   if (startedAt === undefined) return { job: null, metadata: readPodcastMetadata('<ObjectMetadata/>') };
   const p = Math.min(1, (Date.now() - startedAt) / DEMO_DURATION_MS);
@@ -40,14 +49,16 @@ function demoJob(familyRef) {
   };
 }
 
-async function postTransistorWebhook(request, reply) {
+async function handleWebhook(request, reply, { requireAuth }) {
   console.log('postTransistorWebhook << IN:');
   const safe = safeLogRequest(request.headers || {}, request.body || {});
   console.log('Request Headers:', JSON.stringify(safe.headers));
   console.log('Request Body:', JSON.stringify(safe.body));
 
   const env = request.neonEnv;
-  if (!env) return reply.status(401).send({ error: 'Unauthorized' });
+  if (!env || (requireAuth && !(request.neonAuth && request.neonAuth.authenticated))) {
+    return reply.status(401).send({ error: 'Unauthorized' });
+  }
 
   const { model, rootData } = request.body || {};
   if (!model && !rootData) {
@@ -71,15 +82,17 @@ async function postTransistorWebhook(request, reply) {
   return reply.status(200).send({ action: 'writeback', payload });
 }
 
+// /out/transistor: apikey required. /out/transistor/legacy: gated by withInsecureEnvParam instead.
+const postTransistorWebhook = (request, reply) => handleWebhook(request, reply, { requireAuth: true });
+const postTransistorWebhookLegacy = (request, reply) => handleWebhook(request, reply, { requireAuth: false });
+
 async function getPodcastStatus(request, reply) {
   const demo = isDemo(request);
-  if (!demo) {
-    const auth = authenticate(request, reply);
-    if (!auth.authenticated) return reply.status(401).send({ error: 'Unauthorized' });
-  }
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) return reply.status(401).send({ error: 'Unauthorized' });
   const familyRef = request.query && request.query.familyRef;
   if (!familyRef) return reply.status(400).send({ error: 'familyRef is required' });
-  if (demo) return reply.send(demoJob(familyRef));
+  if (demo) return reply.send(demoJob(demoKey(familyRef)));
 
   const env = request.neonEnv;
   if (!env) return reply.status(401).send({ error: 'Unauthorized' });
@@ -94,16 +107,18 @@ async function getPodcastStatus(request, reply) {
 
 async function postPodcastRegenerate(request, reply) {
   const demo = isDemo(request);
-  if (!demo) {
-    const auth = authenticate(request, reply);
-    if (!auth.authenticated) return reply.status(401).send({ error: 'Unauthorized' });
-  }
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) return reply.status(401).send({ error: 'Unauthorized' });
   const { familyRef, provider } = request.body || {};
   if (!familyRef && !demo) return reply.status(400).send({ error: 'familyRef is required' });
   if (demo) {
-    const ref = familyRef || 'demo';
-    demoJobs.set(ref, Date.now());
-    return reply.status(202).send({ status: 'processing', jobId: `demo-${demoJobs.get(ref)}` });
+    const ref = demoKey(familyRef || 'demo');
+    pruneDemo();
+    demoJobs.delete(ref);
+    const startedAt = Date.now();
+    demoJobs.set(ref, startedAt);
+    pruneDemo();
+    return reply.status(202).send({ status: 'processing', jobId: `demo-${startedAt}` });
   }
   const env = request.neonEnv;
   if (!env) return reply.status(401).send({ error: 'Unauthorized' });
@@ -111,4 +126,4 @@ async function postPodcastRegenerate(request, reply) {
   return reply.status(202).send({ status: started.status, jobId: started.jobId });
 }
 
-module.exports = { postTransistorWebhook, getPodcastStatus, postPodcastRegenerate };
+module.exports = { postTransistorWebhook, postTransistorWebhookLegacy, getPodcastStatus, postPodcastRegenerate };

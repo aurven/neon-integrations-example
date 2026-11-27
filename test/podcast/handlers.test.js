@@ -111,3 +111,39 @@ test('demo mode: regenerate then status progresses to done with no deps', async 
     assert.equal(last.body.metadata.shareUrl, 'https://share.transistor.fm/s/demo');
   } finally { Date.now = realNow; }
 });
+
+test('webhook with env but unauthenticated apikey -> 401, no job', async () => {
+  const reply = fakeReply();
+  await h.postTransistorWebhook(req({ body: example, neonAuth: { authenticated: false } }), reply);
+  assert.equal(reply.code, 401);
+  assert.equal(jobs.getJobForArticle('demo', example.rootData.id), null);
+});
+
+test('legacy webhook with env set by wrapper and no neonAuth -> 200 processing', async () => {
+  const reply = fakeReply();
+  await h.postTransistorWebhookLegacy(req({ body: example, neonAuth: null }), reply);
+  assert.equal(reply.code, 200);
+  assert.equal(reply.body.payload.status, 'processing');
+  await jobs.waitForJob(reply.body.payload.jobId);
+});
+
+test('demo regenerate and status without apikey -> 401', async () => {
+  const a = fakeReply();
+  await h.postPodcastRegenerate(req({ query: { demo: 'true' }, body: { familyRef: 'x' }, neonAuth: { authenticated: false } }), a);
+  assert.equal(a.code, 401);
+  const b = fakeReply();
+  await h.getPodcastStatus(req({ query: { demo: 'true', familyRef: 'x' }, neonAuth: { authenticated: false } }), b);
+  assert.equal(b.code, 401);
+});
+
+test('demo store is capped at 100 entries', async () => {
+  for (let i = 0; i < 130; i++) {
+    await h.postPodcastRegenerate(req({ query: { demo: 'true' }, body: { familyRef: 'cap-' + i }, neonEnv: null }), fakeReply());
+  }
+  const old = fakeReply();
+  await h.getPodcastStatus(req({ query: { demo: 'true', familyRef: 'cap-0' } }), old);
+  assert.equal(old.body.job, null);
+  const recent = fakeReply();
+  await h.getPodcastStatus(req({ query: { demo: 'true', familyRef: 'cap-129' } }), recent);
+  assert.ok(recent.body.job);
+});
