@@ -255,3 +255,32 @@ test('decideWebhook is pure and defaults to start', () => {
   assert.equal(jobs.decideWebhook({ model: { ...model(), podcast: { enabled: true, textHash: same.textHash } }, force: false }).action, 'unchanged');
   assert.equal(jobs.decideWebhook({ model: { ...model(), podcast: { enabled: true, textHash: same.textHash } }, force: true }).action, 'start');
 });
+
+test('fix1: failed write-back keeps episode id; next run replaces, never creates', async () => {
+  let failing = true;
+  const f = fakes({ updateOk: () => !failing });
+  const first = await run();
+  assert.equal(first.job.state, 'failed');
+  assert.equal(f.calls.create.length, 1);
+  failing = false;
+  const second = await run({ model: model('Changed') });
+  assert.equal(second.job.state, 'done');
+  assert.equal(f.calls.create.length, 1);
+  assert.equal(f.calls.replace.length, 1);
+  assert.equal(f.calls.replace[0].id, '100');
+  assert.equal(readPodcastMetadata(f.xml).episodeId, '100');
+});
+
+test('fix2: job stays active while failure write is pending', async () => {
+  const f = fakes();
+  f.synthesize = async () => { throw new Error('boom'); };
+  const gate = deferred();
+  const origUpdate = f.neon.updateNodeMetadata;
+  f.neon.updateNodeMetadata = async (r, x) => { await gate.promise; return origUpdate(r, x); };
+  const first = await jobs.startPodcastJob({ env: ENV, familyRef: 'ref1', model: model() });
+  await tick(); await tick();
+  const second = await jobs.startPodcastJob({ env: ENV, familyRef: 'ref1' });
+  assert.deepEqual(second, { status: 'queued', jobId: first.jobId });
+  gate.resolve();
+  await jobs.waitForJob(first.jobId);
+});

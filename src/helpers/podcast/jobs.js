@@ -15,6 +15,8 @@ const WRITE_ATTEMPTS = 2;
 
 const jobs = new Map();
 const queue = [];
+// Episode ids obtained from Transistor, kept in memory so a failed Neon write-back cannot cause a duplicate episode.
+const knownEpisodes = new Map();
 let seq = 0;
 let deps = {};
 
@@ -40,6 +42,13 @@ function newJobId() {
 }
 
 const isActive = (job) => job.state === 'waiting' || job.state === 'running';
+
+const articleKey = (job) => `${job.envId}:${job.familyRef}`;
+
+function rememberEpisode(job, id) {
+  job.episodeId = String(id);
+  knownEpisodes.set(articleKey(job), String(id));
+}
 
 function activeJobFor(envId, familyRef) {
   for (const job of jobs.values()) if (job.envId === envId && job.familyRef === familyRef && isActive(job)) return job;
@@ -81,6 +90,7 @@ async function createEpisode(job, neon, transistor, fields, audioUrl) {
     return await transistor.createEpisode({ ...fields, audioUrl });
   } catch (err) {
     if (err && err.episodeId) {
+      rememberEpisode(job, err.episodeId);
       // The episode exists (draft): persist its id so the next run replaces instead of creating again.
       try {
         await writeMetadata(neon, job.familyRef, { episodeId: String(err.episodeId), status: 'failed', updatedAt: dep('now')().toISOString() });
@@ -117,16 +127,22 @@ async function pipeline(job) {
   const audioUrl = await transistor.uploadAudio(audio.audio, fileName);
   const fields = episodeFields(model, text);
   let episode = null;
-  if (stored.episodeId) {
+  const fromMemory = !stored.episodeId && knownEpisodes.get(articleKey(job));
+  const knownId = stored.episodeId || fromMemory || null;
+  if (knownId) {
     try {
-      episode = await transistor.replaceEpisodeAudio(stored.episodeId, { ...fields, audioUrl });
-      if (stored.status !== 'ready') await transistor.publishEpisode(stored.episodeId);
+      episode = await transistor.replaceEpisodeAudio(knownId, { ...fields, audioUrl });
+      // An id known only from memory may be an unpublished draft, so publish it as well.
+      if (fromMemory || stored.status !== 'ready') await transistor.publishEpisode(knownId);
     } catch (err) {
       if (!(err instanceof EpisodeNotFoundError)) throw err;
-      log(job, `episode ${stored.episodeId} not found in Transistor, creating a new one`);
+      log(job, `episode ${knownId} not found in Transistor, creating a new one`);
     }
   }
   if (!episode) episode = await createEpisode(job, neon, transistor, fields, audioUrl);
+  rememberEpisode(job, episode.id);
+  job.shareUrl = episode.shareUrl;
+  job.mediaUrl = episode.mediaUrl;
 
   job.step = 'writing-metadata';
   const values = {
@@ -144,7 +160,11 @@ async function pipeline(job) {
 async function markFailed(job) {
   try {
     const neon = dep('neon') || require('../neon-bo-api-v3.js').clientFor(job._args.env);
-    await writeMetadata(neon, job.familyRef, { status: 'failed', updatedAt: dep('now')().toISOString() });
+    const values = { status: 'failed', updatedAt: dep('now')().toISOString() };
+    if (job.episodeId) values.episodeId = job.episodeId;
+    if (job.shareUrl) values.shareUrl = job.shareUrl;
+    if (job.mediaUrl) values.mediaUrl = job.mediaUrl;
+    await writeMetadata(neon, job.familyRef, values);
   } catch (err) {
     log(job, `could not write failed status: ${err.message}`);
   }
@@ -159,10 +179,11 @@ async function runJob(job) {
       try {
         await pipeline(job);
       } catch (err) {
-        job.state = 'failed';
+        // Stay 'running' until the failure write finishes, so coalescing and the cap still see this job.
         job.error = (err && err.message) || String(err);
         log(job, `failed at ${job.step}: ${job.error}`);
         await markFailed(job);
+        job.state = 'failed';
       }
     });
   } catch (err) {
@@ -197,6 +218,7 @@ function enqueue(args) {
   const job = {
     id: newJobId(), envId: args.env && args.env.id, familyRef: args.familyRef, state: 'waiting', step: null,
     provider: null, fellBack: false, error: null, startedAt: null, finishedAt: null, rerunRequested: false,
+    episodeId: null,
   };
   let resolve;
   const done = new Promise((r) => { resolve = r; });
@@ -239,6 +261,7 @@ function __resetForTest() {
   for (const job of jobs.values()) clearTimeout(job._timer);
   jobs.clear();
   queue.length = 0;
+  knownEpisodes.clear();
   deps = {};
 }
 
