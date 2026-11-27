@@ -17,7 +17,7 @@
 - This service never triggers a Neon publish.
 - Webhook answers HTTP 200 immediately with `{ action: "writeback", payload }`; payload `status` ∈ `processing` | `queued` | `unchanged` | `disabled` (spec §2).
 - Metadata node: `/ObjectMetadata/DistributionChannels/Podcast/{Enabled,ShareUrl,MediaUrl,EpisodeId,TextHash,Provider,Status,UpdatedAt}`. The service never writes `Enabled`. `TextHash` format `sha256:<hex>`. `Status` ∈ `ready` | `failed`. `UpdatedAt` ISO 8601 UTC (spec §6).
-- `Enabled` empty or `true` → generate; `false` → skip, even when forced.
+- Opt-in: only `Enabled` = `true` (case-insensitive, trimmed) generates. `false`, empty, or no `<Podcast>` node → skip, even when forced. Template default is `false` (demorc conf, set 2026-11-27).
 - Job concurrency: one per familyRef, global cap 2 (FIFO wait), retention 24 h. Concurrent publish while running → `rerunRequested`, re-run once.
 - Third-party config goes through `serviceConfig()` in `src/helpers/neon-env/services.js` (per-env block, else global env vars). Global env var names follow that file's `*_APIKEY` convention: `ELEVENLABS_APIKEY`, `ELEVENLABS_VOICE_ID`, `ELEVENLABS_MODEL`, `OPENAI_APIKEY` (existing), `OPENAI_TTS_MODEL`, `OPENAI_TTS_VOICE`, `TRANSISTOR_APIKEY`, `TRANSISTOR_SHOW_ID`, plus plain `TTS_PROVIDER` (default `elevenlabs`). *Deviation from spec §4/§5 names (`*_API_KEY`), made to match the repo convention.*
 - Metadata write follows the proven flow in `src/requestHandlers/metadata.js`: `getNodeMetadata` → modify XML → `updateNodeMetadata`, no lock. *Deviation from spec §3 step 4 (lock/unlock):* add `lockNode`/`unlockNode` (unlock in `finally`) only if Neon rejects the unlocked write during manual verification.
@@ -44,12 +44,12 @@
 **Interfaces:**
 - Produces:
   - `PODCAST_PATH = '/ObjectMetadata/DistributionChannels/Podcast'`, `PODCAST_FIELDS = ['Enabled','ShareUrl','MediaUrl','EpisodeId','TextHash','Provider','Status','UpdatedAt']`
-  - `readPodcastMetadata(xml: string) → { enabled: boolean, shareUrl, mediaUrl, episodeId, textHash, provider, status, updatedAt }` (strings or `null`; `enabled` is `false` only when text is exactly `false`, case-insensitive, trimmed)
+  - `readPodcastMetadata(xml: string) → { enabled: boolean, shareUrl, mediaUrl, episodeId, textHash, provider, status, updatedAt }` (strings or `null`; `enabled` is `true` only when text is exactly `true`, case-insensitive, trimmed; otherwise `false`)
   - `writePodcastMetadata(xml: string, fields: { shareUrl?, mediaUrl?, episodeId?, textHash?, provider?, status?, updatedAt? }) → string` — sets only provided keys, creates missing `DistributionChannels`/`Podcast`/child elements, never touches `Enabled`
 
 - [ ] **Step 1: Write failing tests** in `test/podcast/metadata.test.js` (style of `test/metadata-xpath-utils.test.js`):
-  - `readPodcastMetadata` on XML with no Podcast node → `{ enabled: true, shareUrl: null, … }`
-  - `Enabled` = ` FALSE ` → `enabled === false`; `Enabled` empty → `true`
+  - `readPodcastMetadata` on XML with no Podcast node → `{ enabled: false, shareUrl: null, … }`
+  - `Enabled` = ` TRUE ` → `enabled === true`; `Enabled` empty → `false`; `false` → `false`
   - full node → all fields read
   - `writePodcastMetadata` on XML with no `DistributionChannels` → result contains `<DistributionChannels><Podcast><ShareUrl>https://share.transistor.fm/s/abc</ShareUrl>` and still contains the original DOCTYPE and `<SEO>…</SEO>`
   - existing `<Print><PrintSection>/Product/World</PrintSection></Print>` preserved, `Podcast` appended as sibling
@@ -169,7 +169,7 @@
   - `Job = { id, envId, familyRef, state: 'waiting'|'running'|'done'|'unchanged'|'disabled'|'failed', step, chunk?: { done, total }, provider, fellBack, error, startedAt, finishedAt, rerunRequested }`
   - `__setDepsForTest({ neon, synthesize, transistor, now })`, `__resetForTest()`
 - Pipeline (spec §3), each step sets `job.step`:
-  1. `reading-metadata`: `neon.getNodeMetadata(familyRef)` → `readPodcastMetadata`. `enabled === false` → `disabled`. If no `model`, `neon.getNode(familyRef)`. Build text + hash; hash equal to stored and not `force` → `unchanged`.
+  1. `reading-metadata`: `neon.getNodeMetadata(familyRef)` → `readPodcastMetadata`. `enabled !== true` → `disabled`. If no `model`, `neon.getNode(familyRef)`. Build text + hash; hash equal to stored and not `force` → `unchanged`.
   2. `generating-audio`: `synthesize(text, { provider })`.
   3. `uploading`: `uploadAudio`; `episodeId` ? `replaceEpisodeAudio` (on `EpisodeNotFoundError` → log, `createEpisode`) : `createEpisode`. Episode title/summary/description from model title/summary (+ article URL from `pubInfo` when present).
   4. `writing-metadata`: re-fetch XML, `writePodcastMetadata` with `shareUrl, mediaUrl, episodeId, textHash, provider, status: 'ready', updatedAt`, `updateNodeMetadata`. **After a `createEpisode`, this write happens immediately** (Review Focus).
@@ -182,6 +182,8 @@
   - stored hash equal, not forced → state `unchanged`, synthesize never called
   - stored hash equal, `force: true` → regenerated via replace
   - `Enabled=false`, `force: true` → `disabled`, nothing called
+  - no `<Podcast>` node → `disabled`, nothing called
+  - (all other job fixtures use `<Enabled>true</Enabled>`)
   - replace throws `EpisodeNotFoundError` → `createEpisode` called, new `EpisodeId` written
   - synthesize throws → state `failed`, metadata `Status=failed`, existing `ShareUrl` kept
   - second `startPodcastJob` for same article while running → `{ status: 'queued', jobId: <same> }`, exactly one extra run after the first finishes
@@ -213,7 +215,7 @@
   - webhook with `examples/out-methode.json` body → 200, `action === 'writeback'`, `payload.status === 'processing'`, `payload.jobId` set
   - webhook with `{}` → 400 `Missing model in request body`
   - regenerate without familyRef → 400
-  - status for unknown article → `{ job: null, metadata: {...enabled: true} }`
+  - status for unknown article → `{ job: null, metadata: {...enabled: false} }`
 - [ ] **Step 2:** `node --test test/podcast/handlers.test.js` → FAIL
 - [ ] **Step 3: Implement** handlers and register routes + services-list entries in `server.js`.
 - [ ] **Step 4:** test → PASS; `npm test` → PASS
@@ -231,7 +233,7 @@
 **Interfaces:**
 - Consumes: Task 6 endpoints.
 - Follow the `neon-create-panel` skill and `article-pdf-panel.hbs` / `articlePdfPanelHandler` (objectId from query, else via `panel-ready`/`getInfo` postMessage; `apiKey` header from panel state; `?demo=true`).
-- UI per spec §7 mockup: header status pill (`No podcast` · `Processing — <step>` (+ `chunk n/m`) · `Ready` · `Failed — <error>` · `Disabled`); Episode share URL with open link; MediaUrl `<audio controls>` preview; Voice (`ElevenLabs` / `OpenAI (fallback)` when `fellBack`); Updated time; Provider select (ElevenLabs, OpenAI) + "Force regenerate" button (disabled while a job runs or when `Enabled=false`). Poll status every 3 s while running, stop when finished.
+- UI per spec §7 mockup: header status pill (`No podcast` · `Processing — <step>` (+ `chunk n/m`) · `Ready` · `Failed — <error>` · `Disabled`); Episode share URL with open link; MediaUrl `<audio controls>` preview; Voice (`ElevenLabs` / `OpenAI (fallback)` when `fellBack`); Updated time; Provider select (ElevenLabs, OpenAI) + "Force regenerate" button (disabled while a job runs or when `enabled !== true`). Poll status every 3 s while running, stop when finished.
 
 - [ ] **Step 1: Implement** handler, route and template.
 - [ ] **Step 2: Verify in browser:** `npm run dev`, open `http://localhost:3000/panels/podcast?demo=true&apikey=<local key>` → status renders; clicking Force regenerate shows the processing steps then Ready. Take a screenshot (webapp-testing / `run` skill).
@@ -246,5 +248,5 @@
 - Modify: `.env.example` (new vars from Global Constraints, empty values), `CLAUDE.md` (Outbound Integrations: add Transistor.fm line)
 
 - [ ] **Step 1:** Add the env vars and the one-line doc entries.
-- [ ] **Step 2: End-to-end (needs real keys; skip and report if absent):** with `OPENAI_APIKEY`, `TRANSISTOR_APIKEY`, `TRANSISTOR_SHOW_ID` set and `TTS_PROVIDER` unset (no ElevenLabs key → fallback path): POST the example payload with `?env=<test env>` against a test Neon env whose article type has the `<Podcast>` node. Expect: episode visible in Transistor, `<Podcast>` node populated, `Provider=openai`. Re-POST same payload → `unchanged`, no new episode. Change body text, re-POST → same `EpisodeId`, new audio.
+- [ ] **Step 2: End-to-end (needs real keys; skip and report if absent):** with `OPENAI_APIKEY`, `TRANSISTOR_APIKEY`, `TRANSISTOR_SHOW_ID` set and `TTS_PROVIDER` unset (no ElevenLabs key → fallback path): POST the example payload with `?env=<test env>` against a test Neon env whose article type has the `<Podcast>` node, on an article with `Enabled=true`. Expect: episode visible in Transistor, `<Podcast>` node populated, `Provider=openai`. Re-POST same payload → `unchanged`, no new episode. Change body text, re-POST → same `EpisodeId`, new audio.
 - [ ] **Step 3: Commit** `docs(transistor): env vars and integration entry`

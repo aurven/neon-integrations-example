@@ -84,7 +84,7 @@ All registered in the services dashboard list in `server.js`.
 4. Read the podcast `Enabled` and `TextHash` values from the payload if exposed (cheap pre-check). The Méthode flow already reads custom metadata (`attributes.printSection`, which maps `/ObjectMetadata/DistributionChannels/Print/PrintSection`) and `pubInfo` from this same payload, and uses `model.id` as the familyRef. If the podcast values are not exposed in the payload, treat them as unknown and let the job's re-read of the metadata XML (§3 step 1) decide.
    - **Single source of truth:** the `<Podcast>` metadata node (§6). `pubInfo.webhookData.transistor` is informational only (last ack) and never used for decisions.
 5. Decide:
-   - `Enabled` is `false` → respond `{ status: "disabled", at }`. No job.
+   - `Enabled` known and not `true` → respond `{ status: "disabled", at }`. No job.
    - hash equal and not forced → respond `{ status: "unchanged", textHash, at }`. No job.
    - a job for this familyRef is already running → mark it `rerunRequested` (coalesce; it re-runs once with the latest text when done) → respond `{ status: "queued", jobId }`.
    - otherwise start a job → respond `{ status: "processing", jobId, textHash, at }`.
@@ -94,7 +94,7 @@ All registered in the services dashboard list in `server.js`.
 
 Steps, each recorded on the job (`step`, `startedAt`, `error`) for the panel:
 
-1. **Re-read** the metadata XML from Neon (`getNodeMetadata`): authoritative `Enabled`, `EpisodeId`, `TextHash`. `Enabled` is `false` → finish as `disabled` (a forced regenerate also respects it). Hash equal and not forced → finish as `unchanged`.
+1. **Re-read** the metadata XML from Neon (`getNodeMetadata`): authoritative `Enabled`, `EpisodeId`, `TextHash`. `Enabled` not `true` (including a missing node or empty value) → finish as `disabled` (a forced regenerate also respects it). Hash equal and not forced → finish as `unchanged`.
 2. **TTS** → one MP3 buffer (see §4).
 3. **Upload to Transistor** (see §5): create the episode if there is no `EpisodeId`, otherwise replace the audio of the existing one.
 4. **Write back to Neon** (lock → `updateNodeMetadata` → unlock; always unlock in `finally`): set `ShareUrl`, `MediaUrl`, `EpisodeId`, `TextHash`, `Provider`, `Status=ready`, `UpdatedAt` in the `<Podcast>` node (§6). Never touch `Enabled`.
@@ -149,7 +149,7 @@ A dedicated node under `DistributionChannels`, next to `Print` (same convention 
 
 | Element | Written by | Meaning |
 | --- | --- | --- |
-| `Enabled` | Editor | Empty or `true` = generate; `false` = skip (per-article opt-out). The service never writes it |
+| `Enabled` | Editor | **Opt-in:** only `true` generates. `false`, empty, or a missing `<Podcast>` node = skip. Template default is `false`. Editors set it in the object panel (Diffusion tab → Podcast). The service never writes it |
 | `ShareUrl` | Service | Public episode page (`share.transistor.fm/s/…`); primary candidate for `importbyurl` |
 | `MediaUrl` | Service | Direct MP3 URL; alternative for `importbyurl` / plain audio player |
 | `EpisodeId` | Service | Transistor episode id; drives create-vs-replace |
