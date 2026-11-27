@@ -11,6 +11,7 @@ const GLOBAL_SERVICES = {
   anthropic: { apiKey: 'ANTHROPIC_API_KEY', chatModel: 'CLAUDE_CHAT_MODEL' },
   openai: { apiKey: 'OPENAI_APIKEY', ttsModel: 'OPENAI_TTS_MODEL', ttsVoice: 'OPENAI_TTS_VOICE' },
   elevenlabs: { apiKey: 'ELEVENLABS_API_KEY', voiceId: 'ELEVENLABS_VOICE_ID', model: 'ELEVENLABS_MODEL' },
+  transistor: { apiKey: 'TRANSISTOR_APIKEY', showId: 'TRANSISTOR_SHOW_ID' },
   pexels: { apiKey: 'PEXELS_APIKEY' },
   youtube: { apiKey: 'YOUTUBE_APIKEY' },
   dailymotion: { apiKey: 'DAILYMOTION_APIKEY', apiSecret: 'DAILYMOTION_APISECRET' },
