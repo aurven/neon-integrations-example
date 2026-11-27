@@ -48,3 +48,14 @@ test('missingServiceFields reports env var names for globals', () => {
 test('unknown service throws', () => {
   assert.throws(() => serviceConfig('nope'), /Unknown service/);
 });
+
+test('array source: new env var name wins, legacy name is the fallback', () => {
+  assert.equal(serviceConfig('openai', { envVars: { OPENAI_API_KEY: 'new', OPENAI_APIKEY: 'old' } }).apiKey, 'new');
+  assert.equal(serviceConfig('openai', { envVars: { OPENAI_APIKEY: 'old' } }).apiKey, 'old');
+  assert.equal(serviceConfig('openai', { envVars: {} }).apiKey, undefined);
+});
+
+test('missingServiceFields reports the preferred name for array sources', () => {
+  assert.deepEqual(missingServiceFields('openai', ['apiKey'], { envVars: {} }), ['OPENAI_API_KEY']);
+  assert.deepEqual(missingServiceFields('transistor', ['apiKey'], { envVars: {} }), ['TRANSISTOR_API_KEY']);
+});

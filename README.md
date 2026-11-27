@@ -193,7 +193,7 @@ MAILJET_APISECRET=your_mailjet_secret
 SENDGRID_APIKEY=your_sendgrid_api_key
 
 # AI Services
-OPENAI_APIKEY=your_openai_api_key
+OPENAI_API_KEY=your_openai_api_key
 DEEPL_APIKEY=your_deepl_api_key
 
 # Media & News
