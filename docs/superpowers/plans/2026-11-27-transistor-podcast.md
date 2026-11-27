@@ -19,7 +19,7 @@
 - Metadata node: `/ObjectMetadata/DistributionChannels/Podcast/{Enabled,ShareUrl,MediaUrl,EpisodeId,TextHash,Provider,Status,UpdatedAt}`. The service never writes `Enabled`. `TextHash` format `sha256:<hex>`. `Status` ∈ `ready` | `failed`. `UpdatedAt` ISO 8601 UTC (spec §6).
 - Opt-in: only `Enabled` = `true` (case-insensitive, trimmed) generates. `false`, empty, or no `<Podcast>` node → skip, even when forced. Template default is `false` (demorc conf, set 2026-11-27).
 - Job concurrency: one per familyRef, global cap 2 (FIFO wait), retention 24 h. Concurrent publish while running → `rerunRequested`, re-run once.
-- Third-party config goes through `serviceConfig()` in `src/helpers/neon-env/services.js` (per-env block, else global env vars). Global env var names follow that file's `*_APIKEY` convention: `ELEVENLABS_APIKEY`, `ELEVENLABS_VOICE_ID`, `ELEVENLABS_MODEL`, `OPENAI_APIKEY` (existing), `OPENAI_TTS_MODEL`, `OPENAI_TTS_VOICE`, `TRANSISTOR_APIKEY`, `TRANSISTOR_SHOW_ID`, plus plain `TTS_PROVIDER` (default `elevenlabs`). *Deviation from spec §4/§5 names (`*_API_KEY`), made to match the repo convention.*
+- Third-party config goes through `serviceConfig()` in `src/helpers/neon-env/services.js` (per-env block, else global env vars). Global env var names follow that file's `*_APIKEY` convention: `ELEVENLABS_API_KEY`, `ELEVENLABS_VOICE_ID`, `ELEVENLABS_MODEL`, `OPENAI_APIKEY` (existing), `OPENAI_TTS_MODEL`, `OPENAI_TTS_VOICE`, `TRANSISTOR_APIKEY`, `TRANSISTOR_SHOW_ID`, plus plain `TTS_PROVIDER` (default `elevenlabs`). *`ELEVENLABS_API_KEY` keeps the name already in the user's `.env`; the others follow the repo's `*_APIKEY` convention.*
 - Metadata write follows the proven flow in `src/requestHandlers/metadata.js`: `getNodeMetadata` → modify XML → `updateNodeMetadata`, no lock. *Deviation from spec §3 step 4 (lock/unlock):* add `lockNode`/`unlockNode` (unlock in `finally`) only if Neon rejects the unlocked write during manual verification.
 - New test files must be added to the `test` script in `package.json` (it lists files explicitly).
 - Never log API keys; use `src/helpers/redact-url.js` for URLs.
@@ -95,7 +95,7 @@
 
 **Files:**
 - Create: `src/helpers/tts/elevenlabs.js`, `src/helpers/tts/openai.js`, `src/helpers/tts/index.js`
-- Modify: `src/helpers/neon-env/services.js` (`GLOBAL_SERVICES`: add `elevenlabs: { apiKey: 'ELEVENLABS_APIKEY', voiceId: 'ELEVENLABS_VOICE_ID', model: 'ELEVENLABS_MODEL' }`; extend `openai` with `ttsModel: 'OPENAI_TTS_MODEL', ttsVoice: 'OPENAI_TTS_VOICE'`)
+- Modify: `src/helpers/neon-env/services.js` (`GLOBAL_SERVICES`: add `elevenlabs: { apiKey: 'ELEVENLABS_API_KEY', voiceId: 'ELEVENLABS_VOICE_ID', model: 'ELEVENLABS_MODEL' }`; extend `openai` with `ttsModel: 'OPENAI_TTS_MODEL', ttsVoice: 'OPENAI_TTS_VOICE'`)
 - Test: `test/tts/tts.test.js`; add `test/tts/*.test.js` to `package.json`
 
 **Interfaces:**
