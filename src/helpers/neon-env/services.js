@@ -9,7 +9,10 @@ const { NeonEnvConfigError } = require('./errors.js');
 
 const GLOBAL_SERVICES = {
   anthropic: { apiKey: 'ANTHROPIC_API_KEY', chatModel: 'CLAUDE_CHAT_MODEL' },
-  openai: { apiKey: 'OPENAI_APIKEY' },
+  // apiKey: new name first, legacy OPENAI_APIKEY still accepted
+  openai: { apiKey: ['OPENAI_API_KEY', 'OPENAI_APIKEY'], ttsModel: 'OPENAI_TTS_MODEL', ttsVoice: 'OPENAI_TTS_VOICE' },
+  elevenlabs: { apiKey: 'ELEVENLABS_API_KEY', voiceId: 'ELEVENLABS_VOICE_ID', model: 'ELEVENLABS_MODEL' },
+  transistor: { apiKey: 'TRANSISTOR_API_KEY', showId: 'TRANSISTOR_SHOW_ID' },
   pexels: { apiKey: 'PEXELS_APIKEY' },
   youtube: { apiKey: 'YOUTUBE_APIKEY' },
   dailymotion: { apiKey: 'DAILYMOTION_APIKEY', apiSecret: 'DAILYMOTION_APISECRET' },
@@ -33,7 +36,8 @@ const GLOBAL_SERVICES = {
 function fromEnvVars(map, envVars) {
   const out = {};
   for (const [field, source] of Object.entries(map)) {
-    out[field] = typeof source === 'object' ? fromEnvVars(source, envVars) : envVars[source];
+    if (Array.isArray(source)) out[field] = source.map((n) => envVars[n]).find((v) => v);
+    else out[field] = typeof source === 'object' ? fromEnvVars(source, envVars) : envVars[source];
   }
   return out;
 }
@@ -49,7 +53,7 @@ function serviceConfig(name, { envVars = process.env } = {}) {
 function missingServiceFields(name, fields, opts = {}) {
   const cfg = serviceConfig(name, opts);
   const missing = fields.filter((f) => !cfg[f]);
-  if (cfg.source === 'global') return missing.map((f) => GLOBAL_SERVICES[name][f]);
+  if (cfg.source === 'global') return missing.map((f) => [].concat(GLOBAL_SERVICES[name][f])[0]);
   return missing.map((f) => `services.${name}.${f}`);
 }
 

@@ -42,5 +42,5 @@ API keys for external connectors (e.g., The Guardian's Dev keys) or other servic
 
 ```
 GUARDIAN_APIKEY=xxx
-OPENAI_APIKEY=xxx
+OPENAI_API_KEY=xxx
 ```

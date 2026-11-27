@@ -49,7 +49,7 @@ async function testAIGeneration(platform) {
 
   // Check configured providers
   const hasAnthropic = !!process.env.ANTHROPIC_API_KEY;
-  const hasOpenAI = !!process.env.OPENAI_APIKEY;
+  const hasOpenAI = !!(process.env.OPENAI_API_KEY || process.env.OPENAI_APIKEY);
 
   console.log('Configuration:');
   console.log(`  Claude (Anthropic): ${hasAnthropic ? '✓ Configured' : '✗ Not configured'}`);
@@ -58,7 +58,7 @@ async function testAIGeneration(platform) {
 
   if (!hasAnthropic && !hasOpenAI) {
     console.error('❌ ERROR: No AI provider configured!');
-    console.error('Please set ANTHROPIC_API_KEY or OPENAI_APIKEY in your .env file\n');
+    console.error('Please set ANTHROPIC_API_KEY or OPENAI_API_KEY in your .env file\n');
     process.exit(1);
   }
 
@@ -113,7 +113,7 @@ async function testFallback() {
   console.log('========================================\n');
 
   const hasAnthropic = !!process.env.ANTHROPIC_API_KEY;
-  const hasOpenAI = !!process.env.OPENAI_APIKEY;
+  const hasOpenAI = !!(process.env.OPENAI_API_KEY || process.env.OPENAI_APIKEY);
 
   if (!hasAnthropic && !hasOpenAI) {
     console.error('❌ Cannot test fallback: No AI providers configured');

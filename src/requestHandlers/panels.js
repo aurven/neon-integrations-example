@@ -916,6 +916,21 @@ async function socialPublisherApiProxyHandler(request, reply) {
   }
 }
 
+function podcastPanelHandler(request, reply) {
+  const auth = authenticate(request, reply);
+  if (!auth.authenticated) {
+    return reply.status(401).send({ error: "Unauthorized" });
+  }
+
+  let params = {
+    seo: seo,
+    apiKey: auth.apikey,
+    neonAppUrl: neonEnv.appUrl(),
+    objectId: request.query.objectId || null
+  };
+  return reply.view("/src/panels/podcast-panel.hbs", params);
+}
+
 module.exports = {
   trelloPanelHandler,
   trelloApiProxyHandler,
@@ -929,6 +944,7 @@ module.exports = {
   methodeApiProxyHandler,
   quickchartPanelHandler,
   articlePdfPanelHandler,
+  podcastPanelHandler,
   generateArticlePdfHandler,
   ga4AnalyticsPanelHandler,
   smartOctoPanelHandler,

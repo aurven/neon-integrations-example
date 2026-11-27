@@ -21,7 +21,7 @@ async function completions({
 }) {
     const openai = getOpenAI();
     if (!openai) {
-        throw new Error('OpenAI client not initialized. Please set OPENAI_APIKEY environment variable.');
+        throw new Error('OpenAI client not initialized. Please set OPENAI_API_KEY environment variable.');
     }
 
     console.log(model);
@@ -54,7 +54,7 @@ async function completions({
 async function transcribeAudio(audio, filename, apiKey = serviceConfig('openai').apiKey) {
   const openai = getOpenAI();
   if (!openai) {
-    throw new Error('OpenAI client not initialized. Please set OPENAI_APIKEY environment variable.');
+    throw new Error('OpenAI client not initialized. Please set OPENAI_API_KEY environment variable.');
   }
 
   try {
@@ -123,7 +123,7 @@ function getAudioMimeType(filename) {
 async function generateInterviewStructure(transcription, apiKey = serviceConfig('openai').apiKey) {
   const openai = getOpenAI();
   if (!openai) {
-    throw new Error('OpenAI client not initialized. Please set OPENAI_APIKEY environment variable.');
+    throw new Error('OpenAI client not initialized. Please set OPENAI_API_KEY environment variable.');
   }
 
   const systemPrompt = `
