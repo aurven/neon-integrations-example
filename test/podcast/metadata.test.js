@@ -90,3 +90,17 @@ test('round trip returns written values', () => {
   const r = readPodcastMetadata(writePodcastMetadata(BARE_XML, fields));
   assert.deepEqual(r, { enabled: false, ...fields });
 });
+
+test('DistributionChannels is inserted before Diffusion when missing', () => {
+  const xml = `${HEAD}<ObjectMetadata>${SEO}<Diffusion><X/></Diffusion></ObjectMetadata>`;
+  const out = writePodcastMetadata(xml, { status: 'ready' });
+  assert.ok(out.indexOf('<DistributionChannels>') > -1);
+  assert.ok(out.indexOf('<DistributionChannels>') < out.indexOf('<Diffusion>'));
+});
+
+test('missing Podcast children are inserted in PODCAST_FIELDS order', () => {
+  const xml = withPodcast('<Enabled>true</Enabled><Status>ready</Status>');
+  const out = writePodcastMetadata(xml, { shareUrl: 'https://s/1', updatedAt: '2026-11-27T10:00:00Z' });
+  const order = [...out.matchAll(/<(Enabled|ShareUrl|Status|UpdatedAt)>/g)].map((m) => m[1]);
+  assert.deepEqual(order, ['Enabled', 'ShareUrl', 'Status', 'UpdatedAt']);
+});

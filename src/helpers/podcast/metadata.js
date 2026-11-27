@@ -37,12 +37,24 @@ function readPodcastMetadata(xml) {
     return result;
 }
 
-function ensureChild(parent, name) {
+function findChild(parent, name) {
     for (let c = parent.firstChild; c; c = c.nextSibling) {
         if (c.nodeType === 1 && c.nodeName === name) return c;
     }
+    return null;
+}
+
+// Get or create a child, inserted before the first existing sibling named in
+// `before` (DTD order); appended when none of them exists.
+function ensureChild(parent, name, before = []) {
+    const existing = findChild(parent, name);
+    if (existing) return existing;
     const el = parent.ownerDocument.createElement(name);
-    parent.appendChild(el);
+    let ref = null;
+    for (let c = parent.firstChild; c && !ref; c = c.nextSibling) {
+        if (c.nodeType === 1 && before.includes(c.nodeName)) ref = c;
+    }
+    parent.insertBefore(el, ref);
     return el;
 }
 
@@ -53,11 +65,11 @@ function ensureChild(parent, name) {
 function writePodcastMetadata(xml, fields) {
     const doc = parse(xml);
     const root = doc.documentElement;
-    const podcast = ensureChild(ensureChild(root, 'DistributionChannels'), 'Podcast');
+    const podcast = ensureChild(ensureChild(root, 'DistributionChannels', ['Diffusion']), 'Podcast');
 
     for (const [key, el] of Object.entries(FIELD_MAP)) {
         if (key === 'enabled' || fields[key] === undefined) continue;
-        const node = ensureChild(podcast, el);
+        const node = ensureChild(podcast, el, PODCAST_FIELDS.slice(PODCAST_FIELDS.indexOf(el) + 1));
         while (node.firstChild) node.removeChild(node.firstChild);
         const value = fields[key] === null ? '' : String(fields[key]);
         if (value !== '') node.appendChild(doc.createTextNode(value));
