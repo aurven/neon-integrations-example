@@ -84,3 +84,22 @@ test('persistent 429 fails without leaking the api key', async () => {
   const { client } = setup([res(429, {}), res(429, {}), res(429, {})]);
   await assert.rejects(() => client.replaceEpisodeAudio('123', fields), (e) => /429/.test(e.message) && !e.message.includes('SECRET'));
 });
+
+test('publish failure after create exposes episodeId on the error', async () => {
+  const { client } = setup([res(201, episodeJson), res(500, {})]);
+  await assert.rejects(() => client.createEpisode(fields), (e) => e.episodeId === '123' && e.status === 500 && /HTTP 500/.test(e.message));
+});
+
+test('publishEpisode PATCHes publish and returns Episode', async () => {
+  const { calls, client } = setup([res(200, episodeJson)]);
+  const ep = await client.publishEpisode('123');
+  assert.equal(ep.id, '123');
+  assert.equal(calls[0].opts.method, 'PATCH');
+  assert.equal(calls[0].url, 'https://api.transistor.fm/v1/episodes/123/publish');
+  assert.equal(new URLSearchParams(calls[0].opts.body).get('episode[status]'), 'published');
+});
+
+test('missing config throws without secrets', () => {
+  assert.throws(() => createTransistorClient({ apiKey: 'SECRET' }), (e) => e.message === 'transistor not configured: missing showId');
+  assert.throws(() => createTransistorClient({ showId: '9' }), /missing apiKey/);
+});

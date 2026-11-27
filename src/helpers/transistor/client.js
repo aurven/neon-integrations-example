@@ -19,6 +19,8 @@ class EpisodeNotFoundError extends Error {
 }
 
 function createTransistorClient({ apiKey, showId, fetchImpl = fetch, sleep = defaultSleep }) {
+  const missing = [!apiKey && 'apiKey', !showId && 'showId'].filter(Boolean);
+  if (missing.length) throw new Error(`transistor not configured: missing ${missing.join(', ')}`);
   async function send(url, opts, label) {
     for (let attempt = 1; ; attempt++) {
       const res = await fetchImpl(url, opts);
@@ -64,8 +66,17 @@ function createTransistorClient({ apiKey, showId, fetchImpl = fetch, sleep = def
 
   async function createEpisode(fields) {
     const created = await toEpisode(await api('/v1/episodes', 'POST', { 'episode[show_id]': String(showId), ...episodeFields(fields) }, 'create episode'));
-    const published = await api(`/v1/episodes/${encodeURIComponent(created.id)}/publish`, 'PATCH', { 'episode[status]': 'published' }, 'publish episode');
-    return toEpisode(published);
+    try {
+      return await publishEpisode(created.id);
+    } catch (e) {
+      // The episode exists: expose its id so a retry never creates a second one.
+      e.episodeId = created.id;
+      throw e;
+    }
+  }
+
+  async function publishEpisode(id) {
+    return toEpisode(await api(`/v1/episodes/${encodeURIComponent(id)}/publish`, 'PATCH', { 'episode[status]': 'published' }, 'publish episode'));
   }
 
   async function replaceEpisodeAudio(id, fields) {
@@ -77,7 +88,7 @@ function createTransistorClient({ apiKey, showId, fetchImpl = fetch, sleep = def
     }
   }
 
-  return { uploadAudio, createEpisode, replaceEpisodeAudio };
+  return { uploadAudio, createEpisode, publishEpisode, replaceEpisodeAudio };
 }
 
 module.exports = { createTransistorClient, EpisodeNotFoundError };
