@@ -3,9 +3,12 @@ const { QuotaExceededError } = require('./errors.js');
 
 const defaultSleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const MAX_TRIES = 3;
+// Premade voice (Rachel), usable with eleven_multilingual_v2; override with ELEVENLABS_VOICE_ID.
+const DEFAULT_VOICE_ID = '21m00Tcm4TlvDq8ikWAM';
 
 // eleven_multilingual_v2 accepts up to 10,000 chars per request (ElevenLabs models docs)
-function createElevenLabsProvider({ apiKey, voiceId, model, fetchImpl = fetch, sleep = defaultSleep }) {
+function createElevenLabsProvider({ apiKey, voiceId: voiceIdOption, model, fetchImpl = fetch, sleep = defaultSleep }) {
+  const voiceId = voiceIdOption || DEFAULT_VOICE_ID;
   const modelId = model || 'eleven_multilingual_v2';
   async function synthesizeChunk(text) {
     for (let attempt = 1; ; attempt++) {
@@ -26,7 +29,7 @@ function createElevenLabsProvider({ apiKey, voiceId, model, fetchImpl = fetch, s
       throw new Error(`ElevenLabs TTS failed: HTTP ${res.status} ${body.slice(0, 200)}`);
     }
   }
-  return { name: 'elevenlabs', maxChars: 10000, apiKey, configured: Boolean(apiKey && voiceId), synthesizeChunk };
+  return { name: 'elevenlabs', maxChars: 10000, apiKey, configured: Boolean(apiKey), synthesizeChunk };
 }
 
 module.exports = { createElevenLabsProvider };

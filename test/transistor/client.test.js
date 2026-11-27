@@ -14,7 +14,7 @@ function setup(responses) {
   const client = createTransistorClient({ apiKey: 'SECRET', showId: '9', fetchImpl, sleep: async (ms) => { sleeps.push(ms); } });
   return { calls, client, sleeps };
 }
-const episodeJson = { data: { id: '123', attributes: { share_url: 'https://share.transistor.fm/s/abc', media_url: 'https://media.transistor.fm/abc.mp3' } } };
+const episodeJson = { data: { id: '123', attributes: { share_url: 'https://share.transistor.fm/s/abc', media_url: 'https://media.transistor.fm/abc.mp3', status: 'published' } } };
 const fields = { title: 'T', summary: 'S', description: 'D', audioUrl: 'https://x/a.mp3' };
 
 test('uploadAudio authorizes then PUTs buffer and returns audio_url', async () => {
@@ -34,7 +34,7 @@ test('uploadAudio authorizes then PUTs buffer and returns audio_url', async () =
 test('createEpisode POSTs then publishes', async () => {
   const { calls, client } = setup([res(201, episodeJson), res(200, episodeJson)]);
   const ep = await client.createEpisode(fields);
-  assert.deepEqual(ep, { id: '123', shareUrl: 'https://share.transistor.fm/s/abc', mediaUrl: 'https://media.transistor.fm/abc.mp3' });
+  assert.deepEqual(ep, { id: '123', shareUrl: 'https://share.transistor.fm/s/abc', mediaUrl: 'https://media.transistor.fm/abc.mp3', status: 'published' });
   assert.equal(calls[0].opts.method, 'POST');
   assert.equal(calls[0].url, 'https://api.transistor.fm/v1/episodes');
   const p = new URLSearchParams(calls[0].opts.body);

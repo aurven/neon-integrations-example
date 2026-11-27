@@ -107,7 +107,9 @@
             const job = d.job;
             const md = d.metadata || {};
             // The demo store has no opt-in metadata; treat the demo as enabled.
+            const loaded = !!state.data && !state.loadFailed;
             const enabled = state.demoMode || md.enabled === true;
+            const disabled = loaded && !enabled;
             const running = !!job && (job.state === 'waiting' || job.state === 'running');
 
             let cls = 'pill-none', text = 'No podcast';
@@ -118,7 +120,7 @@
             } else if (job && job.state === 'failed') {
                 cls = 'pill-failed';
                 text = 'Failed' + (job.error ? ' — ' + job.error : '');
-            } else if (!enabled) {
+            } else if (disabled) {
                 cls = 'pill-disabled'; text = 'Disabled';
             } else if (md.status === 'failed') {
                 cls = 'pill-failed'; text = 'Failed';
@@ -130,7 +132,7 @@
             pill.textContent = text;
 
             const hint = $('hint');
-            if (!enabled) {
+            if (disabled) {
                 hint.textContent = "Disabled — enable 'Generate Podcast' in the article metadata (Diffusion → Podcast)";
                 hint.classList.remove('hidden');
             } else {
@@ -186,8 +188,10 @@
                 state.data = await PanelAPI.apiCallJson(
                     apiPath('/panels/podcast/api/status?familyRef=' + encodeURIComponent(r)),
                     { headers: authHeaders() });
+                state.loadFailed = false;
                 $('load-error').classList.add('hidden');
             } catch (e) {
+                state.loadFailed = true;
                 $('load-error').textContent = 'Could not load podcast status: ' + e.message;
                 $('load-error').classList.remove('hidden');
             }

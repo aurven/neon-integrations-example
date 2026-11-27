@@ -75,7 +75,8 @@ function episodeFields(model, text) {
   const title = (root.title && String(root.title).trim()) || text.split('\n\n')[0] || 'Untitled';
   const summary = (root.summary && String(root.summary).trim()) || '';
   const url = root.url || (model && model.url) || (root.pubInfo && root.pubInfo.url) || null;
-  const description = [summary, url].filter(Boolean).join('\n\n');
+  const absoluteUrl = typeof url === 'string' && /^https?:\/\//i.test(url) ? url : null;
+  const description = [summary, absoluteUrl].filter(Boolean).join('\n\n');
   return { title, summary, description };
 }
 
@@ -127,13 +128,12 @@ async function pipeline(job) {
   const audioUrl = await transistor.uploadAudio(audio.audio, fileName);
   const fields = episodeFields(model, text);
   let episode = null;
-  const fromMemory = !stored.episodeId && knownEpisodes.get(articleKey(job));
-  const knownId = stored.episodeId || fromMemory || null;
+  const knownId = stored.episodeId || knownEpisodes.get(articleKey(job)) || null;
   if (knownId) {
     try {
       episode = await transistor.replaceEpisodeAudio(knownId, { ...fields, audioUrl });
-      // An id known only from memory may be an unpublished draft, so publish it as well.
-      if (fromMemory || stored.status !== 'ready') await transistor.publishEpisode(knownId);
+      // An earlier failed run may have left a draft: publish unless Transistor reports it published.
+      if (!episode || episode.status !== 'published') await transistor.publishEpisode(knownId);
     } catch (err) {
       if (!(err instanceof EpisodeNotFoundError)) throw err;
       log(job, `episode ${knownId} not found in Transistor, creating a new one`);
@@ -197,7 +197,7 @@ async function runJob(job) {
   job._timer = timer;
   if (job.rerunRequested) {
     // Latest text must be re-fetched, so the stale model is dropped.
-    enqueue({ ...job._args, model: undefined, force: false });
+    enqueue({ ...job._args, model: undefined, force: !!job.rerunForce });
   }
   job._resolve();
   pump();
@@ -217,7 +217,7 @@ function enqueue(args) {
   seq += 1;
   const job = {
     id: newJobId(), envId: args.env && args.env.id, familyRef: args.familyRef, state: 'waiting', step: null,
-    provider: null, fellBack: false, error: null, startedAt: null, finishedAt: null, rerunRequested: false,
+    provider: null, fellBack: false, error: null, startedAt: null, finishedAt: null, rerunRequested: false, rerunForce: false,
     episodeId: null,
   };
   let resolve;
@@ -234,6 +234,7 @@ function startPodcastJob({ env, familyRef, model, force = false, provider } = {}
   const existing = activeJobFor(envId, familyRef);
   if (existing) {
     existing.rerunRequested = true;
+    if (force) existing.rerunForce = true;
     return { status: 'queued', jobId: existing.id };
   }
   const job = enqueue({ env, familyRef, model, force, provider });

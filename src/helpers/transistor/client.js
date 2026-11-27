@@ -53,7 +53,7 @@ function createTransistorClient({ apiKey, showId, fetchImpl = fetch, sleep = def
 
   async function toEpisode(res) {
     const { data } = await res.json();
-    return { id: String(data.id), shareUrl: data.attributes.share_url, mediaUrl: data.attributes.media_url };
+    return { id: String(data.id), shareUrl: data.attributes.share_url, mediaUrl: data.attributes.media_url, status: data.attributes.status };
   }
 
   async function uploadAudio(buffer, filename) {

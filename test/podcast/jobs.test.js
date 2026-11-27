@@ -33,7 +33,7 @@ function fakes({ xml = ENABLED, nodeModel = model(), updateOk = () => true } = {
   state.transistor = {
     uploadAudio: async (buf, name) => { state.calls.upload.push(name); return 'https://up/audio.mp3'; },
     createEpisode: async (args) => { state.calls.create.push(args); return { id: '100', shareUrl: 'https://share/100', mediaUrl: 'https://media/100.mp3' }; },
-    replaceEpisodeAudio: async (id, args) => { state.calls.replace.push({ id, args }); return { id, shareUrl: 'https://share/' + id, mediaUrl: 'https://media/' + id + '.mp3' }; },
+    replaceEpisodeAudio: async (id, args) => { state.calls.replace.push({ id, args }); return { id, shareUrl: 'https://share/' + id, mediaUrl: 'https://media/' + id + '.mp3', status: 'published' }; },
     publishEpisode: async (id) => { state.calls.publish.push(id); return { id }; },
   };
   state.install = () => jobs.__setDepsForTest({ neon: state.neon, synthesize: (t, o) => state.synthesize(t, o), transistor: state.transistor });
@@ -237,13 +237,52 @@ test('R6a: createEpisode failing with episodeId persists it and Status=failed', 
   assert.equal(md.status, 'failed');
 });
 
-test('R6b: replace with stored Status failed publishes; ready does not', async () => {
-  const failed = fakes({ xml: xmlWith('<Enabled>true</Enabled><EpisodeId>55</EpisodeId><TextHash>sha256:old</TextHash><Status>failed</Status>') });
+test('replace returning status published does not call publish, even after a failed run', async () => {
+  const f = fakes({ xml: xmlWith('<Enabled>true</Enabled><EpisodeId>55</EpisodeId><TextHash>sha256:old</TextHash><Status>failed</Status>') });
+  f.transistor.replaceEpisodeAudio = async (id, args) => { f.calls.replace.push({ id, args }); return { id, shareUrl: 'https://share/' + id, mediaUrl: 'https://media/' + id + '.mp3', status: 'published' }; };
   const { job } = await run();
   assert.equal(job.state, 'done');
-  assert.equal(failed.calls.replace.length, 1);
-  assert.deepEqual(failed.calls.publish, ['55']);
-  assert.equal(readPodcastMetadata(failed.xml).status, 'ready');
+  assert.equal(f.calls.replace.length, 1);
+  assert.deepEqual(f.calls.publish, []);
+  assert.equal(readPodcastMetadata(f.xml).status, 'ready');
+});
+
+test('replace returning status draft publishes once', async () => {
+  const f = fakes({ xml: xmlWith('<Enabled>true</Enabled><EpisodeId>55</EpisodeId><TextHash>sha256:old</TextHash><Status>ready</Status>') });
+  f.transistor.replaceEpisodeAudio = async (id, args) => { f.calls.replace.push({ id, args }); return { id, shareUrl: 'https://share/' + id, mediaUrl: 'https://media/' + id + '.mp3', status: 'draft' }; };
+  const { job } = await run();
+  assert.equal(job.state, 'done');
+  assert.deepEqual(f.calls.publish, ['55']);
+  assert.equal(readPodcastMetadata(f.xml).status, 'ready');
+});
+
+test('description includes article url only when absolute', async () => {
+  const f = fakes();
+  await run({ model: { title: 'T', summary: 'Sum', url: '/news/x/index.html' } });
+  assert.equal(f.calls.create[0].description, 'Sum');
+  jobs.__resetForTest();
+  const g = fakes();
+  await run({ model: { title: 'T', summary: 'Sum', url: 'https://example.com/a' } });
+  assert.equal(g.calls.create[0].description, 'Sum\n\nhttps://example.com/a');
+});
+
+test('forced start coalescing into a running job keeps force on the rerun', async () => {
+  const f = fakes();
+  const gate = deferred();
+  const orig = f.synthesize;
+  f.synthesize = async (t, o) => { if (!f.calls.synth.length) await gate.promise; return orig(t, o); };
+  const first = await jobs.startPodcastJob({ env: ENV, familyRef: 'ref1', model: model() });
+  await tick();
+  await jobs.startPodcastJob({ env: ENV, familyRef: 'ref1', force: true });
+  await jobs.startPodcastJob({ env: ENV, familyRef: 'ref1' });
+  gate.resolve();
+  await jobs.waitForJob(first.jobId);
+  const rerun = jobs.getJobForArticle('demo', 'ref1');
+  assert.notEqual(rerun.id, first.jobId);
+  assert.equal(rerun._args.force, true);
+  await jobs.waitForJob(rerun.id);
+  // text unchanged but forced: second synthesis still happens
+  assert.equal(f.calls.synth.length, 2);
 });
 
 test('decideWebhook is pure and defaults to start', () => {

@@ -132,3 +132,15 @@ test('synthesize: elevenlabs 429 quota falls back to openai', async () => {
   assert.equal(r.provider, 'openai');
   assert.equal(r.fellBack, true);
 });
+
+test('elevenlabs without voiceId uses the default voice and is configured', async () => {
+  const seen = [];
+  const p = createElevenLabsProvider({ apiKey: 'k', fetchImpl: async (url) => { seen.push(url); return resp(200, 'x'); }, sleep: async () => {} });
+  assert.equal(p.configured, true);
+  const oa = fake('openai');
+  const r = await synthesize('hello world.', { providers: { elevenlabs: p, openai: oa } });
+  assert.equal(r.provider, 'elevenlabs');
+  assert.equal(r.fellBack, false);
+  assert.equal(seen[0], 'https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM');
+  assert.equal(oa.calls.length, 0);
+});
