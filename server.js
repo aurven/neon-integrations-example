@@ -181,6 +181,7 @@ fastify.get("/services", async function handler(request, reply) {
       { name: "YouTube API Proxy", endpoint: "ALL /panels/external-sources/api/youtube/*", description: "Proxy for YouTube Data API calls with authentication" },
       { name: "DailyMotion API Proxy", endpoint: "ALL /panels/external-sources/api/dailymotion/*", description: "Proxy for DailyMotion API calls with authentication" },
       { name: "Méthode Panel", endpoint: "GET /panels/methode", demoUrl: "/panels/methode", description: "Méthode object management panel with PDF preview, workflow status, and Swing integration" },
+      { name: "Podcast Panel", endpoint: "GET /panels/podcast", demoUrl: "/panels/podcast?demo=true", description: "Podcast (Transistor.fm) status and force-regenerate panel for an article" },
       { name: "Méthode API Proxy", endpoint: "ALL /panels/methode/api/*", description: "Proxy for Méthode Editorial API calls with authentication and object retrieval" },
       { name: "QuickChart Panel", endpoint: "GET /panels/quickchart", demoUrl: "/panels/quickchart", description: "QuickChart.io gallery panel for browsing and importing chart examples as PNG assets into Neon CMS" },
       { name: "Social Publisher Panel", endpoint: "GET /panels/social-publisher", demoUrl: "/panels/social-publisher", description: "Unified social publishing panel for Twitter/X, Facebook, Instagram, Threads, Bluesky — with AI content generation, publication, and live metrics." },
@@ -362,6 +363,7 @@ fastify.get("/panels/trello", panelHandlers.trelloPanelHandler);
 fastify.get("/panels/external-sources", panelHandlers.externalSourcesPanelV2Handler);
 fastify.get("/panels/methode", panelHandlers.methodePanelHandler);
 fastify.get("/panels/quickchart", panelHandlers.quickchartPanelHandler);
+fastify.get("/panels/podcast", panelHandlers.podcastPanelHandler);
 fastify.get("/panels/article-pdf", panelHandlers.articlePdfPanelHandler);
 fastify.get("/panels/article-pdf/generate", panelHandlers.generateArticlePdfHandler);
 fastify.get("/panels/ga4-analytics", panelHandlers.ga4AnalyticsPanelHandler);

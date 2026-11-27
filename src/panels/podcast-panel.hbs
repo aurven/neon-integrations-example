@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Podcast Panel</title>
+    <script src="/js/panel-api-helper.js"></script>
+    <script src="/neon/api/demo-integration/js/panel-api-helper.js"></script>
+    <link rel="stylesheet" href="/css/tailwind-panels.css">
+    <link rel="stylesheet" href="/neon/api/demo-integration/css/tailwind-panels.css">
+    <style>
+        .pill { display: inline-block; padding: 2px 10px; border-radius: 9999px; font-size: 0.8rem; font-weight: 600; }
+        .pill-none { background: #f3f4f6; color: #4b5563; }
+        .pill-processing { background: #fef3c7; color: #92400e; }
+        .pill-ready { background: #d1fae5; color: #065f46; }
+        .pill-failed { background: #fee2e2; color: #991b1b; }
+        .pill-disabled { background: #e5e7eb; color: #374151; }
+        .row { margin-top: 0.9rem; }
+        .label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; }
+        .value { font-size: 0.9rem; color: #111827; word-break: break-all; }
+        .btn { padding: 6px 14px; border-radius: 6px; background: #2563eb; color: #fff; font-size: 0.85rem; font-weight: 500; }
+        .btn:disabled { background: #9ca3af; cursor: not-allowed; }
+    </style>
+</head>
+
+<body class="bg-gray-50 font-sans">
+    <div id="app" class="p-4 max-w-xl mx-auto">
+        <div class="bg-white rounded-lg shadow-md p-5">
+            <div class="flex items-center justify-between">
+                <h1 class="text-lg font-semibold text-gray-800">Podcast</h1>
+                <span id="status-pill" class="pill pill-none">No podcast</span>
+            </div>
+            <p id="hint" class="hidden text-sm text-gray-600 mt-2"></p>
+            <p id="load-error" class="hidden text-sm text-red-700 mt-2"></p>
+
+            <div class="row">
+                <div class="label">Episode</div>
+                <div class="value"><span id="share-none">-</span>
+                    <a id="share-link" class="hidden text-blue-600 underline" target="_blank" rel="noopener noreferrer"></a></div>
+            </div>
+            <div class="row">
+                <div class="label">Audio</div>
+                <audio id="audio" class="hidden w-full mt-1" controls preload="none"></audio>
+                <div id="audio-none" class="value">-</div>
+            </div>
+            <div class="row">
+                <div class="label">Voice</div>
+                <div id="voice" class="value">-</div>
+            </div>
+            <div class="row">
+                <div class="label">Updated</div>
+                <div id="updated" class="value">-</div>
+            </div>
+
+            <div class="row flex items-center gap-2">
+                <select id="provider" class="border border-gray-300 rounded px-2 py-1 text-sm">
+                    <option value="elevenlabs">ElevenLabs</option>
+                    <option value="openai">OpenAI</option>
+                </select>
+                <button id="regen-btn" class="btn" onclick="regenerate()" disabled>Force regenerate</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const state = {
+            apiKey: '{{{apiKey}}}',
+            neonAppUrl: '{{{neonAppUrl}}}',
+            familyRef: {{#if objectId}}'{{objectId}}'{{else}}null{{/if}},
+            demoMode: new URLSearchParams(window.location.search).get('demo') === 'true',
+            timer: null,
+            data: null
+        };
+
+        const $ = (id) => document.getElementById(id);
+        const POLL_MS = 3000;
+
+        function apiPath(p) {
+            return state.demoMode ? p + (p.includes('?') ? '&' : '?') + 'demo=true' : p;
+        }
+        function authHeaders() { return { apikey: state.apiKey }; }
+        function ref() { return state.familyRef || (state.demoMode ? 'demo' : null); }
+
+        function setupPostMessageApi() {
+            window.addEventListener('message', (event) => {
+                if (event.origin !== state.neonAppUrl && event.origin !== window.parent.origin) return;
+                if (event.data && event.data.key === 'getInfo') {
+                    const node = event.data.info && event.data.info.originalNode;
+                    if (node && node.familyRef) {
+                        state.familyRef = node.familyRef;
+                        refresh();
+                    }
+                }
+            });
+            if (window.parent !== window) {
+                window.parent.postMessage({ type: 'panel-ready', info: { op: 'getInfo' } }, window.parent.origin);
+            }
+        }
+
+        function formatStep(step) {
+            return String(step || '').replace(/-/g, ' ');
+        }
+
+        function render() {
+            const d = state.data || { job: null, metadata: {} };
+            const job = d.job;
+            const md = d.metadata || {};
+            // The demo store has no opt-in metadata; treat the demo as enabled.
+            const enabled = state.demoMode || md.enabled === true;
+            const running = !!job && (job.state === 'waiting' || job.state === 'running');
+
+            let cls = 'pill-none', text = 'No podcast';
+            if (running) {
+                cls = 'pill-processing';
+                text = 'Processing' + (job.step ? ' — ' + formatStep(job.step) : '');
+                if (job.chunk) text += ' (chunk ' + job.chunk.done + '/' + job.chunk.total + ')';
+            } else if (job && job.state === 'failed') {
+                cls = 'pill-failed';
+                text = 'Failed' + (job.error ? ' — ' + job.error : '');
+            } else if (!enabled) {
+                cls = 'pill-disabled'; text = 'Disabled';
+            } else if (md.status === 'failed') {
+                cls = 'pill-failed'; text = 'Failed';
+            } else if (md.status === 'ready' || (job && (job.state === 'done' || job.state === 'unchanged'))) {
+                cls = 'pill-ready'; text = 'Ready';
+            }
+            const pill = $('status-pill');
+            pill.className = 'pill ' + cls;
+            pill.textContent = text;
+
+            const hint = $('hint');
+            if (!enabled) {
+                hint.textContent = "Disabled — enable 'Generate Podcast' in the article metadata (Diffusion → Podcast)";
+                hint.classList.remove('hidden');
+            } else {
+                hint.classList.add('hidden');
+            }
+
+            const link = $('share-link');
+            if (md.shareUrl && /^https?:\/\//i.test(md.shareUrl)) {
+                link.href = md.shareUrl;
+                link.textContent = md.shareUrl + ' ↗';
+                link.classList.remove('hidden');
+                $('share-none').classList.add('hidden');
+            } else {
+                link.classList.add('hidden');
+                $('share-none').classList.remove('hidden');
+            }
+
+            const audio = $('audio');
+            if (md.mediaUrl && /^https?:\/\//i.test(md.mediaUrl)) {
+                if (audio.getAttribute('src') !== md.mediaUrl) audio.src = md.mediaUrl;
+                audio.classList.remove('hidden');
+                $('audio-none').classList.add('hidden');
+            } else {
+                audio.classList.add('hidden');
+                $('audio-none').classList.remove('hidden');
+            }
+
+            const names = { elevenlabs: 'ElevenLabs', openai: 'OpenAI' };
+            const provider = (job && job.provider) || md.provider;
+            let voice = provider ? (names[provider] || provider) : '-';
+            if (job && job.fellBack && provider) voice = (names[provider] || provider) + ' (fallback)';
+            $('voice').textContent = voice;
+
+            const upd = md.updatedAt || (job && job.finishedAt);
+            $('updated').textContent = upd ? new Date(upd).toLocaleString() : '-';
+
+            $('regen-btn').disabled = running || !enabled || !ref();
+            $('provider').disabled = running;
+        }
+
+        function schedulePoll() {
+            clearTimeout(state.timer);
+            const job = state.data && state.data.job;
+            if (job && (job.state === 'waiting' || job.state === 'running')) {
+                state.timer = setTimeout(refresh, POLL_MS);
+            }
+        }
+
+        async function refresh() {
+            const r = ref();
+            if (!r) return;
+            try {
+                state.data = await PanelAPI.apiCallJson(
+                    apiPath('/panels/podcast/api/status?familyRef=' + encodeURIComponent(r)),
+                    { headers: authHeaders() });
+                $('load-error').classList.add('hidden');
+            } catch (e) {
+                $('load-error').textContent = 'Could not load podcast status: ' + e.message;
+                $('load-error').classList.remove('hidden');
+            }
+            render();
+            schedulePoll();
+        }
+
+        async function regenerate() {
+            const r = ref();
+            if (!r) return;
+            $('regen-btn').disabled = true;
+            try {
+                await PanelAPI.apiCallJson(apiPath('/panels/podcast/api/regenerate'), {
+                    method: 'POST',
+                    headers: authHeaders(),
+                    body: JSON.stringify({ familyRef: r, provider: $('provider').value })
+                });
+            } catch (e) {
+                $('load-error').textContent = 'Could not start regeneration: ' + e.message;
+                $('load-error').classList.remove('hidden');
+                render();
+                return;
+            }
+            await refresh();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const q = new URLSearchParams(window.location.search).get('objectId');
+            if (q) state.familyRef = q;
+            setupPostMessageApi();
+            render();
+            if (ref()) refresh();
+        });
+    </script>
+</body>
+
+</html>
